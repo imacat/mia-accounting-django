@@ -133,25 +133,27 @@ ORDER BY
                  self.kwargs["subject_code"] + "%"])
         pagination = Pagination(
             len(records),
-            self.get_number_query("page"),
-            self.get_number_query("page-size"),
+            get_query_number(self.request, "page"),
+            get_query_number(self.request, "page-size"),
             True)
         start_no = pagination.page_size * (pagination.page_no - 1)
         return records[start_no:start_no + pagination.page_size]
 
-    def get_number_query(self, name):
-        """Returns a positive number query parameter.
 
-        Args:
-            name (str): The name of the query parameter
+def get_query_number(request, name):
+    """Returns a positive number query parameter.
 
-        Returns:
-            The parameter value, or None if this parameter does not
-            exist or is not a positive number
-        """
-        if name not in self.request.GET:
-            return None
-        elif not re.match("^[1-9][0-9]*$", self.request.GET[name]):
-            return None
-        else:
-            return int(self.request.GET)
+    Args:
+        request (HttpRequest): The HTTP request
+        name (str): The name of the query parameter
+
+    Returns:
+        The parameter value, or None if this parameter does not
+        exist or is not a positive number
+    """
+    if name not in request.GET:
+        return None
+    elif not re.match("^[1-9][0-9]*$", request.GET[name]):
+        return None
+    else:
+        return int(request.GET)
