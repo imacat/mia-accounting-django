@@ -148,7 +148,7 @@ def get_query_number(request, name):
         name (str): The name of the query parameter
 
     Returns:
-        The parameter value, or None if this parameter does not
+        int: The parameter value, or None if this parameter does not
         exist or is not a positive number
     """
     if name not in request.GET:
