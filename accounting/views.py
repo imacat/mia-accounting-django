@@ -18,11 +18,9 @@
 """The view controllers of the accounting application.
 
 """
-import logging
 import re
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 
 from django.urls import reverse
 from django.utils import dateformat, timezone
