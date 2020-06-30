@@ -131,7 +131,6 @@ ORDER BY
                  period.end,
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
-        get = self.request.GET
         pagination = Pagination(
             len(records),
             self.get_number_query("page"),
