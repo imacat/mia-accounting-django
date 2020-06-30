@@ -67,6 +67,40 @@ class Transaction(models.Model):
     updated_by_sn = models.IntegerField(
         default=923153018, db_column="updatedby")
 
+    @property
+    def debit_records(self):
+        """The debit records of this transaction."""
+        return [x for x in self.record_set.all() if not x.is_credit]
+
+    @property
+    def credit_records(self):
+        """The credit records of this transaction."""
+        return [x for x in self.record_set.all() if x.is_credit]
+
+    @property
+    def is_balanced(self):
+        """Whether the sum of the amounts of the debit records is the same as the sum of the amounts of the credit
+        records. """
+        debit_sum = sum([x.amount for x in self.debit_records])
+        credit_sum = sum([x.amount for x in self.credit_records])
+        return debit_sum == credit_sum
+
+    @property
+    def is_cash_income(self):
+        """Whether this transaction is a cash income transaction."""
+        debit_records = self.debit_records
+        return (len(debit_records) == 1
+                and debit_records[0].subject.code == "1111"
+                and debit_records[0].summary is None)
+
+    @property
+    def is_cash_expense(self):
+        """Whether this transaction is a cash expense transaction."""
+        credit_records = self.credit_records
+        return (len(credit_records) == 1
+                and credit_records[0].subject.code == "1111"
+                and credit_records[0].summary is None)
+
     def __str__(self):
         """Returns the string representation of this accounting
         transaction."""
@@ -98,12 +132,30 @@ class Record(models.Model):
     updated_by_sn = models.IntegerField(
         default=923153018, db_column="updatedby")
 
+    @property
+    def debit_amount(self):
+        """The debit amount of this accounting record"""
+        return self.amount if not self.is_credit else None
+
+    @property
+    def credit_amount(self):
+        """The credit amount of this accounting record"""
+        return self.amount if self.is_credit else None
+
+    @property
+    def accumulative_balance(self):
+        return self._accumulative_balance
+
+    @accumulative_balance.setter
+    def accumulative_balance(self, value):
+        self._accumulative_balance = value
+
     def __str__(self):
         """Returns the string representation of this accounting
         record."""
-        return self.transaction.date.__str__() + " "\
-               + self.subject.title_zhtw.__str__()\
-               + " " + self.summary.__str__()\
+        return self.transaction.date.__str__() + " " \
+               + self.subject.title_zhtw.__str__() \
+               + " " + self.summary.__str__() \
                + " " + self.amount.__str__()
 
     class Meta:

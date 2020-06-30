@@ -1,0 +1,11 @@
+<h1>Cash Report</h1>
+
+{% if records %}
+  <ul>
+    {% for record in records %}
+      <li>{{record.transaction.date}} {{record.summary}}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No data.</p>
+{% endif %}
