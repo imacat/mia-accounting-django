@@ -22,7 +22,7 @@
       <td>{{ record.debit_amount }}</td>
       <td>{{ record.credit_amount }}</td>
       <td>{{ record.amount }}</td>
-      <td><a href="{% url "accounting:transaction" "transfer" record.transaction.sn %}">View</a></td>
+      <td><a href="{{ record.transaction.get_absolute_url }}">View</a></td>
       </tr>
     {% endfor %}
   </tbody>

@@ -20,6 +20,7 @@
 """
 
 from django.db import models
+from django.urls import reverse
 
 
 class Subject(models.Model):
@@ -100,6 +101,15 @@ class Transaction(models.Model):
         return (len(credit_records) == 1
                 and credit_records[0].subject.code == "1111"
                 and credit_records[0].summary is None)
+
+    def get_absolute_url(self):
+        """Returns the URL to view this transaction."""
+        if self.is_cash_expense:
+            return reverse("accounting:transaction", args=("expense", self.sn))
+        elif self.is_cash_income:
+            return reverse("accounting:transaction", args=("income", self.sn))
+        else:
+            return reverse("accounting:transaction", args=("transfer", self.sn))
 
     def __str__(self):
         """Returns the string representation of this accounting
