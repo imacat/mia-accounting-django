@@ -19,13 +19,29 @@
 
 """
 
-from django.urls import path
+from django.urls import path, register_converter
 
 from . import views
+
+
+class TransactionTypeConverter:
+    """The path converter for the transaction types."""
+    regex = "income|expense|transfer"
+
+    def to_python(self, value):
+        return value
+
+    def to_url(self, value):
+        return value
+
+
+register_converter(TransactionTypeConverter, "txn-type")
 
 app_name = "accounting"
 urlpatterns = [
     path("", views.home, name="home"),
     path("cash", views.cash_home, name="cash.home"),
     path("cash/<str:subject_code>/<str:period_spec>", views.CashReportView.as_view(), name="cash"),
+    path("transactions/<txn-type:type>/<int:pk>", views.CashReportView.as_view(), name="transaction"),
+    path("transactions/<txn-type:type>/<int:pk>/edit", views.CashReportView.as_view(), name="transaction.edit"),
 ]

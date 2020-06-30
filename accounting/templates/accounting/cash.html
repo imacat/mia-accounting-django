@@ -1,11 +1,32 @@
 <h1>Cash Report</h1>
 
 {% if records %}
-  <ul>
+  <table>
+  <thead>
+  <tr>
+    <th scope="col">Date</th>
+    <th scope="col">Subject</th>
+    <th scope="col">Summary</th>
+    <th scope="col">Income</th>
+    <th scope="col">Expense</th>
+    <th scope="col">Balance</th>
+    <th scope="col">View</th>
+  </tr>
+  </thead>
+  <tbody>
     {% for record in records %}
-      <li>{{record.transaction.date}} {{record.summary}}</li>
+      <tr>
+      <td>{{ record.transaction.date }}</td>
+      <td>{{ record.subject.title_zhtw }}</td>
+      <td>{{ record.summary }}</td>
+      <td>{{ record.debit_amount }}</td>
+      <td>{{ record.credit_amount }}</td>
+      <td>{{ record.amount }}</td>
+      <td><a href="{% url "accounting:transaction" "transfer" record.transaction.sn %}">View</a></td>
+      </tr>
     {% endfor %}
-  </ul>
+  </tbody>
+  </table>
 {% else %}
   <p>No data.</p>
 {% endif %}

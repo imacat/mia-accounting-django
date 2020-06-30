@@ -38,3 +38,36 @@ class PeriodParser:
         """
         self.start = period_spec + "-01"
         self.end = period_spec + "-30"
+
+
+class Pagination:
+    """The pagination.
+
+    Attributes:
+        page_no (int): The current page number
+        page_size (int): The page size
+    """
+    page_no = None
+    page_size = None
+
+    DEFAULT_PAGE_SIZE = 10
+
+    def __init__(self, count, page_no, page_size, is_reverse = False):
+        """Constructs a new pagination.
+
+        Args:
+            count (int): The total number of records
+            page_no (int): The specified page number
+            page_size (int): The specified number of records per page
+            is_reverse (bool): Whether we should display the last
+                               page first
+        """
+        self.page_size = page_size \
+            if page_size is not None \
+            else self.DEFAULT_PAGE_SIZE
+        total_pages = int((count - 1) / self.page_size) + 1
+        self.page_no = page_no \
+            if page_no is not None \
+            else 1 if not is_reverse else total_pages
+        if self.page_no > total_pages:
+            self.page_no = total_pages

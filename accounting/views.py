@@ -18,6 +18,8 @@
 """The view controllers of the accounting application.
 
 """
+import logging
+import re
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -28,7 +30,7 @@ from django.views import generic
 from django.views.decorators.http import require_http_methods
 
 from accounting.models import Record
-from accounting.utils import PeriodParser
+from accounting.utils import PeriodParser, Pagination
 from mia import settings
 
 
@@ -62,55 +64,95 @@ class CashReportView(generic.ListView):
     context_object_name = "records"
 
     def get_queryset(self):
-        """Return the records for the accounting cash report."""
+        """Return the accounting records for the cash report.
+
+        Returns:
+            The accounting records for the cash report
+        """
         period = PeriodParser(self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
             records = Record.objects.raw(
                 """SELECT r.*
 FROM accounting_records AS r
-         INNER JOIN (SELECT
-                         t1.sn AS sn,
-                         t1.date AS date,
-                         t1.ord AS ord
-                     FROM accounting_records AS r1
-                              LEFT JOIN accounting_transactions AS t1 ON r1.transaction_sn=t1.sn
-                              LEFT JOIN accounting_subjects AS s1 ON r1.subject_sn = s1.sn
-                     WHERE (s1.code LIKE '11%%'
-                        OR s1.code LIKE '12%%'
-                        OR s1.code LIKE '21%%'
-                        OR s1.code LIKE '22%%')
-                        AND t1.date >= %s
-                        AND t1.date <= %s 
-                     GROUP BY t1.sn) AS t
-                    ON r.transaction_sn=t.sn
-         LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
+  INNER JOIN (SELECT
+         t1.sn AS sn,
+         t1.date AS date,
+         t1.ord AS ord
+      FROM accounting_records AS r1
+        LEFT JOIN accounting_transactions AS t1
+          ON r1.transaction_sn=t1.sn
+        LEFT JOIN accounting_subjects AS s1
+          ON r1.subject_sn = s1.sn
+      WHERE (s1.code LIKE '11%%'
+        OR s1.code LIKE '12%%'
+        OR s1.code LIKE '21%%'
+        OR s1.code LIKE '22%%')
+        AND t1.date >= %s
+        AND t1.date <= %s 
+      GROUP BY t1.sn) AS t
+    ON r.transaction_sn=t.sn
+  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
 WHERE s.code NOT LIKE '11%%'
   AND s.code NOT LIKE '12%%'
   AND s.code NOT LIKE '21%%'
   AND s.code NOT LIKE '22%%'
-ORDER BY t.date, t.ord, CASE WHEN is_credit THEN 1 ELSE 2 END, r.ord""",
+ORDER BY
+  t.date,
+  t.ord,
+  CASE WHEN is_credit THEN 1 ELSE 2 END,
+  r.ord""",
                 [period.start, period.end])
         else:
             records = Record.objects.raw(
                 """SELECT r.*
 FROM accounting_records AS r
-         INNER JOIN (SELECT
-                         t1.sn AS sn,
-                         t1.date AS date,
-                         t1.ord AS ord
-                     FROM accounting_records AS r1
-                              LEFT JOIN accounting_transactions AS t1 ON r1.transaction_sn=t1.sn
-                              LEFT JOIN accounting_subjects AS s1 ON r1.subject_sn = s1.sn
-                     WHERE t1.date >= %s
-                        AND t1.date <= %s 
-                        AND s1.code LIKE %s
-                     GROUP BY t1.sn) AS t
-                    ON r.transaction_sn=t.sn
-         LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
+  INNER JOIN (SELECT
+         t1.sn AS sn,
+         t1.date AS date,
+         t1.ord AS ord
+      FROM accounting_records AS r1
+       LEFT JOIN accounting_transactions AS t1
+         ON r1.transaction_sn=t1.sn
+       LEFT JOIN accounting_subjects AS s1
+         ON r1.subject_sn = s1.sn
+      WHERE t1.date >= %s
+        AND t1.date <= %s 
+        AND s1.code LIKE %s
+      GROUP BY t1.sn) AS t
+    ON r.transaction_sn=t.sn
+  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
 WHERE s.code NOT LIKE %s
-ORDER BY t.date, t.ord, CASE WHEN is_credit THEN 1 ELSE 2 END, r.ord""",
+ORDER BY
+  t.date,
+  t.ord,
+  CASE WHEN is_credit THEN 1 ELSE 2 END,
+  r.ord""",
                 [period.start,
                  period.end,
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
-        return records
+        get = self.request.GET
+        pagination = Pagination(
+            len(records),
+            self.get_number_query("page"),
+            self.get_number_query("page-size"),
+            True)
+        start_no = pagination.page_size * (pagination.page_no - 1)
+        return records[start_no:start_no + pagination.page_size]
+
+    def get_number_query(self, name):
+        """Returns a positive number query parameter.
+
+        Args:
+            name (str): The name of the query parameter
+
+        Returns:
+            The parameter value, or None if this parameter does not
+            exist or is not a positive number
+        """
+        if name not in self.request.GET:
+            return None
+        elif not re.match("^[1-9][0-9]*$", self.request.GET[name]):
+            return None
+        else:
+            return int(self.request.GET)
