@@ -1,5 +1,6 @@
 *.pyc
 __pycache__
+migrations
 settings.py
 db.sqlite3
 .idea
