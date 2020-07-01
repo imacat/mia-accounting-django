@@ -70,4 +70,8 @@ class Pagination:
             if page_no is not None \
             else 1 if not is_reverse else total_pages
         if self.page_no > total_pages:
-            self.page_no = total_pages
+            raise PageNoOutOfRangeError()
+
+
+class PageNoOutOfRangeError(Exception):
+    pass

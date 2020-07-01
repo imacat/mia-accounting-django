@@ -28,8 +28,10 @@ from django.views import generic
 from django.views.decorators.http import require_http_methods
 
 from accounting.models import Record
-from accounting.utils import PeriodParser, Pagination
+from accounting.utils import PeriodParser, Pagination, \
+    PageNoOutOfRangeError
 from mia import settings
+from mia_core.utils import UrlBuilder
 
 
 @require_http_methods(["GET"])
@@ -37,7 +39,8 @@ def home(request):
     """The accounting home page.
 
     Returns:
-        The redirection to the default accounting report.
+        (HttpResponseRedirect) The redirection to the default
+        accounting report.
     """
     return HttpResponseRedirect(reverse("accounting:cash.home"))
 
@@ -47,7 +50,8 @@ def cash_home(request):
     """The accounting cash report home page.
 
     Returns:
-        The redirection to the default subject and month.
+        (HttpResponseRedirect) The redirection to the default subject
+        and month.
     """
     subject_code = settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
     period_spec = dateformat.format(timezone.now(), "Y-m")
@@ -55,7 +59,61 @@ def cash_home(request):
         reverse("accounting:cash", args=(subject_code, period_spec)))
 
 
-class CashReportView(generic.ListView):
+class BaseReportView(generic.ListView):
+    """A base account report.
+
+    Attributes:
+        page_no (int): The specified page number
+        page_size (int): The specified page size
+    """
+    page_no = None
+    page_size = None
+
+    def get(self, request, *args, **kwargs):
+        """Adds object_list to the context.
+
+        Args:
+            request (HttpRequest): The request.
+            args (list): The remaining arguments.
+            kwargs (dict): The keyword arguments.
+
+        Returns:
+            The response
+        """
+        try:
+            self.page_size = int(request.GET["page-size"])
+            if self.page_size < 1:
+                return HttpResponseRedirect(
+                    str(UrlBuilder(request.get_full_path())
+                        .del_param("page-size")))
+        except KeyError:
+            self.page_size = None
+        except ValueError:
+            return HttpResponseRedirect(
+                    str(UrlBuilder(request.get_full_path())
+                        .del_param("page-size")))
+        try:
+            self.page_no = int(request.GET["page"])
+            if self.page_no < 1:
+                return HttpResponseRedirect(
+                    str(UrlBuilder(request.get_full_path())
+                        .del_param("page")))
+        except KeyError:
+            self.page_no = None
+        except ValueError:
+            return HttpResponseRedirect(
+                str(UrlBuilder(request.get_full_path())
+                    .del_param("page")))
+        try:
+            r = super(BaseReportView, self).get(request, *args, **kwargs)
+        except PageNoOutOfRangeError:
+            return HttpResponseRedirect(
+                str(UrlBuilder(request.get_full_path())
+                    .del_param("page")))
+        return r
+
+
+class CashReportView(BaseReportView):
     """The accounting cash report."""
     http_method_names = ["get"]
     template_name = "accounting/cash.html"
@@ -65,7 +123,7 @@ class CashReportView(generic.ListView):
         """Return the accounting records for the cash report.
 
         Returns:
-            The accounting records for the cash report
+            (list[Record]) The accounting records for the cash report
         """
         period = PeriodParser(self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
@@ -130,28 +188,6 @@ ORDER BY
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
         pagination = Pagination(
-            len(records),
-            get_query_number(self.request, "page"),
-            get_query_number(self.request, "page-size"),
-            True)
+            len(records), self.page_no, self.page_size, True)
         start_no = pagination.page_size * (pagination.page_no - 1)
         return records[start_no:start_no + pagination.page_size]
-
-
-def get_query_number(request, name):
-    """Returns a positive number query parameter.
-
-    Args:
-        request (HttpRequest): The HTTP request
-        name (str): The name of the query parameter
-
-    Returns:
-        int: The parameter value, or None if this parameter does not
-        exist or is not a positive number
-    """
-    if name not in request.GET:
-        return None
-    elif not re.match("^[1-9][0-9]*$", request.GET[name]):
-        return None
-    else:
-        return int(request.GET)
