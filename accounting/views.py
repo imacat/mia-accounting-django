@@ -18,7 +18,6 @@
 """The view controllers of the accounting application.
 
 """
-import re
 
 from django.http import HttpResponseRedirect
 
