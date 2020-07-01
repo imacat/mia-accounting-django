@@ -6,3 +6,4 @@ db.sqlite3
 venv
 mirror
 static/ext-libs
+*.mo
