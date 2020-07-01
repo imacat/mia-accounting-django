@@ -39,8 +39,8 @@ def home(request):
     """The accounting home page.
 
     Returns:
-        (HttpResponseRedirect) The redirection to the default
-        accounting report.
+        HttpResponseRedirect: The redirection to the default
+            accounting report.
     """
     return HttpResponseRedirect(reverse("accounting:cash.home"))
 
@@ -50,8 +50,8 @@ def cash_home(request):
     """The accounting cash report home page.
 
     Returns:
-        (HttpResponseRedirect) The redirection to the default subject
-        and month.
+        HttpResponseRedirect: The redirection to the default subject
+            and month.
     """
     subject_code = settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
     period_spec = dateformat.format(timezone.now(), "Y-m")
@@ -123,7 +123,7 @@ class CashReportView(BaseReportView):
         """Return the accounting records for the cash report.
 
         Returns:
-            (list[Record]) The accounting records for the cash report
+            List[Record]: The accounting records for the cash report
         """
         period = PeriodParser(self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":

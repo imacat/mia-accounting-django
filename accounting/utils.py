@@ -23,25 +23,34 @@
 class PeriodParser:
     """The period parser.
 
+    Args:
+        period_spec (str): The period specification.
+
     Attributes:
-        start: The start of the period.
-        end: The end of the period.
+        start (str): The start of the period.
+        end (str): The end of the period.
     """
     start = None
     end = None
 
     def __init__(self, period_spec):
-        """Constructs a new period parser.
-
-        Args:
-            period_spec (str): The period specification.
-        """
         self.start = period_spec + "-01"
         self.end = period_spec + "-30"
 
 
 class Pagination:
     """The pagination.
+
+    Args:
+        count (int): The total number of records
+        page_no (int): The specified page number
+        page_size (int): The specified number of records per page
+        is_reverse (bool): Whether we should display the last
+                           page first
+
+    Raises:
+        PageNoOutOfRangeError: if the specified page number is out
+            of range or is redundant.
 
     Attributes:
         page_no (int): The current page number
@@ -53,19 +62,6 @@ class Pagination:
     DEFAULT_PAGE_SIZE = 10
 
     def __init__(self, count, page_no, page_size, is_reverse = False):
-        """Constructs a new pagination.
-
-        Args:
-            count (int): The total number of records
-            page_no (int): The specified page number
-            page_size (int): The specified number of records per page
-            is_reverse (bool): Whether we should display the last
-                               page first
-
-        Raises:
-            PageNoOutOfRangeError: if the specified page number is out
-                of range or is redundant.
-        """
         self.page_size = page_size \
             if page_size is not None \
             else self.DEFAULT_PAGE_SIZE

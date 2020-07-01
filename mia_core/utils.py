@@ -37,8 +37,8 @@ class UrlBuilder:
             value (str): The parameter value
 
         Returns:
-            (UrlBuilder): The URL builder itself, with the parameter
-            modified.
+            UrlBuilder: The URL builder itself, with the parameter
+                modified.
         """
         self.params.append(self.Param(name, value))
         return self
@@ -50,8 +50,8 @@ class UrlBuilder:
             name (str): The parameter name
 
         Returns:
-            (UrlBuilder): The URL builder itself, with the parameter
-            modified.
+            UrlBuilder: The URL builder itself, with the parameter
+                modified.
         """
         self.params = [x for x in self.params if x.name != name]
         return self
@@ -65,8 +65,8 @@ class UrlBuilder:
             value (str): The parameter value
 
         Returns:
-            (UrlBuilder): The URL builder itself, with the parameter
-            modified.
+            UrlBuilder: The URL builder itself, with the parameter
+                modified.
         """
         return self.del_param(name).add_param(name, value)
 
@@ -98,8 +98,8 @@ class UrlBuilder:
             parameter.
 
             Returns:
-                (str) The string representation of this query
-                parameter
+                str: The string representation of this query
+                    parameter
             """
             return "%s=%s" % (
                 urllib.parse.quote(self.name),
