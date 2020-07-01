@@ -20,9 +20,11 @@ cash.html: The template for the accounting cash reports
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2020/7/1
 {% endcomment %}
+{% load i18n %}
 
 {% block settings %}
-  {% setvar "title" "Cash Report" %}
+  {% trans "Cash Report" context "Accounting|" as title %}
+  {% setvar "title" title %}
 {% endblock %}
 
 {% block content %}
@@ -37,13 +39,13 @@ First written: 2020/7/1
   <table class="table table-stripped">
   <thead>
   <tr>
-    <th scope="col">Date</th>
-    <th scope="col">Subject</th>
-    <th scope="col">Summary</th>
-    <th scope="col">Income</th>
-    <th scope="col">Expense</th>
-    <th scope="col">Balance</th>
-    <th scope="col">View</th>
+    <th scope="col">{% trans "Date" context "Accounting|" %}</th>
+    <th scope="col">{% trans "Subject" context "Accounting|" %}</th>
+    <th scope="col">{% trans "Summary" context "Accounting|" %}</th>
+    <th scope="col">{% trans "Income" context "Accounting|" %}</th>
+    <th scope="col">{% trans "Expense" context "Accounting|" %}</th>
+    <th scope="col">{% trans "Balance" context "Accounting|" %}</th>
+    <th scope="col">{% trans "View" context "Accounting|" %}</th>
   </tr>
   </thead>
   <tbody>
@@ -55,7 +57,7 @@ First written: 2020/7/1
       <td>{{ record.debit_amount|default:"" }}</td>
       <td>{{ record.credit_amount|default:"" }}</td>
       <td>{{ record.amount }}</td>
-      <td><a href="{{ record.transaction.get_absolute_url }}">View</a></td>
+      <td><a href="{{ record.transaction.get_absolute_url }}">{% trans "View" context "Accounting|" %}</a></td>
       </tr>
     {% endfor %}
   </tbody>
