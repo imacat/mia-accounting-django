@@ -21,6 +21,7 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2020/7/1
 {% endcomment %}
 {% load i18n %}
+{% load humanize %}
 
 {% block settings %}
   {% trans "Cash Report" context "Accounting|" as title %}
@@ -29,11 +30,8 @@ First written: 2020/7/1
 
 {% block content %}
 
-  <p>{{ request.path }}</p>
-
-  <p>{{ request.get_full_path }}</p>
-
   <p>{{ request.resolver_match.url_name }}</p>
+  <p>{{ request.resolver_match.app_name }}</p>
 
 {% if records %}
   <table class="table table-stripped">
@@ -51,12 +49,12 @@ First written: 2020/7/1
   <tbody>
     {% for record in records %}
       <tr>
-      <td>{{ record.transaction.date|date:"Y-m-d" }}</td>
+      <td>{{ record.transaction.date|human_date }}</td>
       <td>{{ record.subject.title_zhtw }}</td>
       <td>{{ record.summary }}</td>
-      <td>{{ record.debit_amount|default:"" }}</td>
-      <td>{{ record.credit_amount|default:"" }}</td>
-      <td>{{ record.amount }}</td>
+      <td>{{ record.debit_amount|intcomma:False }}</td>
+      <td>{{ record.credit_amount|default:""|intcomma:False }}</td>
+      <td>{{ record.amount|intcomma:False }}</td>
       <td><a href="{{ record.transaction.get_absolute_url }}">{% trans "View" context "Accounting|" %}</a></td>
       </tr>
     {% endfor %}
