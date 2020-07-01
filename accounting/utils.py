@@ -61,6 +61,10 @@ class Pagination:
             page_size (int): The specified number of records per page
             is_reverse (bool): Whether we should display the last
                                page first
+
+        Raises:
+            PageNoOutOfRangeError: if the specified page number is out
+                of range or is redundant.
         """
         self.page_size = page_size \
             if page_size is not None \
