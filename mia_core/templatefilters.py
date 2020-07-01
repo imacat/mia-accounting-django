@@ -25,7 +25,7 @@ register = template.Library()
 
 
 @register.filter(is_safe=True)
-def human_date(value):
+def smart_date(value):
     """Formats the date for human friendliness.
 
     Args:

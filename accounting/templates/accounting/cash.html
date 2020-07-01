@@ -49,7 +49,7 @@ First written: 2020/7/1
   <tbody>
     {% for record in records %}
       <tr>
-      <td>{{ record.transaction.date|human_date }}</td>
+      <td>{{ record.transaction.date|smart_date }}</td>
       <td>{{ record.subject.title_zhtw }}</td>
       <td>{{ record.summary }}</td>
       <td>{{ record.debit_amount|intcomma:False }}</td>
