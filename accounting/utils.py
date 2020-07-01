@@ -66,9 +66,12 @@ class Pagination:
             if page_size is not None \
             else self.DEFAULT_PAGE_SIZE
         total_pages = int((count - 1) / self.page_size) + 1
+        default_page = 1 if not is_reverse else total_pages
+        if page_no == default_page:
+            raise PageNoOutOfRangeError()
         self.page_no = page_no \
             if page_no is not None \
-            else 1 if not is_reverse else total_pages
+            else default_page
         if self.page_no > total_pages:
             raise PageNoOutOfRangeError()
 
