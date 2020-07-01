@@ -3,8 +3,9 @@ __pycache__
 migrations
 settings.py
 db.sqlite3
+*.mo
+static/ext-libs
 .idea
 venv
 mirror
-static/ext-libs
-*.mo
+excludes
