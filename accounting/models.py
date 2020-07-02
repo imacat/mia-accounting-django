@@ -80,8 +80,8 @@ class Transaction(models.Model):
 
     @property
     def is_balanced(self):
-        """Whether the sum of the amounts of the debit records is the same as the sum of the amounts of the credit
-        records. """
+        """Whether the sum of the amounts of the debit records is the
+        same as the sum of the amounts of the credit records. """
         debit_sum = sum([x.amount for x in self.debit_records])
         credit_sum = sum([x.amount for x in self.credit_records])
         return debit_sum == credit_sum
@@ -105,11 +105,14 @@ class Transaction(models.Model):
     def get_absolute_url(self):
         """Returns the URL to view this transaction."""
         if self.is_cash_expense:
-            return reverse("accounting:transaction", args=("expense", self.sn))
+            return reverse(
+                "accounting:transaction", args=("expense", self.sn))
         elif self.is_cash_income:
-            return reverse("accounting:transaction", args=("income", self.sn))
+            return reverse(
+                "accounting:transaction", args=("income", self.sn))
         else:
-            return reverse("accounting:transaction", args=("transfer", self.sn))
+            return reverse(
+                "accounting:transaction", args=("transfer", self.sn))
 
     def __str__(self):
         """Returns the string representation of this accounting
@@ -163,10 +166,11 @@ class Record(models.Model):
     def __str__(self):
         """Returns the string representation of this accounting
         record."""
-        return self.transaction.date.__str__() + " " \
-               + self.subject.title_zhtw.__str__() \
-               + " " + self.summary.__str__() \
-               + " " + self.amount.__str__()
+        return "%s %s %s %s" % (
+            self.transaction.date,
+            self.subject.title_zhtw,
+            self.summary,
+            self.amount)
 
     class Meta:
         db_table = "accounting_records"

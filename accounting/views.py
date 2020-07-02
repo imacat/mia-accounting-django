@@ -104,7 +104,8 @@ class BaseReportView(generic.ListView):
                 str(UrlBuilder(request.get_full_path())
                     .del_param("page")))
         try:
-            r = super(BaseReportView, self).get(request, *args, **kwargs)
+            r = super(BaseReportView, self) \
+                .get(request, *args, **kwargs)
         except PageNoOutOfRangeError:
             return HttpResponseRedirect(
                 str(UrlBuilder(request.get_full_path())
@@ -143,7 +144,7 @@ FROM accounting_records AS r
         OR s1.code LIKE '21%%'
         OR s1.code LIKE '22%%')
         AND t1.date >= %s
-        AND t1.date <= %s 
+        AND t1.date <= %s
       GROUP BY t1.sn) AS t
     ON r.transaction_sn=t.sn
   LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
@@ -171,7 +172,7 @@ FROM accounting_records AS r
        LEFT JOIN accounting_subjects AS s1
          ON r1.subject_sn = s1.sn
       WHERE t1.date >= %s
-        AND t1.date <= %s 
+        AND t1.date <= %s
         AND s1.code LIKE %s
       GROUP BY t1.sn) AS t
     ON r.transaction_sn=t.sn

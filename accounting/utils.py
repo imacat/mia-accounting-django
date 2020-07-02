@@ -61,7 +61,7 @@ class Pagination:
 
     DEFAULT_PAGE_SIZE = 10
 
-    def __init__(self, count, page_no, page_size, is_reverse = False):
+    def __init__(self, count, page_no, page_size, is_reverse=False):
         self.page_size = page_size \
             if page_size is not None \
             else self.DEFAULT_PAGE_SIZE
