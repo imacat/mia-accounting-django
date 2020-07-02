@@ -52,8 +52,8 @@ First written: 2020/7/1
       <td>{{ record.transaction.date|smart_date }}</td>
       <td>{{ record.subject.title_zhtw }}</td>
       <td>{{ record.summary }}</td>
-      <td>{{ record.debit_amount|intcomma:False }}</td>
       <td>{{ record.credit_amount|default:""|intcomma:False }}</td>
+      <td>{{ record.debit_amount|default:""|intcomma:False }}</td>
       <td>{{ record.amount|intcomma:False }}</td>
       <td><a href="{{ record.transaction.get_absolute_url }}">{% trans "View" context "Accounting|" %}</a></td>
       </tr>
