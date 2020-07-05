@@ -18,14 +18,14 @@
 """The data models of the accounting application.
 
 """
-
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
 
 class Subject(models.Model):
     """An accounting subject."""
-    sn = models.IntegerField(primary_key=True)
+    sn = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True, blank=True,
         db_column="parent_sn")
@@ -36,12 +36,16 @@ class Subject(models.Model):
         max_length=32, null=True, blank=True)
     created_at = models.DateTimeField(
         auto_now_add=True, db_column="created")
-    created_by_sn = models.IntegerField(
-        default=923153018, db_column="createdby")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        db_column="createdby",
+        related_name="created_accounting_subjects")
     updated_at = models.DateTimeField(
         auto_now_add=True, db_column="updated")
-    updated_by_sn = models.IntegerField(
-        default=923153018, db_column="updatedby")
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        db_column="updatedby",
+        related_name="updated_accounting_subjects")
 
     def __str__(self):
         """Returns the string representation of this accounting
@@ -55,18 +59,22 @@ class Subject(models.Model):
 
 class Transaction(models.Model):
     """An accounting transaction."""
-    sn = models.IntegerField(primary_key=True)
-    date = models.DateField(auto_now_add=True)
+    sn = models.PositiveIntegerField(primary_key=True)
+    date = models.DateField()
     ord = models.PositiveSmallIntegerField(default=1)
     note = models.CharField(max_length=128, null=True, blank=True)
     created_at = models.DateTimeField(
         auto_now_add=True, db_column="created")
-    created_by_sn = models.IntegerField(
-        default=923153018, db_column="createdby")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        db_column="createdby",
+        related_name="created_accounting_transactions")
     updated_at = models.DateTimeField(
         auto_now_add=True, db_column="updated")
-    updated_by_sn = models.IntegerField(
-        default=923153018, db_column="updatedby")
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        db_column="updatedby",
+        related_name="updated_accounting_transactions")
 
     @property
     def debit_records(self):
@@ -126,7 +134,7 @@ class Transaction(models.Model):
 
 class Record(models.Model):
     """An accounting record."""
-    sn = models.IntegerField(primary_key=True)
+    sn = models.PositiveIntegerField(primary_key=True)
     transaction = models.ForeignKey(
         Transaction, on_delete=models.CASCADE,
         db_column="transaction_sn")
@@ -138,12 +146,16 @@ class Record(models.Model):
     amount = models.PositiveIntegerField()
     created_at = models.DateTimeField(
         auto_now_add=True, db_column="created")
-    created_by_sn = models.IntegerField(
-        default=923153018, db_column="createdby")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        db_column="createdby",
+        related_name="created_accounting_records")
     updated_at = models.DateTimeField(
         auto_now_add=True, db_column="updated")
-    updated_by_sn = models.IntegerField(
-        default=923153018, db_column="updatedby")
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
+        db_column="updatedby",
+        related_name="updated_accounting_records")
 
     @property
     def debit_amount(self):
