@@ -19,7 +19,7 @@
 
 """
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -79,6 +79,8 @@ class BaseReportView(generic.ListView):
         Returns:
             The response
         """
+        if request.user.is_anonymous:
+            return HttpResponse(status=401)
         try:
             self.page_size = int(request.GET["page-size"])
             if self.page_size < 1:
@@ -111,6 +113,7 @@ class BaseReportView(generic.ListView):
                 str(UrlBuilder(request.get_full_path())
                     .del_param("page")))
         return r
+
 
 
 class CashReportView(BaseReportView):
