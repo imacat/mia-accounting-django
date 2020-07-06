@@ -95,6 +95,13 @@ class Transaction(models.Model):
         return debit_sum == credit_sum
 
     @property
+    def has_order_hole(self):
+        """Whether the order of the transactions on this day is not
+        1, 2, 3, 4, 5..., and should be reordered. """
+        # TODO: To be done
+        return False
+
+    @property
     def is_cash_income(self):
         """Whether this transaction is a cash income transaction."""
         debit_records = self.debit_records
