@@ -53,8 +53,6 @@ class AccountBackend:
         Return:
             User: The user, or None if the user does not eixst.
         """
-        print("mia_core.digest_auth.AccountBackend.get_user(): " + str(User.objects.filter(
-            login_id=username).first()))
         return User.objects.filter(login_id=username).first()
 
 
