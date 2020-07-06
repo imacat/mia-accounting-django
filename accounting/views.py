@@ -23,6 +23,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.http import require_GET
 
@@ -30,10 +31,12 @@ from accounting.models import Record
 from accounting.utils import PeriodParser, Pagination, \
     PageNoOutOfRangeError
 from mia import settings
+from mia_core.digest_auth import digest_login_required
 from mia_core.utils import UrlBuilder
 
 
 @require_GET
+@digest_login_required
 def home(request):
     """The accounting home page.
 
@@ -45,6 +48,7 @@ def home(request):
 
 
 @require_GET
+@digest_login_required
 def cash_home(request):
     """The accounting cash report home page.
 
@@ -58,6 +62,7 @@ def cash_home(request):
         reverse("accounting:cash", args=(subject_code, period_spec)))
 
 
+@method_decorator(digest_login_required, name='dispatch')
 class BaseReportView(generic.ListView):
     """A base account report.
 
@@ -113,7 +118,6 @@ class BaseReportView(generic.ListView):
                 str(UrlBuilder(request.get_full_path())
                     .del_param("page")))
         return r
-
 
 
 class CashReportView(BaseReportView):

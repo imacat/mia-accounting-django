@@ -18,6 +18,10 @@
 """The utilities for the HTTP digest authentication.
 
 """
+from functools import wraps
+
+from django.http import HttpResponse
+
 from mia_core.models import User
 
 
@@ -52,3 +56,19 @@ class AccountBackend:
         print("mia_core.digest_auth.AccountBackend.get_user(): " + str(User.objects.filter(
             login_id=username).first()))
         return User.objects.filter(login_id=username).first()
+
+
+def digest_login_required(function=None):
+    """The decorator to check if the user has logged in, and send
+    HTTP 401 if the user has not logged in.
+    """
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.is_anonymous:
+                return HttpResponse(status=401)
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    if function:
+        return decorator(function)
+    return decorator
