@@ -86,20 +86,42 @@ class Transaction(models.Model):
         """The credit records of this transaction."""
         return [x for x in self.record_set.all() if x.is_credit]
 
+    _is_balanced = None
+
     @property
     def is_balanced(self):
         """Whether the sum of the amounts of the debit records is the
         same as the sum of the amounts of the credit records. """
-        debit_sum = sum([x.amount for x in self.debit_records])
-        credit_sum = sum([x.amount for x in self.credit_records])
-        return debit_sum == credit_sum
+        if self._is_balanced is None:
+            debit_sum = sum([x.amount for x in self.debit_records])
+            credit_sum = sum([x.amount for x in self.credit_records])
+            self._is_balanced = debit_sum == credit_sum
+        return self._is_balanced
+
+    @is_balanced.setter
+    def is_balanced(self, value):
+        self._is_balanced = value
+
+    _has_order_hole = None
 
     @property
     def has_order_hole(self):
         """Whether the order of the transactions on this day is not
         1, 2, 3, 4, 5..., and should be reordered. """
-        # TODO: To be done
-        return False
+        if self._has_order_hole is None:
+            orders = [x.ord for x in Transaction.objects.filter(
+                date=self.date).order_by("-ord")]
+            if orders[0] != len(orders):
+                self._has_order_hole = True
+            elif len(orders) != len(set(orders)):
+                self._has_order_hole = True
+            else:
+                self._has_order_hole = False
+        return self._has_order_hole
+
+    @has_order_hole.setter
+    def has_order_hole(self, value):
+        self._has_order_hole = value
 
     @property
     def is_cash_income(self):
