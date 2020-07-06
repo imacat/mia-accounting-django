@@ -65,6 +65,9 @@ def digest_login_required(function=None):
         def _wrapped_view(request, *args, **kwargs):
             if request.user.is_anonymous:
                 return HttpResponse(status=401)
+            if "logout" in request.session:
+                del request.session["logout"]
+                return HttpResponse(status=401)
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     if function:
