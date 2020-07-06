@@ -24,7 +24,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from django.views import generic
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET
 
 from accounting.models import Record
 from accounting.utils import PeriodParser, Pagination, \
@@ -33,7 +33,7 @@ from mia import settings
 from mia_core.utils import UrlBuilder
 
 
-@require_http_methods(["GET"])
+@require_GET
 def home(request):
     """The accounting home page.
 
@@ -44,7 +44,7 @@ def home(request):
     return HttpResponseRedirect(reverse("accounting:cash.home"))
 
 
-@require_http_methods(["GET"])
+@require_GET
 def cash_home(request):
     """The accounting cash report home page.
 
