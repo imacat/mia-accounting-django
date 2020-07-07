@@ -144,17 +144,19 @@ class Pagination:
     Attributes:
         page_no (int): The current page number
         page_size (int): The page size
+        records (Model): The records in the current page
     """
     page_no = None
     page_size = None
+    records = None
 
     DEFAULT_PAGE_SIZE = 10
 
-    def __init__(self, count, page_no, page_size, is_reverse=False):
+    def __init__(self, records, page_no, page_size, is_reverse=False):
         self.page_size = page_size \
             if page_size is not None \
             else self.DEFAULT_PAGE_SIZE
-        total_pages = int((count - 1) / self.page_size) + 1
+        total_pages = int((len(records) - 1) / self.page_size) + 1
         default_page = 1 if not is_reverse else total_pages
         if page_no == default_page:
             raise PageNoOutOfRangeException()
@@ -163,6 +165,8 @@ class Pagination:
             else default_page
         if self.page_no > total_pages:
             raise PageNoOutOfRangeException()
+        start_no = self.page_size * (self.page_no - 1)
+        self.records = records[start_no:start_no + self.page_size]
 
 
 class PageNoOutOfRangeException(Exception):

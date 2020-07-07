@@ -72,6 +72,7 @@ class BaseReportView(generic.ListView):
     """
     page_no = None
     page_size = None
+    pagination = None
 
     def get(self, request, *args, **kwargs):
         """Adds object_list to the context.
@@ -110,7 +111,6 @@ class BaseReportView(generic.ListView):
             return HttpResponseRedirect(
                 str(UrlBuilder(request.get_full_path())
                     .del_param("page")))
-        print("accounting.views.BaseReportView.get() 1 before")
         try:
             r = super(BaseReportView, self) \
                 .get(request, *args, **kwargs)
@@ -118,15 +118,12 @@ class BaseReportView(generic.ListView):
             return HttpResponseRedirect(
                 str(UrlBuilder(request.get_full_path())
                     .del_param("page")))
-        print("accounting.views.BaseReportView.get() 2 after")
         return r
 
     def get_context_data(self, **kwargs):
-        print("accounting.views.BaseReportView.get_context_data() 1 before")
-        r = super(BaseReportView, self).get_context_data(**kwargs)
-        print("accounting.views.BaseReportView.get_context_data() 2 after")
-        print(r)
-        return r
+        data = super(BaseReportView, self).get_context_data(**kwargs)
+        data["pagination"] = self.pagination
+        return data
 
 
 class CashReportView(BaseReportView):
@@ -141,7 +138,6 @@ class CashReportView(BaseReportView):
         Returns:
             List[Record]: The accounting records for the cash report
         """
-        print("accounting.views.CashReportView.get_queryset() 1 before")
         period = PeriodParser(self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
             records = Record.objects.raw(
@@ -204,8 +200,6 @@ ORDER BY
                  period.end,
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
-        pagination = Pagination(
-            len(records), self.page_no, self.page_size, True)
-        start_no = pagination.page_size * (pagination.page_no - 1)
-        print("accounting.views.CashReportView.get_queryset() 2 after")
-        return records[start_no:start_no + pagination.page_size]
+        self.pagination = Pagination(
+            records, self.page_no, self.page_size, True)
+        return self.pagination.records
