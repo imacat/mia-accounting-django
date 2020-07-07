@@ -166,4 +166,7 @@ class Pagination:
 
 
 class PageNoOutOfRangeError(Exception):
+    """The error thrown when the specified page number is out of
+    range.
+    """
     pass
