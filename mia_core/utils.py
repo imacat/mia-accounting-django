@@ -92,7 +92,10 @@ class UrlBuilder:
         return self.del_param(name).add_param(name, value)
 
     def __str__(self):
-        return self.base_path + "&".join([str(x) for x in self.params])
+        if len(self.params) == 0:
+            return self.base_path
+        return self.base_path + "?" + "&".join([
+            str(x) for x in self.params])
 
     class Param:
         """A query parameter.
