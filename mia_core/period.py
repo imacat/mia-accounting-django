@@ -15,16 +15,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-"""The utilities of the accounting application.
+"""The utilities of the period chooser of the Mia core application.
 
 """
+
 import re
-from datetime import date
+from datetime import date, timedelta
 
 from django.template import defaultfilters
 from django.utils import dateformat
-from django.utils.timezone import localdate, timedelta
-from django.utils.translation import pgettext, gettext
+from django.utils.timezone import localdate
+from django.utils.translation import gettext, pgettext
 
 
 class PeriodParser:
