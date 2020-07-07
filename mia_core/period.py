@@ -164,7 +164,7 @@ class PeriodParser:
     def invalid_period(self):
         """Sets the period when the period specification is invalid.
         """
-        self.error = pgettext("Accounting|", "Invalid period.")
+        self.error = gettext("Invalid period.")
         today = localdate()
         self.spec = dateformat.format(localdate(), "Y-m")
         self.start = date(today.year, today.month, 1)
