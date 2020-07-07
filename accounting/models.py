@@ -109,6 +109,8 @@ class Transaction(models.Model):
         return Transaction.objects.filter(
             date=self.date).count() > 1
 
+    _has_order_hole = None
+
     @property
     def has_order_hole(self):
         """Whether the order of the transactions on this day is not
