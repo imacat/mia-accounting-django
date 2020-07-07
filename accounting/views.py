@@ -70,10 +70,12 @@ class BaseReportView(generic.ListView):
     Attributes:
         page_no (int): The specified page number
         page_size (int): The specified page size
+        period_parser (PeriodParser): The period parser
     """
     page_no = None
     page_size = None
     pagination = None
+    period_parser = None
 
     def get(self, request, *args, **kwargs):
         """Adds object_list to the context.
@@ -123,6 +125,7 @@ class BaseReportView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BaseReportView, self).get_context_data(**kwargs)
+        data["period_parser"] = self.period_parser
         data["pagination_links"] = self.pagination.links
         return data
 
@@ -139,7 +142,7 @@ class CashReportView(BaseReportView):
         Returns:
             List[Record]: The accounting records for the cash report
         """
-        period = PeriodParser(self.kwargs["period_spec"])
+        self.period_parser = PeriodParser(self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
             records = Record.objects.raw(
                 """SELECT r.*
@@ -171,7 +174,7 @@ ORDER BY
   t.ord,
   CASE WHEN is_credit THEN 1 ELSE 2 END,
   r.ord""",
-                [period.start, period.end])
+                [self.period_parser.start, self.period_parser.end])
         else:
             records = Record.objects.raw(
                 """SELECT r.*
@@ -197,8 +200,8 @@ ORDER BY
   t.ord,
   CASE WHEN is_credit THEN 1 ELSE 2 END,
   r.ord""",
-                [period.start,
-                 period.end,
+                [self.period_parser.start,
+                 self.period_parser.end,
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
         self.pagination = Pagination(
