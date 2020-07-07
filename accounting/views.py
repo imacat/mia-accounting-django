@@ -22,8 +22,9 @@
 from django.http import HttpResponseRedirect, HttpResponse
 
 from django.urls import reverse
-from django.utils import dateformat, timezone
+from django.utils import dateformat
 from django.utils.decorators import method_decorator
+from django.utils.timezone import localdate
 from django.views import generic
 from django.views.decorators.http import require_GET
 
@@ -57,7 +58,7 @@ def cash_home(request):
             and month.
     """
     subject_code = settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
-    period_spec = dateformat.format(timezone.now(), "Y-m")
+    period_spec = dateformat.format(localdate(), "Y-m")
     return HttpResponseRedirect(
         reverse("accounting:cash", args=(subject_code, period_spec)))
 
