@@ -210,11 +210,7 @@ class Pagination:
 
     @property
     def links(self):
-        """Creates the pagination bar.
-
-        Args:
-            request (HttpRequest): The request
-        """
+        """Returns the navigation links of the pagination bar."""
         if self._links is None:
             base_url = UrlBuilder(self.current_url).del_param("page")
             self._links = []
