@@ -21,9 +21,9 @@ First written: 2020/7/1
 {% endcomment %}
 
 {# The pagination, if any #}
-{% if pagination.is_paged %}
+{% if pagination_links %}
   <ul class="pagination">
-    {% for link in pagination.links %}
+    {% for link in pagination_links %}
       {% if link.url is not None %}
         <li class="page-item {% if link.is_active %} active {% endif %}{% if not link.is_small_screen %} d-none d-md-inline {% endif %}">
           <a class="page-link" href="{{ link.url }}">{{ link.title }}</a>

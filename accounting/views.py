@@ -122,7 +122,7 @@ class BaseReportView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BaseReportView, self).get_context_data(**kwargs)
-        data["pagination"] = self.pagination
+        data["pagination_links"] = self.pagination.links
         return data
 
 
