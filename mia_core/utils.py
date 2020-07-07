@@ -157,15 +157,15 @@ class Pagination:
         total_pages = int((count - 1) / self.page_size) + 1
         default_page = 1 if not is_reverse else total_pages
         if page_no == default_page:
-            raise PageNoOutOfRangeError()
+            raise PageNoOutOfRangeException()
         self.page_no = page_no \
             if page_no is not None \
             else default_page
         if self.page_no > total_pages:
-            raise PageNoOutOfRangeError()
+            raise PageNoOutOfRangeException()
 
 
-class PageNoOutOfRangeError(Exception):
+class PageNoOutOfRangeException(Exception):
     """The error thrown when the specified page number is out of
     range.
     """

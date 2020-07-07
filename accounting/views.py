@@ -32,7 +32,7 @@ from accounting.utils import PeriodParser
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.utils import UrlBuilder, Pagination, \
-    PageNoOutOfRangeError
+    PageNoOutOfRangeException
 
 
 @require_GET
@@ -114,7 +114,7 @@ class BaseReportView(generic.ListView):
         try:
             r = super(BaseReportView, self) \
                 .get(request, *args, **kwargs)
-        except PageNoOutOfRangeError:
+        except PageNoOutOfRangeException:
             return HttpResponseRedirect(
                 str(UrlBuilder(request.get_full_path())
                     .del_param("page")))
