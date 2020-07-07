@@ -28,11 +28,11 @@ from django.views import generic
 from django.views.decorators.http import require_GET
 
 from accounting.models import Record
-from accounting.utils import PeriodParser, Pagination, \
-    PageNoOutOfRangeError
+from accounting.utils import PeriodParser
 from mia import settings
 from mia_core.digest_auth import digest_login_required
-from mia_core.utils import UrlBuilder
+from mia_core.utils import UrlBuilder, Pagination, \
+    PageNoOutOfRangeError
 
 
 @require_GET
