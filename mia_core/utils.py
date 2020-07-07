@@ -159,6 +159,7 @@ class Pagination:
             of range or is redundant.
 
     Attributes:
+        current_url (bool): The current request URL
         is_reversed (bool): Whether we should display the last
                             page first
         page_size (int): The page size.
@@ -169,18 +170,19 @@ class Pagination:
         links (list[Link]): The navigation links in the pagination
                             bar.
     """
+    current_url = None
     is_reversed = False
     page_size = None
     total_pages = None
     is_paged = None
     page_no = None
     records = None
-    links = None
 
     DEFAULT_PAGE_SIZE = 10
 
-    def __init__(self, request, records, page_no,
+    def __init__(self, current_url, records, page_no,
                  page_size, is_reversed=False):
+        self.current_url = current_url
         self.is_reversed = is_reversed
         self.page_size = page_size \
             if page_size is not None \
@@ -191,7 +193,7 @@ class Pagination:
         if not self.is_paged:
             self.page_no = 1
             self.records = records
-            self.links = []
+            self._links = []
             return
         default_page = 1 if not is_reversed else self.total_pages
         if page_no == default_page:
@@ -203,99 +205,102 @@ class Pagination:
             raise PageNoOutOfRangeException()
         start_no = self.page_size * (self.page_no - 1)
         self.records = records[start_no:start_no + self.page_size]
-        self.create_pagination_bar(request)
 
-    def create_pagination_bar(self, request):
+    _links = None
+
+    @property
+    def links(self):
         """Creates the pagination bar.
 
         Args:
             request (HttpRequest): The request
         """
-        base_url = UrlBuilder(
-            request.get_full_path()).del_param("page")
-        self.links = []
-        # The previous page
-        link = self.Link()
-        link.title = pgettext("Pagination|", "Previous")
-        if self.page_no > 1:
-            if self.page_no - 1 == 1:
-                if not self.is_reversed:
-                    link.url = str(base_url)
+        if self._links is None:
+            base_url = UrlBuilder(self.current_url).del_param("page")
+            self._links = []
+            # The previous page
+            link = self.Link()
+            link.title = pgettext("Pagination|", "Previous")
+            if self.page_no > 1:
+                if self.page_no - 1 == 1:
+                    if not self.is_reversed:
+                        link.url = str(base_url)
+                    else:
+                        link.url = str(base_url.clone().add_param(
+                            "page", "1"))
                 else:
                     link.url = str(base_url.clone().add_param(
-                        "page", "1"))
-            else:
-                link.url = str(base_url.clone().add_param(
-                    "page", str(self.page_no - 1)))
-        link.is_small_screen = True
-        self.links.append(link)
-        # The first page
-        link = self.Link()
-        link.title = "1"
-        if not self.is_reversed:
-            link.url = str(base_url)
-        else:
-            link.url = str(base_url.clone().add_param("page", "1"))
-        if self.page_no == 1:
-            link.is_active = True
-        self.links.append(link)
-        # The previous ellipsis
-        if self.page_no > 4:
+                        "page", str(self.page_no - 1)))
+            link.is_small_screen = True
+            self._links.append(link)
+            # The first page
             link = self.Link()
-            if self.page_no > 5:
-                link.title = pgettext("Pagination|", "...")
+            link.title = "1"
+            if not self.is_reversed:
+                link.url = str(base_url)
             else:
-                link.title = "2"
-                link.url = str(base_url.clone().add_param(
-                    "page", "2"))
-            self.links.append(link)
-        # The nearby pages
-        for no in range(self.page_no - 2, self.page_no + 3):
-            if no <= 1 or no >= self.total_pages:
-                continue
-            link = self.Link()
-            link.title = str(no)
-            link.url = str(base_url.clone().add_param(
-                "page", str(no)))
-            if no == self.page_no:
+                link.url = str(base_url.clone().add_param("page", "1"))
+            if self.page_no == 1:
                 link.is_active = True
-            self.links.append(link)
-        # The next ellipsis
-        if self.page_no + 3 < self.total_pages:
-            link = self.Link()
-            if self.page_no + 4 < self.total_pages:
-                link.title = pgettext("Pagination|", "...")
-            else:
-                link.title = str(self.total_pages - 1)
+            self._links.append(link)
+            # The previous ellipsis
+            if self.page_no > 4:
+                link = self.Link()
+                if self.page_no > 5:
+                    link.title = pgettext("Pagination|", "...")
+                else:
+                    link.title = "2"
+                    link.url = str(base_url.clone().add_param(
+                        "page", "2"))
+                self._links.append(link)
+            # The nearby pages
+            for no in range(self.page_no - 2, self.page_no + 3):
+                if no <= 1 or no >= self.total_pages:
+                    continue
+                link = self.Link()
+                link.title = str(no)
                 link.url = str(base_url.clone().add_param(
-                    "page", str(self.total_pages - 1)))
-            self.links.append(link)
-        # The last page
-        link = self.Link()
-        link.title = str(self.total_pages)
-        if self.is_reversed:
-            link.url = str(base_url)
-        else:
-            link.url = str(base_url.clone().add_param(
-                "page", str(self.total_pages)))
-        if self.page_no == self.total_pages:
-            link.is_active = True
-        self.links.append(link)
-        # The next page
-        link = self.Link()
-        link.title = pgettext("Pagination|", "Next")
-        if self.page_no < self.total_pages:
-            if self.page_no + 1 == self.total_pages:
-                if self.is_reversed:
-                    link.url = str(base_url)
+                    "page", str(no)))
+                if no == self.page_no:
+                    link.is_active = True
+                self._links.append(link)
+            # The next ellipsis
+            if self.page_no + 3 < self.total_pages:
+                link = self.Link()
+                if self.page_no + 4 < self.total_pages:
+                    link.title = pgettext("Pagination|", "...")
+                else:
+                    link.title = str(self.total_pages - 1)
+                    link.url = str(base_url.clone().add_param(
+                        "page", str(self.total_pages - 1)))
+                self._links.append(link)
+            # The last page
+            link = self.Link()
+            link.title = str(self.total_pages)
+            if self.is_reversed:
+                link.url = str(base_url)
+            else:
+                link.url = str(base_url.clone().add_param(
+                    "page", str(self.total_pages)))
+            if self.page_no == self.total_pages:
+                link.is_active = True
+            self._links.append(link)
+            # The next page
+            link = self.Link()
+            link.title = pgettext("Pagination|", "Next")
+            if self.page_no < self.total_pages:
+                if self.page_no + 1 == self.total_pages:
+                    if self.is_reversed:
+                        link.url = str(base_url)
+                    else:
+                        link.url = str(base_url.clone().add_param(
+                            "page", str(self.total_pages)))
                 else:
                     link.url = str(base_url.clone().add_param(
-                        "page", str(self.total_pages)))
-            else:
-                link.url = str(base_url.clone().add_param(
-                    "page", str(self.page_no + 1)))
-        link.is_small_screen = True
-        self.links.append(link)
+                        "page", str(self.page_no + 1)))
+            link.is_small_screen = True
+            self._links.append(link)
+        return self._links
 
     class Link:
         """A navigation link in the pagination bar.

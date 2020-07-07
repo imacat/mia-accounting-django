@@ -201,5 +201,6 @@ ORDER BY
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
         self.pagination = Pagination(
-            self.request, records, self.page_no, self.page_size, True)
+            self.request.get_full_path(), records,
+            self.page_no, self.page_size, True)
         return self.pagination.records
