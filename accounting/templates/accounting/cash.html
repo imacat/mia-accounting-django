@@ -24,7 +24,8 @@ First written: 2020/7/1
 {% load humanize %}
 
 {% block settings %}
-  {% trans "Cash Report" context "Accounting|" as title %}
+  {% trans "Cash Account for {} in {}" context "Accounting|" as title_format %}
+  {% format title_format "庫存現金" period_parser.description as title %}
   {% setvar "title" title %}
 {% endblock %}
 
