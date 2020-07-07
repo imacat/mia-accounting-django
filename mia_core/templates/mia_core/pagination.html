@@ -1,0 +1,38 @@
+{% comment %}
+The Mia Website
+base.html: The side-wide layout template
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/7/1
+{% endcomment %}
+
+{# The pagination, if any #}
+{% if pagination.is_paged %}
+  <ul class="pagination">
+    {% for link in pagination.links %}
+      {% if link.url is not None %}
+        <li class="page-item {% if link.is_active %} active {% endif %}{% if not link.is_small_screen %} d-none d-md-inline {% endif %}">
+          <a class="page-link" href="{{ link.url }}">{{ link.title }}</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled {% if link.is_active %} active {% endif %}{% if not link.is_small_screen %} d-none d-md-inline {% endif %}">
+          <span class="page-link">{{ link.title }}</span>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
