@@ -117,8 +117,10 @@ class Transaction(models.Model):
         1, 2, 3, 4, 5..., and should be reordered. """
         if self._has_order_hole is None:
             orders = [x.ord for x in Transaction.objects.filter(
-                date=self.date).order_by("-ord")]
-            if orders[0] != len(orders):
+                date=self.date)]
+            if max(orders) != len(orders):
+                self._has_order_hole = True
+            elif min(orders) != 1:
                 self._has_order_hole = True
             elif len(orders) != len(set(orders)):
                 self._has_order_hole = True
