@@ -15,7 +15,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-"""The utilities for the HTTP digest authentication.
+"""The HTTP digest authentication utilities of the Mia core
+application.
 
 """
 from functools import wraps

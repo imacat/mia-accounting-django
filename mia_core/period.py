@@ -15,7 +15,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-"""The utilities of the period chooser of the Mia core application.
+"""The period chooser utilities of the Mia core application.
 
 """
 
