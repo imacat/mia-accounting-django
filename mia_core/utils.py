@@ -134,7 +134,7 @@ class Pagination:
     """The pagination.
 
     Args:
-        count (int): The total number of records
+        records (list[Model]): All the records
         page_no (int): The specified page number
         page_size (int): The specified number of records per page
         is_reverse (bool): Whether we should display the last
@@ -147,7 +147,7 @@ class Pagination:
     Attributes:
         page_no (int): The current page number
         page_size (int): The page size
-        records (Model): The records in the current page
+        records (list[Model]): The records in the current page
     """
     page_no = None
     page_size = None
