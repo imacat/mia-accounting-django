@@ -32,7 +32,7 @@ class PeriodParser:
     """The period parser.
 
     Args:
-        period_spec (str): The period specification.
+        spec (str): The period specification.
 
     Attributes:
         spec (str): The currently-using period specification.
@@ -48,10 +48,10 @@ class PeriodParser:
     description = None
     error = None
 
-    def __init__(self, period_spec):
-        self.spec = period_spec
+    def __init__(self, spec):
+        self.spec = spec
         # A specific month
-        m = re.match("^([0-9]{4})-([0-9]{2})$", period_spec)
+        m = re.match("^([0-9]{4})-([0-9]{2})$", spec)
         if m is not None:
             year = int(m.group(1))
             month = int(m.group(2))
@@ -64,7 +64,7 @@ class PeriodParser:
             self.description = self.get_month_text(year, month)
             return
         # From a specific month
-        m = re.match("^([0-9]{4})-([0-9]{2})-$", period_spec)
+        m = re.match("^([0-9]{4})-([0-9]{2})-$", spec)
         if m is not None:
             year = int(m.group(1))
             month = int(m.group(2))
@@ -78,7 +78,7 @@ class PeriodParser:
                 "Since %s") % self.get_month_text(year, month)
             return
         # A specific year
-        m = re.match("^([0-9]{4})$", period_spec)
+        m = re.match("^([0-9]{4})$", spec)
         if m is not None:
             year = int(m.group(1))
             try:
@@ -96,14 +96,14 @@ class PeriodParser:
                 self.description = str(year)
             return
         # All time
-        if period_spec == "-":
+        if spec == "-":
             self.start = date(2000, 1, 1)
             self.end = self.get_month_last_day(localdate())
             self.description = gettext("All")
             return
         # A specific date
         m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$",
-                     period_spec)
+                     spec)
         if m is not None:
             try:
                 self.start = date(
@@ -117,7 +117,7 @@ class PeriodParser:
         # A specific date period
         m = re.match(("^([0-9]{4})-([0-9]{2})-([0-9]{2})"
                       "-([0-9]{4})-([0-9]{2})-([0-9]{2})$"),
-                     period_spec)
+                     spec)
         if m is not None:
             try:
                 self.start = date(
