@@ -131,7 +131,7 @@ class BaseReportView(generic.ListView):
         data = super(BaseReportView, self).get_context_data(**kwargs)
         data["period"] = self.period
         data["subject"] = self.subject
-        data["pagination_links"] = self.pagination.links
+        data["pagination"] = self.pagination
         return data
 
 

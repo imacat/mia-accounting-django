@@ -21,9 +21,9 @@ First written: 2020/7/1
 {% endcomment %}
 
 {# The pagination, if any #}
-{% if pagination_links %}
+{% if pagination.is_paged %}
   <ul class="pagination">
-    {% for link in pagination_links %}
+    {% for link in pagination.links %}
       {% if link.url is not None %}
         <li class="page-item {% if link.is_active %} active {% endif %}{% if not link.is_small_screen %} d-none d-md-inline {% endif %}">
           <a class="page-link" href="{{ link.url }}">{{ link.title }}</a>
@@ -34,5 +34,15 @@ First written: 2020/7/1
         </li>
       {% endif %}
     {% endfor %}
+    <li class="page-item active d-none d-md-inline">
+      <div class="page-link dropdown-toggle" data-toggle="dropdown">
+        {{ pagination.page_size }}
+      </div>
+      <div class="dropdown-menu">
+        {% for option in pagination.page_size_options %}
+          <a class="dropdown-item {% if pagination.page_size == option.size %} active {% endif %}" href="{{ option.url }}">{{ option.size }}</a>
+        {% endfor %}
+      </div>
+    </li>
   </ul>
 {% endif %}

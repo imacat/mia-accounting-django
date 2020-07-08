@@ -142,12 +142,14 @@ class UrlBuilder:
                 urllib.parse.quote(self.name),
                 urllib.parse.quote(self.value))
 
+DEFAULT_PAGE_SIZE = 10
+
 
 class Pagination:
     """The pagination.
 
     Args:
-        request (HttpRequest): The request
+        current_url (str): The current URL
         records (list[Model]): All the records
         page_no (int): The specified page number
         page_size (int): The specified number of records per page
@@ -159,7 +161,6 @@ class Pagination:
             of range or is redundant.
 
     Attributes:
-        current_url (bool): The current request URL
         is_reversed (bool): Whether we should display the last
                             page first
         page_size (int): The page size.
@@ -169,8 +170,10 @@ class Pagination:
         records (list[Model]): The records in the current page.
         links (list[Link]): The navigation links in the pagination
                             bar.
+        page_size_options(list[PageSizeOptions]): The page size
+                                                  options
     """
-    current_url = None
+    _current_url = None
     is_reversed = False
     page_size = None
     total_pages = None
@@ -178,15 +181,14 @@ class Pagination:
     page_no = None
     records = None
 
-    DEFAULT_PAGE_SIZE = 10
-
     def __init__(self, current_url, records, page_no,
                  page_size, is_reversed=False):
-        self.current_url = current_url
+        self._current_url = current_url
+        self._base_url = UrlBuilder(current_url).del_param("page")
         self.is_reversed = is_reversed
         self.page_size = page_size \
             if page_size is not None \
-            else self.DEFAULT_PAGE_SIZE
+            else DEFAULT_PAGE_SIZE
         self.total_pages = int(
             (len(records) - 1) / self.page_size) + 1
         self.is_paged = self.total_pages > 1
@@ -212,7 +214,7 @@ class Pagination:
     def links(self):
         """Returns the navigation links of the pagination bar."""
         if self._links is None:
-            base_url = UrlBuilder(self.current_url).del_param("page")
+            base_url = UrlBuilder(self._current_url).del_param("page")
             self._links = []
             # The previous page
             link = self.Link()
@@ -235,7 +237,8 @@ class Pagination:
             if not self.is_reversed:
                 link.url = str(base_url)
             else:
-                link.url = str(base_url.clone().add_param("page", "1"))
+                link.url = str(base_url.clone().add_param(
+                    "page", "1"))
             if self.page_no == 1:
                 link.is_active = True
             self._links.append(link)
@@ -290,7 +293,7 @@ class Pagination:
                         link.url = str(base_url)
                     else:
                         link.url = str(base_url.clone().add_param(
-                            "page", str(self.total_pages)))
+                                "page", str(self.total_pages)))
                 else:
                     link.url = str(base_url.clone().add_param(
                         "page", str(self.page_no + 1)))
@@ -312,6 +315,33 @@ class Pagination:
         title = None
         is_active = False
         is_small_screen = False
+
+    @property
+    def page_size_options(self):
+        base_url = UrlBuilder(self._current_url).del_param(
+            "page").del_param("page-size")
+        return [self.PageSizeOption(
+            x, str(base_url.clone().add_param("page-size", str(x)))
+            if x != DEFAULT_PAGE_SIZE else str(base_url))
+            for x in [10, 100, 200]]
+
+    class PageSizeOption:
+        """A page size option.
+
+        Args:
+            size (int): The page size.
+            url (str): The URL of this page size.
+
+        Attributes:
+            size (int): The page size.
+            url (str): The URL for this page size.
+        """
+        size = None
+        url = None
+
+        def __init__(self, size, url):
+            self.size = size
+            self.url = url
 
 
 class PageNoOutOfRangeException(Exception):
