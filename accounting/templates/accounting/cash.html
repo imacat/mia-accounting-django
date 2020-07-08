@@ -25,12 +25,15 @@ First written: 2020/7/1
 
 {% block settings %}
   {% trans "Cash Account for {} in {}" context "Accounting|" as title_format %}
-  {% format title_format subject.title_zhtw period.description as title %}
+  {% str_format title_format subject.title_zhtw period.description as title %}
   {% setvar "title" title %}
 {% endblock %}
 
 {% block content %}
 
+  {% trans "Cash Account for {} in {}" context "Accounting|" as title_format %}
+  {% str_format title_format subject.title_zhtw period.description as title_format %}
+  <p>{{ title_format }}</p>
   <p>{{ request.resolver_match.url_name }}</p>
   <p>{{ request.resolver_match.app_name }}</p>
 

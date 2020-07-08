@@ -36,17 +36,12 @@ def setvar(context, key, value):
     return ""
 
 
-@register.simple_tag(takes_context=True)
-def format(context, format, *args, **kwargs):
+@register.simple_tag
+def str_format(format_str, *args):
     """Sets a variable in the template.
 
     Args:
-        context (Context): the context.
-        format (str): The format.
+        format_str (str): The format.
         args (str): The parameters.
-        kwargs (str): The keyword arguments.
     """
-    if "as" in kwargs:
-        context.dicts[0][kwargs["as"]] = format.format(*args)
-        return ""
-    return format.format(*args)
+    return format_str.format(*args)
