@@ -171,22 +171,6 @@ class PeriodParser:
         self.end = self.get_month_last_day(self.start)
         self.description = gettext("This Month")
 
-    def set_month_range(self, year, month):
-        """Calculates and returns the date range of a month.
-
-        Args:
-            year (int): The year.
-            month (int): The month.
-
-        Returns:
-            tuple(date): The date range of the month.
-
-        Throws:
-            ValueError: When the year and month are invalid
-        """
-        self.start = date(year, month, 1)
-        self.end = self.get_month_last_day(self.start)
-
     @staticmethod
     def get_month_last_day(day):
         """Calculates and returns the last day of a month.
