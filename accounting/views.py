@@ -30,7 +30,7 @@ from django.utils.translation import get_language
 from django.views import generic
 from django.views.decorators.http import require_GET
 
-from accounting.models import Record
+from accounting.models import Record, Transaction
 from mia_core.period import Period
 from mia import settings
 from mia_core.digest_auth import digest_login_required
@@ -144,8 +144,12 @@ class CashReportView(BaseReportView):
         Returns:
             List[Record]: The accounting records for the cash report
         """
+        first_txn = Transaction.objects.order_by("date").first()
+        data_start = first_txn.date if first_txn is not None else None
+        last_txn = Transaction.objects.order_by("-date").first()
+        data_end = last_txn.date if last_txn is not None else None
         self.period = Period(
-            get_language(), date(2000, 1, 1), date(2030, 12, 31),
+            get_language(), data_start, data_end,
             self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
             records = Record.objects.raw(
