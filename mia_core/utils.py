@@ -142,6 +142,7 @@ class UrlBuilder:
                 urllib.parse.quote(self.name),
                 urllib.parse.quote(self.value))
 
+
 DEFAULT_PAGE_SIZE = 10
 
 
@@ -320,10 +321,8 @@ class Pagination:
     def page_size_options(self):
         base_url = UrlBuilder(self._current_url).del_param(
             "page").del_param("page-size")
-        return [self.PageSizeOption(
-            x, str(base_url.clone().add_param("page-size", str(x)))
-            if x != DEFAULT_PAGE_SIZE else str(base_url))
-            for x in [10, 100, 200]]
+        return [self.PageSizeOption(x, _page_size_url(base_url, x))
+                for x in [10, 100, 200]]
 
     class PageSizeOption:
         """A page size option.
@@ -342,6 +341,21 @@ class Pagination:
         def __init__(self, size, url):
             self.size = size
             self.url = url
+
+
+def _page_size_url(base_url, size):
+    """Returns the URL for a new page size.
+
+    Args:
+        base_url (UrlBuilder): The base URL builder.
+        size (int): The new page size.
+
+    Returns:
+        str: The URL for the new page size.
+    """
+    if size == DEFAULT_PAGE_SIZE:
+        return str(base_url)
+    return str(base_url.clone().add_param("page-size", str(size)))
 
 
 class PageNoOutOfRangeException(Exception):
