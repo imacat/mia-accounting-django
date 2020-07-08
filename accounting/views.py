@@ -18,6 +18,7 @@
 """The view controllers of the accounting application.
 
 """
+from datetime import date
 
 from django.http import HttpResponseRedirect, HttpResponse
 
@@ -25,11 +26,12 @@ from django.urls import reverse
 from django.utils import dateformat
 from django.utils.decorators import method_decorator
 from django.utils.timezone import localdate
+from django.utils.translation import get_language
 from django.views import generic
 from django.views.decorators.http import require_GET
 
 from accounting.models import Record
-from mia_core.period import PeriodParser
+from mia_core.period import Period
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.utils import UrlBuilder, Pagination, \
@@ -70,12 +72,12 @@ class BaseReportView(generic.ListView):
     Attributes:
         page_no (int): The specified page number
         page_size (int): The specified page size
-        period_parser (PeriodParser): The period parser
+        period (Period): The template period helper
     """
     page_no = None
     page_size = None
     pagination = None
-    period_parser = None
+    period = None
 
     def get(self, request, *args, **kwargs):
         """Adds object_list to the context.
@@ -125,7 +127,7 @@ class BaseReportView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BaseReportView, self).get_context_data(**kwargs)
-        data["period"] = self.period_parser
+        data["period"] = self.period
         data["pagination_links"] = self.pagination.links
         return data
 
@@ -142,7 +144,9 @@ class CashReportView(BaseReportView):
         Returns:
             List[Record]: The accounting records for the cash report
         """
-        self.period_parser = PeriodParser(self.kwargs["period_spec"])
+        self.period = Period(
+            get_language(), date(2000, 1, 1), date(2030, 12, 31),
+            self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
             records = Record.objects.raw(
                 """SELECT r.*
@@ -174,7 +178,7 @@ ORDER BY
   t.ord,
   CASE WHEN is_credit THEN 1 ELSE 2 END,
   r.ord""",
-                [self.period_parser.start, self.period_parser.end])
+                [self.period.start, self.period.end])
         else:
             records = Record.objects.raw(
                 """SELECT r.*
@@ -200,8 +204,8 @@ ORDER BY
   t.ord,
   CASE WHEN is_credit THEN 1 ELSE 2 END,
   r.ord""",
-                [self.period_parser.start,
-                 self.period_parser.end,
+                [self.period.start,
+                 self.period.end,
                  self.kwargs["subject_code"] + "%",
                  self.kwargs["subject_code"] + "%"])
         self.pagination = Pagination(
