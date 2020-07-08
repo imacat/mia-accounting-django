@@ -25,7 +25,7 @@ First written: 2020/7/1
 
 {% block settings %}
   {% trans "Cash Account for {} in {}" context "Accounting|" as title_format %}
-  {% format title_format "庫存現金" period.description as title %}
+  {% format title_format subject.title_zhtw period.description as title %}
   {% setvar "title" title %}
 {% endblock %}
 

@@ -26,11 +26,11 @@ from django.urls import reverse
 from django.utils import dateformat
 from django.utils.decorators import method_decorator
 from django.utils.timezone import localdate
-from django.utils.translation import get_language
+from django.utils.translation import get_language, pgettext
 from django.views import generic
 from django.views.decorators.http import require_GET
 
-from accounting.models import Record, Transaction
+from accounting.models import Record, Transaction, Subject
 from mia_core.period import Period
 from mia import settings
 from mia_core.digest_auth import digest_login_required
@@ -73,11 +73,13 @@ class BaseReportView(generic.ListView):
         page_no (int): The specified page number
         page_size (int): The specified page size
         period (Period): The template period helper
+        subject (Subject): The currently-specified subject
     """
     page_no = None
     page_size = None
     pagination = None
     period = None
+    subject = None
 
     def get(self, request, *args, **kwargs):
         """Adds object_list to the context.
@@ -128,6 +130,7 @@ class BaseReportView(generic.ListView):
     def get_context_data(self, **kwargs):
         data = super(BaseReportView, self).get_context_data(**kwargs)
         data["period"] = self.period
+        data["subject"] = self.subject
         data["pagination_links"] = self.pagination.links
         return data
 
@@ -152,6 +155,9 @@ class CashReportView(BaseReportView):
             get_language(), data_start, data_end,
             self.kwargs["period_spec"])
         if self.kwargs["subject_code"] == "0":
+            self.subject = Subject(code="0")
+            self.subject.title_zhtw = pgettext(
+                "Accounting|", "Current assets and liabilities")
             records = Record.objects.raw(
                 """SELECT r.*
 FROM accounting_records AS r
@@ -184,6 +190,8 @@ ORDER BY
   r.ord""",
                 [self.period.start, self.period.end])
         else:
+            self.subject = Subject.objects.filter(
+                code=self.kwargs["subject_code"]).first()
             records = Record.objects.raw(
                 """SELECT r.*
 FROM accounting_records AS r
@@ -210,8 +218,8 @@ ORDER BY
   r.ord""",
                 [self.period.start,
                  self.period.end,
-                 self.kwargs["subject_code"] + "%",
-                 self.kwargs["subject_code"] + "%"])
+                 self.subject.code + "%",
+                 self.subject.code + "%"])
         self.pagination = Pagination(
             self.request.get_full_path(), records,
             self.page_no, self.page_size, True)
