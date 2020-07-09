@@ -20,6 +20,10 @@
 """
 
 from django import template
+from django.utils.http import urlencode
+
+from mia_core.utils import UrlBuilder
+
 register = template.Library()
 
 
@@ -45,3 +49,18 @@ def str_format(format_str, *args):
         args (str): The parameters.
     """
     return format_str.format(*args)
+
+
+@register.simple_tag
+def url_query(url, **kwargs):
+    """Returns the URL with the query parameters set.
+
+    Args:
+        url (str): The URL.
+        kwargs (**dict): The query parameters.
+    """
+    builder = UrlBuilder(url)
+    for key in kwargs.keys():
+        if kwargs[key] is not None:
+            builder.set_param(key, kwargs[key])
+    return str(builder)
