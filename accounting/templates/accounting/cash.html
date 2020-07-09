@@ -24,8 +24,8 @@ First written: 2020/7/1
 {% load humanize %}
 
 {% block settings %}
-  {% trans "Cash Account for {} in {}" context "Accounting|" as title_format %}
-  {% str_format title_format subject.title_zhtw period.description as title %}
+  {% trans "Cash Account for {} in {}" context "Accounting|" as title %}
+  {% str_format title subject.title_zhtw period.description as title %}
   {% setvar "title" title %}
 {% endblock %}
 
