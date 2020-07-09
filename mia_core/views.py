@@ -20,6 +20,7 @@
 """
 
 from django.contrib.auth import logout as logout_user
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST, require_GET
 
@@ -52,3 +53,13 @@ def logout(request):
         request.session["logout"] = True
         return redirect(request.POST["next"])
     return redirect("/")
+
+
+def todo(request):
+    """A dummy placeholder view for the URL settings that are not
+    implemented yet.
+
+    Returns:
+        HttpResponse: A dummy response.
+    """
+    return HttpResponse("TODO: To be done.")
