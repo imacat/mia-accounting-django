@@ -35,6 +35,9 @@ def setvar(context, key, value):
         context (Context): the context
         key (str): The variable name
         value (str): The variable value
+
+    Returns:
+        str: An empty string.
     """
     context.dicts[0][key] = value
     return ""
@@ -46,7 +49,10 @@ def str_format(format_str, *args):
 
     Args:
         format_str (str): The format.
-        args (str): The parameters.
+        args (*str): The arguments.
+
+    Returns:
+        str: The formatted text string.
     """
     return format_str.format(*args)
 
@@ -58,6 +64,9 @@ def url_query(url, **kwargs):
     Args:
         url (str): The URL.
         kwargs (**dict): The query parameters.
+
+    Returns:
+        str: The URL with query parameters set.
     """
     builder = UrlBuilder(url)
     for key in kwargs.keys():
