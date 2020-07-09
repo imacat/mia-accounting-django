@@ -152,13 +152,16 @@ class Transaction(models.Model):
         """Returns the URL to view this transaction."""
         if self.is_cash_expense:
             return reverse(
-                "accounting:transaction", args=("expense", self.sn))
+                "accounting:transactions.view",
+                args=("expense", self.sn))
         elif self.is_cash_income:
             return reverse(
-                "accounting:transaction", args=("income", self.sn))
+                "accounting:transactions.view",
+                args=("income", self.sn))
         else:
             return reverse(
-                "accounting:transaction", args=("transfer", self.sn))
+                "accounting:transactions.view",
+                args=("transfer", self.sn))
 
     def __str__(self):
         """Returns the string representation of this accounting
