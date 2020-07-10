@@ -20,6 +20,7 @@
 """
 
 from django import template
+from django.urls import reverse
 
 from mia_core.utils import UrlBuilder
 
@@ -72,3 +73,13 @@ def url_query(url, **kwargs):
         if kwargs[key] is not None:
             builder.set_param(key, kwargs[key])
     return str(builder)
+
+
+@register.simple_tag(takes_context=True)
+def url_period(context, period_spec):
+    request = context["request"]
+    viewname = "%s:%s" % (
+        request.resolver_match.app_name,
+        request.resolver_match.url_name)
+    subject_code = request.resolver_match.kwargs["subject_code"]
+    return reverse(viewname, args=[subject_code, period_spec])
