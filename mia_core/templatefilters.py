@@ -28,7 +28,7 @@ from django.utils.translation import gettext
 register = template.Library()
 
 
-@register.filter(is_safe=True)
+@register.filter
 def smart_date(value):
     """Formats the date for human friendliness.
 
