@@ -46,10 +46,10 @@ class UrlBuilder:
             return
         self.base_path = start_url[:pos]
         self.params = []
-        for piece in start_url[pos+1:].split("&"):
+        for piece in start_url[pos + 1:].split("&"):
             pos = piece.find("=")
             name = urllib.parse.unquote(piece[:pos])
-            value = urllib.parse.unquote(piece[pos+1:])
+            value = urllib.parse.unquote(piece[pos + 1:])
             self.params.append(self.Param(name, value))
 
     def add_param(self, name, value):
@@ -143,14 +143,11 @@ class UrlBuilder:
                 urllib.parse.quote(self.value))
 
 
-DEFAULT_PAGE_SIZE = 10
-
-
 class Pagination:
     """The pagination.
 
     Args:
-        current_url (str): The current URL
+        request (HttpRequest): The request
         records (list[Model]): All the records
         page_no (int): The specified page number
         page_size (int): The specified number of records per page
@@ -158,8 +155,7 @@ class Pagination:
                             page first
 
     Raises:
-        PageNoOutOfRangeError: if the specified page number is out
-            of range or is redundant.
+        PaginationException: With invalid pagination parameters
 
     Attributes:
         is_reversed (bool): Whether we should display the last
@@ -182,30 +178,57 @@ class Pagination:
     page_no = None
     records = None
 
-    def __init__(self, current_url, records, page_no,
-                 page_size, is_reversed=False):
+    DEFAULT_PAGE_SIZE = 10
+
+    def __init__(self, request, records, is_reversed=False):
+        current_url = request.get_full_path()
         self._current_url = current_url
-        self._base_url = UrlBuilder(current_url).del_param("page")
         self.is_reversed = is_reversed
-        self.page_size = page_size \
-            if page_size is not None \
-            else DEFAULT_PAGE_SIZE
+
+        # The page size
+        try:
+            self.page_size = int(request.GET["page-size"])
+            if self.page_size == self.DEFAULT_PAGE_SIZE:
+                raise PaginationException(str(
+                    UrlBuilder(current_url).del_param("page-size")))
+            if self.page_size < 1:
+                raise PaginationException(str(
+                    UrlBuilder(current_url).del_param("page-size")))
+        except KeyError:
+            self.page_size = self.DEFAULT_PAGE_SIZE
+        except ValueError:
+            raise PaginationException(str(
+                UrlBuilder(current_url).del_param("page-size")))
         self.total_pages = int(
             (len(records) - 1) / self.page_size) + 1
+        default_page_no = 1 if not is_reversed else self.total_pages
         self.is_paged = self.total_pages > 1
+
+        # The page number
+        try:
+            self.page_no = int(request.GET["page"])
+            if not self.is_paged:
+                raise PaginationException(str(
+                    UrlBuilder(current_url).del_param("page")))
+            if self.page_no == default_page_no:
+                raise PaginationException(str(
+                    UrlBuilder(current_url).del_param("page")))
+            if self.page_no < 1:
+                raise PaginationException(str(
+                    UrlBuilder(current_url).del_param("page")))
+            if self.page_no > self.total_pages:
+                raise PaginationException(str(
+                    UrlBuilder(current_url).del_param("page")))
+        except KeyError:
+            self.page_no = default_page_no
+        except ValueError:
+            raise PaginationException(str(
+                UrlBuilder(current_url).del_param("page")))
+
         if not self.is_paged:
             self.page_no = 1
             self.records = records
-            self._links = []
             return
-        default_page = 1 if not is_reversed else self.total_pages
-        if page_no == default_page:
-            raise PageNoOutOfRangeException()
-        self.page_no = page_no \
-            if page_no is not None \
-            else default_page
-        if self.page_no > self.total_pages:
-            raise PageNoOutOfRangeException()
         start_no = self.page_size * (self.page_no - 1)
         self.records = records[start_no:start_no + self.page_size]
 
@@ -294,7 +317,7 @@ class Pagination:
                         link.url = str(base_url)
                     else:
                         link.url = str(base_url.clone().add_param(
-                                "page", str(self.total_pages)))
+                            "page", str(self.total_pages)))
                 else:
                     link.url = str(base_url.clone().add_param(
                         "page", str(self.page_no + 1)))
@@ -321,8 +344,23 @@ class Pagination:
     def page_size_options(self):
         base_url = UrlBuilder(self._current_url).del_param(
             "page").del_param("page-size")
-        return [self.PageSizeOption(x, _page_size_url(base_url, x))
+        return [self.PageSizeOption(x, self._page_size_url(base_url, x))
                 for x in [10, 100, 200]]
+
+    @staticmethod
+    def _page_size_url(base_url, size):
+        """Returns the URL for a new page size.
+
+        Args:
+            base_url (UrlBuilder): The base URL builder.
+            size (int): The new page size.
+
+        Returns:
+            str: The URL for the new page size.
+        """
+        if size == Pagination.DEFAULT_PAGE_SIZE:
+            return str(base_url)
+        return str(base_url.clone().add_param("page-size", str(size)))
 
     class PageSizeOption:
         """A page size option.
@@ -343,23 +381,16 @@ class Pagination:
             self.url = url
 
 
-def _page_size_url(base_url, size):
-    """Returns the URL for a new page size.
+class PaginationException(Exception):
+    """The exception thrown with invalid pagination parameters.
 
     Args:
-        base_url (UrlBuilder): The base URL builder.
-        size (int): The new page size.
+        url (str): The canonical URL to redirect to.
 
-    Returns:
-        str: The URL for the new page size.
+    Attributes:
+        url (str): The canonical URL to redirect to.
     """
-    if size == DEFAULT_PAGE_SIZE:
-        return str(base_url)
-    return str(base_url.clone().add_param("page-size", str(size)))
+    url = None
 
-
-class PageNoOutOfRangeException(Exception):
-    """The error thrown when the specified page number is out of
-    range.
-    """
-    pass
+    def __init__(self, url):
+        self.url = url

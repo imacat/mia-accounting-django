@@ -43,7 +43,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("cash", views.cash_home, name="cash.home"),
     path("cash/<str:subject_code>/<str:period_spec>",
-         views.CashReportView.as_view(), name="cash"),
+         views.cash, name="cash"),
     path("cash-summary",
          mia_core_views.todo, name="cash-summary.home"),
     path("cash-summary/<str:subject_code>",
