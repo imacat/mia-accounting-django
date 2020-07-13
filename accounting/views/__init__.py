@@ -30,6 +30,7 @@ from django.utils.translation import get_language, pgettext
 from django.views.decorators.http import require_GET
 
 from accounting.models import Record, Transaction, Subject
+from accounting.utils import ReportUrl
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
@@ -198,4 +199,5 @@ ORDER BY
         "pagination": pagination,
         "subject": subject,
         "period": period,
+        "reports": ReportUrl(cash=subject, period=period)
     })

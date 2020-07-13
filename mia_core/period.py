@@ -33,10 +33,10 @@ class Period:
     """The template helper for the period chooser.
 
     Args:
-        language (str): The current language.
-        data_start (date): The available first day of the data.
-        data_end (date): The available last day of the data.
-        spec (str): The current period specification
+        language (str|None): The current language.
+        data_start (date|None): The available first day of the data.
+        data_end (date|None): The available last day of the data.
+        spec (str|None): The current period specification
 
     Attributes:
         spec (date): The currently-working period specification.
@@ -322,7 +322,7 @@ class Period:
         """The period parser.
 
         Args:
-            spec (str): The period specification.
+            spec (str|None): The period specification.
 
         Attributes:
             spec (str): The currently-using period specification.
@@ -339,6 +339,9 @@ class Period:
         error = None
 
         def __init__(self, spec):
+            if spec is None:
+                self.set_this_month()
+                return
             self.spec = spec
             # A specific month
             m = re.match("^([0-9]{4})-([0-9]{2})$", spec)
@@ -457,16 +460,20 @@ class Period:
             # Wrong period format
             self.invalid_period()
 
+        def set_this_month(self):
+            """Sets the period to this month."""
+            today = localdate()
+            self.spec = dateformat.format(today, "Y-m")
+            self.start = date(today.year, today.month, 1)
+            self.end = self.get_month_last_day(self.start)
+            self.description = gettext("This Month")
+
         def invalid_period(self):
             """Sets the period when the period specification is
             invalid.
             """
             self.error = gettext("Invalid period.")
-            today = localdate()
-            self.spec = dateformat.format(localdate(), "Y-m")
-            self.start = date(today.year, today.month, 1)
-            self.end = self.get_month_last_day(self.start)
-            self.description = gettext("This Month")
+            self.set_this_month()
 
         @staticmethod
         def get_month_last_day(day):
