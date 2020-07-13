@@ -394,3 +394,21 @@ class PaginationException(Exception):
 
     def __init__(self, url):
         self.url = url
+
+
+class SqlQuery:
+    """A SQL query statement with its parameters.
+
+    Args:
+        sql (str): The SQL statement.
+        params (list[str]): the parameters.
+
+    Attributes:
+        sql (str): The SQL statement.
+        params (list[str]): the parameters.
+    """
+    sql = ""
+    params = []
+    def __init__(self, sql, params):
+        self.sql = sql
+        self.params = params

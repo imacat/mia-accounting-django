@@ -118,6 +118,8 @@ class Transaction(models.Model):
         if self._has_order_hole is None:
             orders = [x.ord for x in Transaction.objects.filter(
                 date=self.date)]
+            if len(orders) == 0:
+                self._has_order_hole = False
             if max(orders) != len(orders):
                 self._has_order_hole = True
             elif min(orders) != 1:
@@ -198,23 +200,41 @@ class Record(models.Model):
         db_column="updatedby",
         related_name="updated_accounting_records")
 
+    _debit_amount = None
+
     @property
     def debit_amount(self):
         """The debit amount of this accounting record"""
+        if self._debit_amount is not None:
+            return self._debit_amount
         return self.amount if not self.is_credit else None
+
+    @debit_amount.setter
+    def debit_amount(self, value):
+        self._debit_amount = value
+
+    _credit_amount = None
 
     @property
     def credit_amount(self):
         """The credit amount of this accounting record"""
+        if self._credit_amount is not None:
+            return self._credit_amount
         return self.amount if self.is_credit else None
 
-    @property
-    def accumulative_balance(self):
-        return self._accumulative_balance
+    @credit_amount.setter
+    def credit_amount(self, value):
+        self._credit_amount = value
 
-    @accumulative_balance.setter
-    def accumulative_balance(self, value):
-        self._accumulative_balance = value
+    _balance = None
+
+    @property
+    def balance(self):
+        return self._balance
+
+    @balance.setter
+    def balance(self, value):
+        self._balance = value
 
     def __str__(self):
         """Returns the string representation of this accounting

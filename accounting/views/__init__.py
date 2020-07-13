@@ -18,7 +18,9 @@
 """The view controllers of the accounting application.
 
 """
+from datetime import timedelta
 
+from django.db import connection
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -31,7 +33,7 @@ from accounting.models import Record, Transaction, Subject
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
-from mia_core.utils import Pagination
+from mia_core.utils import Pagination, SqlQuery
 
 
 @require_GET
@@ -65,6 +67,7 @@ def cash_home(request):
 @digest_login_required
 def cash(request, subject_code, period_spec):
     """The cash account report."""
+    # The period
     first_txn = Transaction.objects.order_by("date").first()
     data_start = first_txn.date if first_txn is not None else None
     last_txn = Transaction.objects.order_by("-date").first()
@@ -72,13 +75,12 @@ def cash(request, subject_code, period_spec):
     period = Period(
         get_language(), data_start, data_end,
         period_spec)
-    # The list data
+    # The SQL query
     if subject_code == "0":
         subject = Subject(code="0")
         subject.title_zhtw = pgettext(
             "Accounting|", "Current Assets And Liabilities")
-        records = Record.objects.raw(
-            """SELECT r.*
+        select_records = """SELECT r.*
 FROM accounting_records AS r
   INNER JOIN (SELECT
          t1.sn AS sn,
@@ -106,12 +108,20 @@ ORDER BY
   t.date,
   t.ord,
   CASE WHEN is_credit THEN 1 ELSE 2 END,
-  r.ord""",
+  r.ord"""
+        sql_records = SqlQuery(
+            select_records,
             [period.start, period.end])
+        select_balance_before = """SELECT
+    SUM(CASE WHEN is_credit THEN 1 ELSE -1 END * amount) AS amount
+  FROM (%s) AS b""" % select_records
+        sql_balance_before = SqlQuery(
+            select_balance_before,
+            [data_start, period.start - timedelta(days=1)])
     else:
-        subject = Subject.objects.filter(code=subject_code).first()
-        records = Record.objects.raw(
-            """SELECT r.*
+        subject = Subject.objects.filter(
+            code=subject_code).first()
+        select_records = """SELECT r.*
 FROM accounting_records AS r
   INNER JOIN (SELECT
          t1.sn AS sn,
@@ -133,11 +143,55 @@ ORDER BY
   t.date,
   t.ord,
   CASE WHEN is_credit THEN 1 ELSE 2 END,
-  r.ord""",
+  r.ord"""
+        sql_records = SqlQuery(
+            select_records,
             [period.start,
              period.end,
              subject.code + "%",
              subject.code + "%"])
+        select_balance_before = """SELECT
+    SUM(CASE WHEN is_credit THEN 1 ELSE -1 END * amount) AS amount
+  FROM (%s) AS b""" % select_records
+        sql_balance_before = SqlQuery(
+            select_balance_before,
+            [data_start,
+             period.start - timedelta(days=1),
+             subject.code + "%",
+             subject.code + "%"])
+    # The list data
+    records = list(Record.objects.raw(
+        sql_records.sql,
+        sql_records.params))
+    with connection.cursor() as cursor:
+        cursor.execute(
+            sql_balance_before.sql, sql_balance_before.params)
+        row = cursor.fetchone()
+    balance_before = row[0]
+    if balance_before is None:
+        balance_before = 0
+    balance = balance_before
+    for record in records:
+        sign = 1 if record.is_credit else -1
+        balance = balance + sign * record.amount
+        record.balance = balance
+    record_sum = Record(
+        transaction=Transaction(date=records[-1].transaction.date),
+        subject=subject,
+        summary=pgettext("Accounting|", "Total"),
+        balance=balance
+    )
+    record_sum.credit_amount = sum([
+        x.amount for x in records if x.is_credit])
+    record_sum.debit_amount = sum([
+        x.amount for x in records if not x.is_credit])
+    records.insert(0, Record(
+        transaction=Transaction(date=period.start),
+        subject=Subject.objects.filter(code="3351").first(),
+        is_credit=balance_before >= 0,
+        amount=abs(balance_before),
+        balance=balance_before))
+    records.append(record_sum)
     pagination = Pagination(request, records, True)
     return render(request, "accounting/cash.html", {
         "records": pagination.records,
