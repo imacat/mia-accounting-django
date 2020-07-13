@@ -74,8 +74,7 @@ def cash(request, subject_code, period_spec):
     last_txn = Transaction.objects.order_by("-date").first()
     data_end = last_txn.date if last_txn is not None else None
     period = Period(
-        get_language(), data_start, data_end,
-        period_spec)
+        period_spec, data_start, data_end, get_language())
     # The SQL query
     if subject_code == "0":
         subject = Subject(code="0")

@@ -33,10 +33,10 @@ class Period:
     """The template helper for the period chooser.
 
     Args:
-        language (str|None): The current language.
-        data_start (date|None): The available first day of the data.
-        data_end (date|None): The available last day of the data.
-        spec (str|None): The current period specification
+        spec (str): The current period specification
+        data_start (date): The available first day of the data.
+        data_end (date): The available last day of the data.
+        language (str): The current language.
 
     Attributes:
         spec (date): The currently-working period specification.
@@ -82,11 +82,13 @@ class Period:
     _data_end = None
     _period = None
 
-    def __init__(self, language, data_start, data_end, spec):
-        self._language = language
+    def __init__(
+            self, spec = None,
+            data_start = None, data_end = None, language = None):
+        self._period = self.Parser(spec)
         self._data_start = data_start
         self._data_end = data_end
-        self._period = self.Parser(spec)
+        self._language = language
 
     @property
     def spec(self):

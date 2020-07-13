@@ -34,7 +34,7 @@ class ReportUrl:
         if "period" in kwargs:
             self._period = kwargs["period"]
         else:
-            self._period = Period(None, None, None, None)
+            self._period = Period()
         if "cash" in kwargs:
             self._cash_subject = kwargs["cash"]
         else:
