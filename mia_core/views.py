@@ -55,7 +55,7 @@ def logout(request):
     return redirect("/")
 
 
-def todo(request):
+def todo(request, **kwargs):
     """A dummy placeholder view for the URL settings that are not
     implemented yet.
 
