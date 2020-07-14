@@ -26,7 +26,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template import defaultfilters
 from django.utils import dateformat
 from django.utils.timezone import localdate
-from django.utils.translation import gettext
+from django.utils.translation import gettext, get_language
+
+from mia_core.utils import Language
 
 
 class Period:
@@ -36,7 +38,6 @@ class Period:
         spec (str): The current period specification
         data_start (date): The available first day of the data.
         data_end (date): The available last day of the data.
-        language (str): The current language.
 
     Attributes:
         spec (date): The currently-working period specification.
@@ -83,12 +84,11 @@ class Period:
     _period = None
 
     def __init__(
-            self, spec = None,
-            data_start = None, data_end = None, language = None):
+            self, spec = None, data_start = None, data_end = None):
         self._period = self.Parser(spec)
         self._data_start = data_start
         self._data_end = data_end
-        self._language = language
+        self._language = Language(get_language())
 
     @property
     def spec(self):
@@ -306,15 +306,9 @@ class Period:
     def month_picker_params(self):
         if self._data_start is None:
             return None
-        if self._language == "zh-Hant":
-            locale = "zh_TW"
-        elif self._language == "zh-Hans":
-            locale = "zh_CN"
-        else:
-            locale = self._language.replace("-", "_")
         start = date(self._data_start.year, self._data_start.month, 1)
         return DjangoJSONEncoder().encode({
-            "locale": locale,
+            "locale": self._language.locale,
             "minDate": start,
             "maxDate": self._data_end,
             "defaultDate": self.chosen_month,

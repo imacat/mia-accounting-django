@@ -73,8 +73,7 @@ def cash(request, subject_code, period_spec):
     data_start = first_txn.date if first_txn is not None else None
     last_txn = Transaction.objects.order_by("-date").first()
     data_end = last_txn.date if last_txn is not None else None
-    period = Period(
-        period_spec, data_start, data_end, get_language())
+    period = Period(period_spec, data_start, data_end)
     subjects = list(Subject.objects.raw("""SELECT s.*
 FROM accounting_subjects AS s
   WHERE s.code IN (SELECT s1.code
