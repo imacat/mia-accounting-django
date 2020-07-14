@@ -26,7 +26,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template import defaultfilters
 from django.utils import dateformat
 from django.utils.timezone import localdate
-from django.utils.translation import gettext, get_language
+from django.utils.translation import gettext
 
 from mia_core.utils import Language
 
@@ -78,7 +78,6 @@ class Period:
         month_picker_params (str): The month-picker parameters, as a
                                    JSON text string
     """
-    _language = None
     _data_start = None
     _data_end = None
     _period = None
@@ -88,7 +87,6 @@ class Period:
         self._period = self.Parser(spec)
         self._data_start = data_start
         self._data_end = data_end
-        self._language = Language(get_language())
 
     @property
     def spec(self):
@@ -308,7 +306,7 @@ class Period:
             return None
         start = date(self._data_start.year, self._data_start.month, 1)
         return DjangoJSONEncoder().encode({
-            "locale": self._language.locale,
+            "locale": Language.current().locale,
             "minDate": start,
             "maxDate": self._data_end,
             "defaultDate": self.chosen_month,

@@ -56,6 +56,10 @@ class Language:
     def default():
         return Language(settings.LANGUAGE_CODE)
 
+    @staticmethod
+    def current():
+        return Language(get_language())
+
 
 def get_multi_language_attr(model, name):
     """Returns a multi-language attribute of a data model.
@@ -68,7 +72,7 @@ def get_multi_language_attr(model, name):
         (any): The attribute in this language, or in the default
             language if there is no content in the current language.
     """
-    language = Language(get_language())
+    language = Language.current()
     title = getattr(model, name + "_" + language.db)
     if language.is_default:
         return title
