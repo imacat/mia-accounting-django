@@ -107,9 +107,9 @@ First written: 2020/7/1
               {{ text|force_escape }}
             </span>
           {% endif %}</td>
-          <td class="amount">{{ record.credit_amount|accounting_amount }}</td>
-          <td class="amount">{{ record.debit_amount|accounting_amount }}</td>
-          <td class="amount">{{ record.balance|accounting_amount }}</td>
+          <td class="amount {% if record.credit_amount < 0 %} text-danger {% endif %}">{{ record.credit_amount|accounting_amount }}</td>
+          <td class="amount {% if record.debit_amount < 0 %} text-danger {% endif %}">{{ record.debit_amount|accounting_amount }}</td>
+          <td class="amount {% if record.balance < 0 %} text-danger {% endif %}">{{ record.balance|accounting_amount }}</td>
           <td class="actions">
             {% if record.sn is not None %}
               <a href="{{ record.transaction.get_absolute_url }}" class="btn btn-info" role="button">
