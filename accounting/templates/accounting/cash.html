@@ -25,7 +25,7 @@ First written: 2020/7/1
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with subject=subject.title_zhtw period=period.description context "Accounting|" %}Cash Account for {{ subject }} in {{ period }}{% endblocktrans %}
+  {% blocktrans asvar title with subject=current_subject.title_zhtw period=period.description context "Accounting|" %}Cash Account for {{ subject }} in {{ period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
 {% endblock %}
@@ -66,6 +66,22 @@ First written: 2020/7/1
     {% trans "Cash Account" context "Accounting|" as current_report_title %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+      <span class="d-none d-md-inline">{{ current_subject.title_zhtw }}</span>
+      <span class="d-md-none">{% trans "Subject" context "Accounting|" as text %}{{ text|force_escape }}</span>
+    </button>
+    <div class="dropdown-menu subject-picker">
+      <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
+      {% for subject in shortcut_subjects %}
+        <a class="dropdown-item {% if subject.code == current_subject.code %}{% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">{{ subject.title_zhtw|title }}</a>
+      {% endfor %}
+      <div class="dropdown-header">{% trans "All" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
+      {% for subject in all_sibjects %}
+        <a class="dropdown-item {% if subject.code == current_subject.code %}{% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">{{ subject.title_zhtw|title }}</a>
+      {% endfor %}
+    </div>
+  </div>
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
     <i class="far fa-calendar-alt"></i>
     <span class="d-none d-md-inline">{{ period.description }}</span>

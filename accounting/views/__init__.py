@@ -21,7 +21,7 @@
 from datetime import timedelta
 
 from django.db import connection
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import dateformat
@@ -75,11 +75,30 @@ def cash(request, subject_code, period_spec):
     data_end = last_txn.date if last_txn is not None else None
     period = Period(
         period_spec, data_start, data_end, get_language())
+    subjects = list(Subject.objects.raw("""SELECT s.*
+FROM accounting_subjects AS s
+  WHERE s.code IN (SELECT s1.code
+    FROM accounting_subjects AS s1
+      INNER JOIN accounting_records AS r1 ON s1.sn=r1.subject_sn
+    WHERE s1.code LIKE '11%'
+      OR s1.code LIKE '12%'
+      OR s1.code LIKE '21%'
+      OR s1.code LIKE '22%'
+    GROUP BY s1.code)
+  ORDER BY s.code"""))
+    subjects.insert(0, Subject(
+        code="0",
+        title_zhtw=pgettext(
+            "Accounting|", "current assets and liabilities"),
+    ))
+    current_subject = None
+    for subject in subjects:
+        if subject.code == subject_code:
+            current_subject = subject
+    if current_subject is None:
+        raise Http404()
     # The SQL query
-    if subject_code == "0":
-        subject = Subject(code="0")
-        subject.title_zhtw = pgettext(
-            "Accounting|", "Current Assets And Liabilities")
+    if current_subject.code == "0":
         select_records = """SELECT r.*
 FROM accounting_records AS r
   INNER JOIN (SELECT
@@ -119,8 +138,6 @@ ORDER BY
             select_balance_before,
             [data_start, period.start - timedelta(days=1)])
     else:
-        subject = Subject.objects.filter(
-            code=subject_code).first()
         select_records = """SELECT r.*
 FROM accounting_records AS r
   INNER JOIN (SELECT
@@ -148,8 +165,8 @@ ORDER BY
             select_records,
             [period.start,
              period.end,
-             subject.code + "%",
-             subject.code + "%"])
+             current_subject.code + "%",
+             current_subject.code + "%"])
         select_balance_before = """SELECT
     SUM(CASE WHEN is_credit THEN 1 ELSE -1 END * amount) AS amount
   FROM (%s) AS b""" % select_records
@@ -157,8 +174,8 @@ ORDER BY
             select_balance_before,
             [data_start,
              period.start - timedelta(days=1),
-             subject.code + "%",
-             subject.code + "%"])
+             current_subject.code + "%",
+             current_subject.code + "%"])
     # The list data
     records = list(Record.objects.raw(
         sql_records.sql,
@@ -177,7 +194,7 @@ ORDER BY
         record.balance = balance
     record_sum = Record(
         transaction=Transaction(date=records[-1].transaction.date),
-        subject=subject,
+        subject=current_subject,
         summary=pgettext("Accounting|", "Total"),
         balance=balance
     )
@@ -196,7 +213,9 @@ ORDER BY
     return render(request, "accounting/cash.html", {
         "records": pagination.records,
         "pagination": pagination,
-        "subject": subject,
+        "current_subject": current_subject,
         "period": period,
-        "reports": ReportUrl(cash=subject, period=period)
+        "reports": ReportUrl(cash=current_subject, period=period),
+        "shortcut_subjects": [x for x in subjects if x.code in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
+        "all_sibjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
     })
