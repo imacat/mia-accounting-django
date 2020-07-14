@@ -53,7 +53,7 @@ class Language:
         self.is_default = (language == settings.LANGUAGE_CODE)
 
     @staticmethod
-    def get_default():
+    def default():
         return Language(settings.LANGUAGE_CODE)
 
 
@@ -74,7 +74,7 @@ def get_multi_language_attr(model, name):
         return title
     if title is not None:
         return title
-    return getattr(model, name + "_" + Language.get_default().db)
+    return getattr(model, name + "_" + Language.default().db)
 
 
 class UrlBuilder:
