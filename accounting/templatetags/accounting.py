@@ -29,7 +29,6 @@ register = template.Library()
 def accounting_amount(value):
     if value is None:
         return ""
-    print(value)
     s = str(abs(value))
     while True:
         m = re.match("^([1-9][0-9]*)([0-9]{3})", s)
