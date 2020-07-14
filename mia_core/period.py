@@ -78,9 +78,9 @@ class Period:
         month_picker_params (str): The month-picker parameters, as a
                                    JSON text string
     """
+    _period = None
     _data_start = None
     _data_end = None
-    _period = None
 
     def __init__(
             self, spec = None, data_start = None, data_end = None):
