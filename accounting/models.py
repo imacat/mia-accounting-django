@@ -22,6 +22,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
+from mia_core.utils import get_multi_language_attr
+
 
 class Subject(models.Model):
     """An accounting subject."""
@@ -50,7 +52,19 @@ class Subject(models.Model):
     def __str__(self):
         """Returns the string representation of this accounting
         subject."""
-        return self.code.__str__() + " " + self.title_zhtw.__str__()
+        return self.code.__str__() + " " + self.title
+
+    _title = None
+
+    @property
+    def title(self):
+        if self._title is None:
+            self._title = get_multi_language_attr(self, "title")
+        return self._title
+
+    @title.setter
+    def title(self, value):
+        self._title = value
 
     class Meta:
         db_table = "accounting_subjects"
@@ -241,7 +255,7 @@ class Record(models.Model):
         record."""
         return "%s %s %s %s" % (
             self.transaction.date,
-            self.subject.title_zhtw,
+            self.subject.title,
             self.summary,
             self.amount)
 

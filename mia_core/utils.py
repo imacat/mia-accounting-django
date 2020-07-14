@@ -21,7 +21,60 @@
 
 import urllib.parse
 
-from django.utils.translation import pgettext
+from django.conf import settings
+from django.utils.translation import pgettext, get_language
+
+
+class Language:
+    """A language.
+
+    Args:
+        language (str): The Django language code.
+
+    Attributes:
+        db (str): The database column suffix of this language.
+        locale (str); The locale name of this language.
+        is_default (bool): Whether this is the default language.
+    """
+    db = None
+    locale = None
+    is_default = False
+
+    def __init__(self, language):
+        if language == "zh-hant":
+            self.locale = "zh-TW"
+            self.db = "zhtw"
+        elif language == "zh-hans":
+            self.locale = "zh-CN"
+            self.db = "zhcn"
+        else:
+            self.locale = language
+            self.db = language
+        self.is_default = (language == settings.LANGUAGE_CODE)
+
+    @staticmethod
+    def get_default():
+        return Language(settings.LANGUAGE_CODE)
+
+
+def get_multi_language_attr(model, name):
+    """Returns a multi-language attribute of a data model.
+    
+    Args:
+        model (object): The data model.
+        name (str): The attribute name.
+
+    Returns:
+        (any): The attribute in this language, or in the default
+            language if there is no content in the current language.
+    """
+    language = Language(get_language())
+    title = getattr(model, name + "_" + language.db)
+    if language.is_default:
+        return title
+    if title is not None:
+        return title
+    return getattr(model, name + "_" + Language.get_default().db)
 
 
 class UrlBuilder:

@@ -88,7 +88,7 @@ FROM accounting_subjects AS s
   ORDER BY s.code"""))
     subjects.insert(0, Subject(
         code="0",
-        title_zhtw=pgettext(
+        title=pgettext(
             "Accounting|", "current assets and liabilities"),
     ))
     current_subject = None
