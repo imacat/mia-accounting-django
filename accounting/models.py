@@ -252,6 +252,33 @@ class Record(models.Model):
     def balance(self, value):
         self._balance = value
 
+    _is_balanced = None
+
+    @property
+    def is_balanced(self):
+        """Whether the transaction of this record is balanced. """
+        if self._is_balanced is None:
+            self._is_balanced = self.transaction.is_balanced
+        return self._is_balanced
+
+    @is_balanced.setter
+    def is_balanced(self, value):
+        self._is_balanced = value
+
+    _has_order_hole = None
+
+    @property
+    def has_order_hole(self):
+        """Whether the order of the transactions on this day is not
+        1, 2, 3, 4, 5..., and should be reordered. """
+        if self._has_order_hole is None:
+            self._has_order_hole = self.transaction.has_order_hole
+        return self._has_order_hole
+
+    @has_order_hole.setter
+    def has_order_hole(self, value):
+        self._has_order_hole = value
+
     def __str__(self):
         """Returns the string representation of this accounting
         record."""

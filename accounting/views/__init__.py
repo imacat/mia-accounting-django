@@ -90,6 +90,43 @@ FROM accounting_subjects AS s
     return subjects
 
 
+def _find_imbalanced(records):
+    """"Finds the records with imbalanced transactions, and sets their
+    is_balanced attribute.
+
+    Args:
+        records (list[Record]): The accounting records.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT transaction_sn
+  FROM accounting_records
+  GROUP BY transaction_sn
+  HAVING SUM(CASE WHEN is_credit THEN -1 ELSE 1 END * amount) != 0""")
+        imbalanced = [x[0] for x in cursor.fetchall()]
+    for record in records:
+        record.is_balanced = record.transaction.sn not in imbalanced
+
+
+def _find_order_holes(records):
+    """"Finds whether the order of the transactions on this day is not
+        1, 2, 3, 4, 5..., and should be reordered, and sets their
+        has_order_holes attributes.
+
+    Args:
+        records (list[Record]): The accounting records.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("""
+  SELECT date FROM accounting_transactions
+  GROUP BY date HAVING COUNT(*)!=MAX(ord)
+  UNION
+  SELECT date FROM accounting_transactions
+  GROUP BY date, ord HAVING COUNT(*) > 1""")
+        holes = [x[0] for x in cursor.fetchall()]
+    for record in records:
+        record.has_order_hole = record.transaction.date in holes
+
+
 @require_GET
 @digest_login_required
 def cash(request, subject_code, period_spec):
@@ -221,8 +258,11 @@ ORDER BY
         balance=balance_before))
     records.append(record_sum)
     pagination = Pagination(request, records, True)
+    records = pagination.records
+    _find_imbalanced(records)
+    _find_order_holes(records)
     return render(request, "accounting/cash.html", {
-        "records": pagination.records,
+        "records": records,
         "pagination": pagination,
         "current_subject": current_subject,
         "period": period,

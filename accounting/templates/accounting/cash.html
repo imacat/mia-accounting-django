@@ -104,15 +104,15 @@ First written: 2020/7/1
     </thead>
     <tbody>
       {% for record in records %}
-        <tr class="{% if not record.transaction.is_balanced or record.transaction.has_order_hole %} table-danger {% endif %}">
+        <tr class="{% if not record.is_balanced or record.has_order_hole %} table-danger {% endif %}">
           <td>{{ record.transaction.date|smart_date }}</td>
           <td>{{ record.subject.title|title }}</td>
-          <td>{{ record.summary|default:"" }}{% if not record.transaction.is_balanced %}
+          <td>{{ record.summary|default:"" }}{% if not record.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unbalanced" context "Accounting|" as text %}
               {{ text|force_escape }}
             </span>
-          {% endif %}{% if record.transaction.has_order_hole %}
+          {% endif %}{% if record.has_order_hole %}
             <span class="badge badge-danger badge-pill">
               {% trans "Need Reorder" context "Accounting|" as text %}
               {{ text|force_escape }}
@@ -137,7 +137,7 @@ First written: 2020/7/1
   {# The list for small screens #}
   <ul class="list-group d-md-none">
     {% for record in records %}
-      <li class="list-group-item {% if not record.transaction.is_balanced or record.transaction.has_order_hole %} list-group-item-danger {% endif %}">
+      <li class="list-group-item {% if not record.is_balanced or record.has_order_hole %} list-group-item-danger {% endif %}">
         {% if record.sn is not None %}
           <a class="list-group-item-action" href="{{ record.transaction.get_absolute_url }}">
             <div class="date-subject-line d-flex justify-content-between align-items-center">
@@ -146,13 +146,13 @@ First written: 2020/7/1
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 {{ record.summary|default:"" }}
-                {% if not record.transaction.is_balanced %}
+                {% if not record.is_balanced %}
                   <span class="badge badge-danger badge-pill">
                     {% trans "Unbalanced" context "Accounting|" as text %}
                     {{ text|force_escape }}
                   </span>
                 {% endif %}
-                {% if record.transaction.has_order_hole %}
+                {% if record.has_order_hole %}
                   <span class="badge badge-danger badge-pill">
                     {% trans "Need Reorder" context "Accounting|" as text %}
                     {{ text|force_escape }}
