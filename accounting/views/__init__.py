@@ -29,7 +29,8 @@ from django.utils.timezone import localdate
 from django.utils.translation import get_language, pgettext
 from django.views.decorators.http import require_GET
 
-from accounting.models import Record, Transaction, Subject
+from accounting.models import Record, Transaction, Subject, \
+    RecordSummary
 from accounting.utils import ReportUrl
 from mia import settings
 from mia_core.digest_auth import digest_login_required
@@ -64,17 +65,12 @@ def cash_home(request):
         reverse("accounting:cash", args=(subject_code, period_spec)))
 
 
-@require_GET
-@digest_login_required
-def cash(request, subject_code, period_spec):
-    """The cash account report."""
-    # The period
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    period = Period(period_spec, data_start, data_end)
-    # The subject
+def _cash_subjects():
+    """Returns the subjects for the cash account reports.
+
+    Returns:
+        list[Subject]: The subjects for the cash account reports.
+    """
     subjects = list(Subject.objects.raw("""SELECT s.*
 FROM accounting_subjects AS s
   WHERE s.code IN (SELECT s1.code
@@ -91,6 +87,21 @@ FROM accounting_subjects AS s
         title=pgettext(
             "Accounting|", "current assets and liabilities"),
     ))
+    return subjects
+
+
+@require_GET
+@digest_login_required
+def cash(request, subject_code, period_spec):
+    """The cash account report."""
+    # The period
+    first_txn = Transaction.objects.order_by("date").first()
+    data_start = first_txn.date if first_txn is not None else None
+    last_txn = Transaction.objects.order_by("-date").first()
+    data_end = last_txn.date if last_txn is not None else None
+    period = Period(period_spec, data_start, data_end)
+    # The subject
+    subjects = _cash_subjects()
     current_subject = None
     for subject in subjects:
         if subject.code == subject_code:
@@ -219,3 +230,90 @@ ORDER BY
         "shortcut_subjects": [x for x in subjects if x.code in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
         "all_sibjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
     })
+
+
+def cash_summary(request, subject_code):
+    """The cash account summary report."""
+    # The subject
+    subjects = _cash_subjects()
+    current_subject = None
+    for subject in subjects:
+        if subject.code == subject_code:
+            current_subject = subject
+    if current_subject is None:
+        raise Http404()
+    if connection.vendor == "postgresql":
+        month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
+    elif connection.vendor == "sqlite":
+        month_definition = "DATE(t.date, 'start of month')"
+    else:
+        month_definition = None
+    # The SQL query
+    if current_subject.code == "0":
+        records = list(RecordSummary.objects.raw("""SELECT
+  """ + month_definition + """ AS month,
+  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
+FROM accounting_records AS r
+  INNER JOIN (SELECT
+      t1.sn AS sn,
+      t1.date AS date,
+      t1.ord AS ord
+    FROM accounting_records AS r1
+      LEFT JOIN accounting_transactions AS t1 ON r1.transaction_sn=t1.sn
+      LEFT JOIN accounting_subjects AS s1 ON r1.subject_sn = s1.sn
+    WHERE s1.code LIKE '11%%'
+      OR s1.code LIKE '12%%'
+      OR s1.code LIKE '21%%'
+      OR s1.code LIKE '22%%'
+    GROUP BY t1.sn) AS t
+  ON r.transaction_sn=t.sn
+  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
+WHERE s.code NOT LIKE '11%%'
+  AND s.code NOT LIKE '12%%'
+  AND s.code NOT LIKE '21%%'
+  AND s.code NOT LIKE '22%%'
+GROUP BY month
+ORDER BY month"""))
+    else:
+        records = list(RecordSummary.objects.raw("""SELECT
+  """ + month_definition + """ AS month,
+  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
+FROM accounting_records AS r
+  INNER JOIN (SELECT
+      t1.sn AS sn,
+      t1.date AS date,
+      t1.ord AS ord
+    FROM accounting_records AS r1
+      LEFT JOIN accounting_transactions AS t1 ON r1.transaction_sn=t1.sn
+      LEFT JOIN accounting_subjects AS s1 ON r1.subject_sn = s1.sn
+    WHERE s1.code LIKE %s
+    GROUP BY t1.sn) AS t
+  ON r.transaction_sn=t.sn
+  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
+WHERE s.code NOT LIKE %s
+GROUP BY month
+ORDER BY month""",
+            [current_subject.code + "%",
+             current_subject.code + "%"]))
+    cumulative_balance = 0
+    for record in records:
+        cumulative_balance = cumulative_balance + record.balance
+        record.cumulative_balance = cumulative_balance
+    records.append(RecordSummary(
+        label=pgettext("Accounting|", "Total"),
+        credit_amount=sum([x.credit_amount for x in records]),
+        debit_amount=sum([x.debit_amount for x in records]),
+        cumulative_balance=cumulative_balance,
+    ))
+    pagination = Pagination(request, records, True)
+    params = {
+        "records": pagination.records,
+        "pagination": pagination,
+        "current_subject": current_subject,
+        "reports": ReportUrl(cash=current_subject),
+        "shortcut_subjects": [x for x in subjects if x.code in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
+        "all_subjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
+    }
+    return render(request, "accounting/cash_summary.html", params)

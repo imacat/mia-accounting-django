@@ -23,6 +23,7 @@ from datetime import date
 
 from django import template
 from django.template import defaultfilters
+from django.utils.timezone import localdate
 from django.utils.translation import gettext
 
 register = template.Library()
@@ -45,3 +46,26 @@ def smart_date(value):
     if date.today().year == value.year:
         return defaultfilters.date(value, "n/j(D)").replace("星期", "")
     return defaultfilters.date(value, "Y/n/j(D)").replace("星期", "")
+
+
+@register.filter
+def smart_month(value):
+    """Formats the month for human friendliness.
+
+    Args:
+        value (datetime.date): The month.
+
+    Returns:
+        str: The human-friendly format of the month.
+    """
+    today = localdate()
+    if value.year == today.year and value.month == today.month:
+        return gettext("This Month")
+    month = today.month - 1
+    year = today.year
+    if month < 1:
+        month = 12
+        year = year - 1
+    if value.year == year and value.month == month:
+        return gettext("Last Month")
+    return defaultfilters.date(value, "Y/n")

@@ -21,7 +21,9 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
+from django.utils import dateformat
 
+from mia_core.template_filters import smart_month
 from mia_core.utils import get_multi_language_attr
 
 
@@ -262,3 +264,40 @@ class Record(models.Model):
     class Meta:
         db_table = "accounting_records"
         ordering = ["is_credit", "ord"]
+
+
+class RecordSummary(models.Model):
+    """A summary record."""
+    month = models.DateField(primary_key=True)
+    credit_amount = models.PositiveIntegerField()
+    debit_amount = models.PositiveIntegerField()
+
+    _label = None
+
+    @property
+    def label(self):
+        if self._label is None:
+            self._label = smart_month(self.month)
+        return self._label
+
+    @label.setter
+    def label(self, value):
+        self._label = value
+
+    @property
+    def balance(self):
+        return self.credit_amount - self.debit_amount
+
+    _cumulative_balance = None
+
+    @property
+    def cumulative_balance(self):
+        return self._cumulative_balance
+
+    @cumulative_balance.setter
+    def cumulative_balance(self, value):
+        self._cumulative_balance = value
+
+    class Meta:
+        db_table = None
+        managed = False
