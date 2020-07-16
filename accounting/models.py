@@ -279,6 +279,32 @@ class Record(models.Model):
     def has_order_hole(self, value):
         self._has_order_hole = value
 
+    _is_credit_card_paid = None
+
+    @property
+    def is_credit_card_paid(self):
+        # TODO: To be done
+        if self._is_credit_card_paid is None:
+            self._is_credit_card_paid = True
+        return self._is_credit_card_paid
+
+    @is_credit_card_paid.setter
+    def is_credit_card_paid(self, value):
+        self._is_credit_card_paid = value
+
+    _is_existing_equipment = None
+
+    @property
+    def is_existing_equipment(self):
+        # TODO: To be done
+        if self._is_existing_equipment is None:
+            self._is_existing_equipment = False
+        return self._is_existing_equipment
+
+    @is_existing_equipment.setter
+    def is_existing_equipment(self, value):
+        self._is_existing_equipment = value
+
     def __str__(self):
         """Returns the string representation of this accounting
         record."""

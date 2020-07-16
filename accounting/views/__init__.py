@@ -18,6 +18,7 @@
 """The view controllers of the accounting application.
 
 """
+import re
 from datetime import timedelta
 
 from django.db import connection
@@ -357,3 +358,95 @@ ORDER BY month""",
         "all_subjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
     }
     return render(request, "accounting/cash_summary.html", params)
+
+
+def _ledger_subjects():
+    """Returns the subjects for the ledger reports.
+
+    Returns:
+        list[Subject]: The subjects for the ledger reports.
+    """
+    return list(Subject.objects.raw("""SELECT s.*
+  FROM accounting_subjects AS s
+  WHERE s.code IN (SELECT s.code
+    FROM accounting_subjects AS s
+      INNER JOIN (SELECT s.code
+        FROM accounting_subjects AS s
+         INNER JOIN accounting_records AS r ON r.subject_sn = s.sn
+        GROUP BY s.code) AS u
+      ON u.code LIKE s.code || '%'
+    GROUP BY s.code)
+  ORDER BY s.code"""))
+
+
+@require_GET
+@digest_login_required
+def ledger(request, subject_code, period_spec):
+    """The ledger report."""
+    # The period
+    first_txn = Transaction.objects.order_by("date").first()
+    data_start = first_txn.date if first_txn is not None else None
+    last_txn = Transaction.objects.order_by("-date").first()
+    data_end = last_txn.date if last_txn is not None else None
+    period = Period(period_spec, data_start, data_end)
+    # The subject
+    subjects = _ledger_subjects()
+    current_subject = None
+    for subject in subjects:
+        if subject.code == subject_code:
+            current_subject = subject
+    if current_subject is None:
+        raise Http404()
+    # The SQL query
+    select_records = """SELECT r.*
+  FROM accounting_records AS r
+    INNER JOIN accounting_transactions AS t ON r.transaction_sn = t.sn
+    INNER JOIN accounting_subjects AS s ON r.subject_sn = s.sn
+  WHERE t.date >= %s AND t.date <= %s AND s.code LIKE %s
+  ORDER BY t.date, t.ord,
+    CASE WHEN r.is_credit THEN 1 ELSE 2 END, r.ord"""
+    records = list(Record.objects.raw(
+        select_records,
+        [period.start, period.end, current_subject.code + "%"]))
+    if re.match("^[1-3]", current_subject.code) is not None:
+        select_balance_before = """SELECT
+    SUM(CASE WHEN is_credit THEN -1 ELSE 1 END * amount)
+  FROM (%s)""" % select_records
+        with connection.cursor() as cursor:
+            cursor.execute(
+                select_balance_before,
+                [data_start,
+                 period.start - timedelta(days=1),
+                 current_subject.code + "%"])
+            row = cursor.fetchone()
+        balance = row[0]
+        record_brought_forward = Record(
+            transaction=Transaction(date=records[-1].transaction.date),
+            subject=current_subject,
+            summary=pgettext("Accounting|", "Brought Forward"),
+            is_credit=balance<0,
+            amount=abs(balance),
+            balance=balance,
+        )
+    else:
+        balance = 0
+        record_brought_forward = None
+    for record in records:
+        balance = balance + \
+                  (-1 if record.is_credit else 1) * record.amount
+        record.balance = balance
+    if record_brought_forward is not None:
+        records.insert(0, record_brought_forward)
+    pagination = Pagination(request, records, True)
+    records = pagination.records
+    _find_imbalanced(records)
+    _find_order_holes(records)
+    params = {
+        "records": records,
+        "pagination": pagination,
+        "current_subject": current_subject,
+        "period": period,
+        "reports": ReportUrl(ledger=current_subject, period=period),
+        "subjects": subjects,
+    }
+    return render(request, "accounting/ledger.html", params)
