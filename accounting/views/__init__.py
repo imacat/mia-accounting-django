@@ -353,7 +353,7 @@ ORDER BY month""",
     ))
     pagination = Pagination(request, records, True)
     shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
-    params = {
+    return render(request, "accounting/cash_summary.html", {
         "records": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
@@ -362,8 +362,7 @@ ORDER BY month""",
                               x.code in shortcut_subjects],
         "all_subjects": [x for x in subjects if
                          x.code not in shortcut_subjects],
-    }
-    return render(request, "accounting/cash_summary.html", params)
+    })
 
 
 def _ledger_subjects():
@@ -448,12 +447,11 @@ def ledger(request, subject_code, period_spec):
     records = pagination.records
     _find_imbalanced(records)
     _find_order_holes(records)
-    params = {
+    return render(request, "accounting/ledger.html", {
         "records": records,
         "pagination": pagination,
         "current_subject": current_subject,
         "period": period,
         "reports": ReportUrl(ledger=current_subject, period=period),
         "subjects": subjects,
-    }
-    return render(request, "accounting/ledger.html", params)
+    })
