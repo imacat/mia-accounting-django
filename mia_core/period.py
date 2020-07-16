@@ -24,8 +24,7 @@ from datetime import date, timedelta
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import defaultfilters
-from django.utils import dateformat
-from django.utils.timezone import localdate
+from django.utils import dateformat, timezone
 from django.utils.translation import gettext
 
 from mia_core.utils import Language
@@ -111,7 +110,7 @@ class Period:
         Returns:
             date: The first day of the last month.
         """
-        today = localdate()
+        today = timezone.localdate()
         month = today.month - 1
         year = today.year
         if month < 1:
@@ -126,7 +125,7 @@ class Period:
         Returns:
             date: The first day of the next month.
         """
-        today = localdate()
+        today = timezone.localdate()
         month = today.month + 1
         year = today.year
         if month > 12:
@@ -138,7 +137,7 @@ class Period:
     def this_month(self):
         if self._data_start is None:
             return None
-        today = localdate()
+        today = timezone.localdate()
         first_month_start = date(
             self._data_start.year, self._data_start.month, 1)
         if today < first_month_start:
@@ -190,7 +189,7 @@ class Period:
     def this_year(self):
         if self._data_start is None:
             return None
-        this_year = localdate().year
+        this_year = timezone.localdate().year
         if this_year < self._data_start.year:
             return None
         return str(this_year)
@@ -199,7 +198,7 @@ class Period:
     def last_year(self):
         if self._data_start is None:
             return None
-        last_year = localdate().year - 1
+        last_year = timezone.localdate().year - 1
         if last_year < self._data_start.year:
             return None
         return str(last_year)
@@ -208,7 +207,7 @@ class Period:
     def has_years_to_choose(self):
         if self._data_start is None:
             return None
-        this_year = localdate().year
+        this_year = timezone.localdate().year
         if self._data_start.year < this_year - 1:
             return True
         if self._data_end.year > this_year:
@@ -219,7 +218,7 @@ class Period:
     def years_to_choose(self):
         if self._data_start is None:
             return None
-        this_year = localdate().year
+        this_year = timezone.localdate().year
         before = [str(x) for x in range(
             self._data_start.year, this_year - 1)]
         after = [str(x) for x in range(
@@ -244,7 +243,7 @@ class Period:
     def today(self):
         if self._data_start is None:
             return None
-        today = localdate()
+        today = timezone.localdate()
         if today < self._data_start or today > self._data_end:
             return None
         return dateformat.format(today, "Y-m-d")
@@ -253,7 +252,7 @@ class Period:
     def yesterday(self):
         if self._data_start is None:
             return None
-        yesterday = localdate() - timedelta(days=1)
+        yesterday = timezone.localdate() - timedelta(days=1)
         if yesterday < self._data_start or yesterday > self._data_end:
             return None
         return dateformat.format(yesterday, "Y-m-d")
@@ -360,7 +359,8 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                self.end = self.get_month_last_day(localdate())
+                self.end = self.get_month_last_day(
+                    timezone.localdate())
                 self.description = gettext(
                     "Since %s") % self.get_month_text(year, month)
                 return
@@ -374,7 +374,7 @@ class Period:
                     self.invalid_period()
                     return
                 self.end = date(year, 12, 31)
-                today = localdate()
+                today = timezone.localdate()
                 if year == today.year:
                     self.description = gettext("This Year")
                 elif year == today.year - 1:
@@ -385,7 +385,8 @@ class Period:
             # All time
             if spec == "-":
                 self.start = date(2000, 1, 1)
-                self.end = self.get_month_last_day(localdate())
+                self.end = self.get_month_last_day(
+                    timezone.localdate())
                 self.description = gettext("All")
                 return
             # A specific date
@@ -420,7 +421,7 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                today = localdate()
+                today = timezone.localdate()
                 # Spans several years
                 if self.start.year != self.end.year:
                     self.description = "%s-%s" % (
@@ -456,7 +457,7 @@ class Period:
 
         def set_this_month(self):
             """Sets the period to this month."""
-            today = localdate()
+            today = timezone.localdate()
             self.spec = dateformat.format(today, "Y-m")
             self.start = date(today.year, today.month, 1)
             self.end = self.get_month_last_day(self.start)
@@ -497,7 +498,7 @@ class Period:
             Returns:
                 str: The description of the month.
             """
-            today = localdate()
+            today = timezone.localdate()
             if year == today.year and month == today.month:
                 return gettext("This Month")
             prev_month = today.month - 1
@@ -520,7 +521,7 @@ class Period:
             Returns:
                 str: The description of the day.
             """
-            today = localdate()
+            today = timezone.localdate()
             if day == today:
                 return gettext("Today")
             elif day == today - timedelta(days=1):

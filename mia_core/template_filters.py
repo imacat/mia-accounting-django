@@ -23,7 +23,7 @@ from datetime import date
 
 from django import template
 from django.template import defaultfilters
-from django.utils.timezone import localdate
+from django.utils import timezone
 from django.utils.translation import gettext
 
 register = template.Library()
@@ -58,7 +58,7 @@ def smart_month(value):
     Returns:
         str: The human-friendly format of the month.
     """
-    today = localdate()
+    today = timezone.localdate()
     if value.year == today.year and value.month == today.month:
         return gettext("This Month")
     month = today.month - 1
