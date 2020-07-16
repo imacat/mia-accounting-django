@@ -324,6 +324,7 @@ class RecordSummary(models.Model):
     month = models.DateField(primary_key=True)
     credit_amount = models.PositiveIntegerField()
     debit_amount = models.PositiveIntegerField()
+    balance = models.IntegerField()
 
     _label = None
 
@@ -336,10 +337,6 @@ class RecordSummary(models.Model):
     @label.setter
     def label(self, value):
         self._label = value
-
-    @property
-    def balance(self):
-        return self.credit_amount - self.debit_amount
 
     _cumulative_balance = None
 

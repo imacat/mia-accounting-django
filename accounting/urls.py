@@ -55,7 +55,7 @@ urlpatterns = [
     path("ledger-summary",
          mia_core_views.todo, name="ledger-summary.home"),
     path("ledger-summary/<str:subject_code>",
-         mia_core_views.todo, name="ledger-summary"),
+         views.ledger_summary, name="ledger-summary"),
     path("journal",
          mia_core_views.todo, name="journal.home"),
     path("journal/<str:period_spec>",

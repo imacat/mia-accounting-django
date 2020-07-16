@@ -455,3 +455,53 @@ def ledger(request, subject_code, period_spec):
         "reports": ReportUrl(ledger=current_subject, period=period),
         "subjects": subjects,
     })
+
+
+def ledger_summary(request, subject_code):
+    """The ledger summary report."""
+    # The subject
+    subjects = _ledger_subjects()
+    current_subject = None
+    for subject in subjects:
+        if subject.code == subject_code:
+            current_subject = subject
+    if current_subject is None:
+        raise Http404()
+    if connection.vendor == "postgresql":
+        month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
+    elif connection.vendor == "sqlite":
+        month_definition = "DATE(t.date, 'start of month')"
+    else:
+        month_definition = None
+    # The SQL query
+    records = list(RecordSummary.objects.raw(
+        f"""SELECT
+  {month_definition} AS month,
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount,
+  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
+  SUM(CASE WHEN r.is_credit THEN -1 ELSE 1 END * r.amount) AS balance
+FROM accounting_records AS r
+  INNER JOIN accounting_transactions AS t ON r.transaction_sn = t.sn
+  INNER JOIN accounting_subjects AS s ON r.subject_sn = s.sn
+WHERE s.code LIKE %s
+GROUP BY month
+ORDER BY month""",
+        [current_subject.code + "%"]))
+    cumulative_balance = 0
+    for record in records:
+        cumulative_balance = cumulative_balance + record.balance
+        record.cumulative_balance = cumulative_balance
+    records.append(RecordSummary(
+        label=pgettext("Accounting|", "Total"),
+        credit_amount=sum([x.credit_amount for x in records]),
+        debit_amount=sum([x.debit_amount for x in records]),
+        cumulative_balance=cumulative_balance,
+    ))
+    pagination = Pagination(request, records, True)
+    return render(request, "accounting/ledger_summary.html", {
+        "records": pagination.records,
+        "pagination": pagination,
+        "current_subject": current_subject,
+        "reports": ReportUrl(cash=current_subject),
+        "subjects": subjects,
+    })
