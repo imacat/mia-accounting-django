@@ -145,7 +145,7 @@ def cash(request, subject_code, period_spec):
             current_subject = subject
     if current_subject is None:
         raise Http404()
-    # The SQL query
+    # The accounting records
     if current_subject.code == "0":
         select_records = """SELECT r.*
 FROM accounting_records AS r
@@ -285,7 +285,7 @@ def cash_summary(request, subject_code):
             current_subject = subject
     if current_subject is None:
         raise Http404()
-    # The SQL query
+    # The accounting records
     if connection.vendor == "postgresql":
         month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
     elif connection.vendor == "sqlite":
@@ -405,7 +405,7 @@ def ledger(request, subject_code, period_spec):
             current_subject = subject
     if current_subject is None:
         raise Http404()
-    # The SQL query
+    # The accounting records
     select_records = """SELECT r.*
   FROM accounting_records AS r
     INNER JOIN accounting_transactions AS t ON r.transaction_sn = t.sn
@@ -470,7 +470,7 @@ def ledger_summary(request, subject_code):
             current_subject = subject
     if current_subject is None:
         raise Http404()
-    # The SQL query
+    # The accounting records
     if connection.vendor == "postgresql":
         month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
     elif connection.vendor == "sqlite":
