@@ -22,7 +22,7 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
-from mia_core.template_filters import smart_month
+from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import get_multi_language_attr
 
 

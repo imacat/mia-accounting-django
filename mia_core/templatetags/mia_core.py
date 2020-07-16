@@ -1,5 +1,5 @@
-# The template filters of the Mia project.
-#   by imacat <imacat@mail.imacat.idv.tw>, 2020/7/2
+# The core application of the Mia project.
+#   by imacat <imacat@mail.imacat.idv.tw>, 2020/7/1
 
 #  Copyright (c) 2020 imacat.
 #
@@ -15,18 +15,78 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-"""The template filters of the Mia core application.
+"""The template tags and filters of the Mia core application.
 
 """
-
 from datetime import date
 
 from django import template
 from django.template import defaultfilters
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 
+from mia_core.utils import UrlBuilder
+
 register = template.Library()
+
+
+@register.simple_tag(takes_context=True)
+def setvar(context, key, value):
+    """Sets a variable in the template.
+
+    Args:
+        context (Context): the context
+        key (str): The variable name
+        value (str): The variable value
+
+    Returns:
+        str: An empty string.
+    """
+    context.dicts[0][key] = value
+    return ""
+
+
+@register.simple_tag
+def str_format(format_str, *args):
+    """Sets a variable in the template.
+
+    Args:
+        format_str (str): The format.
+        args (*str): The arguments.
+
+    Returns:
+        str: The formatted text string.
+    """
+    return format_str.format(*args)
+
+
+@register.simple_tag
+def url_query(url, **kwargs):
+    """Returns the URL with the query parameters set.
+
+    Args:
+        url (str): The URL.
+        kwargs (**dict): The query parameters.
+
+    Returns:
+        str: The URL with query parameters set.
+    """
+    builder = UrlBuilder(url)
+    for key in kwargs.keys():
+        if kwargs[key] is not None:
+            builder.set_param(key, kwargs[key])
+    return str(builder)
+
+
+@register.simple_tag(takes_context=True)
+def url_period(context, period_spec):
+    request = context["request"]
+    viewname = "%s:%s" % (
+        request.resolver_match.app_name,
+        request.resolver_match.url_name)
+    subject_code = request.resolver_match.kwargs["subject_code"]
+    return reverse(viewname, args=[subject_code, period_spec])
 
 
 @register.filter
