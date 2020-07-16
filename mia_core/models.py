@@ -55,7 +55,7 @@ class Country(models.Model):
     @property
     def name(self):
         if self._name is None:
-            self._name = get_multi_lingual_attr(self, "name")
+            self._name = get_multi_lingual_attr(self, "name", "en")
         return self._name
 
     @name.setter

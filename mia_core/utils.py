@@ -32,15 +32,18 @@ class Language:
         language (str): The Django language code.
 
     Attributes:
+        id (str): The language ID
         db (str): The database column suffix of this language.
         locale (str); The locale name of this language.
         is_default (bool): Whether this is the default language.
     """
+    id = None
     db = None
     locale = None
     is_default = False
 
     def __init__(self, language):
+        self.id = language
         self.db = "_" + language.lower().replace("-", "_")
         if language == "zh-hant":
             self.locale = "zh-TW"
@@ -59,12 +62,13 @@ class Language:
         return Language(get_language())
 
 
-def get_multi_lingual_attr(model, name):
+def get_multi_lingual_attr(model, name, default=None):
     """Returns a multi-lingual attribute of a data model.
 
     Args:
         model (object): The data model.
         name (str): The attribute name.
+        default (str): The default language.
 
     Returns:
         (any): The attribute in this language, or in the default
@@ -72,7 +76,9 @@ def get_multi_lingual_attr(model, name):
     """
     language = Language.current()
     title = getattr(model, name + language.db)
-    if language.is_default:
+    if default is None:
+        default = Language.default().id
+    if language.id == default:
         return title
     if title is not None:
         return title
