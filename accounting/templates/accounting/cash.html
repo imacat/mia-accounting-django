@@ -69,11 +69,11 @@ First written: 2020/7/1
     <div class="dropdown-menu subject-picker">
       <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
       {% for subject in shortcut_subjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %}{% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">{{ subject.title|title }}</a>
+        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">{{ subject.title|title }}</a>
       {% endfor %}
       <div class="dropdown-header">{% trans "All" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
       {% for subject in all_sibjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %}{% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">{{ subject.title|title }}</a>
+        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">{{ subject.title|title }}</a>
       {% endfor %}
     </div>
   </div>
