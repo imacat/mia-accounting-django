@@ -81,8 +81,7 @@ class Period:
     _data_start = None
     _data_end = None
 
-    def __init__(
-            self, spec = None, data_start = None, data_end = None):
+    def __init__(self, spec=None, data_start=None, data_end=None):
         self._period = self.Parser(spec)
         self._data_start = data_start
         self._data_end = data_end

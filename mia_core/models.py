@@ -79,7 +79,8 @@ class User(models.Model):
     visits = models.PositiveSmallIntegerField(null=True)
     visited_at = models.DateTimeField(null=True, db_column="visited")
     visited_ip = models.GenericIPAddressField(null=True, db_column="ip")
-    visited_host = models.CharField(max_length=128, null=True, db_column="host")
+    visited_host = models.CharField(
+        max_length=128, null=True, db_column="host")
     visited_country = models.ForeignKey(
         Country, on_delete=models.PROTECT, null=True,
         db_column="ct", to_field="code", related_name="users")

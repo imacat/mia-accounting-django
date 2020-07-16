@@ -63,7 +63,7 @@ class Language:
 
 def get_multi_language_attr(model, name):
     """Returns a multi-language attribute of a data model.
-    
+
     Args:
         model (object): The data model.
         name (str): The attribute name.
@@ -466,6 +466,7 @@ class SqlQuery:
     """
     sql = ""
     params = []
+
     def __init__(self, sql, params):
         self.sql = sql
         self.params = params
