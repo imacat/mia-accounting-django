@@ -351,6 +351,7 @@ ORDER BY month""",
         label=pgettext("Accounting|", "Total"),
         credit_amount=sum([x.credit_amount for x in records]),
         debit_amount=sum([x.debit_amount for x in records]),
+        balance=sum([x.balance for x in records]),
         cumulative_balance=cumulative_balance,
     ))
     pagination = Pagination(request, records, True)
@@ -497,6 +498,7 @@ ORDER BY month""",
         label=pgettext("Accounting|", "Total"),
         credit_amount=sum([x.credit_amount for x in records]),
         debit_amount=sum([x.debit_amount for x in records]),
+        balance=sum([x.balance for x in records]),
         cumulative_balance=cumulative_balance,
     ))
     pagination = Pagination(request, records, True)
