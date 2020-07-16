@@ -69,11 +69,15 @@ First written: 2020/7/15
     <div class="dropdown-menu subject-picker">
       <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
       {% for subject in shortcut_subjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash-summary" subject.code %}">{{ subject.title|title }}</a>
+        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash-summary" subject.code %}">
+          {{ subject.title|title }}
+        </a>
       {% endfor %}
       <div class="dropdown-header">{% trans "All" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
       {% for subject in all_sibjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash-summary" subject.code %}">{{ subject.title|title }}</a>
+        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash-summary" subject.code %}">
+          {{ subject.code }} {{ subject.title|title }}
+        </a>
       {% endfor %}
     </div>
   </div>
@@ -123,20 +127,36 @@ First written: 2020/7/15
           <a class="list-group-item-action d-flex justify-content-between align-items-center" href="{% url "accounting:cash" current_subject.code record.month|date:"Y-m" %}">
             {{ record.label }}
             <div>
-              <span class="badge badge-success badge-pill">{{ record.credit_amount|accounting_amount }}</span>
-              <span class="badge badge-warning badge-pill">{{ record.debit_amount|accounting_amount }}</span>
-              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">{{ record.balance|intcomma:False }}</span>
-              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">{{ record.cumulative_balance|intcomma:False }}</span>
+              <span class="badge badge-success badge-pill">
+                {{ record.credit_amount|accounting_amount }}
+              </span>
+              <span class="badge badge-warning badge-pill">
+                {{ record.debit_amount|accounting_amount }}
+              </span>
+              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                {{ record.balance|intcomma:False }}
+              </span>
+              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                {{ record.cumulative_balance|intcomma:False }}
+              </span>
             </div>
           </a>
         {% else %}
           <div class="d-flex justify-content-between align-items-center">
             {{ record.label }}
             <div>
-              <span class="badge badge-success badge-pill">{{ record.credit_amount|accounting_amount }}</span>
-              <span class="badge badge-warning badge-pill">{{ record.debit_amount|accounting_amount }}</span>
-              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">{{ record.balance|intcomma:False }}</span>
-              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">{{ record.cumulative_balance|intcomma:False }}</span>
+              <span class="badge badge-success badge-pill">
+                {{ record.credit_amount|accounting_amount }}
+              </span>
+              <span class="badge badge-warning badge-pill">
+                {{ record.debit_amount|accounting_amount }}
+              </span>
+              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                {{ record.balance|intcomma:False }}
+              </span>
+              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                {{ record.cumulative_balance|intcomma:False }}
+              </span>
             </div>
           </div>
         {% endif %}
