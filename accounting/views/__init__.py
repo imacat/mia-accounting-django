@@ -268,7 +268,7 @@ ORDER BY
         "period": period,
         "reports": ReportUrl(cash=current_subject, period=period),
         "shortcut_subjects": [x for x in subjects if x.code in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
-        "all_sibjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
+        "all_subjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
     })
 
 
