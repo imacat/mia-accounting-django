@@ -68,7 +68,7 @@ First written: 2020/7/17
     </button>
     <div class="dropdown-menu subject-picker">
       {% for subject in subjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash-summary" subject.code %}">
+        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:ledger-summary" subject.code %}">
           {{ subject.title|title }}
         </a>
       {% endfor %}
