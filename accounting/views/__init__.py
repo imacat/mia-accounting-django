@@ -27,7 +27,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import dateformat
 from django.utils.timezone import localdate
-from django.utils.translation import get_language, pgettext
+from django.utils.translation import pgettext
 from django.views.decorators.http import require_GET
 
 from accounting.models import Record, Transaction, Subject, \
