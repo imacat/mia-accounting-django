@@ -297,7 +297,8 @@ def cash_summary(request, subject_code):
             f"""SELECT
   {month_definition} AS month,
   SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount,
+  SUM(CASE WHEN r.is_credit THEN 1 ELSE -1 END * r.amount) AS balance
 FROM accounting_records AS r
   INNER JOIN (SELECT
       t1.sn AS sn,
@@ -324,7 +325,8 @@ ORDER BY month"""))
             f"""SELECT
   {month_definition} AS month,
   SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount,
+  SUM(CASE WHEN r.is_credit THEN 1 ELSE -1 END * r.amount) AS balance
 FROM accounting_records AS r
   INNER JOIN (SELECT
       t1.sn AS sn,
