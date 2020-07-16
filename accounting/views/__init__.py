@@ -215,9 +215,9 @@ ORDER BY
              period.end,
              current_subject.code + "%",
              current_subject.code + "%"])
-        select_balance_before = """SELECT
+        select_balance_before = f"""SELECT
     SUM(CASE WHEN is_credit THEN 1 ELSE -1 END * amount) AS amount
-  FROM (%s) AS b""" % select_records
+  FROM ({select_records})"""
         sql_balance_before = SqlQuery(
             select_balance_before,
             [data_start,
@@ -293,8 +293,9 @@ def cash_summary(request, subject_code):
         month_definition = None
     # The SQL query
     if current_subject.code == "0":
-        records = list(RecordSummary.objects.raw("""SELECT
-  """ + month_definition + """ AS month,
+        records = list(RecordSummary.objects.raw(
+            f"""SELECT
+  {month_definition} AS month,
   SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
   SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
 FROM accounting_records AS r
@@ -320,8 +321,8 @@ GROUP BY month
 ORDER BY month"""))
     else:
         records = list(RecordSummary.objects.raw(
-            """SELECT
-  """ + month_definition + """ AS month,
+            f"""SELECT
+  {month_definition} AS month,
   SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
   SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
 FROM accounting_records AS r
@@ -414,9 +415,9 @@ def ledger(request, subject_code, period_spec):
         select_records,
         [period.start, period.end, current_subject.code + "%"]))
     if re.match("^[1-3]", current_subject.code) is not None:
-        select_balance_before = """SELECT
+        select_balance_before = f"""SELECT
     SUM(CASE WHEN is_credit THEN -1 ELSE 1 END * amount)
-  FROM (%s)""" % select_records
+  FROM ({select_records})"""
         with connection.cursor() as cursor:
             cursor.execute(
                 select_balance_before,
