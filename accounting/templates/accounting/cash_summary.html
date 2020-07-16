@@ -136,7 +136,7 @@ First written: 2020/7/15
               <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
                 {{ record.balance|intcomma:False }}
               </span>
-              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
                 {{ record.cumulative_balance|intcomma:False }}
               </span>
             </div>
@@ -154,7 +154,7 @@ First written: 2020/7/15
               <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
                 {{ record.balance|intcomma:False }}
               </span>
-              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+              <span class="badge {% if record.cumulative_balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
                 {{ record.cumulative_balance|intcomma:False }}
               </span>
             </div>
