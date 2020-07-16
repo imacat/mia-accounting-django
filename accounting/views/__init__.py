@@ -285,13 +285,13 @@ def cash_summary(request, subject_code):
             current_subject = subject
     if current_subject is None:
         raise Http404()
+    # The SQL query
     if connection.vendor == "postgresql":
         month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
     elif connection.vendor == "sqlite":
         month_definition = "DATE(t.date, 'start of month')"
     else:
         month_definition = None
-    # The SQL query
     if current_subject.code == "0":
         records = list(RecordSummary.objects.raw(
             f"""SELECT
@@ -470,13 +470,13 @@ def ledger_summary(request, subject_code):
             current_subject = subject
     if current_subject is None:
         raise Http404()
+    # The SQL query
     if connection.vendor == "postgresql":
         month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
     elif connection.vendor == "sqlite":
         month_definition = "DATE(t.date, 'start of month')"
     else:
         month_definition = None
-    # The SQL query
     records = list(RecordSummary.objects.raw(
         f"""SELECT
   {month_definition} AS month,
