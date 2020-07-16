@@ -161,9 +161,19 @@ First written: 2020/7/1
               </div>
             </div>
             <div>
-              {% if record.credit_amount is not None %}<span class="badge badge-success badge-pill">{{ record.credit_amount|intcomma:False }}</span>{% endif %}
-              {% if record.debit_amount is not None %}<span class="badge badge-warning badge-pill">-{{ record.debit_amount|intcomma:False }}</span>{% endif %}
-              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">{{ record.balance|intcomma:False }}</span>
+              {% if record.credit_amount is not None %}
+                <span class="badge badge-success badge-pill">
+                  {{ record.credit_amount|intcomma:False }}
+                </span>
+              {% endif %}
+              {% if record.debit_amount is not None %}
+                <span class="badge badge-warning badge-pill">
+                  -{{ record.debit_amount|intcomma:False }}
+              </span>
+              {% endif %}
+              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
+                {{ record.balance|intcomma:False }}
+              </span>
             </div>
           </a>
         {% else %}
@@ -174,9 +184,19 @@ First written: 2020/7/1
             <div>{{ record.summary|default:"" }}</div>
           </div>
           <div>
-            {% if record.credit_amount is not None %}<span class="badge badge-success badge-pill">{{ record.credit_amount|intcomma:False }}</span>{% endif %}
-            {% if record.debit_amount is not None %}<span class="badge badge-warning badge-pill">-{{ record.debit_amount|intcomma:False }}</span>{% endif %}
-            <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">{{ record.balance|intcomma:False }}</span>
+            {% if record.credit_amount is not None %}
+              <span class="badge badge-success badge-pill">
+                {{ record.credit_amount|intcomma:False }}
+              </span>
+            {% endif %}
+            {% if record.debit_amount is not None %}
+              <span class="badge badge-warning badge-pill">
+                -{{ record.debit_amount|intcomma:False }}
+              </span>
+            {% endif %}
+            <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
+              {{ record.balance|intcomma:False }}
+            </span>
           </div>
         {% endif %}
       </li>
