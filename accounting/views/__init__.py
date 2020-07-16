@@ -261,14 +261,17 @@ ORDER BY
     records = pagination.records
     _find_imbalanced(records)
     _find_order_holes(records)
+    shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
     return render(request, "accounting/cash.html", {
         "records": records,
         "pagination": pagination,
         "current_subject": current_subject,
         "period": period,
         "reports": ReportUrl(cash=current_subject, period=period),
-        "shortcut_subjects": [x for x in subjects if x.code in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
-        "all_subjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
+        "shortcut_subjects": [x for x in subjects
+                              if x.code in shortcut_subjects],
+        "all_subjects": [x for x in subjects
+                         if x.code not in shortcut_subjects],
     })
 
 
@@ -316,7 +319,8 @@ WHERE s.code NOT LIKE '11%%'
 GROUP BY month
 ORDER BY month"""))
     else:
-        records = list(RecordSummary.objects.raw("""SELECT
+        records = list(RecordSummary.objects.raw(
+            """SELECT
   """ + month_definition + """ AS month,
   SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
   SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount
@@ -335,8 +339,7 @@ FROM accounting_records AS r
 WHERE s.code NOT LIKE %s
 GROUP BY month
 ORDER BY month""",
-            [current_subject.code + "%",
-             current_subject.code + "%"]))
+            [current_subject.code + "%", current_subject.code + "%"]))
     cumulative_balance = 0
     for record in records:
         cumulative_balance = cumulative_balance + record.balance
@@ -348,13 +351,16 @@ ORDER BY month""",
         cumulative_balance=cumulative_balance,
     ))
     pagination = Pagination(request, records, True)
+    shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
     params = {
         "records": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
         "reports": ReportUrl(cash=current_subject),
-        "shortcut_subjects": [x for x in subjects if x.code in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
-        "all_subjects": [x for x in subjects if x.code not in settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]],
+        "shortcut_subjects": [x for x in subjects if
+                              x.code in shortcut_subjects],
+        "all_subjects": [x for x in subjects if
+                         x.code not in shortcut_subjects],
     }
     return render(request, "accounting/cash_summary.html", params)
 
@@ -420,10 +426,11 @@ def ledger(request, subject_code, period_spec):
             row = cursor.fetchone()
         balance = row[0]
         record_brought_forward = Record(
-            transaction=Transaction(date=records[-1].transaction.date),
+            transaction=Transaction(
+                date=records[-1].transaction.date),
             subject=current_subject,
             summary=pgettext("Accounting|", "Brought Forward"),
-            is_credit=balance<0,
+            is_credit=balance < 0,
             amount=abs(balance),
             balance=balance,
         )
