@@ -21,7 +21,7 @@
 
 from django.db import models
 
-from mia_core.utils import get_multi_language_attr
+from mia_core.utils import get_multi_lingual_attr
 
 
 class Country(models.Model):
@@ -29,8 +29,10 @@ class Country(models.Model):
     sn = models.PositiveIntegerField(primary_key=True)
     code = models.CharField(max_length=2, unique=True)
     name_en = models.CharField(max_length=64)
-    name_zhtw = models.CharField(max_length=32, null=True)
-    name_zhcn = models.CharField(max_length=32, null=True)
+    name_zh_hant = models.CharField(
+        max_length=32, null=True, db_column="name_zhtw")
+    name_zh_hans = models.CharField(
+        max_length=32, null=True, db_column="name_zhcn")
     is_special = models.BooleanField(
         default=False, db_column="special")
     created_at = models.DateTimeField(
@@ -46,19 +48,19 @@ class Country(models.Model):
 
     def __str__(self):
         """Returns the string representation of this country."""
-        return self.code.__str__() + " " + self.name_zhtw.__str__()
+        return self.code.__str__() + " " + self.name.__str__()
 
-    _title = None
+    _name = None
 
     @property
-    def title(self):
-        if self._title is None:
-            self._title = get_multi_language_attr(self, "title")
-        return self._title
+    def name(self):
+        if self._name is None:
+            self._name = get_multi_lingual_attr(self, "name")
+        return self._name
 
-    @title.setter
-    def title(self, value):
-        self._title = value
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     class Meta:
         db_table = "countries"

@@ -41,15 +41,13 @@ class Language:
     is_default = False
 
     def __init__(self, language):
+        self.db = "_" + language.lower().replace("-", "_")
         if language == "zh-hant":
             self.locale = "zh-TW"
-            self.db = "zhtw"
         elif language == "zh-hans":
             self.locale = "zh-CN"
-            self.db = "zhcn"
         else:
             self.locale = language
-            self.db = language
         self.is_default = (language == settings.LANGUAGE_CODE)
 
     @staticmethod
@@ -61,8 +59,8 @@ class Language:
         return Language(get_language())
 
 
-def get_multi_language_attr(model, name):
-    """Returns a multi-language attribute of a data model.
+def get_multi_lingual_attr(model, name):
+    """Returns a multi-lingual attribute of a data model.
 
     Args:
         model (object): The data model.
@@ -73,12 +71,12 @@ def get_multi_language_attr(model, name):
             language if there is no content in the current language.
     """
     language = Language.current()
-    title = getattr(model, name + "_" + language.db)
+    title = getattr(model, name + language.db)
     if language.is_default:
         return title
     if title is not None:
         return title
-    return getattr(model, name + "_" + Language.default().db)
+    return getattr(model, name + Language.default().db)
 
 
 class UrlBuilder:

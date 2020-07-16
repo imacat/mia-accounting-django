@@ -23,7 +23,7 @@ from django.db import models
 from django.urls import reverse
 
 from mia_core.templatetags.mia_core import smart_month
-from mia_core.utils import get_multi_language_attr
+from mia_core.utils import get_multi_lingual_attr
 
 
 class Subject(models.Model):
@@ -33,10 +33,11 @@ class Subject(models.Model):
         "self", on_delete=models.PROTECT, null=True, blank=True,
         db_column="parent_sn")
     code = models.CharField(max_length=5)
-    title_zhtw = models.CharField(max_length=32)
+    title_zh_hant = models.CharField(
+        max_length=32, db_column="title_zhtw")
     title_en = models.CharField(max_length=128, null=True, blank=True)
-    title_zhcn = models.CharField(
-        max_length=32, null=True, blank=True)
+    title_zh_hans = models.CharField(
+        max_length=32, null=True, blank=True, db_column="title_zhcn")
     created_at = models.DateTimeField(
         auto_now_add=True, db_column="created")
     created_by = models.ForeignKey(
@@ -60,7 +61,7 @@ class Subject(models.Model):
     @property
     def title(self):
         if self._title is None:
-            self._title = get_multi_language_attr(self, "title")
+            self._title = get_multi_lingual_attr(self, "title")
         return self._title
 
     @title.setter
