@@ -298,8 +298,8 @@ def cash_summary(request, subject_code):
         records = list(RecordSummary.objects.raw(
             f"""SELECT
   {month_definition} AS month,
-  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount,
+  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit,
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit,
   SUM(CASE WHEN r.is_credit THEN 1 ELSE -1 END * r.amount) AS balance
 FROM accounting_records AS r
   INNER JOIN (SELECT
@@ -326,8 +326,8 @@ ORDER BY month"""))
         records = list(RecordSummary.objects.raw(
             f"""SELECT
   {month_definition} AS month,
-  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount,
+  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit,
+  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit,
   SUM(CASE WHEN r.is_credit THEN 1 ELSE -1 END * r.amount) AS balance
 FROM accounting_records AS r
   INNER JOIN (SELECT
@@ -351,8 +351,8 @@ ORDER BY month""",
         record.cumulative_balance = cumulative_balance
     records.append(RecordSummary(
         label=pgettext("Accounting|", "Total"),
-        credit_amount=sum([x.credit_amount for x in records]),
-        debit_amount=sum([x.debit_amount for x in records]),
+        credit=sum([x.credit for x in records]),
+        debit=sum([x.debit for x in records]),
         balance=sum([x.balance for x in records]),
         cumulative_balance=cumulative_balance,
     ))
@@ -468,8 +468,8 @@ def ledger_summary(request, subject_code):
     # The accounting records
     records = [RecordSummary(
         month=x["month"],
-        debit_amount=x["debit"] if x["debit"] is not None else 0,
-        credit_amount=x["credit"] if x["credit"] is not None else 0,
+        debit=x["debit"] if x["debit"] is not None else 0,
+        credit=x["credit"] if x["credit"] is not None else 0,
         balance=x["balance"],
     ) for x in Record.objects\
         .filter(subject__code__startswith=current_subject.code)\
@@ -492,8 +492,8 @@ def ledger_summary(request, subject_code):
         record.cumulative_balance = cumulative_balance
     records.append(RecordSummary(
         label=pgettext("Accounting|", "Total"),
-        credit_amount=sum([x.credit_amount for x in records]),
-        debit_amount=sum([x.debit_amount for x in records]),
+        credit=sum([x.credit for x in records]),
+        debit=sum([x.debit for x in records]),
         balance=sum([x.balance for x in records]),
         cumulative_balance=cumulative_balance,
     ))

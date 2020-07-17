@@ -322,8 +322,8 @@ class Record(models.Model):
 class RecordSummary(models.Model):
     """A summary record."""
     month = models.DateField(primary_key=True)
-    credit_amount = models.PositiveIntegerField()
-    debit_amount = models.PositiveIntegerField()
+    credit = models.PositiveIntegerField()
+    debit = models.PositiveIntegerField()
     balance = models.IntegerField()
 
     _label = None

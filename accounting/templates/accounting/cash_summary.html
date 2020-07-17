@@ -102,8 +102,8 @@ First written: 2020/7/15
       {% for record in records %}
         <tr class="{% if record.balance < 0 %} table-danger {% endif %}">
           <td>{{ record.label }}</td>
-          <td class="amount">{{ record.credit_amount|accounting_amount }}</td>
-          <td class="amount">{{ record.debit_amount|accounting_amount }}</td>
+          <td class="amount">{{ record.credit|accounting_amount }}</td>
+          <td class="amount">{{ record.debit|accounting_amount }}</td>
           <td class="amount {% if record.balance < 0 %} text-danger {% endif %}">{{ record.balance|accounting_amount }}</td>
           <td class="amount {% if record.cumulative_balance < 0 %} text-danger {% endif %}">{{ record.cumulative_balance|accounting_amount }}</td>
           <td class="actions">
@@ -128,10 +128,10 @@ First written: 2020/7/15
             {{ record.label }}
             <div>
               <span class="badge badge-success badge-pill">
-                {{ record.credit_amount|accounting_amount }}
+                {{ record.credit|accounting_amount }}
               </span>
               <span class="badge badge-warning badge-pill">
-                {{ record.debit_amount|accounting_amount }}
+                {{ record.debit|accounting_amount }}
               </span>
               <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
                 {{ record.balance|intcomma:False }}
@@ -146,10 +146,10 @@ First written: 2020/7/15
             {{ record.label }}
             <div>
               <span class="badge badge-success badge-pill">
-                {{ record.credit_amount|accounting_amount }}
+                {{ record.credit|accounting_amount }}
               </span>
               <span class="badge badge-warning badge-pill">
-                {{ record.debit_amount|accounting_amount }}
+                {{ record.debit|accounting_amount }}
               </span>
               <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
                 {{ record.balance|intcomma:False }}
