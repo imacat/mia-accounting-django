@@ -509,3 +509,29 @@ ORDER BY month""",
         "reports": ReportUrl(cash=current_subject),
         "subjects": subjects,
     })
+
+
+@require_GET
+@digest_login_required
+def journal(request, period_spec):
+    """The ledger report."""
+    # The period
+    first_txn = Transaction.objects.order_by("date").first()
+    data_start = first_txn.date if first_txn is not None else None
+    last_txn = Transaction.objects.order_by("-date").first()
+    data_end = last_txn.date if last_txn is not None else None
+    period = Period(period_spec, data_start, data_end)
+    # The accounting records
+    records = Record.objects.filter(
+        transaction__date__gte=period.start,
+        transaction__date__lte=period.end).order_by(
+        "transaction__date", "is_credit", "ord")
+    # The brought-forward records
+    # TODO: To be done.
+
+    pagination = Pagination(request, records, True)
+    return render(request, "accounting/journal.html", {
+        "records": pagination.records,
+        "pagination": pagination,
+        "period": period,
+    })

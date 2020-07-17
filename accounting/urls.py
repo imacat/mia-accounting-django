@@ -59,7 +59,7 @@ urlpatterns = [
     path("journal",
          mia_core_views.todo, name="journal.home"),
     path("journal/<str:period_spec>",
-         mia_core_views.todo, name="journal"),
+         views.journal, name="journal"),
     path("trial-balance",
          mia_core_views.todo, name="trial-balance.home"),
     path("trial-balance/<str:period_spec>",
