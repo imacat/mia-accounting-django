@@ -82,12 +82,12 @@ def url_query(url, **kwargs):
 @register.simple_tag(takes_context=True)
 def url_period(context, period_spec):
     request = context["request"]
-    viewname = "%s:%s" % (
+    view_name = "%s:%s" % (
         request.resolver_match.app_name,
         request.resolver_match.url_name)
     kwargs = request.resolver_match.kwargs
     kwargs["period_spec"] = period_spec
-    return reverse(viewname, kwargs=kwargs)
+    return reverse(view_name, kwargs=kwargs)
 
 
 @register.filter
