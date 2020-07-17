@@ -22,6 +22,7 @@ import re
 from datetime import timedelta
 
 from django.db import connection
+from django.db.models import Sum
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
@@ -406,28 +407,21 @@ def ledger(request, subject_code, period_spec):
     if current_subject is None:
         raise Http404()
     # The accounting records
-    select_records = """SELECT r.*
-  FROM accounting_records AS r
-    INNER JOIN accounting_transactions AS t ON r.transaction_sn = t.sn
-    INNER JOIN accounting_subjects AS s ON r.subject_sn = s.sn
-  WHERE t.date >= %s AND t.date <= %s AND s.code LIKE %s
-  ORDER BY t.date, t.ord,
-    CASE WHEN r.is_credit THEN 1 ELSE 2 END, r.ord"""
-    records = list(Record.objects.raw(
-        select_records,
-        [period.start, period.end, current_subject.code + "%"]))
+    records = list(Record.objects.filter(
+        transaction__date__gte=period.start,
+        transaction__date__lte=period.end,
+        subject__code__startswith=current_subject.code))
     if re.match("^[1-3]", current_subject.code) is not None:
-        select_balance_before = f"""SELECT
-    SUM(CASE WHEN is_credit THEN -1 ELSE 1 END * amount)
-  FROM ({select_records})"""
-        with connection.cursor() as cursor:
-            cursor.execute(
-                select_balance_before,
-                [data_start,
-                 period.start - timedelta(days=1),
-                 current_subject.code + "%"])
-            row = cursor.fetchone()
-        balance = 0 if row[0] is None else row[0]
+        debit = Record.objects.filter(
+            transaction__date__lt=period.start,
+            subject__code__startswith=current_subject.code,
+            is_credit=False).aggregate(sum=Sum("amount"))
+        credit = Record.objects.filter(
+            transaction__date__lt=period.start,
+            subject__code__startswith=current_subject.code,
+            is_credit=True).aggregate(sum=Sum("amount"))
+        balance = (0 if debit["sum"] is None else debit["sum"]) \
+                  - (0 if credit["sum"] is None else credit["sum"])
         record_brought_forward = Record(
             transaction=Transaction(
                 date=records[-1].transaction.date),
