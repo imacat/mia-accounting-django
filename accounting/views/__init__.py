@@ -22,7 +22,8 @@ import re
 from datetime import timedelta
 
 from django.db import connection
-from django.db.models import Sum
+from django.db.models import Sum, Case, When, F
+from django.db.models.functions import TruncMonth
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
@@ -465,25 +466,26 @@ def ledger_summary(request, subject_code):
     if current_subject is None:
         raise Http404()
     # The accounting records
-    if connection.vendor == "postgresql":
-        month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
-    elif connection.vendor == "sqlite":
-        month_definition = "DATE(t.date, 'start of month')"
-    else:
-        month_definition = None
-    records = list(RecordSummary.objects.raw(
-        f"""SELECT
-  {month_definition} AS month,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit_amount,
-  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit_amount,
-  SUM(CASE WHEN r.is_credit THEN -1 ELSE 1 END * r.amount) AS balance
-FROM accounting_records AS r
-  INNER JOIN accounting_transactions AS t ON r.transaction_sn = t.sn
-  INNER JOIN accounting_subjects AS s ON r.subject_sn = s.sn
-WHERE s.code LIKE %s
-GROUP BY month
-ORDER BY month""",
-        [current_subject.code + "%"]))
+    records = [RecordSummary(
+        month=x["month"],
+        debit_amount=x["debit"] if x["debit"] is not None else 0,
+        credit_amount=x["credit"] if x["credit"] is not None else 0,
+        balance=x["balance"],
+    ) for x in Record.objects\
+        .filter(subject__code__startswith=current_subject.code)\
+        .annotate(month=TruncMonth("transaction__date"))\
+        .values("month")\
+        .order_by("month")\
+        .annotate(
+        debit=Sum(Case(
+            When(is_credit=False, then=F("amount"))),
+            default=0),
+        credit=Sum(Case(
+            When(is_credit=True, then=F("amount"))),
+            default=0),
+        balance=Sum(Case(
+            When(is_credit=False, then=F("amount")),
+            default=-F("amount"))))]
     cumulative_balance = 0
     for record in records:
         cumulative_balance = cumulative_balance + record.balance
