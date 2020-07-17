@@ -427,7 +427,7 @@ def ledger(request, subject_code, period_spec):
                  period.start - timedelta(days=1),
                  current_subject.code + "%"])
             row = cursor.fetchone()
-        balance = row[0]
+        balance = 0 if row[0] is None else row[0]
         record_brought_forward = Record(
             transaction=Transaction(
                 date=records[-1].transaction.date),
