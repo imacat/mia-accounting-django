@@ -85,8 +85,9 @@ def url_period(context, period_spec):
     viewname = "%s:%s" % (
         request.resolver_match.app_name,
         request.resolver_match.url_name)
-    subject_code = request.resolver_match.kwargs["subject_code"]
-    return reverse(viewname, args=[subject_code, period_spec])
+    kwargs = request.resolver_match.kwargs
+    kwargs["period_spec"] = period_spec
+    return reverse(viewname, kwargs=kwargs)
 
 
 @register.filter
