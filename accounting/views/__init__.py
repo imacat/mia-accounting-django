@@ -497,7 +497,7 @@ def ledger_summary(request, subject_code):
         "records": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
-        "reports": ReportUrl(cash=current_subject),
+        "reports": ReportUrl(ledger=current_subject),
         "subjects": subjects,
     })
 
