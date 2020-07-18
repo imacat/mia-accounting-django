@@ -368,9 +368,9 @@ def ledger(request, subject_code, period_spec):
         balance = Record.objects.filter(
             transaction__date__lt=period.start,
             subject__code__startswith=current_subject.code)\
-            .aggregate(balance=Sum(Case(When(
+            .aggregate(balance=Coalesce(Sum(Case(When(
             is_credit=True, then=-1),
-            default=1) * F("amount")))["balance"]
+            default=1) * F("amount")), 0))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
             subject=current_subject,
