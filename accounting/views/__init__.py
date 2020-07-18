@@ -440,8 +440,47 @@ def journal(request, period_spec):
         transaction__date__lte=period.end).order_by(
         "transaction__date", "is_credit", "ord")
     # The brought-forward records
-    # TODO: To be done.
-
+    brought_forward_subjects = Subject.objects.filter(
+        Q(code__startswith="1")
+        | Q(code__startswith="2")
+        | Q(code__startswith="3"))\
+        .annotate(balance=Sum(
+        Case(
+            When(record__is_credit=True, then=-1),
+            default=1
+        ) * F("record__amount"),
+        filter=Q(record__transaction__date__lt=period.start)))\
+        .filter(~Q(balance__gt=0))
+    debit_records = [Record(
+        transaction=Transaction(date=period.start),
+        subject=x,
+        is_credit=False,
+        amount=x.balance
+    ) for x in brought_forward_subjects if x.balance > 0]
+    credit_records = [Record(
+        transaction=Transaction(date=period.start),
+        subject=x,
+        is_credit=True,
+        amount=-x.balance
+    ) for x in brought_forward_subjects if x.balance < 0]
+    sum_debits = sum([x.amount for x in debit_records])
+    sum_credits = sum([x.amount for x in credit_records])
+    if sum_debits < sum_credits:
+        debit_records.append(Record(
+            transaction=Transaction(date=period.start),
+            subject=Subject.objects.filter(code="3351").first(),
+            is_credit=False,
+            amount=sum_credits - sum_debits
+        ))
+    elif sum_debits > sum_credits:
+        credit_records.append(Record(
+            transaction=Transaction(date=period.start),
+            subject=Subject.objects.filter(code="3351").first(),
+            is_credit=True,
+            amount=sum_debits - sum_credits
+        ))
+    records = list(debit_records) + list(credit_records)\
+              + list(records)
     pagination = Pagination(request, records, True)
     return render(request, "accounting/journal.html", {
         "records": pagination.records,
