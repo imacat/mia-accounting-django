@@ -73,17 +73,13 @@ def _cash_subjects():
     Returns:
         list[Subject]: The subjects for the cash account reports.
     """
-    subjects = list(Subject.objects.raw("""SELECT s.*
-FROM accounting_subjects AS s
-  WHERE s.code IN (SELECT s1.code
-    FROM accounting_subjects AS s1
-      INNER JOIN accounting_records AS r1 ON s1.sn=r1.subject_sn
-    WHERE s1.code LIKE '11%'
-      OR s1.code LIKE '12%'
-      OR s1.code LIKE '21%'
-      OR s1.code LIKE '22%'
-    GROUP BY s1.code)
-  ORDER BY s.code"""))
+    subjects = list(Subject.objects.filter(
+        code__in=Record.objects.filter(
+            Q(subject__code__startswith="11")
+            | Q(subject__code__startswith="12")
+            | Q(subject__code__startswith="21")
+            | Q(subject__code__startswith="22"))
+            .values("subject__code")))
     subjects.insert(0, Subject(
         code="0",
         title=pgettext(
