@@ -413,16 +413,12 @@ def ledger(request, subject_code, period_spec):
         transaction__date__lte=period.end,
         subject__code__startswith=current_subject.code))
     if re.match("^[1-3]", current_subject.code) is not None:
-        debit = Record.objects.filter(
+        balance = Record.objects.filter(
             transaction__date__lt=period.start,
-            subject__code__startswith=current_subject.code,
-            is_credit=False).aggregate(sum=Sum("amount"))
-        credit = Record.objects.filter(
-            transaction__date__lt=period.start,
-            subject__code__startswith=current_subject.code,
-            is_credit=True).aggregate(sum=Sum("amount"))
-        balance = (0 if debit["sum"] is None else debit["sum"]) \
-                  - (0 if credit["sum"] is None else credit["sum"])
+            subject__code__startswith=current_subject.code)\
+            .aggregate(balance=Sum(Case(When(
+            is_credit=True, then=-1),
+            default=1) * F("amount")))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(
                 date=records[-1].transaction.date),
