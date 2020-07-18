@@ -23,7 +23,7 @@ from datetime import timedelta
 
 from django.db import connection
 from django.db.models import Sum, Case, When, F
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
@@ -466,23 +466,18 @@ def ledger_summary(request, subject_code):
     if current_subject is None:
         raise Http404()
     # The accounting records
-    records = [RecordSummary(
-        month=x["month"],
-        debit=x["debit"] if x["debit"] is not None else 0,
-        credit=x["credit"] if x["credit"] is not None else 0,
-        balance=x["balance"],
-    ) for x in Record.objects\
+    records = [RecordSummary(**x) for x in Record.objects\
         .filter(subject__code__startswith=current_subject.code)\
         .annotate(month=TruncMonth("transaction__date"))\
         .values("month")\
         .order_by("month")\
         .annotate(
-        debit=Sum(Case(
-            When(is_credit=False, then=F("amount"))),
-            default=0),
-        credit=Sum(Case(
-            When(is_credit=True, then=F("amount"))),
-            default=0),
+        debit=Coalesce(
+            Sum(Case(When(is_credit=False, then=F("amount")))),
+            0),
+        credit=Coalesce(
+            Sum(Case(When(is_credit=True, then=F("amount")))),
+            0),
         balance=Sum(Case(
             When(is_credit=False, then=F("amount")),
             default=-F("amount"))))]
