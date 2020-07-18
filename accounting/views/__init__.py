@@ -420,8 +420,7 @@ def ledger(request, subject_code, period_spec):
             is_credit=True, then=-1),
             default=1) * F("amount")))["balance"]
         record_brought_forward = Record(
-            transaction=Transaction(
-                date=records[-1].transaction.date),
+            transaction=Transaction(date=period.start),
             subject=current_subject,
             summary=pgettext("Accounting|", "Brought Forward"),
             is_credit=balance < 0,
