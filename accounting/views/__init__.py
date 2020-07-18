@@ -22,7 +22,7 @@ import re
 from datetime import timedelta
 
 from django.db import connection
-from django.db.models import Sum, Case, When, F
+from django.db.models import Sum, Case, When, F, Q
 from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
@@ -149,94 +149,41 @@ def cash(request, subject_code, period_spec):
         raise Http404()
     # The accounting records
     if current_subject.code == "0":
-        select_records = """SELECT r.*
-FROM accounting_records AS r
-  INNER JOIN (SELECT
-         t1.sn AS sn,
-         t1.date AS date,
-         t1.ord AS ord
-      FROM accounting_records AS r1
-        LEFT JOIN accounting_transactions AS t1
-          ON r1.transaction_sn=t1.sn
-        LEFT JOIN accounting_subjects AS s1
-          ON r1.subject_sn = s1.sn
-      WHERE (s1.code LIKE '11%%'
-        OR s1.code LIKE '12%%'
-        OR s1.code LIKE '21%%'
-        OR s1.code LIKE '22%%')
-        AND t1.date >= %s
-        AND t1.date <= %s
-      GROUP BY t1.sn) AS t
-    ON r.transaction_sn=t.sn
-  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
-WHERE s.code NOT LIKE '11%%'
-  AND s.code NOT LIKE '12%%'
-  AND s.code NOT LIKE '21%%'
-  AND s.code NOT LIKE '22%%'
-ORDER BY
-  t.date,
-  t.ord,
-  CASE WHEN is_credit THEN 1 ELSE 2 END,
-  r.ord"""
-        sql_records = SqlQuery(
-            select_records,
-            [period.start, period.end])
-        select_balance_before = """SELECT
-    SUM(CASE WHEN is_credit THEN 1 ELSE -1 END * amount) AS amount
-  FROM (%s) AS b""" % select_records
-        sql_balance_before = SqlQuery(
-            select_balance_before,
-            [data_start, period.start - timedelta(days=1)])
+        records = list(Record.objects.filter(
+            Q(transaction__in=Transaction.objects.filter(
+                Q(date__gte=period.start),
+                Q(date__lte=period.end),
+                (Q(record__subject__code__startswith="11") |
+                 Q(record__subject__code__startswith="12") |
+                 Q(record__subject__code__startswith="21") |
+                 Q(record__subject__code__startswith="22")))),
+            ~Q(subject__code__startswith="11"),
+            ~Q(subject__code__startswith="12"),
+            ~Q(subject__code__startswith="21"),
+            ~Q(subject__code__startswith="22")))
+        balance_before = Record.objects.filter(
+            Q(transaction__date__lt=period.start),
+            (Q(subject__code__startswith="11") |
+             Q(subject__code__startswith="12") |
+             Q(subject__code__startswith="21") |
+             Q(subject__code__startswith="21")))\
+            .aggregate(balance=Coalesce(Sum(Case(When(
+            is_credit=True, then=-1),
+            default=1) * F("amount")), 0))["balance"]
     else:
-        select_records = """SELECT r.*
-FROM accounting_records AS r
-  INNER JOIN (SELECT
-         t1.sn AS sn,
-         t1.date AS date,
-         t1.ord AS ord
-      FROM accounting_records AS r1
-       LEFT JOIN accounting_transactions AS t1
-         ON r1.transaction_sn=t1.sn
-       LEFT JOIN accounting_subjects AS s1
-         ON r1.subject_sn = s1.sn
-      WHERE t1.date >= %s
-        AND t1.date <= %s
-        AND s1.code LIKE %s
-      GROUP BY t1.sn) AS t
-    ON r.transaction_sn=t.sn
-  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
-WHERE s.code NOT LIKE %s
-ORDER BY
-  t.date,
-  t.ord,
-  CASE WHEN is_credit THEN 1 ELSE 2 END,
-  r.ord"""
-        sql_records = SqlQuery(
-            select_records,
-            [period.start,
-             period.end,
-             current_subject.code + "%",
-             current_subject.code + "%"])
-        select_balance_before = f"""SELECT
-    SUM(CASE WHEN is_credit THEN 1 ELSE -1 END * amount) AS amount
-  FROM ({select_records})"""
-        sql_balance_before = SqlQuery(
-            select_balance_before,
-            [data_start,
-             period.start - timedelta(days=1),
-             current_subject.code + "%",
-             current_subject.code + "%"])
-    # The list data
-    records = list(Record.objects.raw(
-        sql_records.sql,
-        sql_records.params))
-    with connection.cursor() as cursor:
-        cursor.execute(
-            sql_balance_before.sql, sql_balance_before.params)
-        row = cursor.fetchone()
-    balance_before = row[0]
-    if balance_before is None:
-        balance_before = 0
+        records = list(Record.objects.filter(
+            Q(transaction__in=Transaction.objects.filter(
+                Q(date__gte=period.start),
+                Q(date__lte=period.end),
+                Q(record__subject__code__startswith=
+                  current_subject.code))),
+            ~Q(subject__code__startswith=current_subject.code)))
+        balance_before = Record.objects.filter(
+            transaction__date__lt=period.start,
+            subject__code__startswith=current_subject.code)\
+            .aggregate(balance=Coalesce(Sum(Case(When(
+            is_credit=True, then=-1),
+            default=1) * F("amount")), 0))["balance"]
     balance = balance_before
     for record in records:
         sign = 1 if record.is_credit else -1
@@ -294,6 +241,11 @@ def cash_summary(request, subject_code):
         month_definition = "DATE(t.date, 'start of month')"
     else:
         month_definition = None
+    q = Transaction.objects.filter(
+        Q(record__subject__code__startswith="11") |
+        Q(record__subject__code__startswith="12") |
+        Q(record__subject__code__startswith="21") |
+        Q(record__subject__code__startswith="22")).values("sn")
     if current_subject.code == "0":
         records = list(RecordSummary.objects.raw(
             f"""SELECT
