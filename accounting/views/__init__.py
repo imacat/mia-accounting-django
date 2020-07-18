@@ -231,68 +231,48 @@ def cash_summary(request, subject_code):
     if current_subject is None:
         raise Http404()
     # The accounting records
-    if connection.vendor == "postgresql":
-        month_definition = "CAST(DATE_TRUNC('month', t.date) AS date)"
-    elif connection.vendor == "sqlite":
-        month_definition = "DATE(t.date, 'start of month')"
-    else:
-        month_definition = None
-    q = Transaction.objects.filter(
-        Q(record__subject__code__startswith="11") |
-        Q(record__subject__code__startswith="12") |
-        Q(record__subject__code__startswith="21") |
-        Q(record__subject__code__startswith="22")).values("sn")
     if current_subject.code == "0":
-        records = list(RecordSummary.objects.raw(
-            f"""SELECT
-  {month_definition} AS month,
-  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit,
-  SUM(CASE WHEN r.is_credit THEN 1 ELSE -1 END * r.amount) AS balance
-FROM accounting_records AS r
-  INNER JOIN (SELECT
-      t1.sn AS sn,
-      t1.date AS date,
-      t1.ord AS ord
-    FROM accounting_records AS r1
-      LEFT JOIN accounting_transactions AS t1 ON r1.transaction_sn=t1.sn
-      LEFT JOIN accounting_subjects AS s1 ON r1.subject_sn = s1.sn
-    WHERE s1.code LIKE '11%%'
-      OR s1.code LIKE '12%%'
-      OR s1.code LIKE '21%%'
-      OR s1.code LIKE '22%%'
-    GROUP BY t1.sn) AS t
-  ON r.transaction_sn=t.sn
-  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
-WHERE s.code NOT LIKE '11%%'
-  AND s.code NOT LIKE '12%%'
-  AND s.code NOT LIKE '21%%'
-  AND s.code NOT LIKE '22%%'
-GROUP BY month
-ORDER BY month"""))
+        records = [RecordSummary(**x) for x in Record.objects.filter(
+            Q(transaction__in=Transaction.objects.filter(
+                Q(record__subject__code__startswith="11") |
+                 Q(record__subject__code__startswith="12") |
+                 Q(record__subject__code__startswith="21") |
+                 Q(record__subject__code__startswith="22"))),
+            ~Q(subject__code__startswith="11"),
+            ~Q(subject__code__startswith="12"),
+            ~Q(subject__code__startswith="21"),
+            ~Q(subject__code__startswith="22")) \
+            .annotate(month=TruncMonth("transaction__date")) \
+            .values("month") \
+            .order_by("month") \
+            .annotate(
+            debit=Coalesce(
+                Sum(Case(When(is_credit=False, then=F("amount")))),
+                0),
+            credit=Coalesce(
+                Sum(Case(When(is_credit=True, then=F("amount")))),
+                0),
+            balance=Sum(Case(
+                When(is_credit=False, then=-F("amount")),
+                default=F("amount"))))]
     else:
-        records = list(RecordSummary.objects.raw(
-            f"""SELECT
-  {month_definition} AS month,
-  SUM(CASE WHEN r.is_credit THEN r.amount ELSE 0 END) AS credit,
-  SUM(CASE WHEN r.is_credit THEN 0 ELSE r.amount END) AS debit,
-  SUM(CASE WHEN r.is_credit THEN 1 ELSE -1 END * r.amount) AS balance
-FROM accounting_records AS r
-  INNER JOIN (SELECT
-      t1.sn AS sn,
-      t1.date AS date,
-      t1.ord AS ord
-    FROM accounting_records AS r1
-      LEFT JOIN accounting_transactions AS t1 ON r1.transaction_sn=t1.sn
-      LEFT JOIN accounting_subjects AS s1 ON r1.subject_sn = s1.sn
-    WHERE s1.code LIKE %s
-    GROUP BY t1.sn) AS t
-  ON r.transaction_sn=t.sn
-  LEFT JOIN accounting_subjects AS s ON r.subject_sn = s.sn
-WHERE s.code NOT LIKE %s
-GROUP BY month
-ORDER BY month""",
-            [current_subject.code + "%", current_subject.code + "%"]))
+        records = [RecordSummary(**x) for x in Record.objects.filter(
+            Q(transaction__in=Transaction.objects.filter(
+                record__subject__code__startswith=current_subject.code)),
+            ~Q(subject__code__startswith=current_subject.code)) \
+            .annotate(month=TruncMonth("transaction__date")) \
+            .values("month") \
+            .order_by("month") \
+            .annotate(
+            debit=Coalesce(
+                Sum(Case(When(is_credit=False, then=F("amount")))),
+                0),
+            credit=Coalesce(
+                Sum(Case(When(is_credit=True, then=F("amount")))),
+                0),
+            balance=Sum(Case(
+                When(is_credit=False, then=-F("amount")),
+                default=F("amount"))))]
     cumulative_balance = 0
     for record in records:
         cumulative_balance = cumulative_balance + record.balance
