@@ -19,7 +19,6 @@
 
 """
 import re
-from datetime import timedelta
 
 from django.db import connection
 from django.db.models import Sum, Case, When, F, Q
@@ -37,7 +36,7 @@ from accounting.utils import ReportUrl
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
-from mia_core.utils import Pagination, SqlQuery
+from mia_core.utils import Pagination
 
 
 @require_GET
