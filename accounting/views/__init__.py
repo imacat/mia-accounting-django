@@ -285,7 +285,7 @@ def cash_summary(request, subject_code):
     ))
     pagination = Pagination(request, records, True)
     shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
-    return render(request, "accounting/cash_summary.html", {
+    return render(request, "accounting/cash-summary.html", {
         "records": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
@@ -415,7 +415,7 @@ def ledger_summary(request, subject_code):
         cumulative_balance=cumulative_balance,
     ))
     pagination = Pagination(request, records, True)
-    return render(request, "accounting/ledger_summary.html", {
+    return render(request, "accounting/ledger-summary.html", {
         "records": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
