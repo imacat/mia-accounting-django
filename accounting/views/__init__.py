@@ -20,8 +20,7 @@
 """
 import re
 
-from django.db import connection
-from django.db.models import Sum, Case, When, F, Q
+from django.db.models import Sum, Case, When, F, Q, Count, Max
 from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
@@ -128,14 +127,14 @@ def _find_order_holes(records):
     Args:
         records (list[Record]): The accounting records.
     """
-    with connection.cursor() as cursor:
-        cursor.execute("""
-  SELECT date FROM accounting_transactions
-  GROUP BY date HAVING COUNT(*)!=MAX(ord)
-  UNION
-  SELECT date FROM accounting_transactions
-  GROUP BY date, ord HAVING COUNT(*) > 1""")
-        holes = [x[0] for x in cursor.fetchall()]
+    holes = [x["date"] for x in Transaction.objects
+        .values("date")
+        .annotate(count=Count("ord"), max=Max("ord"))
+        .filter(Q(count=F("max")))]\
+             + [x["date"] for x in Transaction.objects
+        .values("date", "ord")
+        .annotate(count=Count("sn"))
+        .filter(~Q(count=1))]
     for record in records:
         record.has_order_hole = record.transaction.date in holes
 
