@@ -87,7 +87,7 @@ First written: 2020/7/16
 
 {% include "mia_core/include/period-chooser.html" %}
 
-{% if records %}
+{% if item_list %}
   {% include "mia_core/include/pagination.html" %}
 
   {# The table for large screens #}
@@ -104,37 +104,37 @@ First written: 2020/7/16
       </tr>
     </thead>
     <tbody>
-      {% for record in records %}
-        <tr class="{% if not record.is_balanced or record.has_order_hole or not record.is_credit_card_paid %} table-danger {% endif %}{% if record.is_existing_equipment %} table-info {% endif %}">
-          <td>{{ record.transaction.date|smart_date }}</td>
-          <td>{{ record.subject.title|title }}</td>
-          <td>{{ record.summary|default:"" }}{% if not record.is_balanced %}
+      {% for item in item_list %}
+        <tr class="{% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} table-danger {% endif %}{% if item.is_existing_equipment %} table-info {% endif %}">
+          <td>{{ item.transaction.date|smart_date }}</td>
+          <td>{{ item.subject.title|title }}</td>
+          <td>{{ item.summary|default:"" }}{% if not item.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unbalanced" context "Accounting|" as text %}
               {{ text|force_escape }}
             </span>
-          {% endif %}{% if record.has_order_hole %}
+          {% endif %}{% if item.has_order_hole %}
             <span class="badge badge-danger badge-pill">
               {% trans "Need Reorder" context "Accounting|" as text %}
               {{ text|force_escape }}
             </span>
-          {% endif %}{% if not record.is_credit_card_paid %}
+          {% endif %}{% if not item.is_credit_card_paid %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unpaid" context "Accounting|" as text %}
               {{ text|force_escape }}
             </span>
-          {% endif %}{% if record.is_existing_equipment %}
+          {% endif %}{% if item.is_existing_equipment %}
             <span class="badge badge-info badge-pill">
               {% trans "Existing" context "Accounting|" as text %}
               {{ text|force_escape }}
             </span>
           {% endif %}</td>
-          <td class="amount">{{ record.debit_amount|accounting_amount }}</td>
-          <td class="amount">{{ record.credit_amount|accounting_amount }}</td>
-          <td class="amount {% if record.balance < 0 %} text-danger {% endif %}">{{ record.balance|accounting_amount }}</td>
+          <td class="amount">{{ item.debit_amount|accounting_amount }}</td>
+          <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
+          <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
           <td class="actions">
-            {% if record.sn is not None %}
-              <a href="{{ record.transaction.get_absolute_url }}" class="btn btn-info" role="button">
+            {% if item.sn is not None %}
+              <a href="{{ item.transaction.get_absolute_url }}" class="btn btn-info" role="button">
                 <i class="fas fa-eye"></i>
                 <span class="d-none d-lg-inline">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</span>
               </a>
@@ -147,35 +147,35 @@ First written: 2020/7/16
 
   {# The list for small screens #}
   <ul class="list-group d-md-none">
-    {% for record in records %}
-      <li class="list-group-item {% if not record.is_balanced or record.has_order_hole or not record.is_credit_card_paid %} list-group-item-danger {% endif %}{% if record.is_existing_equipment %} list-group-item-info {% endif %}">
-        {% if record.sn is not None %}
-          <a class="list-group-item-action" href="{{ record.transaction.get_absolute_url }}">
+    {% for item in item_list %}
+      <li class="list-group-item {% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} list-group-item-danger {% endif %}{% if item.is_existing_equipment %} list-group-item-info {% endif %}">
+        {% if item.sn is not None %}
+          <a class="list-group-item-action" href="{{ item.transaction.get_absolute_url }}">
             <div class="date-subject-line">
-              {{ record.transaction.date|smart_date }} {{ record.subject.title|title }}
+              {{ item.transaction.date|smart_date }} {{ item.subject.title|title }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                {{ record.summary|default:"" }}
-                {% if not record.is_balanced %}
+                {{ item.summary|default:"" }}
+                {% if not item.is_balanced %}
                   <span class="badge badge-danger badge-pill">
                     {% trans "Unbalanced" context "Accounting|" as text %}
                     {{ text|force_escape }}
                   </span>
                 {% endif %}
-                {% if record.has_order_hole %}
+                {% if item.has_order_hole %}
                   <span class="badge badge-danger badge-pill">
                     {% trans "Need Reorder" context "Accounting|" as text %}
                     {{ text|force_escape }}
                   </span>
                 {% endif %}
-                {% if not record.is_credit_card_paid %}
+                {% if not item.is_credit_card_paid %}
                   <span class="badge badge-danger badge-pill">
                     {% trans "Unpaid" context "Accounting|" as text %}
                     {{ text|force_escape }}
                   </span>
                 {% endif %}
-                {% if record.is_existing_equipment %}
+                {% if item.is_existing_equipment %}
                   <span class="badge badge-info badge-pill">
                     {% trans "Existing" context "Accounting|" as text %}
                     {{ text|force_escape }}
@@ -183,43 +183,43 @@ First written: 2020/7/16
                 {% endif %}
               </div>
               <div>
-                {% if record.debit_amount is not None %}
+                {% if item.debit_amount is not None %}
                   <span class="badge badge-success badge-pill">
-                    {{ record.debit_amount|intcomma:False }}
+                    {{ item.debit_amount|intcomma:False }}
                   </span>
                 {% endif %}
-                {% if record.credit_amount is not None %}
+                {% if item.credit_amount is not None %}
                   <span class="badge badge-warning badge-pill">
-                    {{ record.credit_amount|intcomma:False }}
+                    {{ item.credit_amount|intcomma:False }}
                   </span>
                 {% endif %}
-                <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
-                  {{ record.balance|intcomma:False }}
+                <span class="badge {% if item.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
+                  {{ item.balance|intcomma:False }}
                 </span>
               </div>
             </div>
           </a>
         {% else %}
           <div class="date-subject-line">
-            {{ record.transaction.date|smart_date }} {{ record.subject.title|title }}
+            {{ item.transaction.date|smart_date }} {{ item.subject.title|title }}
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              {{ record.summary|default:"" }}
+              {{ item.summary|default:"" }}
             </div>
             <div>
-              {% if record.debit_amount is not None %}
+              {% if item.debit_amount is not None %}
                 <span class="badge badge-success badge-pill">
-                  {{ record.debit_amount|intcomma:False }}
+                  {{ item.debit_amount|intcomma:False }}
                 </span>
               {% endif %}
-              {% if record.credit_amount is not None %}
+              {% if item.credit_amount is not None %}
                 <span class="badge badge-warning badge-pill">
-                  {{ record.credit_amount|intcomma:False }}
+                  {{ item.credit_amount|intcomma:False }}
                 </span>
               {% endif %}
-              <span class="badge {% if record.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
-                {{ record.balance|intcomma:False }}
+              <span class="badge {% if item.balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
+                {{ item.balance|intcomma:False }}
               </span>
             </div>
           </div>

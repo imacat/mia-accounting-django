@@ -221,7 +221,7 @@ def cash(request, subject_code, period_spec):
     _find_order_holes(records)
     shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
     return render(request, "accounting/cash.html", {
-        "records": records,
+        "item_list": records,
         "pagination": pagination,
         "current_subject": current_subject,
         "period": period,
@@ -300,7 +300,7 @@ def cash_summary(request, subject_code):
     pagination = Pagination(request, records, True)
     shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
     return render(request, "accounting/cash-summary.html", {
-        "records": pagination.records,
+        "item_list": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
         "reports": ReportUrl(cash=current_subject),
@@ -379,7 +379,7 @@ def ledger(request, subject_code, period_spec):
     _find_imbalanced(records)
     _find_order_holes(records)
     return render(request, "accounting/ledger.html", {
-        "records": records,
+        "item_list": records,
         "pagination": pagination,
         "current_subject": current_subject,
         "period": period,
@@ -427,7 +427,7 @@ def ledger_summary(request, subject_code):
     ))
     pagination = Pagination(request, records, True)
     return render(request, "accounting/ledger-summary.html", {
-        "records": pagination.records,
+        "item_list": pagination.records,
         "pagination": pagination,
         "current_subject": current_subject,
         "reports": ReportUrl(ledger=current_subject),
@@ -490,7 +490,7 @@ def journal(request, period_spec):
               + list(records)
     pagination = Pagination(request, records, True)
     return render(request, "accounting/journal.html", {
-        "records": pagination.records,
+        "item_list": pagination.records,
         "pagination": pagination,
         "period": period,
     })
@@ -570,8 +570,8 @@ def trial_balance(request, period_spec):
     record_sum.credit = sum([x.credit for x in records
                         if x.credit is not None])
     return render(request, "accounting/trial-balance.html", {
-        "records": records,
-        "record_sum": record_sum,
+        "item_list": records,
+        "total_item": record_sum,
         "reports": ReportUrl(period=period),
         "period": period,
     })
