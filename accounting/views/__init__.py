@@ -216,7 +216,7 @@ def cash(request, subject_code, period_spec):
         balance=balance_before))
     records.append(record_sum)
     pagination = Pagination(request, records, True)
-    records = pagination.records
+    records = pagination.items
     _find_imbalanced(records)
     _find_order_holes(records)
     shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
@@ -243,9 +243,9 @@ def cash_summary(request, subject_code):
             current_subject = subject
     if current_subject is None:
         raise Http404()
-    # The accounting records
+    # The month summaries
     if current_subject.code == "0":
-        records = [RecordSummary(**x) for x in Record.objects.filter(
+        months = [RecordSummary(**x) for x in Record.objects.filter(
             Q(transaction__in=Transaction.objects.filter(
                 Q(record__subject__code__startswith="11") |
                  Q(record__subject__code__startswith="12") |
@@ -269,7 +269,7 @@ def cash_summary(request, subject_code):
                 When(is_credit=False, then=-F("amount")),
                 default=F("amount"))))]
     else:
-        records = [RecordSummary(**x) for x in Record.objects.filter(
+        months = [RecordSummary(**x) for x in Record.objects.filter(
             Q(transaction__in=Transaction.objects.filter(
                 record__subject__code__startswith=current_subject.code)),
             ~Q(subject__code__startswith=current_subject.code)) \
@@ -287,20 +287,20 @@ def cash_summary(request, subject_code):
                 When(is_credit=False, then=-F("amount")),
                 default=F("amount"))))]
     cumulative_balance = 0
-    for record in records:
-        cumulative_balance = cumulative_balance + record.balance
-        record.cumulative_balance = cumulative_balance
-    records.append(RecordSummary(
+    for month in months:
+        cumulative_balance = cumulative_balance + month.balance
+        month.cumulative_balance = cumulative_balance
+    months.append(RecordSummary(
         label=pgettext("Accounting|", "Total"),
-        credit=sum([x.credit for x in records]),
-        debit=sum([x.debit for x in records]),
-        balance=sum([x.balance for x in records]),
+        credit=sum([x.credit for x in months]),
+        debit=sum([x.debit for x in months]),
+        balance=sum([x.balance for x in months]),
         cumulative_balance=cumulative_balance,
     ))
-    pagination = Pagination(request, records, True)
+    pagination = Pagination(request, months, True)
     shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
     return render(request, "accounting/cash-summary.html", {
-        "item_list": pagination.records,
+        "item_list": pagination.items,
         "pagination": pagination,
         "current_subject": current_subject,
         "reports": ReportUrl(cash=current_subject),
@@ -375,7 +375,7 @@ def ledger(request, subject_code, period_spec):
     if record_brought_forward is not None:
         records.insert(0, record_brought_forward)
     pagination = Pagination(request, records, True)
-    records = pagination.records
+    records = pagination.items
     _find_imbalanced(records)
     _find_order_holes(records)
     return render(request, "accounting/ledger.html", {
@@ -398,8 +398,8 @@ def ledger_summary(request, subject_code):
             current_subject = subject
     if current_subject is None:
         raise Http404()
-    # The accounting records
-    records = [RecordSummary(**x) for x in Record.objects\
+    # The month summaries
+    months = [RecordSummary(**x) for x in Record.objects\
         .filter(subject__code__startswith=current_subject.code)\
         .annotate(month=TruncMonth("transaction__date"))\
         .values("month")\
@@ -415,19 +415,19 @@ def ledger_summary(request, subject_code):
             When(is_credit=False, then=F("amount")),
             default=-F("amount"))))]
     cumulative_balance = 0
-    for record in records:
-        cumulative_balance = cumulative_balance + record.balance
-        record.cumulative_balance = cumulative_balance
-    records.append(RecordSummary(
+    for month in months:
+        cumulative_balance = cumulative_balance + month.balance
+        month.cumulative_balance = cumulative_balance
+    months.append(RecordSummary(
         label=pgettext("Accounting|", "Total"),
-        credit=sum([x.credit for x in records]),
-        debit=sum([x.debit for x in records]),
-        balance=sum([x.balance for x in records]),
+        credit=sum([x.credit for x in months]),
+        debit=sum([x.debit for x in months]),
+        balance=sum([x.balance for x in months]),
         cumulative_balance=cumulative_balance,
     ))
-    pagination = Pagination(request, records, True)
+    pagination = Pagination(request, months, True)
     return render(request, "accounting/ledger-summary.html", {
-        "item_list": pagination.records,
+        "item_list": pagination.items,
         "pagination": pagination,
         "current_subject": current_subject,
         "reports": ReportUrl(ledger=current_subject),
@@ -490,7 +490,7 @@ def journal(request, period_spec):
               + list(records)
     pagination = Pagination(request, records, True)
     return render(request, "accounting/journal.html", {
-        "item_list": pagination.records,
+        "item_list": pagination.items,
         "pagination": pagination,
         "period": period,
     })
@@ -561,17 +561,17 @@ def trial_balance(request, period_spec):
             brought_forward.debit = None
             brought_forward.credit = -balance
         real.append(brought_forward)
-    records = nominal + real
-    records.sort(key=lambda x: x.code)
-    record_sum = Subject()
-    record_sum.title = pgettext("Accounting|", "Total")
-    record_sum.debit = sum([x.debit for x in records
-                       if x.debit is not None])
-    record_sum.credit = sum([x.credit for x in records
-                        if x.credit is not None])
+    accounts = nominal + real
+    accounts.sort(key=lambda x: x.code)
+    total_account = Subject()
+    total_account.title = pgettext("Accounting|", "Total")
+    total_account.debit = sum([x.debit for x in accounts
+                               if x.debit is not None])
+    total_account.credit = sum([x.credit for x in accounts
+                                if x.credit is not None])
     return render(request, "accounting/trial-balance.html", {
-        "item_list": records,
-        "total_item": record_sum,
+        "item_list": accounts,
+        "total_item": total_account,
         "reports": ReportUrl(period=period),
         "period": period,
     })

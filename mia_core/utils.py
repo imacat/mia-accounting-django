@@ -209,9 +209,9 @@ class Pagination:
 
     Args:
         request (HttpRequest): The request
-        records (list[Model]): All the records
+        items (list): All the items
         page_no (int): The specified page number
-        page_size (int): The specified number of records per page
+        page_size (int): The specified number of items per page
         is_reversed (bool): Whether we should display the last
                             page first
 
@@ -225,7 +225,7 @@ class Pagination:
         total_pages (int): The total number of pages available.
         is_paged (bool): Whether there are more than one page.
         page_no (int): The current page number.
-        records (list[Model]): The records in the current page.
+        items (list[Model]): The items in the current page.
         links (list[Link]): The navigation links in the pagination
                             bar.
         page_size_options(list[PageSizeOptions]): The page size
@@ -237,11 +237,11 @@ class Pagination:
     total_pages = None
     is_paged = None
     page_no = None
-    records = None
+    items = None
 
     DEFAULT_PAGE_SIZE = 10
 
-    def __init__(self, request, records, is_reversed=False):
+    def __init__(self, request, items, is_reversed=False):
         current_url = request.get_full_path()
         self._current_url = current_url
         self.is_reversed = is_reversed
@@ -261,7 +261,7 @@ class Pagination:
             raise PaginationException(str(
                 UrlBuilder(current_url).del_param("page-size")))
         self.total_pages = int(
-            (len(records) - 1) / self.page_size) + 1
+            (len(items) - 1) / self.page_size) + 1
         default_page_no = 1 if not is_reversed else self.total_pages
         self.is_paged = self.total_pages > 1
 
@@ -288,10 +288,10 @@ class Pagination:
 
         if not self.is_paged:
             self.page_no = 1
-            self.records = records
+            self.items = items
             return
         start_no = self.page_size * (self.page_no - 1)
-        self.records = records[start_no:start_no + self.page_size]
+        self.items = items[start_no:start_no + self.page_size]
 
     _links = None
 
