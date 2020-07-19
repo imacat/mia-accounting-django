@@ -61,8 +61,8 @@ First written: 2020/7/1
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-book" %}
-    {% trans "Journal" context "Accounting|" as current_report_title %}
+  {% with current_report_icon="fas fa-balance-scale-right" %}
+    {% trans "Trial Balance" context "Accounting|" as current_report_title %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
