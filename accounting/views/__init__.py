@@ -162,9 +162,10 @@ def cash(request, subject_code, period_spec):
              Q(subject__code__startswith="12") |
              Q(subject__code__startswith="21") |
              Q(subject__code__startswith="21")))\
-            .aggregate(balance=Coalesce(Sum(Case(When(
-            is_credit=True, then=-1),
-            default=1) * F("amount")), 0))["balance"]
+            .aggregate(
+            balance=Coalesce(Sum(Case(
+                When(is_credit=True, then=-1),
+                default=1) * F("amount")), 0))["balance"]
     else:
         records = list(Record.objects.filter(
             Q(transaction__in=Transaction.objects.filter(
@@ -176,9 +177,10 @@ def cash(request, subject_code, period_spec):
         balance_before = Record.objects.filter(
             transaction__date__lt=period.start,
             subject__code__startswith=current_subject.code)\
-            .aggregate(balance=Coalesce(Sum(Case(When(
-            is_credit=True, then=-1),
-            default=1) * F("amount")), 0))["balance"]
+            .aggregate(
+            balance=Coalesce(Sum(Case(When(
+                is_credit=True, then=-1),
+                default=1) * F("amount")), 0))["balance"]
     balance = balance_before
     for record in records:
         sign = 1 if record.is_credit else -1
@@ -343,9 +345,10 @@ def ledger(request, subject_code, period_spec):
         balance = Record.objects.filter(
             transaction__date__lt=period.start,
             subject__code__startswith=current_subject.code)\
-            .aggregate(balance=Coalesce(Sum(Case(When(
-            is_credit=True, then=-1),
-            default=1) * F("amount")), 0))["balance"]
+            .aggregate(
+            balance=Coalesce(Sum(Case(When(
+                is_credit=True, then=-1),
+                default=1) * F("amount")), 0))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
             subject=current_subject,
