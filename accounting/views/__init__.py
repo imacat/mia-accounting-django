@@ -66,6 +66,22 @@ def cash_home(request):
         reverse("accounting:cash", args=(subject_code, period_spec)))
 
 
+def _get_period(period_spec):
+    """Obtains the period helper.
+
+    Args:
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        Period: The period helper.
+    """
+    first_txn = Transaction.objects.order_by("date").first()
+    data_start = first_txn.date if first_txn is not None else None
+    last_txn = Transaction.objects.order_by("-date").first()
+    data_end = last_txn.date if last_txn is not None else None
+    return Period(period_spec, data_start, data_end)
+
+
 def _cash_subjects():
     """Returns the subjects for the cash account reports.
 
@@ -129,11 +145,7 @@ def _find_order_holes(records):
 def cash(request, subject_code, period_spec):
     """The cash account report."""
     # The period
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    period = Period(period_spec, data_start, data_end)
+    period = _get_period(period_spec)
     # The subject
     subjects = _cash_subjects()
     current_subject = None
@@ -323,11 +335,7 @@ def _ledger_subjects():
 def ledger(request, subject_code, period_spec):
     """The ledger report."""
     # The period
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    period = Period(period_spec, data_start, data_end)
+    period = _get_period(period_spec)
     # The subject
     subjects = _ledger_subjects()
     current_subject = None
@@ -432,11 +440,7 @@ def ledger_summary(request, subject_code):
 def journal(request, period_spec):
     """The ledger report."""
     # The period
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    period = Period(period_spec, data_start, data_end)
+    period = _get_period(period_spec)
     # The accounting records
     records = Record.objects.filter(
         transaction__date__gte=period.start,
@@ -497,11 +501,7 @@ def journal(request, period_spec):
 def trial_balance(request, period_spec):
     """The trial blanace."""
     # The period
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    period = Period(period_spec, data_start, data_end)
+    period = _get_period(period_spec)
     # The accounts
     nominal = list(
         Subject.objects.filter(
