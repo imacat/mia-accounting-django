@@ -487,3 +487,88 @@ def journal(request, period_spec):
         "pagination": pagination,
         "period": period,
     })
+
+
+@require_GET
+@digest_login_required
+def trial_balance(request, period_spec):
+    """The trial blanace."""
+    # The period
+    first_txn = Transaction.objects.order_by("date").first()
+    data_start = first_txn.date if first_txn is not None else None
+    last_txn = Transaction.objects.order_by("-date").first()
+    data_end = last_txn.date if last_txn is not None else None
+    period = Period(period_spec, data_start, data_end)
+    # The accounts
+    nominal = list(
+        Subject.objects.filter(
+            Q(record__transaction__date__gte=period.start),
+            Q(record__transaction__date__lte=period.end),
+            ~(Q(code__startswith="1")
+              | Q(code__startswith="2")
+              | Q(code__startswith="3")))
+            .annotate(
+            balance=Sum(Case(
+                When(record__is_credit=True, then=-1),
+                default=1) * F("record__amount")))
+            .filter(balance__isnull=False)
+            .annotate(
+            debit=Case(
+                When(balance__gt=0, then=F("balance")),
+                default=None),
+            credit=Case(
+                When(balance__lt=0, then=-F("balance")),
+                default=None)))
+    real = list(
+        Subject.objects
+            .filter(Q(record__transaction__date__lte=period.end),
+                    (Q(code__startswith="1")
+                     | Q(code__startswith="2")
+                     | Q(code__startswith="3")),
+                    ~Q(code="3351"))
+            .annotate(
+            balance=Sum(Case(
+                When(record__is_credit=True, then=-1),
+                default=1) * F("record__amount")))
+            .filter(balance__isnull=False)
+            .annotate(
+            debit=Case(
+                When(balance__gt=0, then=F("balance")),
+                default=None),
+            credit=Case(
+                When(balance__lt=0, then=-F("balance")),
+                default=None)))
+    balance = Record.objects.filter(
+        (Q(transaction__date__lt=period.start)
+         & ~(Q(subject__code__startswith="1")
+             | Q(subject__code__startswith="2")
+             | Q(subject__code__startswith="3")))
+        | (Q(transaction__date__lte=period.end)
+           & Q(subject__code="3351")))\
+        .aggregate(
+        balance=Sum(Case(
+            When(is_credit=True, then=-1),
+            default=1) * F("amount")))["balance"]
+    if balance is not None and balance != 0:
+        brought_forward = Subject.objects.filter(code="3351").first()
+        if balance > 0:
+            brought_forward.debit = balance
+            brought_forward.credit = 0
+        else:
+            brought_forward.debit = None
+            brought_forward.credit = -balance
+        real.append(brought_forward)
+    records = nominal + real
+    records.sort(key=lambda x: x.code)
+    record_sum = Subject()
+    record_sum.title = pgettext("Accounting|", "Total")
+    record_sum.debit = sum([x.debit for x in records
+                       if x.debit is not None])
+    record_sum.credit = sum([x.credit for x in records
+                        if x.credit is not None])
+    return render(request, "accounting/trial-balance.html", {
+        "records": records,
+        "record_sum": record_sum,
+        "reports": ReportUrl(period=period),
+        "period": period,
+    })

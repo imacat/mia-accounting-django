@@ -1,0 +1,212 @@
+/* The Mia Website
+ * report.css: The style sheet for the accounting report
+ */
+
+/*  Copyright (c) 2019-2020 imacat.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+/* Author: imacat@mail.imacat.idv.tw (imacat)
+ * First written: 2019/9/12
+ */
+
+
+.subject-picker {
+    height: auto;
+    max-height: 400px;
+    overflow-x: hidden;
+}
+.date-subject-line {
+    font-size: 0.833em;
+}
+.negative {
+    color: red;
+}
+.journal-credit {
+    padding-left: 1em;
+}
+
+/* The general journal tables */
+.general-journal-table th, .general-journal-table td {
+    vertical-align: middle;
+    height: 50px;
+}
+
+/* The report block */
+.report-block {
+    margin: 1em;
+    background-color: #E9ECEF;
+    border-radius: 0.3em;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.report-block .table {
+    background-color: transparent;
+}
+.report-block h2 {
+    border-bottom: thick double slategray;
+}
+.report-block-lg {
+    padding: 2em 1.5em;
+}
+.report-block-sm {
+    padding: 1em 1em;
+}
+.report-block-lg table th, .report-block-lg table td {
+    vertical-align: middle;
+    height: 50px;
+}
+.report-block-sm .list-group-item {
+    background-color: transparent;
+    border: none;
+}
+
+/* The trial balance */
+.trial-balance-table thead {
+    font-size: 1.1em;
+}
+.trial-balance-table tbody {
+    border-top: thick double slategray;
+    border-bottom: thick double slategray;
+}
+.trial-balance-table tfoot {
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+.trial-balance-list .total {
+    border-top: thick double slategray;
+    font-weight: bolder;
+    font-size: 1.1em;
+}
+
+/* The income statement */
+.income-statement-table thead {
+    font-size: 1.21em;
+}
+.income-statement-table tbody {
+    border-top: thick double slategray;
+    border-bottom: thick double slategray;
+}
+.income-statement-table tr {
+    height: 50px;
+}
+.income-statement-table td .subject {
+    text-indent: 2em;
+}
+.income-statement-table tr.first-level-header {
+    font-weight: bolder;
+    font-size: 1.21em;
+}
+.income-statement-table tr.second-level-header {
+    font-weight: bolder;
+    font-size: 1.1em;
+}
+.income-statement-table td .second-level-header {
+    text-indent: 1em;
+}
+.income-statement-table .total {
+    border-top: 1px solid slategray;
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+.income-statement-table .cum-total {
+    font-size: 1.21em;
+    font-weight: bolder;
+}
+.income-statement-list .list-group-item {
+    background-color: transparent;
+    border: none;
+}
+.income-statement-list .first-level-header {
+    font-weight: bolder;
+    font-size: 1.21em;
+}
+.income-statement-list .second-level-header {
+    font-weight: bolder;
+    font-size: 1.1em;
+}
+.income-statement-list .total {
+    border-top: 1px solid slategray;
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+.income-statement-list .cum-total {
+    font-weight: bolder;
+    font-size: 1.21em;
+}
+
+/* The balance sheet */
+.balance-sheet-table thead {
+    font-size: 1.21em;
+    border-bottom: thick double slategray;
+}
+.balance-sheet-table tbody {
+}
+.balance-sheet-table .second-level-header {
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+.balance-sheet-table td .subject {
+    text-indent: 1em;
+}
+.balance-sheet-table .total {
+    border-top: thick double slategray;
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+.balance-sheet-total-table .total {
+    border-top: thick double slategray;
+    font-size: 1.21em;
+    font-weight: bolder;
+}
+.balance-sheet-list {
+    margin-bottom: 1em;
+}
+.balance-sheet-list .list-group-item {
+    background-color: transparent;
+    border: none;
+}
+.balance-sheet-list .section-title {
+    font-size: 1.21em;
+    font-weight: bolder;
+    border-bottom: thick double slategray;
+}
+.balance-sheet-list .second-level-header {
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+.balance-sheet-list .total {
+    font-size: 1.1em;
+    font-weight: bolder;
+    border-top: thick double slategray;
+}
+.balance-sheet-list .grand-total {
+    font-size: 1.21em;
+    font-weight: bolder;
+    border-top: thick double slategray;
+}
+
+/* The search */
+.btn-actions .btn .search-input {
+    height: calc(1em + .5rem + 2px);
+    border-radius: .2rem;
+}
+.btn-actions .btn .search-label {
+    margin-bottom: 0;
+}
+.btn-actions .btn .search-label button {
+    border: none;
+    background-color: transparent;
+    color: inherit;
+    padding-right: 0;
+}
