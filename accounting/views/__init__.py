@@ -316,6 +316,7 @@ def _ledger_subjects():
     Returns:
         list[Subject]: The subjects for the ledger reports.
     """
+    # TODO: Te be replaced with the Django model queries
     return list(Subject.objects.raw("""SELECT s.*
   FROM accounting_subjects AS s
   WHERE s.code IN (SELECT s.code
