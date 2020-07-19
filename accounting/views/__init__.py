@@ -110,12 +110,12 @@ def _find_imbalanced(records):
     Args:
         records (list[Record]): The accounting records.
     """
-    with connection.cursor() as cursor:
-        cursor.execute("""SELECT transaction_sn
-  FROM accounting_records
-  GROUP BY transaction_sn
-  HAVING SUM(CASE WHEN is_credit THEN -1 ELSE 1 END * amount) != 0""")
-        imbalanced = [x[0] for x in cursor.fetchall()]
+    imbalanced = [x.sn for x in Transaction.objects
+        .annotate(
+        balance=Sum(Case(
+            When(record__is_credit=True, then=-1),
+            default=1) * F("record__amount")))
+        .filter(~Q(balance=0))]
     for record in records:
         record.is_balanced = record.transaction.sn not in imbalanced
 
