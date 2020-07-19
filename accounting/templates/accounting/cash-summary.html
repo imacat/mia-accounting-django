@@ -20,6 +20,7 @@ cash_summary.html: The template for the cash summary reports
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2020/7/15
 {% endcomment %}
+{% load static %}
 {% load i18n %}
 {% load humanize %}
 {% load mia_core %}
@@ -28,6 +29,8 @@ First written: 2020/7/15
 {% block settings %}
   {% blocktrans asvar title with subject=current_subject.title|title context "Accounting|" %}Cash Summary for {{ subject }}{% endblocktrans %}
   {% setvar "title" title %}
+  {% static "accounting/css/report.css" as css %}
+  {% setvar "css" css %}
 {% endblock %}
 
 {% block content %}

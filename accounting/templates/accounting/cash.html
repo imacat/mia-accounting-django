@@ -20,6 +20,7 @@ cash.html: The template for the cash account reports
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2020/7/1
 {% endcomment %}
+{% load static %}
 {% load i18n %}
 {% load humanize %}
 {% load mia_core %}
@@ -29,6 +30,8 @@ First written: 2020/7/1
   {% blocktrans asvar title with subject=current_subject.title|title period=period.description context "Accounting|" %}Cash Account for {{ subject }} in {{ period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
+  {% static "accounting/css/report.css" as css %}
+  {% setvar "css" css %}
 {% endblock %}
 
 {% block content %}
