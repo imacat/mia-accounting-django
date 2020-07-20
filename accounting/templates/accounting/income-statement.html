@@ -154,7 +154,6 @@ First written: 2020/7/1
   </div>
 
   {# The list for small screens #}
-  {% comment %}
   <div class="d-sm-none report-block report-block-sm">
     <div class="row justify-content-center">
       <h2>{{ title }}</h2>
@@ -163,46 +162,62 @@ First written: 2020/7/1
     <div class="row">
       <div class="col-sm-12">
         <ul class="list-group income-statement-list">
-          {% for item in item_list %}
-            <li class="list-group-item d-flex justify-content-between align-items-center <%=$record->class%>">
-              % if (!defined $record->class && defined $record->subject->code) {
-                <a class="list-group-item-action" href="<%=url_for("acct.ledger", {"subject_code" => $record->subject->code})%>">
-                  <%=$record->subject->title%>
-                  <div class="float-right">
-                    % if (defined $record->amount) {
-                      <span class="badge <%=$record->amount < 0? "badge-warning": "badge-secondary"%> badge-pill">
-                      <%=format_amount($record->amount)%>
-                      </span>
-                    % }
-                    % if (defined $record->total) {
-                      <span class="badge <%=$record->total < 0? "badge-danger": "badge-info"%> badge-pill">
-                      <%=format_amount($record->total)%>
-                      </span>
-                    % }
-                  </div>
-                </a>
-              % } else {
-                <%=$record->subject->title%>
-                <div class="float-right">
-                  % if (defined $record->amount) {
-                    <span class="badge <%=$record->amount < 0? "badge-warning": "badge-secondary"%> badge-pill">
-                      <%=format_amount($record->amount)%>
-                    </span>
-                  % }
-                  % if (defined $record->total) {
-                    <span class="badge <%=$record->total < 0? "badge-danger": "badge-info"%> badge-pill">
-                      <%=format_amount($record->total)%>
-                    </span>
-                  % }
-                </div>
-              % }
+          {% for section in item_list %}
+            <li class="list-group-item d-flex justify-content-between align-items-center first-level-header">
+              {{ section.title|title|escape }}
             </li>
+            {% if section.groups %}
+              {% for group in section.groups %}
+                <li class="list-group-item d-flex justify-content-between align-items-center second-level-header">
+                  {{ group.title|title|escape }}
+                </li>
+                {% for item in group.details %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center subject">
+                    <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period.spec %}">
+                      {{ item.title|title|escape }}
+                      <div class="float-right">
+                        <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
+                          {{ item.balance|accounting_amount }}
+                        </span>
+                      </div>
+                    </a>
+                  </li>
+                {% endfor %}
+                <li class="list-group-item d-flex justify-content-between align-items-center total">
+                  {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+                  <div class="float-right">
+                    <span class="badge {% if group.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                      {{ group.total|accounting_amount }}
+                    </span>
+                  </div>
+                </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item d-flex justify-content-between align-items-center total">
+                {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+                <div class="float-right">
+                  <span class="badge {% if group.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">-</span>
+                </div>
+              </li>
+            {% endif %}
+            {% if section.cumulative_total is not None %}
+              <li class="list-group-item d-flex justify-content-between align-items-center cum-total">
+                {{ section.cumulative_total.title|title|escape }}
+                <div class="float-right">
+                  <span class="badge {% if section.cumulative_total.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                    {{ section.cumulative_total.total|accounting_amount }}
+                  </span>
+                </div>
+              </li>
+            {% endif %}
+            {% if section.has_next %}
+              <li class="list-group-item d-flex justify-content-between align-items-center"></li>
+            {% endif %}
           {% endfor %}
         </ul>
       </div>
     </div>
   </div>
-  {% endcomment %}
 {% else %}
   <p>{{ _("There is currently no data.")|force_escape }}</p>
 {% endif %}
