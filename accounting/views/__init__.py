@@ -637,4 +637,76 @@ def income_statement(request, period_spec):
     })
 
 
+@require_GET
+@digest_login_required
+def balance_sheet(request, period_spec):
+    """The balance sheet."""
+    # The period
+    period = _get_period(period_spec)
+    # The accounts
+    accounts = list(
+        Subject.objects
+            .filter(Q(record__transaction__date__lte=period.end),
+                    (Q(code__startswith="1")
+                     | Q(code__startswith="2")
+                     | Q(code__startswith="3")),
+                    ~Q(code="3351"))
+            .annotate(
+            balance=Sum(Case(
+                When(record__is_credit=True, then=-1),
+                default=1) * F("record__amount")))
+            .filter(balance__isnull=False))
+    balance = Record.objects\
+        .filter(
+        Q(transaction__date__lt=period.start)
+        & ~((Q(subject__code__startswith="1")
+             | Q(subject__code__startswith="2")
+             | Q(subject__code__startswith="3"))
+            & ~Q(subject__code="3351")))\
+        .aggregate(
+        balance=Sum(Case(
+            When(is_credit=True, then=-1),
+            default=1) * F("amount")))["balance"]
+    if balance is not None and balance != 0:
+        brought_forward = Subject.objects.get(code="3351")
+        brought_forward.balance = -balance
+        accounts.append(brought_forward)
+    balance = Record.objects\
+        .filter(
+        Q(transaction__date__gte=period.start)
+        & Q(transaction__date__lte=period.end)
+        & ~((Q(subject__code__startswith="1")
+             | Q(subject__code__startswith="2")
+             | Q(subject__code__startswith="3"))
+            & ~Q(subject__code="3351")))\
+        .aggregate(
+        balance=Sum(Case(
+            When(is_credit=True, then=-1),
+            default=1) * F("amount")))["balance"]
+    if balance is not None and balance != 0:
+        net_income = Subject.objects.get(code="3353")
+        net_income.balance = -balance
+        accounts.append(net_income)
+    groups = list(Subject.objects.filter(
+        code__in=[x.code[:2] for x in accounts]))
+    sections = list(Subject.objects.filter(
+        Q(code="1") | Q(code="2") | Q(code="3")).order_by("code"))
+    for section in sections:
+        section.groups = [x for x in groups
+                          if x.code[:1] == section.code]
+        for group in section.groups:
+            group.details = [x for x in accounts
+                             if x.code[:2] == group.code]
+            group.balance = sum([x.balance
+                                 for x in group.details])
+        section.balance = sum([x.balance for x in section.groups])
+    by_code = {x.code: x for x in sections}
+    return render(request, "accounting/balance-sheet.html", {
+        "section_1": by_code["1"],
+        "section_2": by_code["2"],
+        "section_3": by_code["3"],
+        "reports": ReportUrl(period=period),
+        "period": period,
+    })
+
 

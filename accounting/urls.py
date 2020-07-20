@@ -71,7 +71,7 @@ urlpatterns = [
     path("balance-sheet",
          mia_core_views.todo, name="balance-sheet.home"),
     path("balance-sheet/<str:period_spec>",
-         mia_core_views.todo, name="balance-sheet"),
+         views.balance_sheet, name="balance-sheet"),
     path("search",
          mia_core_views.todo, name="search"),
     path("transactions/<txn-type:type>/create",

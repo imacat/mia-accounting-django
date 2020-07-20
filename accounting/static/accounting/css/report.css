@@ -152,7 +152,7 @@
 }
 .balance-sheet-table tbody {
 }
-.balance-sheet-table .second-level-header {
+.balance-sheet-table .group-title {
     font-size: 1.1em;
     font-weight: bolder;
 }
@@ -181,7 +181,7 @@
     font-weight: bolder;
     border-bottom: thick double slategray;
 }
-.balance-sheet-list .second-level-header {
+.balance-sheet-list .group-title {
     font-size: 1.1em;
     font-weight: bolder;
 }
