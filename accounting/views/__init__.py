@@ -602,7 +602,6 @@ def income_statement(request, period_spec):
         Q(code="4") | Q(code="5") | Q(code="6")
         | Q(code="7") | Q(code="8") | Q(code="9")).order_by("code"))
     cumulative_accounts = {
-        "4": None,
         "5": Subject(title=pgettext("Accounting|", "Gross Income")),
         "6": Subject(title=pgettext("Accounting|", "Operating Income")),
         "7": Subject(title=pgettext("Accounting|", "Before Tax Income")),
@@ -623,13 +622,14 @@ def income_statement(request, period_spec):
         section.total = sum([x.total for x in section.groups])
         cumulative_total = cumulative_total + section.total
         if section.code in cumulative_accounts:
-            if cumulative_accounts[section.code] is None:
-                section.cumulative_total = None
-            else:
-                section.cumulative_total\
-                    = cumulative_accounts[section.code]
-                section.cumulative_total.balance = None
-                section.cumulative_total.total = cumulative_total
+            section.cumulative_total\
+                = cumulative_accounts[section.code]
+            section.cumulative_total.balance = None
+            section.cumulative_total.total = cumulative_total
+        else:
+            section.cumulative_total = None
+        section.has_next = True
+    sections[-1].has_next = False
     return render(request, "accounting/income-statement.html", {
         "item_list": sections,
         "reports": ReportUrl(period=period),
