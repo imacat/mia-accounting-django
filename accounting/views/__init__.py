@@ -232,6 +232,19 @@ def cash(request, subject_code, period_spec):
     })
 
 
+@require_GET
+@digest_login_required
+def cash_summary_home(request):
+    """The cash summary home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default subject.
+    """
+    subject_code = settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
+    return HttpResponseRedirect(
+        reverse("accounting:cash-summary", args=(subject_code)))
+
+
 def cash_summary(request, subject_code):
     """The cash account summary report."""
     # The subject
@@ -332,6 +345,21 @@ def _ledger_subjects():
 
 @require_GET
 @digest_login_required
+def ledger_home(request):
+    """The ledger home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default subject
+            and month.
+    """
+    subject_code = settings.ACCOUNTING["DEFAULT_LEDGER_SUBJECT"]
+    period_spec = dateformat.format(timezone.localdate(), "Y-m")
+    return HttpResponseRedirect(
+        reverse("accounting:ledger", args=(subject_code, period_spec)))
+
+
+@require_GET
+@digest_login_required
 def ledger(request, subject_code, period_spec):
     """The ledger report."""
     # The period
@@ -388,6 +416,19 @@ def ledger(request, subject_code, period_spec):
     })
 
 
+@require_GET
+@digest_login_required
+def ledger_summary_home(request):
+    """The ledger summary home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default subject.
+    """
+    subject_code = settings.ACCOUNTING["DEFAULT_LEDGER_SUBJECT"]
+    return HttpResponseRedirect(
+        reverse("accounting:ledger-summary", args=(subject_code)))
+
+
 def ledger_summary(request, subject_code):
     """The ledger summary report."""
     # The subject
@@ -433,6 +474,19 @@ def ledger_summary(request, subject_code):
         "reports": ReportUrl(ledger=current_subject),
         "subjects": subjects,
     })
+
+
+@require_GET
+@digest_login_required
+def journal_home(request):
+    """The journal home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default month.
+    """
+    period_spec = dateformat.format(timezone.localdate(), "Y-m")
+    return HttpResponseRedirect(
+        reverse("accounting:journal", args=(period_spec)))
 
 
 @require_GET
@@ -494,6 +548,19 @@ def journal(request, period_spec):
         "pagination": pagination,
         "period": period,
     })
+
+
+@require_GET
+@digest_login_required
+def trial_balance_home(request):
+    """The trial balance home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default month.
+    """
+    period_spec = dateformat.format(timezone.localdate(), "Y-m")
+    return HttpResponseRedirect(
+        reverse("accounting:trial-balance", args=(period_spec)))
 
 
 @require_GET
@@ -579,6 +646,19 @@ def trial_balance(request, period_spec):
 
 @require_GET
 @digest_login_required
+def income_statement_home(request):
+    """The income statement home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default month.
+    """
+    period_spec = dateformat.format(timezone.localdate(), "Y-m")
+    return HttpResponseRedirect(
+        reverse("accounting:income-statement", args=(period_spec)))
+
+
+@require_GET
+@digest_login_required
 def income_statement(request, period_spec):
     """The income statement."""
     # The period
@@ -635,6 +715,19 @@ def income_statement(request, period_spec):
         "reports": ReportUrl(period=period),
         "period": period,
     })
+
+
+@require_GET
+@digest_login_required
+def balance_sheet_home(request):
+    """The balance sheet home page.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default month.
+    """
+    period_spec = dateformat.format(timezone.localdate(), "Y-m")
+    return HttpResponseRedirect(
+        reverse("accounting:balance-sheet", args=(period_spec)))
 
 
 @require_GET
