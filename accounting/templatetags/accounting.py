@@ -31,7 +31,6 @@ def accounting_amount(value):
         return ""
     if value == 0:
         return "-"
-    print(value)
     s = str(abs(value))
     while True:
         m = re.match("^([1-9][0-9]*)([0-9]{3})", s)
