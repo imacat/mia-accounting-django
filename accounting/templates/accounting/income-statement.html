@@ -93,7 +93,7 @@ First written: 2020/7/19
           </thead>
           <tbody>
             {% for section in item_list %}
-              <tr class="first-level-header">
+              <tr class="section-title">
                 <td><div>{{ section.title|title|escape }}</div></td>
                 <td class="amount"></td>
                 <td class="amount"></td>
@@ -101,8 +101,8 @@ First written: 2020/7/19
               </tr>
               {% if section.groups %}
                 {% for group in section.groups %}
-                  <tr class="second-level-header">
-                    <td><div class="second-level-header">{{ group.title|title|escape }}</div></td>
+                  <tr class="group-title">
+                    <td><div class="group-title">{{ group.title|title|escape }}</div></td>
                     <td class="amount"></td>
                     <td class="amount"></td>
                     <td class="actions"></td>
@@ -136,7 +136,7 @@ First written: 2020/7/19
                 </tr>
               {% endif %}
               {% if section.cumulative_total is not None %}
-                <tr class="cum-total">
+                <tr class="cumulative-total">
                   <td><div>{{ section.cumulative_total.title|title|escape }}</div></td>
                   <td class="amount"></td>
                   <td class="amount {% if section.cumulative_total.total < 0 %} text-danger {% endif %}">{{ section.cumulative_total.total|accounting_amount }}</td>
@@ -163,12 +163,12 @@ First written: 2020/7/19
       <div class="col-sm-12">
         <ul class="list-group income-statement-list">
           {% for section in item_list %}
-            <li class="list-group-item d-flex justify-content-between align-items-center first-level-header">
+            <li class="list-group-item d-flex justify-content-between align-items-center section-title">
               {{ section.title|title|escape }}
             </li>
             {% if section.groups %}
               {% for group in section.groups %}
-                <li class="list-group-item d-flex justify-content-between align-items-center second-level-header">
+                <li class="list-group-item d-flex justify-content-between align-items-center group-title">
                   {{ group.title|title|escape }}
                 </li>
                 {% for item in group.details %}
@@ -201,7 +201,7 @@ First written: 2020/7/19
               </li>
             {% endif %}
             {% if section.cumulative_total is not None %}
-              <li class="list-group-item d-flex justify-content-between align-items-center cum-total">
+              <li class="list-group-item d-flex justify-content-between align-items-center cumulative-total">
                 {{ section.cumulative_total.title|title|escape }}
                 <div class="float-right">
                   <span class="badge {% if section.cumulative_total.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">

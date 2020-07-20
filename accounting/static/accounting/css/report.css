@@ -103,15 +103,15 @@
 .income-statement-table td .subject {
     text-indent: 2em;
 }
-.income-statement-table tr.first-level-header {
+.income-statement-table tr.section-title {
     font-weight: bolder;
     font-size: 1.21em;
 }
-.income-statement-table tr.second-level-header {
+.income-statement-table tr.group-title {
     font-weight: bolder;
     font-size: 1.1em;
 }
-.income-statement-table td .second-level-header {
+.income-statement-table td .group-title {
     text-indent: 1em;
 }
 .income-statement-table .total {
@@ -119,7 +119,7 @@
     font-size: 1.1em;
     font-weight: bolder;
 }
-.income-statement-table .cum-total {
+.income-statement-table .cumulative-total {
     font-size: 1.21em;
     font-weight: bolder;
 }
@@ -127,7 +127,7 @@
     background-color: transparent;
     border: none;
 }
-.income-statement-list .first-level-header {
+.income-statement-list .section-title {
     font-weight: bolder;
     font-size: 1.21em;
 }
@@ -140,7 +140,7 @@
     font-size: 1.1em;
     font-weight: bolder;
 }
-.income-statement-list .cum-total {
+.income-statement-list .cumulative-total {
     font-weight: bolder;
     font-size: 1.21em;
 }
