@@ -18,11 +18,30 @@
 """The views of the Mia core application.
 
 """
-
+import random
 import urllib.parse
 
 from django.conf import settings
+from django.db.models import Model
 from django.utils.translation import pgettext, get_language
+
+
+def new_sn(cls):
+    """Finds a random serial number that does not conflict with
+    the existing data records.
+
+    Args:
+        cls (class): The Django model class.
+
+    Returns:
+         int: The new random serial number.
+    """
+    while True:
+        sn = random.randint(100000000, 999999999)
+        try:
+            cls.objects.get(pk=sn)
+        except cls.DoesNotExist:
+            return sn
 
 
 class Language:
