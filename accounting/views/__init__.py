@@ -575,3 +575,66 @@ def trial_balance(request, period_spec):
         "reports": ReportUrl(period=period),
         "period": period,
     })
+
+
+@require_GET
+@digest_login_required
+def income_statement(request, period_spec):
+    """The income statement."""
+    # The period
+    period = _get_period(period_spec)
+    # The accounts
+    accounts = list(
+        Subject.objects.filter(
+            Q(record__transaction__date__gte=period.start),
+            Q(record__transaction__date__lte=period.end),
+            ~(Q(code__startswith="1")
+              | Q(code__startswith="2")
+              | Q(code__startswith="3")))
+            .annotate(
+            balance=Sum(Case(
+                When(record__is_credit=True, then=1),
+                default=-1) * F("record__amount")))
+            .filter(balance__isnull=False))
+    groups = list(Subject.objects.filter(
+        code__in=[x.code[:2] for x in accounts]))
+    sections = list(Subject.objects.filter(
+        Q(code="4") | Q(code="5") | Q(code="6")
+        | Q(code="7") | Q(code="8") | Q(code="9")).order_by("code"))
+    cumulative_accounts = {
+        "4": None,
+        "5": Subject(title=pgettext("Accounting|", "Gross Income")),
+        "6": Subject(title=pgettext("Accounting|", "Operating Income")),
+        "7": Subject(title=pgettext("Accounting|", "Before Tax Income")),
+        "8": Subject(title=pgettext("Accounting|", "After Tax Income")),
+        "9": Subject.objects.get(code="3353"),
+    }
+    cumulative_total = 0
+    for section in sections:
+        section.groups = [x for x in groups
+                          if x.code[:1] == section.code]
+        for group in section.groups:
+            group.details = [x for x in accounts
+                             if x.code[:2] == group.code]
+            group.balance = None
+            group.total = sum([x.balance
+                               for x in group.details])
+        section.balance = None
+        section.total = sum([x.total for x in section.groups])
+        cumulative_total = cumulative_total + section.total
+        if section.code in cumulative_accounts:
+            if cumulative_accounts[section.code] is None:
+                section.cumulative_total = None
+            else:
+                section.cumulative_total\
+                    = cumulative_accounts[section.code]
+                section.cumulative_total.balance = None
+                section.cumulative_total.total = cumulative_total
+    return render(request, "accounting/income-statement.html", {
+        "item_list": sections,
+        "reports": ReportUrl(period=period),
+        "period": period,
+    })
+
+
+

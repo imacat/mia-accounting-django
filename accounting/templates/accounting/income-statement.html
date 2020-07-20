@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% comment %}
+The Mia Accounting Application
+cash.html: The template for the cash account reports
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/7/1
+{% endcomment %}
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+{% load mia_core %}
+{% load accounting %}
+
+{% block settings %}
+  {% blocktrans asvar title with period=period.description context "Accounting|" %}Income Statement in {{ period }}{% endblocktrans %}
+  {% setvar "title" title %}
+  {% setvar "use_period_chooser" True %}
+  {% static "accounting/css/report.css" as css %}
+  {% setvar "css" css %}
+{% endblock %}
+
+{% block content %}
+
+<div class="btn-group btn-actions">
+  <div class="btn-group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+      <i class="fas fa-edit"></i>
+      {% trans "New" context "Accounting|" as text %}
+      {{ text|force_escape }}
+    </button>
+    <div class="dropdown-menu">
+      {% url "accounting:transaction.create" "expense" as url %}
+      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+        {% trans "Cash Expense" context "Accounting|" as text %}
+        {{ text|force_escape }}
+      </a>
+      {% url "accounting:transaction.create" "income" as url %}
+      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+        {% trans "Cash Income" context "Accounting|" as text %}
+        {{ text|force_escape }}
+      </a>
+      {% url "accounting:transaction.create" "transfer" as url %}
+      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+        {% trans "Transfer" context "Accounting|" as text %}
+        {{ text|force_escape }}
+      </a>
+    </div>
+  </div>
+  {% with current_report_icon="fas fa-file-invoice" %}
+    {% trans "Income Statement" context "Accounting|" as current_report_title %}
+    {% include "accounting/include/report-chooser.html" %}
+  {% endwith %}
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
+    <i class="far fa-calendar-alt"></i>
+    <span class="d-none d-md-inline">{{ period.description }}</span>
+    <span class="d-md-none">{% trans "Period" context "Period|" as text %}{{ text|force_escape }}</span>
+  </button>
+</div>
+
+{% include "mia_core/include/period-chooser.html" %}
+
+{% if item_list %}
+  {# The table for large screens #}
+  <div class="d-none d-sm-block report-block report-block-lg">
+    <div class="row justify-content-center">
+      <h2>{{ title }}</h2>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <table class="table table-borderless table-hover table-sm income-statement-table">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th class="amount" colspan="2" scope="col">{% trans "Amount" context "Period|" as text %}{{ text|force_escape }}</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for section in item_list %}
+              <tr class="first-level-header">
+                <td><div>{{ section.title|title|escape }}</div></td>
+                <td class="amount"></td>
+                <td class="amount"></td>
+                <td class="actions"></td>
+              </tr>
+              {% for group in section.groups %}
+                <tr class="second-level-header">
+                  <td><div class="second-level-header">{{ group.title|title|escape }}</div></td>
+                  <td class="amount"></td>
+                  <td class="amount"></td>
+                  <td class="actions"></td>
+                </tr>
+                {% for item in group.details %}
+                  <tr>
+                    <td><div class="subject">{{ item.title|title|escape }}</div></td>
+                    <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
+                    <td class="amount"></td>
+                    <td class="actions">
+                      <a href="{% url "accounting:ledger" item.code period.spec %}" class="btn btn-info" role="button">
+                        <i class="fas fa-eye"></i>
+                        <span class="d-none d-lg-inline">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</span>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+                <tr class="total">
+                  <td><div>{% trans "Total" context "Period|" as text %}{{ text|force_escape }}</div></td>
+                  <td class="amount"></td>
+                  <td class="amount {% if group.total < 0 %} text-danger {% endif %}">{{ group.total|accounting_amount }}</td>
+                  <td class="actions"></td>
+                </tr>
+              {% endfor %}
+              {% if section.cumulative_total is not None %}
+                <tr class="cum-total">
+                  <td><div>{{ section.cumulative_total.title|title|escape }}</div></td>
+                  <td class="amount"></td>
+                  <td class="amount {% if section.cumulative_total.total < 0 %} text-danger {% endif %}">{{ section.cumulative_total.total|accounting_amount }}</td>
+                  <td class="actions"></td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# The list for small screens #}
+  {% comment %}
+  <div class="d-sm-none report-block report-block-sm">
+    <div class="row justify-content-center">
+      <h2>{{ title }}</h2>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <ul class="list-group income-statement-list">
+          {% for item in item_list %}
+            <li class="list-group-item d-flex justify-content-between align-items-center <%=$record->class%>">
+              % if (!defined $record->class && defined $record->subject->code) {
+                <a class="list-group-item-action" href="<%=url_for("acct.ledger", {"subject_code" => $record->subject->code})%>">
+                  <%=$record->subject->title%>
+                  <div class="float-right">
+                    % if (defined $record->amount) {
+                      <span class="badge <%=$record->amount < 0? "badge-warning": "badge-secondary"%> badge-pill">
+                      <%=format_amount($record->amount)%>
+                      </span>
+                    % }
+                    % if (defined $record->total) {
+                      <span class="badge <%=$record->total < 0? "badge-danger": "badge-info"%> badge-pill">
+                      <%=format_amount($record->total)%>
+                      </span>
+                    % }
+                  </div>
+                </a>
+              % } else {
+                <%=$record->subject->title%>
+                <div class="float-right">
+                  % if (defined $record->amount) {
+                    <span class="badge <%=$record->amount < 0? "badge-warning": "badge-secondary"%> badge-pill">
+                      <%=format_amount($record->amount)%>
+                    </span>
+                  % }
+                  % if (defined $record->total) {
+                    <span class="badge <%=$record->total < 0? "badge-danger": "badge-info"%> badge-pill">
+                      <%=format_amount($record->total)%>
+                    </span>
+                  % }
+                </div>
+              % }
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endcomment %}
+{% else %}
+  <p>{{ _("There is currently no data.")|force_escape }}</p>
+{% endif %}
+
+{% endblock %}
