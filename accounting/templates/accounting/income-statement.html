@@ -74,152 +74,148 @@ First written: 2020/7/19
 
 {% include "mia_core/include/period-chooser.html" %}
 
-{% if item_list %}
-  {# The table for large screens #}
-  <div class="d-none d-sm-block report-block report-block-lg">
-    <div class="row justify-content-center">
-      <h2>{{ title }}</h2>
-    </div>
+{# The table for large screens #}
+<div class="d-none d-sm-block report-block report-block-lg">
+  <div class="row justify-content-center">
+    <h2>{{ title }}</h2>
+  </div>
 
-    <div class="row">
-      <div class="col-sm-12">
-        <table class="table table-borderless table-hover table-sm income-statement-table">
-          <thead>
-            <tr>
-              <th scope="col"></th>
-              <th class="amount" colspan="2" scope="col">{% trans "Amount" context "Accounting|" as text %}{{ text|force_escape }}</th>
-              <th scope="col"></th>
+  <div class="row">
+    <div class="col-sm-12">
+      <table class="table table-borderless table-hover table-sm income-statement-table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th class="amount" colspan="2" scope="col">{% trans "Amount" context "Accounting|" as text %}{{ text|force_escape }}</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for section in item_list %}
+            <tr class="section-title">
+              <td><div>{{ section.title|title|escape }}</div></td>
+              <td class="amount"></td>
+              <td class="amount"></td>
+              <td class="actions"></td>
             </tr>
-          </thead>
-          <tbody>
-            {% for section in item_list %}
-              <tr class="section-title">
-                <td><div>{{ section.title|title|escape }}</div></td>
-                <td class="amount"></td>
-                <td class="amount"></td>
-                <td class="actions"></td>
-              </tr>
-              {% if section.groups %}
-                {% for group in section.groups %}
-                  <tr class="group-title">
-                    <td><div class="group-title">{{ group.title|title|escape }}</div></td>
+            {% if section.groups %}
+              {% for group in section.groups %}
+                <tr class="group-title">
+                  <td><div class="group-title">{{ group.title|title|escape }}</div></td>
+                  <td class="amount"></td>
+                  <td class="amount"></td>
+                  <td class="actions"></td>
+                </tr>
+                {% for item in group.details %}
+                  <tr>
+                    <td><div class="subject">{{ item.title|title|escape }}</div></td>
+                    <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
                     <td class="amount"></td>
-                    <td class="amount"></td>
-                    <td class="actions"></td>
-                  </tr>
-                  {% for item in group.details %}
-                    <tr>
-                      <td><div class="subject">{{ item.title|title|escape }}</div></td>
-                      <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
-                      <td class="amount"></td>
-                      <td class="actions">
-                        <a href="{% url "accounting:ledger" item.code period.spec %}" class="btn btn-info" role="button">
-                          <i class="fas fa-eye"></i>
-                          <span class="d-none d-lg-inline">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</span>
-                        </a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  <tr class="total">
-                    <td><div>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</div></td>
-                    <td class="amount"></td>
-                    <td class="amount {% if group.total < 0 %} text-danger {% endif %}">{{ group.total|accounting_amount }}</td>
-                    <td class="actions"></td>
+                    <td class="actions">
+                      <a href="{% url "accounting:ledger" item.code period.spec %}" class="btn btn-info" role="button">
+                        <i class="fas fa-eye"></i>
+                        <span class="d-none d-lg-inline">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</span>
+                      </a>
+                    </td>
                   </tr>
                 {% endfor %}
-              {% else %}
                 <tr class="total">
                   <td><div>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</div></td>
                   <td class="amount"></td>
-                  <td class="amount">-</td>
+                  <td class="amount {% if group.total < 0 %} text-danger {% endif %}">{{ group.total|accounting_amount }}</td>
                   <td class="actions"></td>
                 </tr>
-              {% endif %}
-              {% if section.cumulative_total is not None %}
-                <tr class="cumulative-total">
-                  <td><div>{{ section.cumulative_total.title|title|escape }}</div></td>
-                  <td class="amount"></td>
-                  <td class="amount {% if section.cumulative_total.total < 0 %} text-danger {% endif %}">{{ section.cumulative_total.total|accounting_amount }}</td>
-                  <td class="actions"></td>
-                </tr>
-              {% endif %}
-              {% if section.has_next %}
-                <tr><td colspan="4"></td></tr>
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  {# The list for small screens #}
-  <div class="d-sm-none report-block report-block-sm">
-    <div class="row justify-content-center">
-      <h2>{{ title }}</h2>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-12">
-        <ul class="list-group income-statement-list">
-          {% for section in item_list %}
-            <li class="list-group-item d-flex justify-content-between align-items-center section-title">
-              {{ section.title|title|escape }}
-            </li>
-            {% if section.groups %}
-              {% for group in section.groups %}
-                <li class="list-group-item d-flex justify-content-between align-items-center group-title">
-                  {{ group.title|title|escape }}
-                </li>
-                {% for item in group.details %}
-                  <li class="list-group-item d-flex justify-content-between align-items-center subject">
-                    <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period.spec %}">
-                      {{ item.title|title|escape }}
-                      <div class="float-right">
-                        <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
-                          {{ item.balance|accounting_amount }}
-                        </span>
-                      </div>
-                    </a>
-                  </li>
-                {% endfor %}
-                <li class="list-group-item d-flex justify-content-between align-items-center total">
-                  {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-                  <div class="float-right">
-                    <span class="badge {% if group.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                      {{ group.total|accounting_amount }}
-                    </span>
-                  </div>
-                </li>
               {% endfor %}
             {% else %}
+              <tr class="total">
+                <td><div>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</div></td>
+                <td class="amount"></td>
+                <td class="amount">-</td>
+                <td class="actions"></td>
+              </tr>
+            {% endif %}
+            {% if section.cumulative_total is not None %}
+              <tr class="cumulative-total">
+                <td><div>{{ section.cumulative_total.title|title|escape }}</div></td>
+                <td class="amount"></td>
+                <td class="amount {% if section.cumulative_total.total < 0 %} text-danger {% endif %}">{{ section.cumulative_total.total|accounting_amount }}</td>
+                <td class="actions"></td>
+              </tr>
+            {% endif %}
+            {% if section.has_next %}
+              <tr><td colspan="4"></td></tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{# The list for small screens #}
+<div class="d-sm-none report-block report-block-sm">
+  <div class="row justify-content-center">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <ul class="list-group income-statement-list">
+        {% for section in item_list %}
+          <li class="list-group-item d-flex justify-content-between align-items-center section-title">
+            {{ section.title|title|escape }}
+          </li>
+          {% if section.groups %}
+            {% for group in section.groups %}
+              <li class="list-group-item d-flex justify-content-between align-items-center group-title">
+                {{ group.title|title|escape }}
+              </li>
+              {% for item in group.details %}
+                <li class="list-group-item d-flex justify-content-between align-items-center subject">
+                  <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period.spec %}">
+                    {{ item.title|title|escape }}
+                    <div class="float-right">
+                      <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
+                        {{ item.balance|accounting_amount }}
+                      </span>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
               <li class="list-group-item d-flex justify-content-between align-items-center total">
                 {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
                 <div class="float-right">
-                  <span class="badge {% if group.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">-</span>
-                </div>
-              </li>
-            {% endif %}
-            {% if section.cumulative_total is not None %}
-              <li class="list-group-item d-flex justify-content-between align-items-center cumulative-total">
-                {{ section.cumulative_total.title|title|escape }}
-                <div class="float-right">
-                  <span class="badge {% if section.cumulative_total.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                    {{ section.cumulative_total.total|accounting_amount }}
+                  <span class="badge {% if group.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                    {{ group.total|accounting_amount }}
                   </span>
                 </div>
               </li>
-            {% endif %}
-            {% if section.has_next %}
-              <li class="list-group-item d-flex justify-content-between align-items-center"></li>
-            {% endif %}
-          {% endfor %}
-        </ul>
-      </div>
+            {% endfor %}
+          {% else %}
+            <li class="list-group-item d-flex justify-content-between align-items-center total">
+              {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+              <div class="float-right">
+                <span class="badge {% if group.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">-</span>
+              </div>
+            </li>
+          {% endif %}
+          {% if section.cumulative_total is not None %}
+            <li class="list-group-item d-flex justify-content-between align-items-center cumulative-total">
+              {{ section.cumulative_total.title|title|escape }}
+              <div class="float-right">
+                <span class="badge {% if section.cumulative_total.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+                  {{ section.cumulative_total.total|accounting_amount }}
+                </span>
+              </div>
+            </li>
+          {% endif %}
+          {% if section.has_next %}
+            <li class="list-group-item d-flex justify-content-between align-items-center"></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
     </div>
   </div>
-{% else %}
-  <p>{{ _("There is currently no data.")|force_escape }}</p>
-{% endif %}
+</div>
 
 {% endblock %}
