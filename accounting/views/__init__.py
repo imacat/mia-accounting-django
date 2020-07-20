@@ -43,6 +43,9 @@ from mia_core.utils import Pagination
 def home(request):
     """The accounting home page.
 
+    Args:
+        request (HttpRequest) The request.
+
     Returns:
         HttpResponseRedirect: The redirection to the default
             accounting report.
@@ -52,8 +55,11 @@ def home(request):
 
 @require_GET
 @digest_login_required
-def cash_home(request):
-    """The accounting cash report home page.
+def cash_default(request):
+    """The default cash account.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default subject
@@ -142,7 +148,16 @@ def _find_order_holes(records):
 @require_GET
 @digest_login_required
 def cash(request, subject_code, period_spec):
-    """The cash account report."""
+    """The cash account.
+
+    Args:
+        request (HttpRequest) The request.
+        subject_code (str): The code of the specified subject.
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The period
     period = _get_period(period_spec)
     # The subject
@@ -234,8 +249,11 @@ def cash(request, subject_code, period_spec):
 
 @require_GET
 @digest_login_required
-def cash_summary_home(request):
-    """The cash summary home page.
+def cash_summary_default(request):
+    """The default cash account summary.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default subject.
@@ -245,8 +263,18 @@ def cash_summary_home(request):
         reverse("accounting:cash-summary", args=(subject_code)))
 
 
+@require_GET
+@digest_login_required
 def cash_summary(request, subject_code):
-    """The cash account summary report."""
+    """The cash account summary.
+
+    Args:
+        request (HttpRequest) The request.
+        subject_code (str): The code of the specified subject.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The subject
     subjects = _cash_subjects()
     current_subject = None
@@ -345,8 +373,11 @@ def _ledger_subjects():
 
 @require_GET
 @digest_login_required
-def ledger_home(request):
-    """The ledger home page.
+def ledger_default(request):
+    """The default ledger.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default subject
@@ -361,7 +392,16 @@ def ledger_home(request):
 @require_GET
 @digest_login_required
 def ledger(request, subject_code, period_spec):
-    """The ledger report."""
+    """The ledger.
+
+    Args:
+        request (HttpRequest) The request.
+        subject_code (str): The code of the specified subject.
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The period
     period = _get_period(period_spec)
     # The subject
@@ -418,8 +458,11 @@ def ledger(request, subject_code, period_spec):
 
 @require_GET
 @digest_login_required
-def ledger_summary_home(request):
-    """The ledger summary home page.
+def ledger_summary_default(request):
+    """The default ledger summary.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default subject.
@@ -429,8 +472,18 @@ def ledger_summary_home(request):
         reverse("accounting:ledger-summary", args=(subject_code)))
 
 
+@require_GET
+@digest_login_required
 def ledger_summary(request, subject_code):
-    """The ledger summary report."""
+    """The ledger summary report.
+
+    Args:
+        request (HttpRequest) The request.
+        subject_code (str): The code of the specified subject.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The subject
     subjects = _ledger_subjects()
     current_subject = None
@@ -478,8 +531,11 @@ def ledger_summary(request, subject_code):
 
 @require_GET
 @digest_login_required
-def journal_home(request):
-    """The journal home page.
+def journal_default(request):
+    """The default journal.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default month.
@@ -492,7 +548,15 @@ def journal_home(request):
 @require_GET
 @digest_login_required
 def journal(request, period_spec):
-    """The ledger report."""
+    """The journal.
+
+    Args:
+        request (HttpRequest) The request.
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The period
     period = _get_period(period_spec)
     # The accounting records
@@ -552,8 +616,11 @@ def journal(request, period_spec):
 
 @require_GET
 @digest_login_required
-def trial_balance_home(request):
-    """The trial balance home page.
+def trial_balance_default(request):
+    """The default trial balance.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default month.
@@ -566,7 +633,15 @@ def trial_balance_home(request):
 @require_GET
 @digest_login_required
 def trial_balance(request, period_spec):
-    """The trial blanace."""
+    """The trial balance.
+
+    Args:
+        request (HttpRequest) The request.
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The period
     period = _get_period(period_spec)
     # The accounts
@@ -646,8 +721,11 @@ def trial_balance(request, period_spec):
 
 @require_GET
 @digest_login_required
-def income_statement_home(request):
-    """The income statement home page.
+def income_statement_default(request):
+    """The default income statement.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default month.
@@ -660,7 +738,15 @@ def income_statement_home(request):
 @require_GET
 @digest_login_required
 def income_statement(request, period_spec):
-    """The income statement."""
+    """The income statement.
+
+    Args:
+        request (HttpRequest) The request.
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The period
     period = _get_period(period_spec)
     # The accounts
@@ -719,8 +805,11 @@ def income_statement(request, period_spec):
 
 @require_GET
 @digest_login_required
-def balance_sheet_home(request):
-    """The balance sheet home page.
+def balance_sheet_default(request):
+    """The default balance sheet.
+
+    Args:
+        request (HttpRequest) The request.
 
     Returns:
         HttpResponseRedirect: The redirection to the default month.
@@ -733,7 +822,15 @@ def balance_sheet_home(request):
 @require_GET
 @digest_login_required
 def balance_sheet(request, period_spec):
-    """The balance sheet."""
+    """The balance sheet.
+
+    Args:
+        request (HttpRequest) The request.
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        HttpResponse: The response.
+    """
     # The period
     period = _get_period(period_spec)
     # The accounts
