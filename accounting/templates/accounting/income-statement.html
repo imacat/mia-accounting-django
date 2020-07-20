@@ -93,7 +93,7 @@ First written: 2020/7/19
         <tbody>
           {% for section in item_list %}
             <tr class="section-title">
-              <td><div>{{ section.title|title|escape }}</div></td>
+              <td><div>{{ section.title|title }}</div></td>
               <td class="amount"></td>
               <td class="amount"></td>
               <td class="actions"></td>
@@ -101,14 +101,14 @@ First written: 2020/7/19
             {% if section.groups %}
               {% for group in section.groups %}
                 <tr class="group-title">
-                  <td><div class="group-title">{{ group.title|title|escape }}</div></td>
+                  <td><div class="group-title">{{ group.title|title }}</div></td>
                   <td class="amount"></td>
                   <td class="amount"></td>
                   <td class="actions"></td>
                 </tr>
                 {% for item in group.details %}
                   <tr>
-                    <td><div class="subject">{{ item.title|title|escape }}</div></td>
+                    <td><div class="subject">{{ item.title|title }}</div></td>
                     <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
                     <td class="amount"></td>
                     <td class="actions">
@@ -136,7 +136,7 @@ First written: 2020/7/19
             {% endif %}
             {% if section.cumulative_total is not None %}
               <tr class="cumulative-total">
-                <td><div>{{ section.cumulative_total.title|title|escape }}</div></td>
+                <td><div>{{ section.cumulative_total.title|title }}</div></td>
                 <td class="amount"></td>
                 <td class="amount {% if section.cumulative_total.total < 0 %} text-danger {% endif %}">{{ section.cumulative_total.total|accounting_amount }}</td>
                 <td class="actions"></td>
@@ -163,17 +163,17 @@ First written: 2020/7/19
       <ul class="list-group income-statement-list">
         {% for section in item_list %}
           <li class="list-group-item d-flex justify-content-between align-items-center section-title">
-            {{ section.title|title|escape }}
+            {{ section.title|title }}
           </li>
           {% if section.groups %}
             {% for group in section.groups %}
               <li class="list-group-item d-flex justify-content-between align-items-center group-title">
-                {{ group.title|title|escape }}
+                {{ group.title|title }}
               </li>
               {% for item in group.details %}
                 <li class="list-group-item d-flex justify-content-between align-items-center subject">
                   <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period.spec %}">
-                    {{ item.title|title|escape }}
+                    {{ item.title|title }}
                     <div class="float-right">
                       <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
                         {{ item.balance|accounting_amount }}
@@ -201,7 +201,7 @@ First written: 2020/7/19
           {% endif %}
           {% if section.cumulative_total is not None %}
             <li class="list-group-item d-flex justify-content-between align-items-center cumulative-total">
-              {{ section.cumulative_total.title|title|escape }}
+              {{ section.cumulative_total.title|title }}
               <div class="float-right">
                 <span class="badge {% if section.cumulative_total.total < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
                   {{ section.cumulative_total.total|accounting_amount }}
