@@ -784,9 +784,9 @@ def balance_sheet(request, period_spec):
         section.balance = sum([x.balance for x in section.groups])
     by_code = {x.code: x for x in sections}
     return render(request, "accounting/balance-sheet.html", {
-        "section_1": by_code["1"],
-        "section_2": by_code["2"],
-        "section_3": by_code["3"],
+        "assets": by_code["1"],
+        "liabilities": by_code["2"],
+        "owners_equity": by_code["3"],
         "reports": ReportUrl(period=period),
         "period": period,
     })

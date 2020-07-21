@@ -85,11 +85,11 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-table">
         <thead>
           <tr>
-            <th colspan="3" scope="col">{{ section_1.title|title }}</th>
+            <th colspan="3" scope="col">{{ assets.title|title }}</th>
           </tr>
         </thead>
         <tbody>
-          {% for group in section_1.groups %}
+          {% for group in assets.groups %}
             <tr class="group-title">
               <td><div>{{ group.title|title }}</div></td>
               <td class="amount"></td>
@@ -116,11 +116,11 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-table">
         <thead>
           <tr>
-            <th colspan="3" scope="col">{{ section_2.title|title }}</th>
+            <th colspan="3" scope="col">{{ liabilities.title|title }}</th>
           </tr>
         </thead>
         <tbody>
-          {% for group in section_2.groups %}
+          {% for group in liabilities.groups %}
             <tr class="group-title">
               <td><div>{{ group.title|title }}</div></td>
               <td class="amount"></td>
@@ -143,8 +143,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="amount {% if section_2.balance < 0 %} text-danger {% endif %}">
-              {{ section_2.balance|accounting_amount }}
+            <td class="amount {% if liabilities.balance < 0 %} text-danger {% endif %}">
+              {{ liabilities.balance|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -153,11 +153,11 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-table">
         <thead>
           <tr>
-            <th colspan="3" scope="col">{{ section_3.title|title }}</th>
+            <th colspan="3" scope="col">{{ owners_equity.title|title }}</th>
           </tr>
         </thead>
         <tbody>
-          {% for group in section_3.groups %}
+          {% for group in owners_equity.groups %}
             <tr class="group-title">
               <td><div>{{ group.title|title }}</div></td>
               <td class="amount"></td>
@@ -180,8 +180,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="amount {% if section_3.balance < 0 %} text-danger {% endif %}">
-              {{ section_3.balance|accounting_amount }}
+            <td class="amount {% if owners_equity.balance < 0 %} text-danger {% endif %}">
+              {{ owners_equity.balance|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -195,8 +195,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td class="align-middle">{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="text-right align-middle font-italic {% if section_1.balance < 0 %} text-danger {% endif %}">
-              {{ section_1.balance|accounting_amount }}
+            <td class="text-right align-middle font-italic {% if assets.balance < 0 %} text-danger {% endif %}">
+              {{ assets.balance|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -208,8 +208,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td class="align-middle">{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="text-right align-middle font-italic {% if section_2.balance|add:section_3.balance < 0 %} text-danger {% endif %}">
-              {{ section_2.balance|add:section_3.balance|accounting_amount }}
+            <td class="text-right align-middle font-italic {% if liabilities.balance|add:owners_equity.balance < 0 %} text-danger {% endif %}">
+              {{ liabilities.balance|add:owners_equity.balance|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -228,9 +228,9 @@ First written: 2020/7/20
     <div class="col-sm-6">
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item section-title">
-          {{ section_1.title|title }}
+          {{ assets.title|title }}
         </li>
-        {% for group in section_1.groups %}
+        {% for group in assets.groups %}
           <li class="list-group-item d-flex justify-content-between align-items-center group-title">
             {{ group.title|title }}
           </li>
@@ -249,8 +249,8 @@ First written: 2020/7/20
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center grand-total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if section_1.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ section_1.balance|accounting_amount }}
+          <span class="badge {% if assets.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ assets.balance|accounting_amount }}
           </span>
         </li>
       </ul>
@@ -259,9 +259,9 @@ First written: 2020/7/20
     <div class="col-sm-6">
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item section-title">
-          {{ section_2.title|title }}
+          {{ liabilities.title|title }}
         </li>
-        {% for group in section_2.groups %}
+        {% for group in liabilities.groups %}
           <li class="list-group-item d-flex justify-content-between align-items-center group-title">
             {{ group.title|title }}
           </li>
@@ -280,17 +280,17 @@ First written: 2020/7/20
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if section_2.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ section_2.balance|accounting_amount }}
+          <span class="badge {% if liabilities.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ liabilities.balance|accounting_amount }}
           </span>
         </li>
       </ul>
 
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item section-title">
-          {{ section_3.title|title }}
+          {{ owners_equity.title|title }}
         </li>
-        {% for group in section_3.groups %}
+        {% for group in owners_equity.groups %}
           <li class="list-group-item d-flex justify-content-between align-items-center group-title">
             {{ group.title|title }}
           </li>
@@ -310,8 +310,8 @@ First written: 2020/7/20
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if section_3.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ section_3.balance|accounting_amount }}
+          <span class="badge {% if owners_equity.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ owners_equity.balance|accounting_amount }}
           </span>
         </li>
       </ul>
@@ -319,8 +319,8 @@ First written: 2020/7/20
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item d-flex justify-content-between align-items-center grand-total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if section_2.balance|add:section_3.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ section_2.balance|add:section_3.balance|accounting_amount }}
+          <span class="badge {% if liabilities.balance|add:owners_equity.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ liabilities.balance|add:owners_equity.balance|accounting_amount }}
           </span>
         </li>
       </ul>
