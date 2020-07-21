@@ -45,7 +45,12 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
-        user = User.objects.get(login_id="imacat")
+        user = User(sn=923153018, login_id="imacat",
+                    password="5486b64881adaf7bc1485cc26e57e51e", name="依瑪貓",
+                    is_disabled=False, is_deleted=False)
+        user.created_by = user
+        user.updated_by = user
+        user.save()
 
         Account(sn=new_sn(Account), code="1", title_zh_hant="資產",
                 title_en="assets", title_zh_hans="资产", created_by=user,
