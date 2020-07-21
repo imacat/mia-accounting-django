@@ -67,6 +67,16 @@ class Account(models.Model):
     def title(self, value):
         self._title = value
 
+    _url = None
+
+    @property
+    def url(self):
+        return self._url
+
+    @url.setter
+    def url(self, value):
+        self._url = value
+
     class Meta:
         db_table = "accounting_accounts"
         ordering = ["code"]

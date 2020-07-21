@@ -738,6 +738,9 @@ def balance_sheet(request, period_spec):
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
             .filter(balance__isnull=False))
+    for account in accounts:
+        account.url = reverse(
+            "accounting:ledger", args=[account.code, period.spec])
     balance = Record.objects\
         .filter(
         Q(transaction__date__lt=period.start)
@@ -752,6 +755,8 @@ def balance_sheet(request, period_spec):
     if balance is not None and balance != 0:
         brought_forward = Account.objects.get(code="3351")
         brought_forward.balance = -balance
+        brought_forward.url = reverse(
+            "accounting:income-statement", args=[period.spec])
         accounts.append(brought_forward)
     balance = Record.objects\
         .filter(
@@ -768,6 +773,8 @@ def balance_sheet(request, period_spec):
     if balance is not None and balance != 0:
         net_income = Account.objects.get(code="3353")
         net_income.balance = -balance
+        net_income.url = reverse(
+            "accounting:income-statement", args=[period.spec])
         accounts.append(net_income)
     groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
