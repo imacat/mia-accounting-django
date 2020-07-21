@@ -60,7 +60,6 @@ class Country(models.Model):
 
     class Meta:
         db_table = "countries"
-        ordering = ["code"]
 
 
 class User(models.Model):
@@ -117,4 +116,3 @@ class User(models.Model):
     class Meta:
         db_table = "users"
         app_label = "mia_core"
-        ordering = ["login_id"]
