@@ -912,7 +912,7 @@ def _find_order_holes(records):
     holes = [x["date"] for x in Transaction.objects
         .values("date")
         .annotate(count=Count("ord"), max=Max("ord"))
-        .filter(Q(count=F("max")))]\
+        .filter(~Q(count=F("max")))]\
              + [x["date"] for x in Transaction.objects
         .values("date", "ord")
         .annotate(count=Count("sn"))
