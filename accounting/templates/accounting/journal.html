@@ -27,7 +27,7 @@ First written: 2020/7/17
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with subject=current_subject.title|title period=period.description context "Accounting|" %}Cash Account for {{ subject }} in {{ period }}{% endblocktrans %}
+  {% blocktrans asvar title with period=period.description context "Accounting|" %}Journal in {{ period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as css %}
