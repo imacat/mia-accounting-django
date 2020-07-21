@@ -144,7 +144,7 @@ def cash(request, account_code, period_spec):
         x.amount for x in records if not x.is_credit])
     records.insert(0, Record(
         transaction=Transaction(date=period.start),
-        account=Account.objects.filter(code="3351").first(),
+        account=Account.objects.get(code="3351"),
         is_credit=balance_before >= 0,
         amount=abs(balance_before),
         balance=balance_before))
@@ -502,14 +502,14 @@ def journal(request, period_spec):
     if sum_debits < sum_credits:
         debit_records.append(Record(
             transaction=Transaction(date=period.start),
-            account=Account.objects.filter(code="3351").first(),
+            account=Account.objects.get(code="3351"),
             is_credit=False,
             amount=sum_credits - sum_debits
         ))
     elif sum_debits > sum_credits:
         credit_records.append(Record(
             transaction=Transaction(date=period.start),
-            account=Account.objects.filter(code="3351").first(),
+            account=Account.objects.get(code="3351"),
             is_credit=True,
             amount=sum_debits - sum_credits
         ))
@@ -610,7 +610,7 @@ def trial_balance(request, period_spec):
                 When(is_credit=True, then=-1),
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        brought_forward = Account.objects.filter(code="3351").first()
+        brought_forward = Account.objects.get(code="3351")
         if balance > 0:
             brought_forward.debit = balance
             brought_forward.credit = 0
