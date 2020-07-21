@@ -865,12 +865,12 @@ def _ledger_accounts():
     """
     # TODO: Te be replaced with the Django model queries
     return list(Account.objects.raw("""SELECT s.*
-  FROM accounting_subjects AS s
+  FROM accounting_accounts AS s
   WHERE s.code IN (SELECT s.code
-    FROM accounting_subjects AS s
+    FROM accounting_accounts AS s
       INNER JOIN (SELECT s.code
-        FROM accounting_subjects AS s
-         INNER JOIN accounting_records AS r ON r.subject_sn = s.sn
+        FROM accounting_accounts AS s
+         INNER JOIN accounting_records AS r ON r.account_sn = s.sn
         GROUP BY s.code) AS u
       ON u.code LIKE s.code || '%'
     GROUP BY s.code)

@@ -68,7 +68,7 @@ class Account(models.Model):
         self._title = value
 
     class Meta:
-        db_table = "accounting_subjects"
+        db_table = "accounting_accounts"
         ordering = ["code"]
 
 
@@ -199,7 +199,7 @@ class Record(models.Model):
     is_credit = models.BooleanField()
     ord = models.PositiveSmallIntegerField(default=1)
     account = models.ForeignKey(
-        Account, on_delete=models.PROTECT, db_column="subject_sn")
+        Account, on_delete=models.PROTECT, db_column="account_sn")
     summary = models.CharField(max_length=128, blank=True, null=True)
     amount = models.PositiveIntegerField()
     created_at = models.DateTimeField(
