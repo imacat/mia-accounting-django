@@ -136,7 +136,6 @@ class Command(BaseCommand):
                                   date=localdate() - timedelta(days=2), ord=1,
                                   created_by=user, updated_by=user)
         transaction.save()
-        transaction.record_set.all()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
                                       account=Account.objects.get(code="6272"),
@@ -151,13 +150,11 @@ class Command(BaseCommand):
                                       account=Account.objects.get(code="1111"),
                                       amount=2500, created_by=user,
                                       updated_by=user)
-        transaction.record_set.all()
 
         transaction = Transaction(sn=new_sn(Transaction),
                                   date=localdate() - timedelta(days=1), ord=1,
                                   created_by=user, updated_by=user)
         transaction.save()
-        transaction.record_set.all()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
                                       account=Account.objects.get(code="6272"),
@@ -172,12 +169,10 @@ class Command(BaseCommand):
                                       account=Account.objects.get(code="1111"),
                                       amount=2300, created_by=user,
                                       updated_by=user)
-        transaction.record_set.all()
 
         transaction = Transaction(sn=new_sn(Transaction), date=localdate(),
                                   ord=1, created_by=user, updated_by=user)
         transaction.save()
-        transaction.record_set.all()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
                                       account=Account.objects.get(code="6272"),
@@ -192,4 +187,3 @@ class Command(BaseCommand):
                                       account=Account.objects.get(code="1111"),
                                       amount=2100, created_by=user,
                                       updated_by=user)
-        transaction.record_set.all()
