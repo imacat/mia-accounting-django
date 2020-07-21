@@ -96,16 +96,17 @@ def cash(request, account_code, period_spec):
                     ~Q(account__code__startswith="21"),
                     ~Q(account__code__startswith="22"))
                 .order_by("transaction__date", "is_credit", "ord"))
-        balance_before = Record.objects.filter(
-            Q(transaction__date__lt=period.start),
-            (Q(account__code__startswith="11") |
-             Q(account__code__startswith="12") |
-             Q(account__code__startswith="21") |
-             Q(account__code__startswith="21")))\
+        balance_before = Record.objects\
+            .filter(
+                Q(transaction__date__lt=period.start),
+                (Q(account__code__startswith="11") |
+                 Q(account__code__startswith="12") |
+                 Q(account__code__startswith="21") |
+                 Q(account__code__startswith="21")))\
             .aggregate(
-            balance=Coalesce(Sum(Case(
-                When(is_credit=True, then=-1),
-                default=1) * F("amount")), 0))["balance"]
+                balance=Coalesce(Sum(Case(
+                    When(is_credit=True, then=-1),
+                    default=1) * F("amount")), 0))["balance"]
     else:
         records = list(
             Record.objects
@@ -118,13 +119,14 @@ def cash(request, account_code, period_spec):
                     ~Q(account__code__startswith=
                        current_account.code))
                 .order_by("transaction__date", "is_credit", "ord"))
-        balance_before = Record.objects.filter(
-            transaction__date__lt=period.start,
-            account__code__startswith=current_account.code)\
+        balance_before = Record.objects\
+            .filter(
+                transaction__date__lt=period.start,
+                account__code__startswith=current_account.code)\
             .aggregate(
-            balance=Coalesce(Sum(Case(When(
-                is_credit=True, then=-1),
-                default=1) * F("amount")), 0))["balance"]
+                balance=Coalesce(Sum(Case(When(
+                    is_credit=True, then=-1),
+                    default=1) * F("amount")), 0))["balance"]
     balance = balance_before
     for record in records:
         sign = 1 if record.is_credit else -1
@@ -203,47 +205,50 @@ def cash_summary(request, account_code):
         raise Http404()
     # The month summaries
     if current_account.code == "0":
-        months = [RecordSummary(**x) for x in Record.objects.filter(
-            Q(transaction__in=Transaction.objects.filter(
-                Q(record__account__code__startswith="11") |
-                 Q(record__account__code__startswith="12") |
-                 Q(record__account__code__startswith="21") |
-                 Q(record__account__code__startswith="22"))),
-            ~Q(account__code__startswith="11"),
-            ~Q(account__code__startswith="12"),
-            ~Q(account__code__startswith="21"),
-            ~Q(account__code__startswith="22")) \
+        months = [RecordSummary(**x) for x in Record.objects
+            .filter(
+                Q(transaction__in=Transaction.objects.filter(
+                    Q(record__account__code__startswith="11") |
+                     Q(record__account__code__startswith="12") |
+                     Q(record__account__code__startswith="21") |
+                     Q(record__account__code__startswith="22"))),
+                ~Q(account__code__startswith="11"),
+                ~Q(account__code__startswith="12"),
+                ~Q(account__code__startswith="21"),
+                ~Q(account__code__startswith="22")) \
             .annotate(month=TruncMonth("transaction__date")) \
             .values("month") \
             .order_by("month") \
             .annotate(
-            debit=Coalesce(
-                Sum(Case(When(is_credit=False, then=F("amount")))),
-                0),
-            credit=Coalesce(
-                Sum(Case(When(is_credit=True, then=F("amount")))),
-                0),
-            balance=Sum(Case(
-                When(is_credit=False, then=-F("amount")),
-                default=F("amount"))))]
+                debit=Coalesce(
+                    Sum(Case(When(is_credit=False, then=F("amount")))),
+                    0),
+                credit=Coalesce(
+                    Sum(Case(When(is_credit=True, then=F("amount")))),
+                    0),
+                balance=Sum(Case(
+                    When(is_credit=False, then=-F("amount")),
+                    default=F("amount"))))]
     else:
-        months = [RecordSummary(**x) for x in Record.objects.filter(
-            Q(transaction__in=Transaction.objects.filter(
-                record__account__code__startswith=current_account.code)),
-            ~Q(account__code__startswith=current_account.code)) \
+        months = [RecordSummary(**x) for x in Record.objects
+            .filter(
+                Q(transaction__in=Transaction.objects.filter(
+                    record__account__code__startswith=
+                    current_account.code)),
+                ~Q(account__code__startswith=current_account.code)) \
             .annotate(month=TruncMonth("transaction__date")) \
             .values("month") \
             .order_by("month") \
             .annotate(
-            debit=Coalesce(
-                Sum(Case(When(is_credit=False, then=F("amount")))),
-                0),
-            credit=Coalesce(
-                Sum(Case(When(is_credit=True, then=F("amount")))),
-                0),
-            balance=Sum(Case(
-                When(is_credit=False, then=-F("amount")),
-                default=F("amount"))))]
+                debit=Coalesce(
+                    Sum(Case(When(is_credit=False, then=F("amount")))),
+                    0),
+                credit=Coalesce(
+                    Sum(Case(When(is_credit=True, then=F("amount")))),
+                    0),
+                balance=Sum(Case(
+                    When(is_credit=False, then=-F("amount")),
+                    default=F("amount"))))]
     cumulative_balance = 0
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
@@ -319,13 +324,14 @@ def ledger(request, account_code, period_spec):
                 account__code__startswith=current_account.code)
             .order_by("transaction__date", "is_credit", "ord"))
     if re.match("^[1-3]", current_account.code) is not None:
-        balance = Record.objects.filter(
-            transaction__date__lt=period.start,
-            account__code__startswith=current_account.code)\
+        balance = Record.objects\
+            .filter(
+                transaction__date__lt=period.start,
+                account__code__startswith=current_account.code)\
             .aggregate(
-            balance=Coalesce(Sum(Case(When(
-                is_credit=True, then=-1),
-                default=1) * F("amount")), 0))["balance"]
+                balance=Coalesce(Sum(Case(When(
+                    is_credit=True, then=-1),
+                    default=1) * F("amount")), 0))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
             account=current_account,
@@ -467,16 +473,17 @@ def journal(request, period_spec):
             transaction__date__lte=period.end)\
         .order_by("transaction__date", "is_credit", "ord")
     # The brought-forward records
-    brought_forward_accounts = Account.objects.filter(
-        Q(code__startswith="1")
-        | Q(code__startswith="2")
-        | Q(code__startswith="3"))\
+    brought_forward_accounts = Account.objects\
+        .filter(
+            Q(code__startswith="1")
+            | Q(code__startswith="2")
+            | Q(code__startswith="3"))\
         .annotate(balance=Sum(
-        Case(
-            When(record__is_credit=True, then=-1),
-            default=1
-        ) * F("record__amount"),
-        filter=Q(record__transaction__date__lt=period.start)))\
+            Case(
+                When(record__is_credit=True, then=-1),
+                default=1
+            ) * F("record__amount"),
+            filter=Q(record__transaction__date__lt=period.start)))\
         .filter(~Q(balance__gt=0))
     debit_records = [Record(
         transaction=Transaction(date=period.start),
