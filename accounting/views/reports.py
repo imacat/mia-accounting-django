@@ -56,80 +56,6 @@ def cash_default(request):
         reverse("accounting:cash", args=(subject_code, period_spec)))
 
 
-def _get_period(period_spec):
-    """Obtains the period helper.
-
-    Args:
-        period_spec (str): The period specificaiton.
-
-    Returns:
-        Period: The period helper.
-    """
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    return Period(period_spec, data_start, data_end)
-
-
-def _cash_subjects():
-    """Returns the subjects for the cash account reports.
-
-    Returns:
-        list[Subject]: The subjects for the cash account reports.
-    """
-    subjects = list(Subject.objects.filter(
-        code__in=Record.objects.filter(
-            Q(subject__code__startswith="11")
-            | Q(subject__code__startswith="12")
-            | Q(subject__code__startswith="21")
-            | Q(subject__code__startswith="22"))
-            .values("subject__code")))
-    subjects.insert(0, Subject(
-        code="0",
-        title=pgettext(
-            "Accounting|", "current assets and liabilities"),
-    ))
-    return subjects
-
-
-def _find_imbalanced(records):
-    """"Finds the records with imbalanced transactions, and sets their
-    is_balanced attribute.
-
-    Args:
-        records (list[Record]): The accounting records.
-    """
-    imbalanced = [x.sn for x in Transaction.objects
-        .annotate(
-        balance=Sum(Case(
-            When(record__is_credit=True, then=-1),
-            default=1) * F("record__amount")))
-        .filter(~Q(balance=0))]
-    for record in records:
-        record.is_balanced = record.transaction.sn not in imbalanced
-
-
-def _find_order_holes(records):
-    """"Finds whether the order of the transactions on this day is not
-        1, 2, 3, 4, 5..., and should be reordered, and sets their
-        has_order_holes attributes.
-
-    Args:
-        records (list[Record]): The accounting records.
-    """
-    holes = [x["date"] for x in Transaction.objects
-        .values("date")
-        .annotate(count=Count("ord"), max=Max("ord"))
-        .filter(Q(count=F("max")))]\
-             + [x["date"] for x in Transaction.objects
-        .values("date", "ord")
-        .annotate(count=Count("sn"))
-        .filter(~Q(count=1))]
-    for record in records:
-        record.has_order_hole = record.transaction.date in holes
-
-
 @require_GET
 @digest_login_required
 def cash(request, subject_code, period_spec):
@@ -334,26 +260,6 @@ def cash_summary(request, subject_code):
         "all_subjects": [x for x in subjects if
                          x.code not in shortcut_subjects],
     })
-
-
-def _ledger_subjects():
-    """Returns the subjects for the ledger reports.
-
-    Returns:
-        list[Subject]: The subjects for the ledger reports.
-    """
-    # TODO: Te be replaced with the Django model queries
-    return list(Subject.objects.raw("""SELECT s.*
-  FROM accounting_subjects AS s
-  WHERE s.code IN (SELECT s.code
-    FROM accounting_subjects AS s
-      INNER JOIN (SELECT s.code
-        FROM accounting_subjects AS s
-         INNER JOIN accounting_records AS r ON r.subject_sn = s.sn
-        GROUP BY s.code) AS u
-      ON u.code LIKE s.code || '%'
-    GROUP BY s.code)
-  ORDER BY s.code"""))
 
 
 @require_GET
@@ -883,3 +789,97 @@ def balance_sheet(request, period_spec):
         "reports": ReportUrl(period=period),
         "period": period,
     })
+
+
+def _get_period(period_spec):
+    """Obtains the period helper.
+
+    Args:
+        period_spec (str): The period specificaiton.
+
+    Returns:
+        Period: The period helper.
+    """
+    first_txn = Transaction.objects.order_by("date").first()
+    data_start = first_txn.date if first_txn is not None else None
+    last_txn = Transaction.objects.order_by("-date").first()
+    data_end = last_txn.date if last_txn is not None else None
+    return Period(period_spec, data_start, data_end)
+
+
+def _cash_subjects():
+    """Returns the subjects for the cash account reports.
+
+    Returns:
+        list[Subject]: The subjects for the cash account reports.
+    """
+    subjects = list(Subject.objects.filter(
+        code__in=Record.objects.filter(
+            Q(subject__code__startswith="11")
+            | Q(subject__code__startswith="12")
+            | Q(subject__code__startswith="21")
+            | Q(subject__code__startswith="22"))
+            .values("subject__code")))
+    subjects.insert(0, Subject(
+        code="0",
+        title=pgettext(
+            "Accounting|", "current assets and liabilities"),
+    ))
+    return subjects
+
+
+def _ledger_subjects():
+    """Returns the subjects for the ledger reports.
+
+    Returns:
+        list[Subject]: The subjects for the ledger reports.
+    """
+    # TODO: Te be replaced with the Django model queries
+    return list(Subject.objects.raw("""SELECT s.*
+  FROM accounting_subjects AS s
+  WHERE s.code IN (SELECT s.code
+    FROM accounting_subjects AS s
+      INNER JOIN (SELECT s.code
+        FROM accounting_subjects AS s
+         INNER JOIN accounting_records AS r ON r.subject_sn = s.sn
+        GROUP BY s.code) AS u
+      ON u.code LIKE s.code || '%'
+    GROUP BY s.code)
+  ORDER BY s.code"""))
+
+
+def _find_imbalanced(records):
+    """"Finds the records with imbalanced transactions, and sets their
+    is_balanced attribute.
+
+    Args:
+        records (list[Record]): The accounting records.
+    """
+    imbalanced = [x.sn for x in Transaction.objects
+        .annotate(
+        balance=Sum(Case(
+            When(record__is_credit=True, then=-1),
+            default=1) * F("record__amount")))
+        .filter(~Q(balance=0))]
+    for record in records:
+        record.is_balanced = record.transaction.sn not in imbalanced
+
+
+def _find_order_holes(records):
+    """"Finds whether the order of the transactions on this day is not
+        1, 2, 3, 4, 5..., and should be reordered, and sets their
+        has_order_holes attributes.
+
+    Args:
+        records (list[Record]): The accounting records.
+    """
+    holes = [x["date"] for x in Transaction.objects
+        .values("date")
+        .annotate(count=Count("ord"), max=Max("ord"))
+        .filter(Q(count=F("max")))]\
+             + [x["date"] for x in Transaction.objects
+        .values("date", "ord")
+        .annotate(count=Count("sn"))
+        .filter(~Q(count=1))]
+    for record in records:
+        record.has_order_hole = record.transaction.date in holes
