@@ -104,6 +104,18 @@ def get_multi_lingual_attr(model, name, default=None):
     return getattr(model, name + Language.default().db)
 
 
+def set_multi_lingual_attr(model, name, value):
+    """Sets a multi-lingual attribute of a data model.
+
+    Args:
+        model (object): The data model.
+        name (str): The attribute name.
+        value (any): The new value
+    """
+    language = Language.current()
+    setattr(model, name + language.db, value)
+
+
 def get_multi_lingual_search(attr, query):
     """Returns the query condition on a multi-lingual attribute.
 
