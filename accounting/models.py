@@ -23,7 +23,7 @@ from django.db import models
 from django.urls import reverse
 
 from mia_core.templatetags.mia_core import smart_month
-from mia_core.utils import get_multi_lingual_attr
+from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 
 class Account(models.Model):
@@ -55,17 +55,13 @@ class Account(models.Model):
         """Returns the string representation of this account."""
         return self.code.__str__() + " " + self.title
 
-    _title = None
-
     @property
     def title(self):
-        if self._title is None:
-            self._title = get_multi_lingual_attr(self, "title")
-        return self._title
+        return get_multi_lingual_attr(self, "title")
 
     @title.setter
     def title(self, value):
-        self._title = value
+        set_multi_lingual_attr(self, "title", value)
 
     _url = None
 

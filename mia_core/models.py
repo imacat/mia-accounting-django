@@ -21,7 +21,7 @@
 
 from django.db import models
 
-from mia_core.utils import get_multi_lingual_attr
+from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 
 class Country(models.Model):
@@ -50,17 +50,13 @@ class Country(models.Model):
         """Returns the string representation of this country."""
         return self.code.__str__() + " " + self.name.__str__()
 
-    _name = None
-
     @property
     def name(self):
-        if self._name is None:
-            self._name = get_multi_lingual_attr(self, "name", "en")
-        return self._name
+        return get_multi_lingual_attr(self, "name", "en")
 
     @name.setter
     def name(self, value):
-        self._name = value
+        set_multi_lingual_attr(self, "name", value)
 
     class Meta:
         db_table = "countries"
