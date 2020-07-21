@@ -26,6 +26,7 @@ from django.views.decorators.http import require_GET
 from mia_core.digest_auth import digest_login_required
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def home(request):

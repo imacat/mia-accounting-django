@@ -26,7 +26,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import dateformat, timezone
-from django.utils.translation import pgettext, get_language
+from django.utils.translation import pgettext
 from django.views.decorators.http import require_GET
 
 from accounting.models import Record, Transaction, Account, \
@@ -38,6 +38,7 @@ from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def cash_default(request):
@@ -165,6 +166,7 @@ def cash(request, account_code, period_spec):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def cash_summary_default(request):
@@ -178,7 +180,7 @@ def cash_summary_default(request):
     """
     account_code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
     return HttpResponseRedirect(
-        reverse("accounting:cash-summary", args=(account_code)))
+        reverse("accounting:cash-summary", args=(account_code,)))
 
 
 @require_GET
@@ -271,6 +273,7 @@ def cash_summary(request, account_code):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def ledger_default(request):
@@ -361,6 +364,7 @@ def ledger(request, account_code, period_spec):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def ledger_summary_default(request):
@@ -373,8 +377,9 @@ def ledger_summary_default(request):
         HttpResponseRedirect: The redirection to the default account.
     """
     account_code = settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"]
+    print(account_code)
     return HttpResponseRedirect(
-        reverse("accounting:ledger-summary", args=(account_code)))
+        reverse("accounting:ledger-summary", args=(account_code,)))
 
 
 @require_GET
@@ -434,6 +439,7 @@ def ledger_summary(request, account_code):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def journal_default(request):
@@ -447,7 +453,7 @@ def journal_default(request):
     """
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:journal", args=(period_spec)))
+        reverse("accounting:journal", args=(period_spec,)))
 
 
 @require_GET
@@ -457,7 +463,7 @@ def journal(request, period_spec):
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specificaiton.
+        period_spec (str): The period specification.
 
     Returns:
         HttpResponse: The response.
@@ -522,6 +528,7 @@ def journal(request, period_spec):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def trial_balance_default(request):
@@ -535,7 +542,7 @@ def trial_balance_default(request):
     """
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:trial-balance", args=(period_spec)))
+        reverse("accounting:trial-balance", args=(period_spec,)))
 
 
 @require_GET
@@ -545,7 +552,7 @@ def trial_balance(request, period_spec):
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specificaiton.
+        period_spec (str): The period specification.
 
     Returns:
         HttpResponse: The response.
@@ -632,6 +639,7 @@ def trial_balance(request, period_spec):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def income_statement_default(request):
@@ -645,7 +653,7 @@ def income_statement_default(request):
     """
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:income-statement", args=(period_spec)))
+        reverse("accounting:income-statement", args=(period_spec,)))
 
 
 @require_GET
@@ -655,7 +663,7 @@ def income_statement(request, period_spec):
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specificaiton.
+        period_spec (str): The period specification.
 
     Returns:
         HttpResponse: The response.
@@ -718,6 +726,7 @@ def income_statement(request, period_spec):
     })
 
 
+# noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
 def balance_sheet_default(request):
@@ -731,7 +740,7 @@ def balance_sheet_default(request):
     """
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:balance-sheet", args=(period_spec)))
+        reverse("accounting:balance-sheet", args=(period_spec,)))
 
 
 @require_GET
@@ -741,7 +750,7 @@ def balance_sheet(request, period_spec):
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specificaiton.
+        period_spec (str): The period specification.
 
     Returns:
         HttpResponse: The response.
@@ -856,7 +865,7 @@ def _get_period(period_spec):
     """Obtains the period helper.
 
     Args:
-        period_spec (str): The period specificaiton.
+        period_spec (str): The period specification.
 
     Returns:
         Period: The period helper.
