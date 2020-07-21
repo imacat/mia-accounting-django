@@ -26,7 +26,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import dateformat, timezone
-from django.utils.translation import pgettext
+from django.utils.translation import pgettext, get_language
 from django.views.decorators.http import require_GET
 
 from accounting.models import Record, Transaction, Subject, \
@@ -35,7 +35,7 @@ from accounting.utils import ReportUrl
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
-from mia_core.utils import Pagination
+from mia_core.utils import Pagination, get_multi_lingual_search
 
 
 @require_GET
@@ -788,6 +788,34 @@ def balance_sheet(request, period_spec):
         "section_3": by_code["3"],
         "reports": ReportUrl(period=period),
         "period": period,
+    })
+
+
+@require_GET
+@digest_login_required
+def search(request):
+    """The search.
+
+    Args:
+        request (HttpRequest) The request.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    # The accounting records
+    query = request.GET.get("q")
+    if query is None:
+        records = []
+    else:
+        records = Record.objects.filter(
+            get_multi_lingual_search("subject__title", query)
+            | Q(subject__code__icontains=query)
+            | Q(summary__icontains=query)
+            | Q(transaction__note__icontains=query))
+    pagination = Pagination(request, records, True)
+    return render(request, "accounting/search.html", {
+        "item_list": pagination.items,
+        "pagination": pagination,
     })
 
 

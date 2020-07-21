@@ -74,7 +74,7 @@ urlpatterns = [
     path("balance-sheet/<str:period_spec>",
          reports.balance_sheet, name="balance-sheet"),
     path("search",
-         mia_core_views.todo, name="search"),
+         reports.search, name="search"),
     path("transactions/<txn-type:type>/create",
          mia_core_views.todo, name="transactions.create"),
     path("transactions/<txn-type:type>/store",

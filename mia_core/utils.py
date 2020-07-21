@@ -22,7 +22,7 @@ import random
 import urllib.parse
 
 from django.conf import settings
-from django.db.models import Model
+from django.db.models import Model, Q
 from django.utils.translation import pgettext, get_language
 
 
@@ -102,6 +102,27 @@ def get_multi_lingual_attr(model, name, default=None):
     if title is not None:
         return title
     return getattr(model, name + Language.default().db)
+
+
+def get_multi_lingual_search(attr, query):
+    """Returns the query condition on a multi-lingual attribute.
+
+    Args:
+        attr (str): The base name of the multi-lingual attribute.
+        query (str): The query.
+
+    Returns:
+        Q: The query condition
+    """
+    language = Language.current()
+    if language.is_default:
+        return Q(**{attr + language.db + "__icontains": query})
+    default = Language.default()
+    q = (Q(**{attr + language.db + "__isnull": False})
+            & Q(**{attr + language.db + "__icontains": query}))\
+           | (Q(**{attr + language.db + "__isnull": True})
+              & Q(**{attr + default.db + "__icontains": query}))
+    return q
 
 
 class UrlBuilder:
