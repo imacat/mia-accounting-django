@@ -32,7 +32,7 @@ class Account(models.Model):
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True, blank=True,
         db_column="parent_sn")
-    code = models.CharField(max_length=5)
+    code = models.CharField(max_length=5, unique=True)
     title_zh_hant = models.CharField(
         max_length=32, db_column="title_zhtw")
     title_en = models.CharField(max_length=128, null=True, blank=True)
