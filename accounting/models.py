@@ -79,7 +79,6 @@ class Account(models.Model):
 
     class Meta:
         db_table = "accounting_accounts"
-        ordering = ["code"]
 
 
 class Transaction(models.Model):
@@ -197,7 +196,6 @@ class Transaction(models.Model):
 
     class Meta:
         db_table = "accounting_transactions"
-        ordering = ["date", "ord"]
 
 
 class Record(models.Model):
@@ -325,7 +323,6 @@ class Record(models.Model):
 
     class Meta:
         db_table = "accounting_records"
-        ordering = ["is_credit", "ord"]
 
 
 class RecordSummary(models.Model):
