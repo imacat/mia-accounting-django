@@ -21,8 +21,10 @@
 
 from django.urls import path, register_converter
 
+from mia_core.period import Period
 from . import views
 from mia_core import views as mia_core_views
+from .models import Transaction
 from .views import reports
 
 
@@ -39,11 +41,50 @@ class TransactionTypeConverter:
 
 register_converter(TransactionTypeConverter, "txn-type")
 
+
+class PeriodConverter:
+    """The path converter for the period."""
+    regex = ".+"
+
+    def to_python(self, value):
+        """Returns the period by the period specification.
+
+        Args:
+            value (str): The period specification.
+
+        Returns:
+            Period: The period.
+        """
+        first_txn = Transaction.objects.order_by("date").first()
+        data_start = first_txn.date if first_txn is not None else None
+        last_txn = Transaction.objects.order_by("-date").first()
+        data_end = last_txn.date if last_txn is not None else None
+        period = Period(value, data_start, data_end)
+        if period.error is not None:
+            raise ValueError
+        return period
+
+    def to_url(self, value):
+        """Returns the specification of a period.
+
+        Args:
+            value (Period|str): The period.
+
+        Returns:
+            str: The period specification.
+        """
+        if isinstance(value, Period):
+            return value.spec
+        return value
+
+
+register_converter(PeriodConverter, "period")
+
 app_name = "accounting"
 urlpatterns = [
     path("", views.home, name="home"),
     path("cash", reports.cash_default, name="cash.home"),
-    path("cash/<str:account_code>/<str:period_spec>",
+    path("cash/<str:account_code>/<period:period>",
          reports.cash, name="cash"),
     path("cash-summary",
          reports.cash_summary_default, name="cash-summary.home"),
@@ -51,7 +92,7 @@ urlpatterns = [
          reports.cash_summary, name="cash-summary"),
     path("ledger",
          reports.ledger_default, name="ledger.home"),
-    path("ledger/<str:account_code>/<str:period_spec>",
+    path("ledger/<str:account_code>/<period:period>",
          reports.ledger, name="ledger"),
     path("ledger-summary",
          reports.ledger_summary_default, name="ledger-summary.home"),
@@ -59,19 +100,19 @@ urlpatterns = [
          reports.ledger_summary, name="ledger-summary"),
     path("journal",
          reports.journal_default, name="journal.home"),
-    path("journal/<str:period_spec>",
+    path("journal/<period:period>",
          reports.journal, name="journal"),
     path("trial-balance",
          reports.trial_balance_default, name="trial-balance.home"),
-    path("trial-balance/<str:period_spec>",
+    path("trial-balance/<period:period>",
          reports.trial_balance, name="trial-balance"),
     path("income-statement",
          reports.income_statement_default, name="income-statement.home"),
-    path("income-statement/<str:period_spec>",
+    path("income-statement/<period:period>",
          reports.income_statement, name="income-statement"),
     path("balance-sheet",
          reports.balance_sheet_default, name="balance-sheet.home"),
-    path("balance-sheet/<str:period_spec>",
+    path("balance-sheet/<period:period>",
          reports.balance_sheet, name="balance-sheet"),
     path("search",
          reports.search, name="search"),

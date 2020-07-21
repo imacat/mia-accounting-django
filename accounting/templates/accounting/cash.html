@@ -73,13 +73,13 @@ First written: 2020/7/1
     <div class="dropdown-menu account-picker">
       <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Account|" as text %}{{ text|force_escape }}</div>
       {% for account in shortcut_accounts %}
-        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}>" href="{% url "accounting:cash" account.code period.spec %}">
+        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}>" href="{% url "accounting:cash" account.code period %}">
           {{ account.title|title }}
         </a>
       {% endfor %}
       <div class="dropdown-header">{% trans "All" context "Accounting|Account|" as text %}{{ text|force_escape }}</div>
       {% for account in all_accounts %}
-        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}>" href="{% url "accounting:cash" account.code period.spec %}">
+        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}>" href="{% url "accounting:cash" account.code period %}">
           {{ account.code }} {{ account.title|title }}
         </a>
       {% endfor %}

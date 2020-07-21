@@ -102,6 +102,10 @@ class Period:
     def description(self):
         return self._period.description
 
+    @property
+    def error(self):
+        return self._period.error
+
     @staticmethod
     def _get_last_month_start():
         """Returns the first day of the last month.

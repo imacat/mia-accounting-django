@@ -71,7 +71,7 @@ class ReportUrl:
     def cash(self):
         return reverse(
             "accounting:cash",
-            args=[self._cash_account.code, self._period.spec])
+            args=[self._cash_account.code, self._period])
 
     @property
     def cash_summary(self):
@@ -82,7 +82,7 @@ class ReportUrl:
     def ledger(self):
         return reverse(
             "accounting:ledger",
-            args=[self._ledger_account.code, self._period.spec])
+            args=[self._ledger_account.code, self._period])
 
     @property
     def ledger_summary(self):
@@ -92,19 +92,19 @@ class ReportUrl:
 
     @property
     def journal(self):
-        return reverse("accounting:journal", args=[self._period.spec])
+        return reverse("accounting:journal", args=[self._period])
 
     @property
     def trial_balance(self):
         return reverse(
-            "accounting:trial-balance", args=[self._period.spec])
+            "accounting:trial-balance", args=[self._period])
 
     @property
     def income_statement(self):
         return reverse(
-            "accounting:income-statement", args=[self._period.spec])
+            "accounting:income-statement", args=[self._period])
 
     @property
     def balance_sheet(self):
         return reverse(
-            "accounting:balance-sheet", args=[self._period.spec])
+            "accounting:balance-sheet", args=[self._period])

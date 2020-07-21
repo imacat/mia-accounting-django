@@ -112,7 +112,7 @@ First written: 2020/7/19
                     <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
                     <td class="amount"></td>
                     <td class="actions">
-                      <a href="{% url "accounting:ledger" item.code period.spec %}" class="btn btn-info" role="button">
+                      <a href="{% url "accounting:ledger" item.code period %}" class="btn btn-info" role="button">
                         <i class="fas fa-eye"></i>
                         <span class="d-none d-lg-inline">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</span>
                       </a>
@@ -172,7 +172,7 @@ First written: 2020/7/19
               </li>
               {% for item in group.details %}
                 <li class="list-group-item d-flex justify-content-between align-items-center account">
-                  <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period.spec %}">
+                  <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period %}">
                     {{ item.title|title }}
                     <div class="float-right">
                       <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">

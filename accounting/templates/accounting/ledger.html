@@ -72,7 +72,7 @@ First written: 2020/7/16
     </button>
     <div class="dropdown-menu account-picker">
       {% for account in accounts %}
-        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}" href="{% url "accounting:ledger" account.code period.spec %}">
+        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}" href="{% url "accounting:ledger" account.code period %}">
           {{ account.code }} {{ account.title|title }}
         </a>
       {% endfor %}

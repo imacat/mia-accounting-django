@@ -59,19 +59,17 @@ def cash_default(request):
 
 @require_GET
 @digest_login_required
-def cash(request, account_code, period_spec):
+def cash(request, account_code, period):
     """The cash account.
 
     Args:
         request (HttpRequest) The request.
         account_code (str): The code of the specified account.
-        period_spec (str): The period specification.
+        period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The period
-    period = _get_period(period_spec)
     # The account
     accounts = _cash_accounts()
     current_account = None
@@ -295,19 +293,17 @@ def ledger_default(request):
 
 @require_GET
 @digest_login_required
-def ledger(request, account_code, period_spec):
+def ledger(request, account_code, period):
     """The ledger.
 
     Args:
         request (HttpRequest) The request.
         account_code (str): The code of the specified account.
-        period_spec (str): The period specification.
+        period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The period
-    period = _get_period(period_spec)
     # The account
     accounts = _ledger_accounts()
     current_account = None
@@ -458,18 +454,16 @@ def journal_default(request):
 
 @require_GET
 @digest_login_required
-def journal(request, period_spec):
+def journal(request, period):
     """The journal.
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specification.
+        period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The period
-    period = _get_period(period_spec)
     # The accounting records
     records = Record.objects\
         .filter(
@@ -547,18 +541,16 @@ def trial_balance_default(request):
 
 @require_GET
 @digest_login_required
-def trial_balance(request, period_spec):
+def trial_balance(request, period):
     """The trial balance.
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specification.
+        period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The period
-    period = _get_period(period_spec)
     # The accounts
     nominal = list(
         Account.objects
@@ -658,18 +650,16 @@ def income_statement_default(request):
 
 @require_GET
 @digest_login_required
-def income_statement(request, period_spec):
+def income_statement(request, period):
     """The income statement.
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specification.
+        period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The period
-    period = _get_period(period_spec)
     # The accounts
     accounts = list(
         Account.objects
@@ -745,18 +735,16 @@ def balance_sheet_default(request):
 
 @require_GET
 @digest_login_required
-def balance_sheet(request, period_spec):
+def balance_sheet(request, period):
     """The balance sheet.
 
     Args:
         request (HttpRequest) The request.
-        period_spec (str): The period specification.
+        period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The period
-    period = _get_period(period_spec)
     # The accounts
     accounts = list(
         Account.objects
@@ -774,7 +762,7 @@ def balance_sheet(request, period_spec):
         .order_by("code"))
     for account in accounts:
         account.url = reverse(
-            "accounting:ledger", args=[account.code, period.spec])
+            "accounting:ledger", args=(account.code, period))
     balance = Record.objects\
         .filter(
             Q(transaction__date__lt=period.start)
@@ -790,7 +778,7 @@ def balance_sheet(request, period_spec):
         brought_forward = Account.objects.get(code="3351")
         brought_forward.balance = -balance
         brought_forward.url = reverse(
-            "accounting:income-statement", args=[period.spec])
+            "accounting:income-statement", args=(period,))
         accounts.append(brought_forward)
     balance = Record.objects\
         .filter(
@@ -808,7 +796,7 @@ def balance_sheet(request, period_spec):
         net_income = Account.objects.get(code="3353")
         net_income.balance = -balance
         net_income.url = reverse(
-            "accounting:income-statement", args=[period.spec])
+            "accounting:income-statement", args=(period,))
         accounts.append(net_income)
     groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
@@ -859,22 +847,6 @@ def search(request):
         "item_list": pagination.items,
         "pagination": pagination,
     })
-
-
-def _get_period(period_spec):
-    """Obtains the period helper.
-
-    Args:
-        period_spec (str): The period specification.
-
-    Returns:
-        Period: The period helper.
-    """
-    first_txn = Transaction.objects.order_by("date").first()
-    data_start = first_txn.date if first_txn is not None else None
-    last_txn = Transaction.objects.order_by("-date").first()
-    data_end = last_txn.date if last_txn is not None else None
-    return Period(period_spec, data_start, data_end)
 
 
 def _cash_accounts():
