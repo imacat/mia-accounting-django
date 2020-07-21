@@ -20,7 +20,7 @@
 """
 import re
 
-from django.db.models import Sum, Case, When, F, Q, Count, Max
+from django.db.models import Sum, Case, When, F, Q, Count, Max, Min
 from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
@@ -911,8 +911,8 @@ def _find_order_holes(records):
     """
     holes = [x["date"] for x in Transaction.objects
         .values("date")
-        .annotate(count=Count("ord"), max=Max("ord"))
-        .filter(~Q(count=F("max")))]\
+        .annotate(count=Count("ord"), max=Max("ord"), min=Min("ord"))
+        .filter(~(Q(max=F("count")) & Q(min=1)))]\
              + [x["date"] for x in Transaction.objects
         .values("date", "ord")
         .annotate(count=Count("sn"))
