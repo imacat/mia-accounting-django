@@ -62,7 +62,7 @@ First written: 2020/7/9
     </span>
     <span class="d-md-none">{% trans "Book" context "Accounting|" as text %}{{ text|force_escape }}</span>
   </button>
-  <div class="dropdown-menu subject-picker">
+  <div class="dropdown-menu account-picker">
     <a class="dropdown-item {% if request.resolver_match.url_name == "cash" %} active {% endif %}" href="{{ reports.cash }}">
       <i class="fas fa-money-bill-wave"></i>
       {% trans "Cash Account" context "Accounting|" as text %}
@@ -108,9 +108,9 @@ First written: 2020/7/9
       {% trans "Search" context "Accounting|" as text %}
       {{ text|force_escape }}
     </span>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "subjects" %} active {% endif %}" href="{% url "accounting:subjects" %}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "accounts" %} active {% endif %}" href="{% url "accounting:accounts" %}">
       <i class="fas fa-list-ol"></i>
-      {% trans "Subjects" context "Accounting|" as text %}
+      {% trans "Accounts" context "Accounting|" as text %}
       {{ text|force_escape }}
     </a>
   </div>

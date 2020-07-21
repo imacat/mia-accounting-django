@@ -26,8 +26,8 @@ from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import get_multi_lingual_attr
 
 
-class Subject(models.Model):
-    """An accounting subject."""
+class Account(models.Model):
+    """An account."""
     sn = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True, blank=True,
@@ -43,17 +43,16 @@ class Subject(models.Model):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
         db_column="createdby",
-        related_name="created_accounting_subjects")
+        related_name="created_accounting_accounts")
     updated_at = models.DateTimeField(
         auto_now_add=True, db_column="updated")
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
         db_column="updatedby",
-        related_name="updated_accounting_subjects")
+        related_name="updated_accounting_accounts")
 
     def __str__(self):
-        """Returns the string representation of this accounting
-        subject."""
+        """Returns the string representation of this account."""
         return self.code.__str__() + " " + self.title
 
     _title = None
@@ -155,7 +154,7 @@ class Transaction(models.Model):
         """Whether this transaction is a cash income transaction."""
         debit_records = self.debit_records
         return (len(debit_records) == 1
-                and debit_records[0].subject.code == "1111"
+                and debit_records[0].account.code == "1111"
                 and debit_records[0].summary is None)
 
     @property
@@ -163,7 +162,7 @@ class Transaction(models.Model):
         """Whether this transaction is a cash expense transaction."""
         credit_records = self.credit_records
         return (len(credit_records) == 1
-                and credit_records[0].subject.code == "1111"
+                and credit_records[0].account.code == "1111"
                 and credit_records[0].summary is None)
 
     def get_absolute_url(self):
@@ -199,8 +198,8 @@ class Record(models.Model):
         db_column="transaction_sn")
     is_credit = models.BooleanField()
     ord = models.PositiveSmallIntegerField(default=1)
-    subject = models.ForeignKey(
-        Subject, on_delete=models.PROTECT, db_column="subject_sn")
+    account = models.ForeignKey(
+        Account, on_delete=models.PROTECT, db_column="subject_sn")
     summary = models.CharField(max_length=128, blank=True, null=True)
     amount = models.PositiveIntegerField()
     created_at = models.DateTimeField(
@@ -310,7 +309,7 @@ class Record(models.Model):
         record."""
         return "%s %s %s %s" % (
             self.transaction.date,
-            self.subject.title,
+            self.account.title,
             self.summary,
             self.amount)
 

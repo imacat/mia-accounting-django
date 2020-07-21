@@ -27,7 +27,7 @@ First written: 2020/7/16
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with subject=current_subject.title|title period=period.description context "Accounting|" %}Ledger for {{ subject }} in {{ period }}{% endblocktrans %}
+  {% blocktrans asvar title with account=current_account.title|title period=period.description context "Accounting|" %}Ledger for {{ account }} in {{ period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as css %}
@@ -67,13 +67,13 @@ First written: 2020/7/16
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ current_subject.title|title }}</span>
-      <span class="d-md-none">{% trans "Subject" context "Accounting|" as text %}{{ text|force_escape }}</span>
+      <span class="d-none d-md-inline">{{ current_account.title|title }}</span>
+      <span class="d-md-none">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</span>
     </button>
-    <div class="dropdown-menu subject-picker">
-      {% for subject in subjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}" href="{% url "accounting:ledger" subject.code period.spec %}">
-          {{ subject.code }} {{ subject.title|title }}
+    <div class="dropdown-menu account-picker">
+      {% for account in accounts %}
+        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}" href="{% url "accounting:ledger" account.code period.spec %}">
+          {{ account.code }} {{ account.title|title }}
         </a>
       {% endfor %}
     </div>
@@ -95,7 +95,7 @@ First written: 2020/7/16
     <thead>
       <tr>
         <th scope="col">{% trans "Date" context "Accounting|" as text %}{{ text|force_escape }}</th>
-        <th scope="col">{% trans "Subject" context "Accounting|" as text %}{{ text|force_escape }}</th>
+        <th scope="col">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th scope="col">{% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th class="amount" scope="col">{% trans "Debit" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th class="amount" scope="col">{% trans "Credit" context "Accounting|" as text %}{{ text|force_escape }}</th>
@@ -107,7 +107,7 @@ First written: 2020/7/16
       {% for item in item_list %}
         <tr class="{% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} table-danger {% endif %}{% if item.is_existing_equipment %} table-info {% endif %}">
           <td>{{ item.transaction.date|smart_date }}</td>
-          <td>{{ item.subject.title|title }}</td>
+          <td>{{ item.account.title|title }}</td>
           <td>{{ item.summary|default:"" }}{% if not item.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unbalanced" context "Accounting|" as text %}
@@ -151,8 +151,8 @@ First written: 2020/7/16
       <li class="list-group-item {% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} list-group-item-danger {% endif %}{% if item.is_existing_equipment %} list-group-item-info {% endif %}">
         {% if item.sn is not None %}
           <a class="list-group-item-action" href="{{ item.transaction.get_absolute_url }}">
-            <div class="date-subject-line">
-              {{ item.transaction.date|smart_date }} {{ item.subject.title|title }}
+            <div class="date-account-line">
+              {{ item.transaction.date|smart_date }} {{ item.account.title|title }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div>
@@ -200,8 +200,8 @@ First written: 2020/7/16
             </div>
           </a>
         {% else %}
-          <div class="date-subject-line">
-            {{ item.transaction.date|smart_date }} {{ item.subject.title|title }}
+          <div class="date-account-line">
+            {{ item.transaction.date|smart_date }} {{ item.account.title|title }}
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <div>

@@ -108,7 +108,7 @@ First written: 2020/7/19
                 </tr>
                 {% for item in group.details %}
                   <tr>
-                    <td><div class="subject">{{ item.title|title }}</div></td>
+                    <td><div class="account">{{ item.title|title }}</div></td>
                     <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
                     <td class="amount"></td>
                     <td class="actions">
@@ -171,7 +171,7 @@ First written: 2020/7/19
                 {{ group.title|title }}
               </li>
               {% for item in group.details %}
-                <li class="list-group-item d-flex justify-content-between align-items-center subject">
+                <li class="list-group-item d-flex justify-content-between align-items-center account">
                   <a class="list-group-item-action" href="{% url "accounting:ledger" item.code period.spec %}">
                     {{ item.title|title }}
                     <div class="float-right">

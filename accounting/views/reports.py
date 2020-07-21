@@ -29,7 +29,7 @@ from django.utils import dateformat, timezone
 from django.utils.translation import pgettext, get_language
 from django.views.decorators.http import require_GET
 
-from accounting.models import Record, Transaction, Subject, \
+from accounting.models import Record, Transaction, Account, \
     RecordSummary
 from accounting.utils import ReportUrl
 from mia import settings
@@ -47,58 +47,58 @@ def cash_default(request):
         request (HttpRequest) The request.
 
     Returns:
-        HttpResponseRedirect: The redirection to the default subject
+        HttpResponseRedirect: The redirection to the default account
             and month.
     """
-    subject_code = settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
+    account_code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:cash", args=(subject_code, period_spec)))
+        reverse("accounting:cash", args=(account_code, period_spec)))
 
 
 @require_GET
 @digest_login_required
-def cash(request, subject_code, period_spec):
+def cash(request, account_code, period_spec):
     """The cash account.
 
     Args:
         request (HttpRequest) The request.
-        subject_code (str): The code of the specified subject.
-        period_spec (str): The period specificaiton.
+        account_code (str): The code of the specified account.
+        period_spec (str): The period specification.
 
     Returns:
         HttpResponse: The response.
     """
     # The period
     period = _get_period(period_spec)
-    # The subject
-    subjects = _cash_subjects()
-    current_subject = None
-    for subject in subjects:
-        if subject.code == subject_code:
-            current_subject = subject
-    if current_subject is None:
+    # The account
+    accounts = _cash_accounts()
+    current_account = None
+    for account in accounts:
+        if account.code == account_code:
+            current_account = account
+    if current_account is None:
         raise Http404()
     # The accounting records
-    if current_subject.code == "0":
+    if current_account.code == "0":
         records = list(Record.objects.filter(
             Q(transaction__in=Transaction.objects.filter(
                 Q(date__gte=period.start),
                 Q(date__lte=period.end),
-                (Q(record__subject__code__startswith="11") |
-                 Q(record__subject__code__startswith="12") |
-                 Q(record__subject__code__startswith="21") |
-                 Q(record__subject__code__startswith="22")))),
-            ~Q(subject__code__startswith="11"),
-            ~Q(subject__code__startswith="12"),
-            ~Q(subject__code__startswith="21"),
-            ~Q(subject__code__startswith="22")))
+                (Q(record__account__code__startswith="11") |
+                 Q(record__account__code__startswith="12") |
+                 Q(record__account__code__startswith="21") |
+                 Q(record__account__code__startswith="22")))),
+            ~Q(account__code__startswith="11"),
+            ~Q(account__code__startswith="12"),
+            ~Q(account__code__startswith="21"),
+            ~Q(account__code__startswith="22")))
         balance_before = Record.objects.filter(
             Q(transaction__date__lt=period.start),
-            (Q(subject__code__startswith="11") |
-             Q(subject__code__startswith="12") |
-             Q(subject__code__startswith="21") |
-             Q(subject__code__startswith="21")))\
+            (Q(account__code__startswith="11") |
+             Q(account__code__startswith="12") |
+             Q(account__code__startswith="21") |
+             Q(account__code__startswith="21")))\
             .aggregate(
             balance=Coalesce(Sum(Case(
                 When(is_credit=True, then=-1),
@@ -108,12 +108,12 @@ def cash(request, subject_code, period_spec):
             Q(transaction__in=Transaction.objects.filter(
                 Q(date__gte=period.start),
                 Q(date__lte=period.end),
-                Q(record__subject__code__startswith=
-                  current_subject.code))),
-            ~Q(subject__code__startswith=current_subject.code)))
+                Q(record__account__code__startswith=
+                  current_account.code))),
+            ~Q(account__code__startswith=current_account.code)))
         balance_before = Record.objects.filter(
             transaction__date__lt=period.start,
-            subject__code__startswith=current_subject.code)\
+            account__code__startswith=current_account.code)\
             .aggregate(
             balance=Coalesce(Sum(Case(When(
                 is_credit=True, then=-1),
@@ -125,7 +125,7 @@ def cash(request, subject_code, period_spec):
         record.balance = balance
     record_sum = Record(
         transaction=Transaction(date=records[-1].transaction.date),
-        subject=current_subject,
+        account=current_account,
         summary=pgettext("Accounting|", "Total"),
         balance=balance
     )
@@ -135,7 +135,7 @@ def cash(request, subject_code, period_spec):
         x.amount for x in records if not x.is_credit])
     records.insert(0, Record(
         transaction=Transaction(date=period.start),
-        subject=Subject.objects.filter(code="3351").first(),
+        account=Account.objects.filter(code="3351").first(),
         is_credit=balance_before >= 0,
         amount=abs(balance_before),
         balance=balance_before))
@@ -144,17 +144,17 @@ def cash(request, subject_code, period_spec):
     records = pagination.items
     _find_imbalanced(records)
     _find_order_holes(records)
-    shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
+    shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash.html", {
         "item_list": records,
         "pagination": pagination,
-        "current_subject": current_subject,
+        "current_account": current_account,
         "period": period,
-        "reports": ReportUrl(cash=current_subject, period=period),
-        "shortcut_subjects": [x for x in subjects
-                              if x.code in shortcut_subjects],
-        "all_subjects": [x for x in subjects
-                         if x.code not in shortcut_subjects],
+        "reports": ReportUrl(cash=current_account, period=period),
+        "shortcut_accounts": [x for x in accounts
+                              if x.code in shortcut_accounts],
+        "all_accounts": [x for x in accounts
+                         if x.code not in shortcut_accounts],
     })
 
 
@@ -167,45 +167,45 @@ def cash_summary_default(request):
         request (HttpRequest) The request.
 
     Returns:
-        HttpResponseRedirect: The redirection to the default subject.
+        HttpResponseRedirect: The redirection to the default account.
     """
-    subject_code = settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
+    account_code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
     return HttpResponseRedirect(
-        reverse("accounting:cash-summary", args=(subject_code)))
+        reverse("accounting:cash-summary", args=(account_code)))
 
 
 @require_GET
 @digest_login_required
-def cash_summary(request, subject_code):
+def cash_summary(request, account_code):
     """The cash account summary.
 
     Args:
         request (HttpRequest) The request.
-        subject_code (str): The code of the specified subject.
+        account_code (str): The code of the specified account.
 
     Returns:
         HttpResponse: The response.
     """
-    # The subject
-    subjects = _cash_subjects()
-    current_subject = None
-    for subject in subjects:
-        if subject.code == subject_code:
-            current_subject = subject
-    if current_subject is None:
+    # The account
+    accounts = _cash_accounts()
+    current_account = None
+    for account in accounts:
+        if account.code == account_code:
+            current_account = account
+    if current_account is None:
         raise Http404()
     # The month summaries
-    if current_subject.code == "0":
+    if current_account.code == "0":
         months = [RecordSummary(**x) for x in Record.objects.filter(
             Q(transaction__in=Transaction.objects.filter(
-                Q(record__subject__code__startswith="11") |
-                 Q(record__subject__code__startswith="12") |
-                 Q(record__subject__code__startswith="21") |
-                 Q(record__subject__code__startswith="22"))),
-            ~Q(subject__code__startswith="11"),
-            ~Q(subject__code__startswith="12"),
-            ~Q(subject__code__startswith="21"),
-            ~Q(subject__code__startswith="22")) \
+                Q(record__account__code__startswith="11") |
+                 Q(record__account__code__startswith="12") |
+                 Q(record__account__code__startswith="21") |
+                 Q(record__account__code__startswith="22"))),
+            ~Q(account__code__startswith="11"),
+            ~Q(account__code__startswith="12"),
+            ~Q(account__code__startswith="21"),
+            ~Q(account__code__startswith="22")) \
             .annotate(month=TruncMonth("transaction__date")) \
             .values("month") \
             .order_by("month") \
@@ -222,8 +222,8 @@ def cash_summary(request, subject_code):
     else:
         months = [RecordSummary(**x) for x in Record.objects.filter(
             Q(transaction__in=Transaction.objects.filter(
-                record__subject__code__startswith=current_subject.code)),
-            ~Q(subject__code__startswith=current_subject.code)) \
+                record__account__code__startswith=current_account.code)),
+            ~Q(account__code__startswith=current_account.code)) \
             .annotate(month=TruncMonth("transaction__date")) \
             .values("month") \
             .order_by("month") \
@@ -249,16 +249,16 @@ def cash_summary(request, subject_code):
         cumulative_balance=cumulative_balance,
     ))
     pagination = Pagination(request, months, True)
-    shortcut_subjects = settings.ACCOUNTING["CASH_SHORTCUT_SUBJECTS"]
+    shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "current_subject": current_subject,
-        "reports": ReportUrl(cash=current_subject),
-        "shortcut_subjects": [x for x in subjects if
-                              x.code in shortcut_subjects],
-        "all_subjects": [x for x in subjects if
-                         x.code not in shortcut_subjects],
+        "current_account": current_account,
+        "reports": ReportUrl(cash=current_account),
+        "shortcut_accounts": [x for x in accounts if
+                              x.code in shortcut_accounts],
+        "all_accounts": [x for x in accounts if
+                         x.code not in shortcut_accounts],
     })
 
 
@@ -271,54 +271,54 @@ def ledger_default(request):
         request (HttpRequest) The request.
 
     Returns:
-        HttpResponseRedirect: The redirection to the default subject
+        HttpResponseRedirect: The redirection to the default account
             and month.
     """
-    subject_code = settings.ACCOUNTING["DEFAULT_LEDGER_SUBJECT"]
+    account_code = settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"]
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:ledger", args=(subject_code, period_spec)))
+        reverse("accounting:ledger", args=(account_code, period_spec)))
 
 
 @require_GET
 @digest_login_required
-def ledger(request, subject_code, period_spec):
+def ledger(request, account_code, period_spec):
     """The ledger.
 
     Args:
         request (HttpRequest) The request.
-        subject_code (str): The code of the specified subject.
-        period_spec (str): The period specificaiton.
+        account_code (str): The code of the specified account.
+        period_spec (str): The period specification.
 
     Returns:
         HttpResponse: The response.
     """
     # The period
     period = _get_period(period_spec)
-    # The subject
-    subjects = _ledger_subjects()
-    current_subject = None
-    for subject in subjects:
-        if subject.code == subject_code:
-            current_subject = subject
-    if current_subject is None:
+    # The account
+    accounts = _ledger_accounts()
+    current_account = None
+    for account in accounts:
+        if account.code == account_code:
+            current_account = account
+    if current_account is None:
         raise Http404()
     # The accounting records
     records = list(Record.objects.filter(
         transaction__date__gte=period.start,
         transaction__date__lte=period.end,
-        subject__code__startswith=current_subject.code))
-    if re.match("^[1-3]", current_subject.code) is not None:
+        account__code__startswith=current_account.code))
+    if re.match("^[1-3]", current_account.code) is not None:
         balance = Record.objects.filter(
             transaction__date__lt=period.start,
-            subject__code__startswith=current_subject.code)\
+            account__code__startswith=current_account.code)\
             .aggregate(
             balance=Coalesce(Sum(Case(When(
                 is_credit=True, then=-1),
                 default=1) * F("amount")), 0))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
-            subject=current_subject,
+            account=current_account,
             summary=pgettext("Accounting|", "Brought Forward"),
             is_credit=balance < 0,
             amount=abs(balance),
@@ -340,10 +340,10 @@ def ledger(request, subject_code, period_spec):
     return render(request, "accounting/ledger.html", {
         "item_list": records,
         "pagination": pagination,
-        "current_subject": current_subject,
+        "current_account": current_account,
         "period": period,
-        "reports": ReportUrl(ledger=current_subject, period=period),
-        "subjects": subjects,
+        "reports": ReportUrl(ledger=current_account, period=period),
+        "accounts": accounts,
     })
 
 
@@ -356,36 +356,36 @@ def ledger_summary_default(request):
         request (HttpRequest) The request.
 
     Returns:
-        HttpResponseRedirect: The redirection to the default subject.
+        HttpResponseRedirect: The redirection to the default account.
     """
-    subject_code = settings.ACCOUNTING["DEFAULT_LEDGER_SUBJECT"]
+    account_code = settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"]
     return HttpResponseRedirect(
-        reverse("accounting:ledger-summary", args=(subject_code)))
+        reverse("accounting:ledger-summary", args=(account_code)))
 
 
 @require_GET
 @digest_login_required
-def ledger_summary(request, subject_code):
+def ledger_summary(request, account_code):
     """The ledger summary report.
 
     Args:
         request (HttpRequest) The request.
-        subject_code (str): The code of the specified subject.
+        account_code (str): The code of the specified account.
 
     Returns:
         HttpResponse: The response.
     """
-    # The subject
-    subjects = _ledger_subjects()
-    current_subject = None
-    for subject in subjects:
-        if subject.code == subject_code:
-            current_subject = subject
-    if current_subject is None:
+    # The account
+    accounts = _ledger_accounts()
+    current_account = None
+    for account in accounts:
+        if account.code == account_code:
+            current_account = account
+    if current_account is None:
         raise Http404()
     # The month summaries
     months = [RecordSummary(**x) for x in Record.objects\
-        .filter(subject__code__startswith=current_subject.code)\
+        .filter(account__code__startswith=current_account.code)\
         .annotate(month=TruncMonth("transaction__date"))\
         .values("month")\
         .order_by("month")\
@@ -414,9 +414,9 @@ def ledger_summary(request, subject_code):
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "current_subject": current_subject,
-        "reports": ReportUrl(ledger=current_subject),
-        "subjects": subjects,
+        "current_account": current_account,
+        "reports": ReportUrl(ledger=current_account),
+        "accounts": accounts,
     })
 
 
@@ -456,7 +456,7 @@ def journal(request, period_spec):
         transaction__date__lte=period.end).order_by(
         "transaction__date", "is_credit", "ord")
     # The brought-forward records
-    brought_forward_subjects = Subject.objects.filter(
+    brought_forward_accounts = Account.objects.filter(
         Q(code__startswith="1")
         | Q(code__startswith="2")
         | Q(code__startswith="3"))\
@@ -469,29 +469,29 @@ def journal(request, period_spec):
         .filter(~Q(balance__gt=0))
     debit_records = [Record(
         transaction=Transaction(date=period.start),
-        subject=x,
+        account=x,
         is_credit=False,
         amount=x.balance
-    ) for x in brought_forward_subjects if x.balance > 0]
+    ) for x in brought_forward_accounts if x.balance > 0]
     credit_records = [Record(
         transaction=Transaction(date=period.start),
-        subject=x,
+        account=x,
         is_credit=True,
         amount=-x.balance
-    ) for x in brought_forward_subjects if x.balance < 0]
+    ) for x in brought_forward_accounts if x.balance < 0]
     sum_debits = sum([x.amount for x in debit_records])
     sum_credits = sum([x.amount for x in credit_records])
     if sum_debits < sum_credits:
         debit_records.append(Record(
             transaction=Transaction(date=period.start),
-            subject=Subject.objects.filter(code="3351").first(),
+            account=Account.objects.filter(code="3351").first(),
             is_credit=False,
             amount=sum_credits - sum_debits
         ))
     elif sum_debits > sum_credits:
         credit_records.append(Record(
             transaction=Transaction(date=period.start),
-            subject=Subject.objects.filter(code="3351").first(),
+            account=Account.objects.filter(code="3351").first(),
             is_credit=True,
             amount=sum_debits - sum_credits
         ))
@@ -501,6 +501,7 @@ def journal(request, period_spec):
     return render(request, "accounting/journal.html", {
         "item_list": pagination.items,
         "pagination": pagination,
+        "reports": ReportUrl(period=period),
         "period": period,
     })
 
@@ -537,7 +538,7 @@ def trial_balance(request, period_spec):
     period = _get_period(period_spec)
     # The accounts
     nominal = list(
-        Subject.objects.filter(
+        Account.objects.filter(
             Q(record__transaction__date__gte=period.start),
             Q(record__transaction__date__lte=period.end),
             ~(Q(code__startswith="1")
@@ -556,7 +557,7 @@ def trial_balance(request, period_spec):
                 When(balance__lt=0, then=-F("balance")),
                 default=None)))
     real = list(
-        Subject.objects
+        Account.objects
             .filter(Q(record__transaction__date__lte=period.end),
                     (Q(code__startswith="1")
                      | Q(code__startswith="2")
@@ -576,17 +577,17 @@ def trial_balance(request, period_spec):
                 default=None)))
     balance = Record.objects.filter(
         (Q(transaction__date__lt=period.start)
-         & ~(Q(subject__code__startswith="1")
-             | Q(subject__code__startswith="2")
-             | Q(subject__code__startswith="3")))
+         & ~(Q(account__code__startswith="1")
+             | Q(account__code__startswith="2")
+             | Q(account__code__startswith="3")))
         | (Q(transaction__date__lte=period.end)
-           & Q(subject__code="3351")))\
+           & Q(account__code="3351")))\
         .aggregate(
         balance=Sum(Case(
             When(is_credit=True, then=-1),
             default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        brought_forward = Subject.objects.filter(code="3351").first()
+        brought_forward = Account.objects.filter(code="3351").first()
         if balance > 0:
             brought_forward.debit = balance
             brought_forward.credit = 0
@@ -596,7 +597,7 @@ def trial_balance(request, period_spec):
         real.append(brought_forward)
     accounts = nominal + real
     accounts.sort(key=lambda x: x.code)
-    total_account = Subject()
+    total_account = Account()
     total_account.title = pgettext("Accounting|", "Total")
     total_account.debit = sum([x.debit for x in accounts
                                if x.debit is not None])
@@ -642,7 +643,7 @@ def income_statement(request, period_spec):
     period = _get_period(period_spec)
     # The accounts
     accounts = list(
-        Subject.objects.filter(
+        Account.objects.filter(
             Q(record__transaction__date__gte=period.start),
             Q(record__transaction__date__lte=period.end),
             ~(Q(code__startswith="1")
@@ -653,17 +654,17 @@ def income_statement(request, period_spec):
                 When(record__is_credit=True, then=1),
                 default=-1) * F("record__amount")))
             .filter(balance__isnull=False))
-    groups = list(Subject.objects.filter(
+    groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
-    sections = list(Subject.objects.filter(
+    sections = list(Account.objects.filter(
         Q(code="4") | Q(code="5") | Q(code="6")
         | Q(code="7") | Q(code="8") | Q(code="9")).order_by("code"))
     cumulative_accounts = {
-        "5": Subject(title=pgettext("Accounting|", "Gross Income")),
-        "6": Subject(title=pgettext("Accounting|", "Operating Income")),
-        "7": Subject(title=pgettext("Accounting|", "Before Tax Income")),
-        "8": Subject(title=pgettext("Accounting|", "After Tax Income")),
-        "9": Subject.objects.get(code="3353"),
+        "5": Account(title=pgettext("Accounting|", "Gross Income")),
+        "6": Account(title=pgettext("Accounting|", "Operating Income")),
+        "7": Account(title=pgettext("Accounting|", "Before Tax Income")),
+        "8": Account(title=pgettext("Accounting|", "After Tax Income")),
+        "9": Account.objects.get(code="3353"),
     }
     cumulative_total = 0
     for section in sections:
@@ -726,7 +727,7 @@ def balance_sheet(request, period_spec):
     period = _get_period(period_spec)
     # The accounts
     accounts = list(
-        Subject.objects
+        Account.objects
             .filter(Q(record__transaction__date__lte=period.end),
                     (Q(code__startswith="1")
                      | Q(code__startswith="2")
@@ -740,37 +741,37 @@ def balance_sheet(request, period_spec):
     balance = Record.objects\
         .filter(
         Q(transaction__date__lt=period.start)
-        & ~((Q(subject__code__startswith="1")
-             | Q(subject__code__startswith="2")
-             | Q(subject__code__startswith="3"))
-            & ~Q(subject__code="3351")))\
+        & ~((Q(account__code__startswith="1")
+             | Q(account__code__startswith="2")
+             | Q(account__code__startswith="3"))
+            & ~Q(account__code="3351")))\
         .aggregate(
         balance=Sum(Case(
             When(is_credit=True, then=-1),
             default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        brought_forward = Subject.objects.get(code="3351")
+        brought_forward = Account.objects.get(code="3351")
         brought_forward.balance = -balance
         accounts.append(brought_forward)
     balance = Record.objects\
         .filter(
         Q(transaction__date__gte=period.start)
         & Q(transaction__date__lte=period.end)
-        & ~((Q(subject__code__startswith="1")
-             | Q(subject__code__startswith="2")
-             | Q(subject__code__startswith="3"))
-            & ~Q(subject__code="3351")))\
+        & ~((Q(account__code__startswith="1")
+             | Q(account__code__startswith="2")
+             | Q(account__code__startswith="3"))
+            & ~Q(account__code="3351")))\
         .aggregate(
         balance=Sum(Case(
             When(is_credit=True, then=-1),
             default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        net_income = Subject.objects.get(code="3353")
+        net_income = Account.objects.get(code="3353")
         net_income.balance = -balance
         accounts.append(net_income)
-    groups = list(Subject.objects.filter(
+    groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
-    sections = list(Subject.objects.filter(
+    sections = list(Account.objects.filter(
         Q(code="1") | Q(code="2") | Q(code="3")).order_by("code"))
     for section in sections:
         section.groups = [x for x in groups
@@ -808,8 +809,8 @@ def search(request):
         records = []
     else:
         records = Record.objects.filter(
-            get_multi_lingual_search("subject__title", query)
-            | Q(subject__code__icontains=query)
+            get_multi_lingual_search("account__title", query)
+            | Q(account__code__icontains=query)
             | Q(summary__icontains=query)
             | Q(transaction__note__icontains=query))
     pagination = Pagination(request, records, True)
@@ -835,35 +836,35 @@ def _get_period(period_spec):
     return Period(period_spec, data_start, data_end)
 
 
-def _cash_subjects():
-    """Returns the subjects for the cash account reports.
+def _cash_accounts():
+    """Returns the cash accounts.
 
     Returns:
-        list[Subject]: The subjects for the cash account reports.
+        list[Account]: The cash accounts.
     """
-    subjects = list(Subject.objects.filter(
+    accounts = list(Account.objects.filter(
         code__in=Record.objects.filter(
-            Q(subject__code__startswith="11")
-            | Q(subject__code__startswith="12")
-            | Q(subject__code__startswith="21")
-            | Q(subject__code__startswith="22"))
-            .values("subject__code")))
-    subjects.insert(0, Subject(
+            Q(account__code__startswith="11")
+            | Q(account__code__startswith="12")
+            | Q(account__code__startswith="21")
+            | Q(account__code__startswith="22"))
+            .values("account__code")))
+    accounts.insert(0, Account(
         code="0",
         title=pgettext(
             "Accounting|", "current assets and liabilities"),
     ))
-    return subjects
+    return accounts
 
 
-def _ledger_subjects():
-    """Returns the subjects for the ledger reports.
+def _ledger_accounts():
+    """Returns the accounts for the ledger.
 
     Returns:
-        list[Subject]: The subjects for the ledger reports.
+        list[Account]: The accounts for the ledger.
     """
     # TODO: Te be replaced with the Django model queries
-    return list(Subject.objects.raw("""SELECT s.*
+    return list(Account.objects.raw("""SELECT s.*
   FROM accounting_subjects AS s
   WHERE s.code IN (SELECT s.code
     FROM accounting_subjects AS s

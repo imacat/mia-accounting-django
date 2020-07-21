@@ -22,7 +22,7 @@
 from django.conf import settings
 from django.urls import reverse
 
-from accounting.models import Subject
+from accounting.models import Account
 from mia_core.period import Period
 
 
@@ -32,9 +32,9 @@ class ReportUrl:
     Args:
         **kwargs: the keyword arguments:
             period (Period): The currently-specified period.
-            cash (Subject): The currently-specified subject of the
+            cash (Account): The currently-specified account of the
                 cash account or cash summary.
-            ledger (Subject): The currently-specified subject of the
+            ledger (Account): The currently-specified account of the
                 ledger or leger summary.
 
     Attributes:
@@ -48,8 +48,8 @@ class ReportUrl:
         balance_sheet (str): The URL of the balance sheet.
     """
     _period = None
-    _cash_subject = None
-    _ledger_subject = None
+    _cash_account = None
+    _ledger_account = None
 
     def __init__(self, **kwargs):
         if "period" in kwargs:
@@ -57,40 +57,38 @@ class ReportUrl:
         else:
             self._period = Period()
         if "cash" in kwargs:
-            self._cash_subject = kwargs["cash"]
+            self._cash_account = kwargs["cash"]
         else:
-            self._cash_subject = Subject.objects.filter(
-                code=settings.ACCOUNTING["DEFAULT_CASH_SUBJECT"]
-            ).first()
+            self._cash_account = Account.objects.get(
+                code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
         if "ledger" in kwargs:
-            self._ledger_subject = kwargs["ledger"]
+            self._ledger_account = kwargs["ledger"]
         else:
-            self._ledger_subject = Subject.objects.filter(
-                code=settings.ACCOUNTING["DEFAULT_LEDGER_SUBJECT"]
-            ).first()
+            self._ledger_account = Account.objects.get(
+                code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
 
     @property
     def cash(self):
         return reverse(
             "accounting:cash",
-            args=[self._cash_subject.code, self._period.spec])
+            args=[self._cash_account.code, self._period.spec])
 
     @property
     def cash_summary(self):
         return reverse(
-            "accounting:cash-summary", args=[self._cash_subject.code])
+            "accounting:cash-summary", args=[self._cash_account.code])
 
     @property
     def ledger(self):
         return reverse(
             "accounting:ledger",
-            args=[self._ledger_subject.code, self._period.spec])
+            args=[self._ledger_account.code, self._period.spec])
 
     @property
     def ledger_summary(self):
         return reverse(
             "accounting:ledger-summary",
-            args=[self._ledger_subject.code])
+            args=[self._ledger_account.code])
 
     @property
     def journal(self):

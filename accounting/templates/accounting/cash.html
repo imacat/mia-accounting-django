@@ -27,7 +27,7 @@ First written: 2020/7/1
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with subject=current_subject.title|title period=period.description context "Accounting|" %}Cash Account for {{ subject }} in {{ period }}{% endblocktrans %}
+  {% blocktrans asvar title with account=current_account.title|title period=period.description context "Accounting|" %}Cash Account for {{ account }} in {{ period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as css %}
@@ -67,20 +67,20 @@ First written: 2020/7/1
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ current_subject.title|title }}</span>
-      <span class="d-md-none">{% trans "Subject" context "Accounting|" as text %}{{ text|force_escape }}</span>
+      <span class="d-none d-md-inline">{{ current_account.title|title }}</span>
+      <span class="d-md-none">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</span>
     </button>
-    <div class="dropdown-menu subject-picker">
-      <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
-      {% for subject in shortcut_subjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">
-          {{ subject.title|title }}
+    <div class="dropdown-menu account-picker">
+      <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Account|" as text %}{{ text|force_escape }}</div>
+      {% for account in shortcut_accounts %}
+        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}>" href="{% url "accounting:cash" account.code period.spec %}">
+          {{ account.title|title }}
         </a>
       {% endfor %}
-      <div class="dropdown-header">{% trans "All" context "Accounting|Subject|" as text %}{{ text|force_escape }}</div>
-      {% for subject in all_sibjects %}
-        <a class="dropdown-item {% if subject.code == current_subject.code %} active {% endif %}>" href="{% url "accounting:cash" subject.code period.spec %}">
-          {{ subject.code }} {{ subject.title|title }}
+      <div class="dropdown-header">{% trans "All" context "Accounting|Account|" as text %}{{ text|force_escape }}</div>
+      {% for account in all_accounts %}
+        <a class="dropdown-item {% if account.code == current_account.code %} active {% endif %}>" href="{% url "accounting:cash" account.code period.spec %}">
+          {{ account.code }} {{ account.title|title }}
         </a>
       {% endfor %}
     </div>
@@ -102,7 +102,7 @@ First written: 2020/7/1
     <thead>
       <tr>
         <th scope="col">{% trans "Date" context "Accounting|" as text %}{{ text|force_escape }}</th>
-        <th scope="col">{% trans "Subject" context "Accounting|" as text %}{{ text|force_escape }}</th>
+        <th scope="col">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th scope="col">{% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th class="amount" scope="col">{% trans "Income" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th class="amount" scope="col">{% trans "Expense" context "Accounting|" as text %}{{ text|force_escape }}</th>
@@ -114,7 +114,7 @@ First written: 2020/7/1
       {% for item in item_list %}
         <tr class="{% if not item.is_balanced or item.has_order_hole %} table-danger {% endif %}">
           <td>{{ item.transaction.date|smart_date }}</td>
-          <td>{{ item.subject.title|title }}</td>
+          <td>{{ item.account.title|title }}</td>
           <td>{{ item.summary|default:"" }}{% if not item.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unbalanced" context "Accounting|" as text %}
@@ -148,8 +148,8 @@ First written: 2020/7/1
       <li class="list-group-item {% if not item.is_balanced or item.has_order_hole %} list-group-item-danger {% endif %}">
         {% if item.sn is not None %}
           <a class="list-group-item-action" href="{{ item.transaction.get_absolute_url }}">
-            <div class="date-subject-line d-flex justify-content-between align-items-center">
-              {{ item.transaction.date|smart_date }} {{ item.subject.title|title }}
+            <div class="date-account-line d-flex justify-content-between align-items-center">
+              {{ item.transaction.date|smart_date }} {{ item.account.title|title }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div>
@@ -185,8 +185,8 @@ First written: 2020/7/1
             </div>
           </a>
         {% else %}
-          <div class="date-subject-line d-flex justify-content-between align-items-center">
-            {{ item.transaction.date|smart_date }} {{ item.subject.title }}
+          <div class="date-account-line d-flex justify-content-between align-items-center">
+            {{ item.transaction.date|smart_date }} {{ item.account.title }}
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <div>{{ item.summary|default:"" }}</div>

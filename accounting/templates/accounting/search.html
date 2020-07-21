@@ -85,7 +85,7 @@ First written: 2020/7/21
     <thead>
       <tr>
         <th scope="col">{% trans "Date" context "Accounting|" as text %}{{ text|force_escape }}</th>
-        <th scope="col">{% trans "Subject" context "Accounting|" as text %}{{ text|force_escape }}</th>
+        <th scope="col">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th scope="col">{% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th class="amount" scope="col">{% trans "Debit" context "Accounting|" as text %}{{ text|force_escape }}</th>
         <th class="amount" scope="col">{% trans "Credit" context "Accounting|" as text %}{{ text|force_escape }}</th>
@@ -97,7 +97,7 @@ First written: 2020/7/21
       {% for item in item_list %}
         <tr class="{% if not item.is_balanced or item.has_order_hole %} table-danger {% endif %}">
           <td>{{ item.transaction.date|smart_date }}</td>
-          <td>{{ item.subject.title|title }}</td>
+          <td>{{ item.account.title|title }}</td>
           <td><div class="{% if item.is_credit %} journal-credit {% else %} journal-debit {% endif %}">{{ item.summary|default:"" }}{% if not item.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unbalanced" context "Accounting|" as text %}
@@ -129,8 +129,8 @@ First written: 2020/7/21
       <li class="list-group-item {% if not item.is_balanced or item.has_order_hole %} list-group-item-danger {% endif %}">
         <a class="list-group-item-action" href="{{ item.transaction.get_absolute_url }}">
           <div class="{% if item.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
-            <div class="date-subject-line">
-              {{ item.transaction.date|smart_date }} {{ item.subject.title|title }}
+            <div class="date-account-line">
+              {{ item.transaction.date|smart_date }} {{ item.account.title|title }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div>

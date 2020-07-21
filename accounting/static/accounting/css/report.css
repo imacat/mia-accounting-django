@@ -22,12 +22,12 @@
  */
 
 
-.subject-picker {
+.account-picker {
     height: auto;
     max-height: 400px;
     overflow-x: hidden;
 }
-.date-subject-line {
+.date-account-line {
     font-size: 0.833em;
 }
 .negative {
@@ -100,7 +100,7 @@
 .income-statement-table tr {
     height: 50px;
 }
-.income-statement-table td .subject {
+.income-statement-table td .account {
     text-indent: 2em;
 }
 .income-statement-table tr.section-title {
@@ -156,7 +156,7 @@
     font-size: 1.1em;
     font-weight: bolder;
 }
-.balance-sheet-table td .subject {
+.balance-sheet-table td .account {
     text-indent: 1em;
 }
 .balance-sheet-table .total {
