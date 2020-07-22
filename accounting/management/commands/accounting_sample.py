@@ -21,7 +21,7 @@
 import random
 
 from django.core.management import BaseCommand, CommandParser
-from django.utils.timezone import localdate, timedelta
+from django.utils import timezone
 
 from accounting.models import Record, Account, Transaction
 from mia_core.models import User
@@ -134,14 +134,15 @@ class Command(BaseCommand):
                 code="6272", title_zh_hant="伙食費", title_en="meal (expenses)",
                 title_zh_hans="伙食费", created_by=user, updated_by=user).save()
 
+        today = timezone.localdate()
         cash_account = Account.objects.get(code="1111")
         meal_account = Account.objects.get(code="6272")
 
         amount1 = random.randint(0, 200)
         amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
-                                  date=localdate() - timedelta(days=2), ord=1,
-                                  created_by=user, updated_by=user)
+                                  date=today - timezone.timedelta(days=2),
+                                  ord=1, created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
@@ -161,8 +162,8 @@ class Command(BaseCommand):
         amount1 = random.randint(40, 200)
         amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
-                                  date=localdate() - timedelta(days=1), ord=1,
-                                  created_by=user, updated_by=user)
+                                  date=today - timezone.timedelta(days=1),
+                                  ord=1, created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
@@ -182,8 +183,8 @@ class Command(BaseCommand):
         amount1 = random.randint(40, 200)
         amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
-                                  date=localdate() - timedelta(days=1), ord=3,
-                                  created_by=user, updated_by=user)
+                                  date=today - timezone.timedelta(days=1),
+                                  ord=3, created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
@@ -202,7 +203,7 @@ class Command(BaseCommand):
 
         amount1 = random.randint(40, 200)
         amount2 = random.randint(40, 200)
-        transaction = Transaction(sn=new_sn(Transaction), date=localdate(),
+        transaction = Transaction(sn=new_sn(Transaction), date=today,
                                   ord=1, created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
@@ -213,7 +214,7 @@ class Command(BaseCommand):
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=2,
                                       account=meal_account,
-                                      summary="飲料—冬瓜茶", amount=amount2,
+                                      summary="飲料—咖啡", amount=amount2,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=True, ord=1,
                                       account=cash_account,
