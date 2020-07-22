@@ -85,26 +85,6 @@ class Command(BaseCommand):
                 title_en="nonrecurring gain or loss", title_zh_hans="非经常营业损益",
                 created_by=user, updated_by=user).save()
 
-        Account(sn=new_sn(Account), parent=Account.objects.get(code="3"),
-                code="33", title_zh_hant="保留盈餘(或累積虧損)",
-                title_en="retained earnings (accumulated deficit)",
-                title_zh_hans="保留盈余(或累积亏损)", created_by=user,
-                updated_by=user).save()
-        Account(sn=new_sn(Account), parent=Account.objects.get(code="33"),
-                code="335", title_zh_hant="未分配盈餘(或累積虧損)",
-                title_en=("retained earnings-unappropriated "
-                          "(or accumulated deficit)"),
-                title_zh_hans="未分配盈余(或累积亏损)", created_by=user,
-                updated_by=user).save()
-        Account(sn=new_sn(Account), parent=Account.objects.get(code="335"),
-                code="3351", title_zh_hant="累積盈虧",
-                title_en="accumulated profit or loss", title_zh_hans="累积盈亏",
-                created_by=user, updated_by=user).save()
-        Account(sn=new_sn(Account), parent=Account.objects.get(code="335"),
-                code="3353", title_zh_hant="本期損益",
-                title_en="net income or loss for current period",
-                title_zh_hans="本期损益", created_by=user, updated_by=user).save()
-
         Account(sn=new_sn(Account), parent=Account.objects.get(code="1"),
                 code="11", title_zh_hant="流動資產", title_en="current assets",
                 title_zh_hans="流动资产", created_by=user, updated_by=user).save()
@@ -120,10 +100,75 @@ class Command(BaseCommand):
                 code="1112", title_zh_hant="零用金/週轉金", title_en="cash on hand",
                 title_zh_hans="零用金/周转金", created_by=user,
                 updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="111"),
+                code="1113", title_zh_hant="銀行存款", title_en="cash in banks",
+                title_zh_hans="银行存款", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="1"),
+                code="12", title_zh_hant="流動資產", title_en="current assets",
+                title_zh_hans="流动资产", created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="12"),
+                code="125", title_zh_hant="預付費用", title_en="prepaid expenses",
+                title_zh_hans="预付费用", created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="125"),
+                code="1255", title_zh_hant="預付所得稅", title_en="prepaid income tax",
+                title_zh_hans="预付所得税", created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="1"),
+                code="13", title_zh_hant="基金及長期投資",
+                title_en="funds and long-term investments",
+                title_zh_hans="基金及长期投资",
+                created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="13"),
+                code="131", title_zh_hant="基金", title_en="funds",
+                title_zh_hans="基金", created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="131"),
+                code="1314", title_zh_hant="退休基金", title_en="pension fund",
+                title_zh_hans="退休基金", created_by=user, updated_by=user).save()
+
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="4"),
+                code="46", title_zh_hant="勞務收入", title_en="service revenue",
+                title_zh_hans="劳务收入", created_by=user,updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="46"),
+                code="461", title_zh_hant="勞務收入", title_en="service revenue",
+                title_zh_hans="劳务收入", created_by=user,updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="461"),
+                code="4611", title_zh_hant="勞務收入", title_en="service revenue",
+                title_zh_hans="劳务收入", created_by=user,updated_by=user).save()
+
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="3"),
+                code="33", title_zh_hant="保留盈餘(或累積虧損)",
+                title_en="retained earnings (accumulated deficit)",
+                title_zh_hans="保留盈余(或累积亏损)", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="33"),
+                code="335", title_zh_hant="未分配盈餘(或累積虧損)",
+                title_en=("retaid earnings-unappropriated "
+                          "(or accumulated deficit)"),
+                title_zh_hans="未分配盈余(或累积亏损)", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="335"),
+                code="3351", title_zh_hant="累積盈虧",
+                title_en="accumulated profit or loss", title_zh_hans="累积盈亏",
+                created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="335"),
+                code="3353", title_zh_hant="本期損益",
+                title_en="net income or loss for current period",
+                title_zh_hans="本期损益", created_by=user, updated_by=user).save()
+
         Account(sn=new_sn(Account), parent=Account.objects.get(code="6"),
                 code="62", title_zh_hant="管理及總務費用",
                 title_en="general & administrative expenses",
                 title_zh_hans="管理及总务费用", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="62"),
+                code="626", title_zh_hant="管理及總務費用",
+                title_en="general & administrative expenses",
+                title_zh_hans="管理及总务费用", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="626"),
+                code="6262", title_zh_hant="保險費",
+                title_en="insurance (expense)",
+                title_zh_hans="保险费", created_by=user,
                 updated_by=user).save()
         Account(sn=new_sn(Account), parent=Account.objects.get(code="62"),
                 code="627", title_zh_hant="管理及總務費用",
@@ -131,14 +176,85 @@ class Command(BaseCommand):
                 title_zh_hans="管理及总务费用", created_by=user,
                 updated_by=user).save()
         Account(sn=new_sn(Account), parent=Account.objects.get(code="627"),
-                code="6272", title_zh_hant="伙食費", title_en="meal (expenses)",
+                code="6272", title_zh_hant="伙食費", title_en="meal (enses)",
                 title_zh_hans="伙食费", created_by=user, updated_by=user).save()
 
         today = timezone.localdate()
         cash_account = Account.objects.get(code="1111")
+        bank_account = Account.objects.get(code="1113")
         meal_account = Account.objects.get(code="6272")
+        pension_account = Account.objects.get(code="1314")
+        insurance_account = Account.objects.get(code="6262")
+        tax_account = Account.objects.get(code="1255")
+        salary_account = Account.objects.get(code="4611")
 
-        amount1 = random.randint(0, 200)
+        income = random.randint(40000, 50000)
+        pension = 882 if income <= 40100\
+            else 924 if income <= 42000\
+            else 966 if income <= 43900\
+            else 1008
+        insurance = 564 if income <= 40100\
+            else 591 if income <= 42000\
+            else 618 if income <= 43900\
+            else 644 if income <= 45800\
+            else 678 if income <= 48200\
+            else 712
+        tax = round(income * 0.05)
+        savings = income - pension - insurance - tax
+        date = today - timezone.timedelta(days=15)
+        month = (date.replace(day=1) - timezone.timedelta(days=1)).month
+
+        transaction = Transaction(sn=new_sn(Transaction),
+                                  date=today - timezone.timedelta(days=15),
+                                  ord=1, created_by=user, updated_by=user)
+        transaction.save()
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=1,
+                                      account=bank_account,
+                                      summary="薪資轉帳", amount=savings,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=2,
+                                      account=pension_account,
+                                      summary=F"勞保{month}月",
+                                      amount=pension,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=3,
+                                      account=insurance_account,
+                                      summary=F"健保{month}月",
+                                      amount=insurance,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=4,
+                                      account=tax_account,
+                                      summary="代扣所得稅",
+                                      amount=tax,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=True,
+                                      ord=1,
+                                      account=salary_account,
+                                      summary=F"{month}月份薪水",
+                                      amount=income,
+                                      created_by=user, updated_by=user)
+
+        transaction = Transaction(sn=new_sn(Transaction),
+                                  date=today - timezone.timedelta(days=15),
+                                  ord=2, created_by=user, updated_by=user)
+        transaction.save()
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=1,
+                                      account=cash_account,
+                                      amount=2000,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=True,
+                                      ord=1,
+                                      account=bank_account,
+                                      summary="ATM提款",
+                                      amount=2000,
+                                      created_by=user, updated_by=user)
+
+        amount1 = random.randint(40, 200)
         amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
                                   date=today - timezone.timedelta(days=2),
@@ -184,7 +300,7 @@ class Command(BaseCommand):
         amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
                                   date=today - timezone.timedelta(days=1),
-                                  ord=3, created_by=user, updated_by=user)
+                                  ord=2, created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
