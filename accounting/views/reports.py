@@ -778,7 +778,7 @@ def balance_sheet(request, period):
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
         brought_forward = Account.objects.get(code="3351")
-        brought_forward.balance = -balance
+        brought_forward.balance = balance
         brought_forward.url = reverse(
             "accounting:income-statement", args=(period,))
         accounts.append(brought_forward)
@@ -796,10 +796,12 @@ def balance_sheet(request, period):
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
         net_income = Account.objects.get(code="3353")
-        net_income.balance = -balance
+        net_income.balance = balance
         net_income.url = reverse(
             "accounting:income-statement", args=(period,))
         accounts.append(net_income)
+    for account in [x for x in accounts if x.code[0] in "23"]:
+        account.balance = -account.balance
     groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
     sections = list(Account.objects.filter(
