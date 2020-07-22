@@ -21,64 +21,13 @@
 
 from django.urls import path, register_converter
 
-from mia_core.period import Period
-from . import views
 from mia_core import views as mia_core_views
-from .models import Transaction
+from . import views, converters
 from .views import reports
 
+register_converter(converters.TransactionTypeConverter, "txn-type")
 
-class TransactionTypeConverter:
-    """The path converter for the transaction types."""
-    regex = "income|expense|transfer"
-
-    def to_python(self, value):
-        return value
-
-    def to_url(self, value):
-        return value
-
-
-register_converter(TransactionTypeConverter, "txn-type")
-
-
-class PeriodConverter:
-    """The path converter for the period."""
-    regex = ".+"
-
-    def to_python(self, value):
-        """Returns the period by the period specification.
-
-        Args:
-            value (str): The period specification.
-
-        Returns:
-            Period: The period.
-        """
-        first_txn = Transaction.objects.order_by("date").first()
-        data_start = first_txn.date if first_txn is not None else None
-        last_txn = Transaction.objects.order_by("-date").first()
-        data_end = last_txn.date if last_txn is not None else None
-        period = Period(value, data_start, data_end)
-        if period.error is not None:
-            raise ValueError
-        return period
-
-    def to_url(self, value):
-        """Returns the specification of a period.
-
-        Args:
-            value (Period|str): The period.
-
-        Returns:
-            str: The period specification.
-        """
-        if isinstance(value, Period):
-            return value.spec
-        return value
-
-
-register_converter(PeriodConverter, "period")
+register_converter(converters.PeriodConverter, "period")
 
 app_name = "accounting"
 urlpatterns = [
