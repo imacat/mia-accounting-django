@@ -94,7 +94,8 @@ def cash(request, account_code, period):
                 ~Q(account__code__startswith="12"),
                 ~Q(account__code__startswith="21"),
                 ~Q(account__code__startswith="22"))
-            .order_by("transaction__date", "is_credit", "ord"))
+            .order_by("transaction__date", "transaction__ord",
+                      "is_credit", "ord"))
         balance_before = Record.objects\
             .filter(
                 Q(transaction__date__lt=period.start),
@@ -115,7 +116,8 @@ def cash(request, account_code, period):
                     Q(date__lte=period.end),
                     Q(record__account__code__startswith=account_code))),
                 ~Q(account__code__startswith=account_code))
-            .order_by("transaction__date", "is_credit", "ord"))
+            .order_by("transaction__date", "transaction__ord",
+                      "is_credit", "ord"))
         balance_before = Record.objects\
             .filter(
                 transaction__date__lt=period.start,
@@ -319,7 +321,7 @@ def ledger(request, account_code, period):
             transaction__date__gte=period.start,
             transaction__date__lte=period.end,
             account__code__startswith=current_account.code)
-        .order_by("transaction__date", "is_credit", "ord"))
+        .order_by("transaction__date", "transaction__ord", "is_credit", "ord"))
     if re.match("^[1-3]", current_account.code) is not None:
         balance = Record.objects\
             .filter(
@@ -469,7 +471,7 @@ def journal(request, period):
         .filter(
             transaction__date__gte=period.start,
             transaction__date__lte=period.end)\
-        .order_by("transaction__date", "is_credit", "ord")
+        .order_by("transaction__date", "transaction__ord", "is_credit", "ord")
     # The brought-forward records
     brought_forward_accounts = Account.objects\
         .filter(
