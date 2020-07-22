@@ -18,6 +18,8 @@
 """The command to populate the database with sample accounting data.
 
 """
+import random
+
 from django.core.management import BaseCommand, CommandParser
 from django.utils.timezone import localdate, timedelta
 
@@ -132,58 +134,88 @@ class Command(BaseCommand):
                 code="6272", title_zh_hant="伙食費", title_en="meal (expenses)",
                 title_zh_hans="伙食费", created_by=user, updated_by=user).save()
 
+        cash_account = Account.objects.get(code="1111")
+        meal_account = Account.objects.get(code="6272")
+
+        amount1 = random.randint(0, 200)
+        amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
                                   date=localdate() - timedelta(days=2), ord=1,
                                   created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
-                                      account=Account.objects.get(code="6272"),
-                                      summary="午餐", amount=1200,
+                                      account=meal_account,
+                                      summary="午餐—排骨飯", amount=amount1,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=2,
-                                      account=Account.objects.get(code="6272"),
-                                      summary="飲料", amount=1300,
+                                      account=meal_account,
+                                      summary="飲料—咖啡", amount=amount2,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=True, ord=1,
-                                      account=Account.objects.get(code="1111"),
-                                      amount=2500, created_by=user,
-                                      updated_by=user)
+                                      account=cash_account,
+                                      amount=amount1 + amount2,
+                                      created_by=user, updated_by=user)
 
+        amount1 = random.randint(40, 200)
+        amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction),
                                   date=localdate() - timedelta(days=1), ord=1,
                                   created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
-                                      account=Account.objects.get(code="6272"),
-                                      summary="午餐", amount=900,
+                                      account=meal_account,
+                                      summary="午餐—牛肉麵", amount=amount1,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=2,
-                                      account=Account.objects.get(code="6272"),
-                                      summary="飲料", amount=1400,
+                                      account=meal_account,
+                                      summary="飲料—紅茶", amount=amount2,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=True, ord=1,
-                                      account=Account.objects.get(code="1111"),
-                                      amount=2300, created_by=user,
-                                      updated_by=user)
+                                      account=cash_account,
+                                      amount=amount1 + amount2,
+                                      created_by=user, updated_by=user)
 
+        amount1 = random.randint(40, 200)
+        amount2 = random.randint(40, 200)
+        transaction = Transaction(sn=new_sn(Transaction),
+                                  date=localdate() - timedelta(days=1), ord=3,
+                                  created_by=user, updated_by=user)
+        transaction.save()
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=1,
+                                      account=meal_account,
+                                      summary="午餐—排骨飯", amount=amount1,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=2,
+                                      account=meal_account,
+                                      summary="飲料—冬瓜茶", amount=amount2,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=True, ord=1,
+                                      account=cash_account,
+                                      amount=amount1 + amount2,
+                                      created_by=user, updated_by=user)
+
+        amount1 = random.randint(40, 200)
+        amount2 = random.randint(40, 200)
         transaction = Transaction(sn=new_sn(Transaction), date=localdate(),
                                   ord=1, created_by=user, updated_by=user)
         transaction.save()
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=1,
-                                      account=Account.objects.get(code="6272"),
-                                      summary="午餐", amount=1500,
+                                      account=meal_account,
+                                      summary="午餐—雞腿飯", amount=amount1,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=False,
                                       ord=2,
-                                      account=Account.objects.get(code="6272"),
-                                      summary="飲料", amount=600,
+                                      account=meal_account,
+                                      summary="飲料—冬瓜茶", amount=amount2,
                                       created_by=user, updated_by=user)
         transaction.record_set.create(sn=new_sn(Record), is_credit=True, ord=1,
-                                      account=Account.objects.get(code="1111"),
-                                      amount=2100, created_by=user,
-                                      updated_by=user)
+                                      account=cash_account,
+                                      amount=amount1 + amount2,
+                                      created_by=user, updated_by=user)
