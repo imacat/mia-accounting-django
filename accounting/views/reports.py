@@ -850,6 +850,7 @@ def search(request):
     return render(request, "accounting/search.html", {
         "item_list": pagination.items,
         "pagination": pagination,
+        "reports": ReportUrl(),
     })
 
 
