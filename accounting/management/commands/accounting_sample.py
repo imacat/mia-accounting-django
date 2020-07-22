@@ -46,6 +46,10 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
+        print("This may mess up your data.  Continue? [Y/N] ", end="")
+        if input().lower() not in ("y", "yes"):
+            return
+
         user = User(sn=923153018, login_id="imacat",
                     password="5486b64881adaf7bc1485cc26e57e51e", name="依瑪貓",
                     is_disabled=False, is_deleted=False)
