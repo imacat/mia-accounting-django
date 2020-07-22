@@ -484,7 +484,7 @@ def journal(request, period):
                 default=1
             ) * F("record__amount"),
             filter=Q(record__transaction__date__lt=period.start)))\
-        .filter(~Q(balance__gt=0))
+        .filter(~Q(balance=0))
     debit_records = [Record(
         transaction=Transaction(date=period.start),
         account=x,
