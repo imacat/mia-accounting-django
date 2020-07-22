@@ -125,6 +125,16 @@ class Command(BaseCommand):
                 code="1314", title_zh_hant="退休基金", title_en="pension fund",
                 title_zh_hans="退休基金", created_by=user, updated_by=user).save()
 
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="2"),
+                code="21", title_zh_hant="流動負債", title_en="current liabilities",
+                title_zh_hans="流动负债", created_by=user,updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="21"),
+                code="214", title_zh_hant="應付帳款", title_en="accounts payable",
+                title_zh_hans="应付帐款", created_by=user,updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="214"),
+                code="2141", title_zh_hant="應付帳款", title_en="accounts payable",
+                title_zh_hans="应付帐款", created_by=user,updated_by=user).save()
+
         Account(sn=new_sn(Account), parent=Account.objects.get(code="4"),
                 code="46", title_zh_hant="勞務收入", title_en="service revenue",
                 title_zh_hans="劳务收入", created_by=user,updated_by=user).save()
@@ -161,6 +171,16 @@ class Command(BaseCommand):
                 title_zh_hans="管理及总务费用", created_by=user,
                 updated_by=user).save()
         Account(sn=new_sn(Account), parent=Account.objects.get(code="62"),
+                code="625", title_zh_hant="管理及總務費用",
+                title_en="general & administrative expenses",
+                title_zh_hans="管理及总务费用", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="625"),
+                code="6254", title_zh_hant="旅費",
+                title_en="travelling expense, travel",
+                title_zh_hans="旅费", created_by=user,
+                updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="62"),
                 code="626", title_zh_hant="管理及總務費用",
                 title_en="general & administrative expenses",
                 title_zh_hans="管理及总务费用", created_by=user,
@@ -178,15 +198,21 @@ class Command(BaseCommand):
         Account(sn=new_sn(Account), parent=Account.objects.get(code="627"),
                 code="6272", title_zh_hant="伙食費", title_en="meal (enses)",
                 title_zh_hans="伙食费", created_by=user, updated_by=user).save()
+        Account(sn=new_sn(Account), parent=Account.objects.get(code="627"),
+                code="6273", title_zh_hant="職工福利", title_en="employee benefits/welfare",
+                title_zh_hans="职工福利", created_by=user, updated_by=user).save()
 
         today = timezone.localdate()
         cash_account = Account.objects.get(code="1111")
         bank_account = Account.objects.get(code="1113")
-        meal_account = Account.objects.get(code="6272")
-        pension_account = Account.objects.get(code="1314")
-        insurance_account = Account.objects.get(code="6262")
         tax_account = Account.objects.get(code="1255")
+        pension_account = Account.objects.get(code="1314")
         salary_account = Account.objects.get(code="4611")
+        payable_account = Account.objects.get(code="2141")
+        travel_account = Account.objects.get(code="6254")
+        insurance_account = Account.objects.get(code="6262")
+        meal_account = Account.objects.get(code="6272")
+        welfare_account = Account.objects.get(code="6273")
 
         income = random.randint(40000, 50000)
         pension = 882 if income <= 40100\
@@ -252,6 +278,57 @@ class Command(BaseCommand):
                                       account=bank_account,
                                       summary="ATM提款",
                                       amount=2000,
+                                      created_by=user, updated_by=user)
+
+        transaction = Transaction(sn=new_sn(Transaction),
+                                  date=today - timezone.timedelta(days=14),
+                                  ord=1, created_by=user, updated_by=user)
+        transaction.save()
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=1,
+                                      account=travel_account,
+                                      summary="高鐵—台北→左營",
+                                      amount=1490,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=True,
+                                      ord=1,
+                                      account=payable_account,
+                                      summary="高鐵—台北→左營",
+                                      amount=1490,
+                                      created_by=user, updated_by=user)
+
+        transaction = Transaction(sn=new_sn(Transaction),
+                                  date=today - timezone.timedelta(days=14),
+                                  ord=2, created_by=user, updated_by=user)
+        transaction.save()
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=1,
+                                      account=welfare_account,
+                                      summary="電影—復仇者聯盟",
+                                      amount=80,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=True,
+                                      ord=1,
+                                      account=payable_account,
+                                      summary="電影—復仇者聯盟",
+                                      amount=80,
+                                      created_by=user, updated_by=user)
+
+        transaction = Transaction(sn=new_sn(Transaction),
+                                  date=today - timezone.timedelta(days=11),
+                                  ord=1, created_by=user, updated_by=user)
+        transaction.save()
+        transaction.record_set.create(sn=new_sn(Record), is_credit=False,
+                                      ord=1,
+                                      account=payable_account,
+                                      summary="電影—復仇者聯盟",
+                                      amount=80,
+                                      created_by=user, updated_by=user)
+        transaction.record_set.create(sn=new_sn(Record), is_credit=True,
+                                      ord=1,
+                                      account=bank_account,
+                                      summary="電影—復仇者聯盟",
+                                      amount=80,
                                       created_by=user, updated_by=user)
 
         amount1 = random.randint(40, 200)
