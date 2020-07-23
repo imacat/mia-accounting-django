@@ -116,7 +116,7 @@ class LedgerAccountConverter:
     regex = "[1-9]{1,5}"
 
     def to_python(self, value):
-        """Returns the ledger accountby the account code.
+        """Returns the ledger account by the account code.
 
         Args:
             value (str): The account code.
