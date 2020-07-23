@@ -18,7 +18,10 @@
 """The URL converters.
 
 """
-from accounting.models import Transaction
+
+from django.utils.translation import pgettext
+
+from accounting.models import Transaction, Record, Account
 from mia_core.period import Period
 
 
@@ -67,3 +70,75 @@ class PeriodConverter:
         if isinstance(value, Period):
             return value.spec
         return value
+
+
+class CashAccountConverter:
+    """The path converter for the cash account."""
+    regex = "0|(11|12|21|22)[1-9]{1,3}"
+
+    def to_python(self, value):
+        """Returns the cash account by the account code.
+
+        Args:
+            value (str): The account code.
+
+        Returns:
+            Account: The account.
+        """
+        if value == "0":
+            return Account(
+                code="0",
+                title=pgettext(
+                    "Accounting|", "current assets and liabilities"),
+            )
+        try:
+            account = Account.objects.get(code=value)
+        except Account.DoesNotExist:
+            raise ValueError
+        if Record.objects.filter(account=account).count() == 0:
+            raise ValueError
+        return account
+
+    def to_url(self, value):
+        """Returns the code of an account.
+
+        Args:
+            value (Account): The account.
+
+        Returns:
+            str: The account code.
+        """
+        return value.code
+
+
+class LedgerAccountConverter:
+    """The path converter for the ledger account."""
+    regex = "[1-9]{1,5}"
+
+    def to_python(self, value):
+        """Returns the ledger accountby the account code.
+
+        Args:
+            value (str): The account code.
+
+        Returns:
+            Account: The account.
+        """
+        try:
+            account = Account.objects.get(code=value)
+        except Account.DoesNotExist:
+            raise ValueError
+        if Record.objects.filter(account__code__startswith=value).count() == 0:
+            raise ValueError
+        return account
+
+    def to_url(self, value):
+        """Returns the code of an account.
+
+        Args:
+            value (Account): The account.
+
+        Returns:
+            str: The account code.
+        """
+        return value.code

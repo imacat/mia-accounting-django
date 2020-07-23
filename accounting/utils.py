@@ -48,8 +48,8 @@ class ReportUrl:
         balance_sheet (str): The URL of the balance sheet.
     """
     _period = None
-    _cash_account = None
-    _ledger_account = None
+    _cash = None
+    _ledger = None
 
     def __init__(self, **kwargs):
         if "period" in kwargs:
@@ -57,54 +57,46 @@ class ReportUrl:
         else:
             self._period = Period()
         if "cash" in kwargs:
-            self._cash_account = kwargs["cash"]
+            self._cash = kwargs["cash"]
         else:
-            self._cash_account = Account.objects.get(
+            self._cash = Account.objects.get(
                 code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
         if "ledger" in kwargs:
-            self._ledger_account = kwargs["ledger"]
+            self._ledger = kwargs["ledger"]
         else:
-            self._ledger_account = Account.objects.get(
+            self._ledger = Account.objects.get(
                 code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
 
     @property
     def cash(self):
         return reverse(
-            "accounting:cash",
-            args=[self._cash_account.code, self._period])
+            "accounting:cash", args=(self._cash, self._period))
 
     @property
     def cash_summary(self):
-        return reverse(
-            "accounting:cash-summary", args=[self._cash_account.code])
+        return reverse("accounting:cash-summary", args=(self._cash,))
 
     @property
     def ledger(self):
         return reverse(
-            "accounting:ledger",
-            args=[self._ledger_account.code, self._period])
+            "accounting:ledger", args=(self._ledger, self._period))
 
     @property
     def ledger_summary(self):
-        return reverse(
-            "accounting:ledger-summary",
-            args=[self._ledger_account.code])
+        return reverse("accounting:ledger-summary", args=(self._ledger,))
 
     @property
     def journal(self):
-        return reverse("accounting:journal", args=[self._period])
+        return reverse("accounting:journal", args=(self._period,))
 
     @property
     def trial_balance(self):
-        return reverse(
-            "accounting:trial-balance", args=[self._period])
+        return reverse("accounting:trial-balance", args=(self._period,))
 
     @property
     def income_statement(self):
-        return reverse(
-            "accounting:income-statement", args=[self._period])
+        return reverse("accounting:income-statement", args=(self._period,))
 
     @property
     def balance_sheet(self):
-        return reverse(
-            "accounting:balance-sheet", args=[self._period])
+        return reverse("accounting:balance-sheet", args=(self._period,))

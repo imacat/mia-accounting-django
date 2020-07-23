@@ -26,26 +26,27 @@ from . import views, converters
 from .views import reports
 
 register_converter(converters.TransactionTypeConverter, "txn-type")
-
 register_converter(converters.PeriodConverter, "period")
+register_converter(converters.CashAccountConverter, "cash-account")
+register_converter(converters.LedgerAccountConverter, "ledger-account")
 
 app_name = "accounting"
 urlpatterns = [
     path("", views.home, name="home"),
     path("cash", reports.cash_default, name="cash.home"),
-    path("cash/<str:account_code>/<period:period>",
+    path("cash/<cash-account:account>/<period:period>",
          reports.cash, name="cash"),
     path("cash-summary",
          reports.cash_summary_default, name="cash-summary.home"),
-    path("cash-summary/<str:account_code>",
+    path("cash-summary/<cash-account:account>",
          reports.cash_summary, name="cash-summary"),
     path("ledger",
          reports.ledger_default, name="ledger.home"),
-    path("ledger/<str:account_code>/<period:period>",
+    path("ledger/<ledger-account:account>/<period:period>",
          reports.ledger, name="ledger"),
     path("ledger-summary",
          reports.ledger_summary_default, name="ledger-summary.home"),
-    path("ledger-summary/<str:account_code>",
+    path("ledger-summary/<ledger-account:account>",
          reports.ledger_summary, name="ledger-summary"),
     path("journal",
          reports.journal_default, name="journal.home"),

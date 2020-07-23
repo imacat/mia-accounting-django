@@ -51,35 +51,28 @@ def cash_default(request):
         HttpResponseRedirect: The redirection to the default account
             and month.
     """
-    account_code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
+    account = Account.objects.get(
+        code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:cash", args=(account_code, period_spec)))
+        reverse("accounting:cash", args=(account, period_spec)))
 
 
 @require_GET
 @digest_login_required
-def cash(request, account_code, period):
+def cash(request, account, period):
     """The cash account.
 
     Args:
         request (HttpRequest) The request.
-        account_code (str): The code of the specified account.
+        account (Account): The account.
         period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The account
-    accounts = _cash_accounts()
-    current_account = None
-    for account in accounts:
-        if account.code == account_code:
-            current_account = account
-    if current_account is None:
-        raise Http404()
     # The accounting records
-    if current_account.code == "0":
+    if account.code == "0":
         records = list(
             Record.objects
             .filter(
@@ -114,14 +107,14 @@ def cash(request, account_code, period):
                 Q(transaction__in=Transaction.objects.filter(
                     Q(date__gte=period.start),
                     Q(date__lte=period.end),
-                    Q(record__account__code__startswith=account_code))),
-                ~Q(account__code__startswith=account_code))
+                    Q(record__account__code__startswith=account.code))),
+                ~Q(account__code__startswith=account.code))
             .order_by("transaction__date", "transaction__ord",
                       "is_credit", "ord"))
         balance_before = Record.objects\
             .filter(
                 transaction__date__lt=period.start,
-                account__code__startswith=current_account.code)\
+                account__code__startswith=account.code)\
             .aggregate(
                 balance=Coalesce(Sum(Case(When(
                     is_credit=True, then=-1),
@@ -133,7 +126,7 @@ def cash(request, account_code, period):
         record.balance = balance
     record_sum = Record(
         transaction=Transaction(date=records[-1].transaction.date),
-        account=current_account,
+        account=account,
         summary=pgettext("Accounting|", "Total"),
         balance=balance
     )
@@ -152,13 +145,14 @@ def cash(request, account_code, period):
     records = pagination.items
     _find_imbalanced(records)
     _find_order_holes(records)
+    accounts = _cash_accounts()
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash.html", {
         "item_list": records,
         "pagination": pagination,
-        "current_account": current_account,
+        "current_account": account,
         "period": period,
-        "reports": ReportUrl(cash=current_account, period=period),
+        "reports": ReportUrl(cash=account, period=period),
         "shortcut_accounts": [x for x in accounts
                               if x.code in shortcut_accounts],
         "all_accounts": [x for x in accounts
@@ -178,33 +172,28 @@ def cash_summary_default(request):
     Returns:
         HttpResponseRedirect: The redirection to the default account.
     """
-    account_code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
+    account = Account.objects.get(
+        code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
     return HttpResponseRedirect(
-        reverse("accounting:cash-summary", args=(account_code,)))
+        reverse("accounting:cash-summary", args=(account,)))
 
 
 @require_GET
 @digest_login_required
-def cash_summary(request, account_code):
+def cash_summary(request, account):
     """The cash account summary.
 
     Args:
         request (HttpRequest) The request.
-        account_code (str): The code of the specified account.
+        account (Account): The account.
 
     Returns:
         HttpResponse: The response.
     """
     # The account
     accounts = _cash_accounts()
-    current_account = None
-    for account in accounts:
-        if account.code == account_code:
-            current_account = account
-    if current_account is None:
-        raise Http404()
     # The month summaries
-    if current_account.code == "0":
+    if account.code == "0":
         months = [RecordSummary(**x) for x in Record.objects
                   .filter(
                     Q(transaction__in=Transaction.objects.filter(
@@ -233,8 +222,8 @@ def cash_summary(request, account_code):
         months = [RecordSummary(**x) for x in Record.objects
                   .filter(
                     Q(transaction__in=Transaction.objects.filter(
-                        record__account__code__startswith=account_code)),
-                    ~Q(account__code__startswith=account_code))
+                        record__account__code__startswith=account.code)),
+                    ~Q(account__code__startswith=account.code))
                   .annotate(month=TruncMonth("transaction__date"))
                   .values("month")
                   .order_by("month")
@@ -264,8 +253,8 @@ def cash_summary(request, account_code):
     return render(request, "accounting/cash-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "current_account": current_account,
-        "reports": ReportUrl(cash=current_account),
+        "current_account": account,
+        "reports": ReportUrl(cash=account),
         "shortcut_accounts": [x for x in accounts if
                               x.code in shortcut_accounts],
         "all_accounts": [x for x in accounts if
@@ -286,54 +275,46 @@ def ledger_default(request):
         HttpResponseRedirect: The redirection to the default account
             and month.
     """
-    account_code = settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"]
+    account = Account.objects.get(
+        code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
     period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:ledger",
-                args=(account_code, period_spec)))
+        reverse("accounting:ledger", args=(account, period_spec)))
 
 
 @require_GET
 @digest_login_required
-def ledger(request, account_code, period):
+def ledger(request, account, period):
     """The ledger.
 
     Args:
         request (HttpRequest) The request.
-        account_code (str): The code of the specified account.
+        account (Account): The account.
         period (Period): The period.
 
     Returns:
         HttpResponse: The response.
     """
-    # The account
-    accounts = _ledger_accounts()
-    current_account = None
-    for account in accounts:
-        if account.code == account_code:
-            current_account = account
-    if current_account is None:
-        raise Http404()
     # The accounting records
     records = list(
         Record.objects
         .filter(
             transaction__date__gte=period.start,
             transaction__date__lte=period.end,
-            account__code__startswith=current_account.code)
+            account__code__startswith=account.code)
         .order_by("transaction__date", "transaction__ord", "is_credit", "ord"))
-    if re.match("^[1-3]", current_account.code) is not None:
+    if re.match("^[1-3]", account.code) is not None:
         balance = Record.objects\
             .filter(
                 transaction__date__lt=period.start,
-                account__code__startswith=current_account.code)\
+                account__code__startswith=account.code)\
             .aggregate(
                 balance=Coalesce(Sum(Case(When(
                     is_credit=True, then=-1),
                     default=1) * F("amount")), 0))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
-            account=current_account,
+            account=account,
             summary=pgettext("Accounting|", "Brought Forward"),
             is_credit=balance < 0,
             amount=abs(balance),
@@ -355,10 +336,10 @@ def ledger(request, account_code, period):
     return render(request, "accounting/ledger.html", {
         "item_list": records,
         "pagination": pagination,
-        "current_account": current_account,
+        "current_account": account,
         "period": period,
-        "reports": ReportUrl(ledger=current_account, period=period),
-        "accounts": accounts,
+        "reports": ReportUrl(ledger=account, period=period),
+        "accounts": _ledger_accounts(),
     })
 
 
@@ -374,35 +355,27 @@ def ledger_summary_default(request):
     Returns:
         HttpResponseRedirect: The redirection to the default account.
     """
-    account_code = settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"]
-    print(account_code)
+    account = Account.objects.get(
+        code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
     return HttpResponseRedirect(
-        reverse("accounting:ledger-summary", args=(account_code,)))
+        reverse("accounting:ledger-summary", args=(account,)))
 
 
 @require_GET
 @digest_login_required
-def ledger_summary(request, account_code):
+def ledger_summary(request, account):
     """The ledger summary report.
 
     Args:
         request (HttpRequest) The request.
-        account_code (str): The code of the specified account.
+        account (Account): The account.
 
     Returns:
         HttpResponse: The response.
     """
-    # The account
-    accounts = _ledger_accounts()
-    current_account = None
-    for account in accounts:
-        if account.code == account_code:
-            current_account = account
-    if current_account is None:
-        raise Http404()
     # The month summaries
     months = [RecordSummary(**x) for x in Record.objects
-              .filter(account__code__startswith=current_account.code)
+              .filter(account__code__startswith=account.code)
               .annotate(month=TruncMonth("transaction__date"))
               .values("month")
               .order_by("month")
@@ -431,9 +404,9 @@ def ledger_summary(request, account_code):
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "current_account": current_account,
-        "reports": ReportUrl(ledger=current_account),
-        "accounts": accounts,
+        "current_account": account,
+        "reports": ReportUrl(ledger=account),
+        "accounts": _ledger_accounts(),
     })
 
 
@@ -763,8 +736,7 @@ def balance_sheet(request, period):
         .filter(balance__isnull=False)
         .order_by("code"))
     for account in accounts:
-        account.url = reverse(
-            "accounting:ledger", args=(account.code, period))
+        account.url = reverse("accounting:ledger", args=(account, period))
     balance = Record.objects\
         .filter(
             Q(transaction__date__lt=period.start)
