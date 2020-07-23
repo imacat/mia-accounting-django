@@ -42,7 +42,11 @@ First written: 2020/7/23
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{{ request.GET.r }}">
     <i class="fas fa-chevron-circle-left"></i>
-    {{ _("Back") }}
+    {% trans "Back" context "Navigation|" as text %}{{ text|force_escape }}
+  </a>
+  <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" item.type item %}">
+    <i class="fas fa-edit"></i>
+    {% trans "Edit" context "Navigation|" as text %}{{ text|force_escape }}
   </a>
 </div>
 

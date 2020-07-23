@@ -137,3 +137,19 @@ def url_with_return(context, view_name, *args):
     url = reverse(view_name, args=args)
     return_to = context.request.get_full_path()
     return str(UrlBuilder(url).set_param("r", return_to))
+
+
+@register.simple_tag(takes_context=True)
+def url_keep_return(context, view_name, *args):
+    """Returns the transaction URL.
+
+    Args:
+        context (RequestContext): The request context.
+        view_name (str): The view name.
+        *args (tuple[any]): The URL arguments.
+
+    Returns:
+        str: The URL.
+    """
+    url = reverse(view_name, args=args)
+    return str(UrlBuilder(url).set_param("r", context.request.GET.get("r")))
