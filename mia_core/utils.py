@@ -26,7 +26,7 @@ from django.db.models import Model, Q
 from django.utils.translation import pgettext, get_language
 
 
-def new_id(cls):
+def new_pk(cls):
     """Finds a random ID that does not conflict with the existing data records.
 
     Args:

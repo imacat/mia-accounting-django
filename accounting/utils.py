@@ -27,7 +27,7 @@ from django.utils.translation import pgettext
 
 from accounting.models import Account, Transaction, Record
 from mia_core.period import Period
-from mia_core.utils import new_id
+from mia_core.utils import new_pk
 
 
 class ReportUrl:
@@ -134,7 +134,7 @@ class Populator:
                 code = str(code)
             parent = None if len(code) == 1\
                 else Account.objects.get(code=code[:-1])
-            Account(pk=new_id(Account), parent=parent, code=code,
+            Account(pk=new_pk(Account), parent=parent, code=code,
                     title_zh_hant=data[1], title_en=data[2],
                     title_zh_hans=data[3],
                     created_by=self.user, updated_by=self.user).save()
@@ -153,7 +153,7 @@ class Populator:
         if isinstance(date, int):
             date = timezone.localdate() + timezone.timedelta(days=date)
         order = Transaction.objects.filter(date=date).count() + 1
-        transaction = Transaction(pk=new_id(Transaction), date=date, ord=order,
+        transaction = Transaction(pk=new_pk(Transaction), date=date, ord=order,
                                   created_by=self.user, updated_by=self.user)
         transaction.save()
         order = 1
@@ -163,7 +163,7 @@ class Populator:
                 account = Account.objects.get(code=account)
             elif isinstance(account, int):
                 account = Account.objects.get(code=str(account))
-            transaction.record_set.create(pk=new_id(Record), is_credit=False,
+            transaction.record_set.create(pk=new_pk(Record), is_credit=False,
                                           ord=order, account=account,
                                           summary=data[1], amount=data[2],
                                           created_by=self.user,
@@ -176,7 +176,7 @@ class Populator:
                 account = Account.objects.get(code=account)
             elif isinstance(account, int):
                 account = Account.objects.get(code=str(account))
-            transaction.record_set.create(pk=new_id(Record), is_credit=True,
+            transaction.record_set.create(pk=new_pk(Record), is_credit=True,
                                           ord=order, account=account,
                                           summary=data[1], amount=data[2],
                                           created_by=self.user,
