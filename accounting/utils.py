@@ -20,8 +20,10 @@
 """
 
 from django.conf import settings
+from django.db.models import Q, Sum, Case, When, F, Count, Max, Min
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import pgettext
 
 from accounting.models import Account, Transaction, Record
 from mia_core.period import Period
@@ -204,3 +206,87 @@ class Populator:
         """
         amount = sum([x[2] for x in debit])
         self.add_transfer_transaction(date, debit, (("1111", None, amount),))
+
+
+def get_cash_accounts():
+    """Returns the cash accounts.
+
+    Returns:
+        list[Account]: The cash accounts.
+    """
+    accounts = list(
+        Account.objects
+        .filter(
+            code__in=Record.objects
+            .filter(
+                Q(account__code__startswith="11")
+                | Q(account__code__startswith="12")
+                | Q(account__code__startswith="21")
+                | Q(account__code__startswith="22"))
+            .values("account__code"))
+        .order_by("code"))
+    accounts.insert(0, Account(
+        code="0",
+        title=pgettext(
+            "Accounting|", "current assets and liabilities"),
+    ))
+    return accounts
+
+
+def get_ledger_accounts():
+    """Returns the accounts for the ledger.
+
+    Returns:
+        list[Account]: The accounts for the ledger.
+    """
+    # TODO: Te be replaced with the Django model queries
+    return list(Account.objects.raw("""SELECT s.*
+  FROM accounting_accounts AS s
+  WHERE s.code IN (SELECT s.code
+    FROM accounting_accounts AS s
+      INNER JOIN (SELECT s.code
+        FROM accounting_accounts AS s
+         INNER JOIN accounting_records AS r ON r.account_sn = s.sn
+        GROUP BY s.code) AS u
+      ON u.code LIKE s.code || '%'
+    GROUP BY s.code)
+  ORDER BY s.code"""))
+
+
+def find_imbalanced(records):
+    """"Finds the records with imbalanced transactions, and sets their
+    is_balanced attribute.
+
+    Args:
+        records (list[Record]): The accounting records.
+    """
+    imbalanced = [x.sn for x in Transaction.objects
+                  .annotate(
+                    balance=Sum(Case(
+                        When(record__is_credit=True, then=-1),
+                        default=1) * F("record__amount")))
+                  .filter(~Q(balance=0))]
+    for record in records:
+        record.is_balanced = record.transaction.sn not in imbalanced
+
+
+def find_order_holes(records):
+    """"Finds whether the order of the transactions on this day is not
+        1, 2, 3, 4, 5..., and should be reordered, and sets their
+        has_order_holes attributes.
+
+    Args:
+        records (list[Record]): The accounting records.
+    """
+    holes = [x["date"] for x in Transaction.objects
+             .values("date")
+             .annotate(count=Count("ord"),
+                       max=Max("ord"),
+                       min=Min("ord"))
+             .filter(~(Q(max=F("count")) & Q(min=1)))] +\
+            [x["date"] for x in Transaction.objects
+             .values("date", "ord")
+             .annotate(count=Count("sn"))
+             .filter(~Q(count=1))]
+    for record in records:
+        record.has_order_hole = record.transaction.date in holes

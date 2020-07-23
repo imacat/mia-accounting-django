@@ -20,9 +20,9 @@
 """
 import re
 
-from django.db.models import Sum, Case, When, F, Q, Count, Max, Min
+from django.db.models import Sum, Case, When, F, Q
 from django.db.models.functions import TruncMonth, Coalesce
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -31,7 +31,8 @@ from django.views.decorators.http import require_GET
 
 from accounting.models import Record, Transaction, Account, \
     RecordSummary
-from accounting.utils import ReportUrl
+from accounting.utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
+    find_imbalanced, find_order_holes
 from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
@@ -143,9 +144,9 @@ def cash(request, account, period):
     records.append(record_sum)
     pagination = Pagination(request, records, True)
     records = pagination.items
-    _find_imbalanced(records)
-    _find_order_holes(records)
-    accounts = _cash_accounts()
+    find_imbalanced(records)
+    find_order_holes(records)
+    accounts = get_cash_accounts()
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash.html", {
         "item_list": records,
@@ -191,7 +192,7 @@ def cash_summary(request, account):
         HttpResponse: The response.
     """
     # The account
-    accounts = _cash_accounts()
+    accounts = get_cash_accounts()
     # The month summaries
     if account.code == "0":
         months = [RecordSummary(**x) for x in Record.objects
@@ -331,15 +332,15 @@ def ledger(request, account, period):
         records.insert(0, record_brought_forward)
     pagination = Pagination(request, records, True)
     records = pagination.items
-    _find_imbalanced(records)
-    _find_order_holes(records)
+    find_imbalanced(records)
+    find_order_holes(records)
     return render(request, "accounting/ledger.html", {
         "item_list": records,
         "pagination": pagination,
         "account": account,
         "period": period,
         "reports": ReportUrl(ledger=account, period=period),
-        "accounts": _ledger_accounts(),
+        "accounts": get_ledger_accounts(),
     })
 
 
@@ -406,7 +407,7 @@ def ledger_summary(request, account):
         "pagination": pagination,
         "account": account,
         "reports": ReportUrl(ledger=account),
-        "accounts": _ledger_accounts(),
+        "accounts": get_ledger_accounts(),
     })
 
 
@@ -824,87 +825,3 @@ def search(request):
         "pagination": pagination,
         "reports": ReportUrl(),
     })
-
-
-def _cash_accounts():
-    """Returns the cash accounts.
-
-    Returns:
-        list[Account]: The cash accounts.
-    """
-    accounts = list(
-        Account.objects
-        .filter(
-            code__in=Record.objects
-            .filter(
-                Q(account__code__startswith="11")
-                | Q(account__code__startswith="12")
-                | Q(account__code__startswith="21")
-                | Q(account__code__startswith="22"))
-            .values("account__code"))
-        .order_by("code"))
-    accounts.insert(0, Account(
-        code="0",
-        title=pgettext(
-            "Accounting|", "current assets and liabilities"),
-    ))
-    return accounts
-
-
-def _ledger_accounts():
-    """Returns the accounts for the ledger.
-
-    Returns:
-        list[Account]: The accounts for the ledger.
-    """
-    # TODO: Te be replaced with the Django model queries
-    return list(Account.objects.raw("""SELECT s.*
-  FROM accounting_accounts AS s
-  WHERE s.code IN (SELECT s.code
-    FROM accounting_accounts AS s
-      INNER JOIN (SELECT s.code
-        FROM accounting_accounts AS s
-         INNER JOIN accounting_records AS r ON r.account_sn = s.sn
-        GROUP BY s.code) AS u
-      ON u.code LIKE s.code || '%'
-    GROUP BY s.code)
-  ORDER BY s.code"""))
-
-
-def _find_imbalanced(records):
-    """"Finds the records with imbalanced transactions, and sets their
-    is_balanced attribute.
-
-    Args:
-        records (list[Record]): The accounting records.
-    """
-    imbalanced = [x.sn for x in Transaction.objects
-                  .annotate(
-                    balance=Sum(Case(
-                        When(record__is_credit=True, then=-1),
-                        default=1) * F("record__amount")))
-                  .filter(~Q(balance=0))]
-    for record in records:
-        record.is_balanced = record.transaction.sn not in imbalanced
-
-
-def _find_order_holes(records):
-    """"Finds whether the order of the transactions on this day is not
-        1, 2, 3, 4, 5..., and should be reordered, and sets their
-        has_order_holes attributes.
-
-    Args:
-        records (list[Record]): The accounting records.
-    """
-    holes = [x["date"] for x in Transaction.objects
-             .values("date")
-             .annotate(count=Count("ord"),
-                       max=Max("ord"),
-                       min=Min("ord"))
-             .filter(~(Q(max=F("count")) & Q(min=1)))] +\
-            [x["date"] for x in Transaction.objects
-             .values("date", "ord")
-             .annotate(count=Count("sn"))
-             .filter(~Q(count=1))]
-    for record in records:
-        record.has_order_hole = record.transaction.date in holes
