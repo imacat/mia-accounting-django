@@ -63,11 +63,19 @@ def str_format(format_str, *args):
 
 @register.simple_tag(takes_context=True)
 def url_period(context, period_spec):
-    request = context["request"]
+    """Returns the current URL with a new period.
+
+    Args:
+        context (RequestContext): The request context.
+        period_spec (str): The period specification.
+
+    Returns:
+        str: The current URL with the new period.
+    """
     view_name = "%s:%s" % (
-        request.resolver_match.app_name,
-        request.resolver_match.url_name)
-    kwargs = request.resolver_match.kwargs
+        context.request.resolver_match.app_name,
+        context.request.resolver_match.url_name)
+    kwargs = context.request.resolver_match.kwargs
     kwargs["period"] = period_spec
     return reverse(view_name, kwargs=kwargs)
 
