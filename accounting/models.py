@@ -136,8 +136,7 @@ class Transaction(models.Model):
     def has_many_same_day(self):
         """whether there are more than one transactions at this day,
         so that the user can sort their orders. """
-        return Transaction.objects.filter(
-            date=self.date).count() > 1
+        return Transaction.objects.filter(date=self.date).count() > 1
 
     _has_order_hole = None
 
