@@ -21,7 +21,7 @@
 
 from django.utils.translation import pgettext
 
-from accounting.models import Transaction, Record, Account
+from .models import Transaction, Record, Account
 from mia_core.period import Period
 
 

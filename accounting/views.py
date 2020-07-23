@@ -20,6 +20,7 @@
 """
 import re
 
+from django.conf import settings
 from django.db.models import Sum, Case, When, F, Q
 from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect
@@ -29,11 +30,9 @@ from django.utils import dateformat, timezone
 from django.utils.translation import pgettext
 from django.views.decorators.http import require_GET
 
-from accounting.models import Record, Transaction, Account, \
-    RecordSummary
-from accounting.utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
+from .models import Record, Transaction, Account, RecordSummary
+from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes
-from mia import settings
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search
