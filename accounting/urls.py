@@ -22,8 +22,7 @@
 from django.urls import path, register_converter
 
 from mia_core import views as mia_core_views
-from . import views, converters
-from .views import reports
+from . import converters, views
 
 register_converter(converters.TransactionTypeConverter, "txn-type")
 register_converter(converters.PeriodConverter, "period")
@@ -33,39 +32,39 @@ register_converter(converters.LedgerAccountConverter, "ledger-account")
 app_name = "accounting"
 urlpatterns = [
     path("", views.home, name="home"),
-    path("cash", reports.cash_default, name="cash.home"),
+    path("cash", views.cash_default, name="cash.home"),
     path("cash/<cash-account:account>/<period:period>",
-         reports.cash, name="cash"),
+         views.cash, name="cash"),
     path("cash-summary",
-         reports.cash_summary_default, name="cash-summary.home"),
+         views.cash_summary_default, name="cash-summary.home"),
     path("cash-summary/<cash-account:account>",
-         reports.cash_summary, name="cash-summary"),
+         views.cash_summary, name="cash-summary"),
     path("ledger",
-         reports.ledger_default, name="ledger.home"),
+         views.ledger_default, name="ledger.home"),
     path("ledger/<ledger-account:account>/<period:period>",
-         reports.ledger, name="ledger"),
+         views.ledger, name="ledger"),
     path("ledger-summary",
-         reports.ledger_summary_default, name="ledger-summary.home"),
+         views.ledger_summary_default, name="ledger-summary.home"),
     path("ledger-summary/<ledger-account:account>",
-         reports.ledger_summary, name="ledger-summary"),
+         views.ledger_summary, name="ledger-summary"),
     path("journal",
-         reports.journal_default, name="journal.home"),
+         views.journal_default, name="journal.home"),
     path("journal/<period:period>",
-         reports.journal, name="journal"),
+         views.journal, name="journal"),
     path("trial-balance",
-         reports.trial_balance_default, name="trial-balance.home"),
+         views.trial_balance_default, name="trial-balance.home"),
     path("trial-balance/<period:period>",
-         reports.trial_balance, name="trial-balance"),
+         views.trial_balance, name="trial-balance"),
     path("income-statement",
-         reports.income_statement_default, name="income-statement.home"),
+         views.income_statement_default, name="income-statement.home"),
     path("income-statement/<period:period>",
-         reports.income_statement, name="income-statement"),
+         views.income_statement, name="income-statement"),
     path("balance-sheet",
-         reports.balance_sheet_default, name="balance-sheet.home"),
+         views.balance_sheet_default, name="balance-sheet.home"),
     path("balance-sheet/<period:period>",
-         reports.balance_sheet, name="balance-sheet"),
+         views.balance_sheet, name="balance-sheet"),
     path("search",
-         reports.search, name="search"),
+         views.search, name="search"),
     path("transactions/<txn-type:type>/create",
          mia_core_views.todo, name="transactions.create"),
     path("transactions/<txn-type:type>/store",

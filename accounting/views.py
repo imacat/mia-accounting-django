@@ -42,6 +42,22 @@ from mia_core.utils import Pagination, get_multi_lingual_search
 # noinspection PyUnusedLocal
 @require_GET
 @digest_login_required
+def home(request):
+    """The accounting home page.
+
+    Args:
+        request (HttpRequest) The request.
+
+    Returns:
+        HttpResponseRedirect: The redirection to the default
+            accounting report.
+    """
+    return HttpResponseRedirect(reverse("accounting:cash.home"))
+
+
+# noinspection PyUnusedLocal
+@require_GET
+@digest_login_required
 def cash_default(request):
     """The default cash account.
 
