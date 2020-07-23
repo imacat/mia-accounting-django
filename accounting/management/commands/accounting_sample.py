@@ -150,19 +150,19 @@ class Command(BaseCommand):
             (("2141", "電影—復仇者聯盟", 80),),
             (("1113", "電影—復仇者聯盟", 80),))
 
-        p.add_income_transaction(
+        p.add_expense_transaction(
             -2,
             (("6272", "午餐—排骨飯", random.randint(40, 200)),
              ("6272", "飲料—紅茶", random.randint(40, 200))))
-        p.add_income_transaction(
+        p.add_expense_transaction(
             -1,
             (("6272", "午餐—牛肉麵", random.randint(40, 200)),
              ("6272", "飲料—紅茶", random.randint(40, 200))))
-        p.add_income_transaction(
+        p.add_expense_transaction(
             -1,
             (("6272", "午餐—排骨飯", random.randint(40, 200)),
              ("6272", "飲料—冬瓜茶", random.randint(40, 200))))
-        p.add_income_transaction(
+        p.add_expense_transaction(
             0,
             (("6272", "午餐—雞腿飯", random.randint(40, 200)),
              ("6272", "飲料—咖啡", random.randint(40, 200))))
