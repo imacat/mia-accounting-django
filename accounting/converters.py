@@ -38,7 +38,9 @@ class TransactionTypeConverter:
 
 class PeriodConverter:
     """The path converter for the period."""
-    regex = ".+"
+    regex = ("([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)|"
+             "([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?-"
+             "([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?")
 
     def to_python(self, value):
         """Returns the period by the period specification.

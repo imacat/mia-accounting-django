@@ -30,7 +30,7 @@ $(function () {
     $("#button-period-day")
         .on("click", function () {
             window.location = $("#period-url").val()
-                .replace("period-spec", $("#day-picker").val());
+                .replace("0000-00-00", $("#day-picker").val());
         });
     $("#period-start")
         .on("change", function () {
@@ -43,7 +43,7 @@ $(function () {
     $("#button-period-custom")
         .on("click", function () {
             window.location = $("#period-url").val().replace(
-                "period-spec",
+                "0000-00-00",
                 $("#period-start").val() + "-" + $("#period-end").val());
         });
 
@@ -80,7 +80,7 @@ function monthPickerChanged(newDate) {
         periodSpec = year + "-" + month;
     }
     window.location = $("#period-url").val()
-        .replace("period-spec", periodSpec);
+        .replace("0000-00-00", periodSpec);
 }
 
 /**
