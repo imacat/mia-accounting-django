@@ -61,25 +61,6 @@ def str_format(format_str, *args):
     return format_str.format(*args)
 
 
-@register.simple_tag
-def url_query(url, **kwargs):
-    """Returns the URL with the query parameters set.
-
-    Args:
-        url (str): The URL.
-        kwargs (**dict): The query parameters.
-
-    Returns:
-        str: The URL with query parameters set.
-    """
-    print(url)
-    builder = UrlBuilder(url)
-    for key in kwargs.keys():
-        if kwargs[key] is not None:
-            builder.set_param(key, kwargs[key])
-    return str(builder)
-
-
 @register.simple_tag(takes_context=True)
 def url_period(context, period_spec):
     request = context["request"]
