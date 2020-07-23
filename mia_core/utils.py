@@ -175,7 +175,8 @@ class UrlBuilder:
             UrlBuilder: The URL builder itself, with the parameter
                 modified.
         """
-        self.params.append(self.Param(name, value))
+        if value is not None:
+            self.params.append(self.Param(name, value))
         return self
 
     def del_param(self, name):
