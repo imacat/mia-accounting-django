@@ -50,7 +50,7 @@ class Command(BaseCommand):
         if input().lower() not in ("y", "yes"):
             return
 
-        user = User(sn=923153018, login_id="imacat",
+        user = User(pk=923153018, login_id="imacat",
                     password="5486b64881adaf7bc1485cc26e57e51e", name="依瑪貓",
                     is_disabled=False, is_deleted=False)
         user.created_by = user

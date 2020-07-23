@@ -193,7 +193,7 @@ class TransactionConverter:
             Transaction: The account.
         """
         try:
-            return Transaction.objects.get(sn=value)
+            return Transaction.objects.get(pk=value)
         except Transaction.DoesNotExist:
             raise ValueError
 
