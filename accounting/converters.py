@@ -142,3 +142,33 @@ class LedgerAccountConverter:
             str: The account code.
         """
         return value.code
+
+
+class TransactionConverter:
+    """The path converter for the accounting transactions."""
+    regex = "[1-9][0-9]{8}"
+
+    def to_python(self, value):
+        """Returns the transaction by the transaction ID.
+
+        Args:
+            value (str): The transaction ID.
+
+        Returns:
+            Transaction: The account.
+        """
+        try:
+            return Transaction.objects.get(sn=value)
+        except Transaction.DoesNotExist:
+            raise ValueError
+
+    def to_url(self, value):
+        """Returns the ID of an account.
+
+        Args:
+            value (Transaction): The transaction.
+
+        Returns:
+            str: The transaction ID.
+        """
+        return value.sn

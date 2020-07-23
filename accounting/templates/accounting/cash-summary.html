@@ -43,18 +43,15 @@ First written: 2020/7/15
       {{ text|force_escape }}
     </button>
     <div class="dropdown-menu">
-      {% url "accounting:transaction.create" "expense" as url %}
-      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
         {% trans "Cash Expense" context "Accounting|" as text %}
         {{ text|force_escape }}
       </a>
-      {% url "accounting:transaction.create" "income" as url %}
-      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
         {% trans "Cash Income" context "Accounting|" as text %}
         {{ text|force_escape }}
       </a>
-      {% url "accounting:transaction.create" "transfer" as url %}
-      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
         {% trans "Transfer" context "Accounting|" as text %}
         {{ text|force_escape }}
       </a>

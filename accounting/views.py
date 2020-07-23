@@ -840,3 +840,21 @@ def search(request):
         "pagination": pagination,
         "reports": ReportUrl(),
     })
+
+
+@require_GET
+@digest_login_required
+def transaction_show(request, type, transaction):
+    """The view of an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        type (str): The transaction type.
+        transaction (Transaction): The transaction.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    return render(request, F"accounting/transactions/{type}/show.html", {
+        "item": transaction,
+    })

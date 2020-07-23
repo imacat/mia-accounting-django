@@ -21,6 +21,9 @@
 import re
 
 from django import template
+from django.urls import reverse
+
+from mia_core.utils import UrlBuilder
 
 register = template.Library()
 
@@ -40,3 +43,20 @@ def accounting_amount(value):
     if value < 0:
         s = "(%s)" % (s)
     return s
+
+
+@register.simple_tag(takes_context=True)
+def url_with_return(context, view_name, *args):
+    """Returns the transaction URL.
+
+    Args:
+        context (RequestContext): The request context.
+        view_name (str): The view name.
+        *args (tuple[any]): The URL arguments.
+
+    Returns:
+        str: The URL.
+    """
+    url = reverse(view_name, args=args)
+    return_to = context.request.get_full_path()
+    return str(UrlBuilder(url).set_param("return-to", return_to))

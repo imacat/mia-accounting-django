@@ -24,10 +24,11 @@ from django.urls import path, register_converter
 from mia_core import views as mia_core_views
 from . import converters, views
 
-register_converter(converters.TransactionTypeConverter, "txn-type")
 register_converter(converters.PeriodConverter, "period")
 register_converter(converters.CashAccountConverter, "cash-account")
 register_converter(converters.LedgerAccountConverter, "ledger-account")
+register_converter(converters.TransactionTypeConverter, "txn-type")
+register_converter(converters.TransactionConverter, "txn")
 
 app_name = "accounting"
 urlpatterns = [
@@ -69,13 +70,13 @@ urlpatterns = [
          mia_core_views.todo, name="transactions.create"),
     path("transactions/<txn-type:type>/store",
          mia_core_views.todo, name="transactions.store"),
-    path("transactions/<txn-type:type>/<int:pk>",
-         mia_core_views.todo, name="transactions.view"),
-    path("transactions/<txn-type:type>/<int:pk>/edit",
+    path("transactions/<txn-type:type>/<txn:transaction>",
+         views.transaction_show, name="transactions.show"),
+    path("transactions/<txn-type:type>/<txn:transaction>/edit",
          mia_core_views.todo, name="transactions.edit"),
-    path("transactions/<txn-type:type>/<int:pk>/update",
+    path("transactions/<txn-type:type>/<txn:transaction>/update",
          mia_core_views.todo, name="transactions.update"),
-    path("transactions/<int:pk>/delete",
+    path("transactions/<txn:transaction>/delete",
          mia_core_views.todo, name="transactions.delete"),
     path("accounts",
          mia_core_views.todo, name="accounts"),
@@ -84,7 +85,7 @@ urlpatterns = [
     path("accounts/store",
          mia_core_views.todo, name="accounts.store"),
     path("accounts/<str:account_code>",
-         mia_core_views.todo, name="accounts.view"),
+         mia_core_views.todo, name="accounts.show"),
     path("accounts/<str:account_code>/edit",
          mia_core_views.todo, name="accounts.edit"),
     path("accounts/<str:account_code>/update",

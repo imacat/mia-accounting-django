@@ -72,6 +72,7 @@ def url_query(url, **kwargs):
     Returns:
         str: The URL with query parameters set.
     """
+    print(url)
     builder = UrlBuilder(url)
     for key in kwargs.keys():
         if kwargs[key] is not None:

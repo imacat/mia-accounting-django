@@ -44,18 +44,15 @@ First written: 2020/7/21
       {{ text|force_escape }}
     </button>
     <div class="dropdown-menu">
-      {% url "accounting:transaction.create" "expense" as url %}
-      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
         {% trans "Cash Expense" context "Accounting|" as text %}
         {{ text|force_escape }}
       </a>
-      {% url "accounting:transaction.create" "income" as url %}
-      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
         {% trans "Cash Income" context "Accounting|" as text %}
         {{ text|force_escape }}
       </a>
-      {% url "accounting:transaction.create" "transfer" as url %}
-      <a class="dropdown-item" href="{% url_query url r=request.get_full_path %}">
+      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
         {% trans "Transfer" context "Accounting|" as text %}
         {{ text|force_escape }}
       </a>
@@ -113,7 +110,7 @@ First written: 2020/7/21
           <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
           <td>{{ item.transaction.note|default:"" }}</td>
           <td class="actions">
-            <a href="{{ item.transaction.get_absolute_url }}" class="btn btn-info" role="button">
+            <a href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}" class="btn btn-info" role="button">
               <i class="fas fa-eye"></i>
               {% trans "View" context "Accounting|" as text %}{{ text|force_escape }}
             </a>
@@ -127,7 +124,7 @@ First written: 2020/7/21
   <ul class="list-group d-md-none">
     {% for item in item_list %}
       <li class="list-group-item {% if not item.is_balanced or item.has_order_hole %} list-group-item-danger {% endif %}">
-        <a class="list-group-item-action" href="{{ item.transaction.get_absolute_url }}">
+        <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}">
           <div class="{% if item.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
             <div class="date-account-line">
               {{ item.transaction.date|smart_date }} {{ item.account.title|title }}

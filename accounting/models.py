@@ -82,7 +82,7 @@ class Transaction(models.Model):
     sn = models.PositiveIntegerField(primary_key=True)
     date = models.DateField()
     ord = models.PositiveSmallIntegerField(default=1)
-    note = models.CharField(max_length=128, null=True, blank=True)
+    notes = models.CharField(max_length=128, null=True, blank=True)
     created_at = models.DateTimeField(
         auto_now_add=True, db_column="created")
     created_by = models.ForeignKey(
@@ -102,9 +102,19 @@ class Transaction(models.Model):
         return [x for x in self.record_set.all() if not x.is_credit]
 
     @property
+    def debit_total(self):
+        """The total amount of the debit records."""
+        return sum([x.amount for x in self.debit_records])
+
+    @property
     def credit_records(self):
         """The credit records of this transaction."""
         return [x for x in self.record_set.all() if x.is_credit]
+
+    @property
+    def credit_total(self):
+        """The total amount of the credit records."""
+        return sum([x.amount for x in self.credit_records])
 
     _is_balanced = None
 
@@ -170,20 +180,27 @@ class Transaction(models.Model):
                 and credit_records[0].account.code == "1111"
                 and credit_records[0].summary is None)
 
+    @property
+    def type(self):
+        """The transaction type."""
+        if self.is_cash_expense:
+            return "expense"
+        elif self.is_cash_income:
+            return "income"
+        else:
+            return "transfer"
+
     def get_absolute_url(self):
         """Returns the URL to view this transaction."""
         if self.is_cash_expense:
             return reverse(
-                "accounting:transactions.view",
-                args=("expense", self.sn))
+                "accounting:transactions.show", args=("expense", self))
         elif self.is_cash_income:
             return reverse(
-                "accounting:transactions.view",
-                args=("income", self.sn))
+                "accounting:transactions.show", args=("income", self))
         else:
             return reverse(
-                "accounting:transactions.view",
-                args=("transfer", self.sn))
+                "accounting:transactions.show", args=("transfer", self))
 
     def __str__(self):
         """Returns the string representation of this accounting
