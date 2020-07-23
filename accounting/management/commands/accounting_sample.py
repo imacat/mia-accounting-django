@@ -23,7 +23,7 @@ import random
 from django.core.management import BaseCommand, CommandParser
 from django.utils import timezone
 
-from accounting.populate import Populator
+from accounting.utils import Populator
 from mia_core.models import User
 
 
