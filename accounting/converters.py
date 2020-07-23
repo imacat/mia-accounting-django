@@ -206,4 +206,4 @@ class TransactionConverter:
         Returns:
             str: The transaction ID.
         """
-        return value.sn
+        return value.pk

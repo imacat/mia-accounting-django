@@ -260,14 +260,14 @@ def find_imbalanced(records):
     Args:
         records (list[Record]): The accounting records.
     """
-    imbalanced = [x.sn for x in Transaction.objects
+    imbalanced = [x.pk for x in Transaction.objects
                   .annotate(
                     balance=Sum(Case(
                         When(record__is_credit=True, then=-1),
                         default=1) * F("record__amount")))
                   .filter(~Q(balance=0))]
     for record in records:
-        record.is_balanced = record.transaction.sn not in imbalanced
+        record.is_balanced = record.transaction.pk not in imbalanced
 
 
 def find_order_holes(records):

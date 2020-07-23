@@ -107,7 +107,7 @@ First written: 2020/7/17
           <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
           <td>{{ item.transaction.note|default:"" }}</td>
           <td class="actions">
-            {% if item.sn is not None %}
+            {% if item.pk is not None %}
               <a href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}" class="btn btn-info" role="button">
                 <i class="fas fa-eye"></i>
                 {% trans "View" context "Accounting|" as text %}{{ text|force_escape }}
@@ -123,7 +123,7 @@ First written: 2020/7/17
   <ul class="list-group d-lg-none">
     {% for item in item_list %}
       <li class="list-group-item {% if not item.is_balanced or item.has_order_hole %} list-group-item-danger {% endif %}">
-        {% if item.sn is not None %}
+        {% if item.pk is not None %}
           <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}">
             <div class="{% if item.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
               <div class="date-account-line">
