@@ -26,22 +26,21 @@ from django.db.models import Model, Q
 from django.utils.translation import pgettext, get_language
 
 
-def new_sn(cls):
-    """Finds a random serial number that does not conflict with
-    the existing data records.
+def new_id(cls):
+    """Finds a random ID that does not conflict with the existing data records.
 
     Args:
         cls (class): The Django model class.
 
     Returns:
-         int: The new random serial number.
+         int: The new random ID.
     """
     while True:
-        sn = random.randint(100000000, 999999999)
+        id = random.randint(100000000, 999999999)
         try:
-            cls.objects.get(pk=sn)
+            cls.objects.get(pk=id)
         except cls.DoesNotExist:
-            return sn
+            return id
 
 
 class Language:
