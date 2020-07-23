@@ -39,6 +39,13 @@ First written: 2020/7/23
   </div>
 {% endif %}
 
+<div class="btn-group btn-actions">
+  <a class="btn btn-primary" role="button" href="{{ request.GET.r }}">
+    <i class="fas fa-chevron-circle-left"></i>
+    {{ _("Back") }}
+  </a>
+</div>
+
 <div class="row">
   <div class="col-sm-2">{% trans "Date:" context "Accounting|" as text %}{{ text|force_escape }}</div>
   <div class="col-sm-10">{{ item.date|smart_date }}</div>
