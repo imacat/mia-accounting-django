@@ -67,7 +67,7 @@ First written: 2020/7/23
 </form>
 
 <div class="btn-group btn-actions">
-  <a class="btn btn-primary" role="button" href="{{ request.GET.r }}">
+  <a class="btn btn-primary" role="button" href="{% if "r" in request.GET %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
     {% trans "Back" context "Navigation|" as text %}{{ text|force_escape }}
   </a>
