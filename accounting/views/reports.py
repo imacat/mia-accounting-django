@@ -150,7 +150,7 @@ def cash(request, account, period):
     return render(request, "accounting/cash.html", {
         "item_list": records,
         "pagination": pagination,
-        "current_account": account,
+        "account": account,
         "period": period,
         "reports": ReportUrl(cash=account, period=period),
         "shortcut_accounts": [x for x in accounts
@@ -253,7 +253,7 @@ def cash_summary(request, account):
     return render(request, "accounting/cash-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "current_account": account,
+        "account": account,
         "reports": ReportUrl(cash=account),
         "shortcut_accounts": [x for x in accounts if
                               x.code in shortcut_accounts],
@@ -336,7 +336,7 @@ def ledger(request, account, period):
     return render(request, "accounting/ledger.html", {
         "item_list": records,
         "pagination": pagination,
-        "current_account": account,
+        "account": account,
         "period": period,
         "reports": ReportUrl(ledger=account, period=period),
         "accounts": _ledger_accounts(),
@@ -404,7 +404,7 @@ def ledger_summary(request, account):
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "current_account": account,
+        "account": account,
         "reports": ReportUrl(ledger=account),
         "accounts": _ledger_accounts(),
     })
