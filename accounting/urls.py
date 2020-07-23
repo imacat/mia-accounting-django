@@ -29,6 +29,7 @@ register_converter(converters.CashAccountConverter, "cash-account")
 register_converter(converters.LedgerAccountConverter, "ledger-account")
 register_converter(converters.TransactionTypeConverter, "txn-type")
 register_converter(converters.TransactionConverter, "txn")
+register_converter(converters.DateConverter, "date")
 
 app_name = "accounting"
 urlpatterns = [
@@ -78,6 +79,8 @@ urlpatterns = [
          mia_core_views.todo, name="transactions.update"),
     path("transactions/<txn:transaction>/delete",
          mia_core_views.todo, name="transactions.delete"),
+    path("transactions/sort/<date:date>",
+         mia_core_views.todo, name="transactions.sort"),
     path("accounts",
          mia_core_views.todo, name="accounts"),
     path("accounts/create",

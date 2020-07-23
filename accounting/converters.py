@@ -18,6 +18,8 @@
 """The URL converters.
 
 """
+import datetime
+import re
 
 from django.utils.translation import pgettext
 
@@ -72,6 +74,37 @@ class PeriodConverter:
         if isinstance(value, Period):
             return value.spec
         return value
+
+
+class DateConverter:
+    """The path converter for the date."""
+    regex = "([0-9]{4})-([0-9]{2})-([0-9]{2})"
+
+    def to_python(self, value):
+        """Returns the date by the date specification.
+
+        Args:
+            value (str): The date specification.
+
+        Returns:
+            datetime.date: The date.
+        """
+        m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", value)
+        year = int(m.group(1))
+        month = int(m.group(2))
+        day = int(m.group(3))
+        return datetime.date(year, month, day)
+
+    def to_url(self, value):
+        """Returns the specification of a date.
+
+        Args:
+            value (datetime.date): The date.
+
+        Returns:
+            str: The date specification.
+        """
+        return value.strftime("%Y-%m-%d")
 
 
 class CashAccountConverter:

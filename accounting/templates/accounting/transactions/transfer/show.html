@@ -39,6 +39,33 @@ First written: 2020/7/23
   </div>
 {% endif %}
 
+<!-- the delete confirmation dialog -->
+<form action="{% url_keep_return "accounting:transactions.delete" item %}" method="post">
+  {% csrf_token %}
+  <!-- The Modal -->
+  <div class="modal" id="del-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">{% trans "Transfer Transaction Deletion Confirmation" context "Accounting|" as text %}{{ text|force_escape }}</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">{% trans "Do you really want to delete this transfer transaction?" context "Accounting|" as text %}{{ text|force_escape }}</div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button class="btn btn-danger" type="submit" name="del-confirm">{{ _("Confirm") }}</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _("Cancel") }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{{ request.GET.r }}">
     <i class="fas fa-chevron-circle-left"></i>
@@ -48,6 +75,39 @@ First written: 2020/7/23
     <i class="fas fa-edit"></i>
     {% trans "Edit" context "Navigation|" as text %}{{ text|force_escape }}
   </a>
+  {% if not item.has_many_same_day %}
+    <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{% trans "There is no other transaction at the same day." context "Accounting|" as text %}{{ text|force_escape }}">
+      <i class="fas fa-sort"></i>
+      {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+    </button>
+  {% else %}
+    <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url_with_return "accounting:transactions.sort" item.date %}">
+      <i class="fas fa-sort"></i>
+      {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+    </a>
+  {% endif %}
+  <div class="btn-group d-sm-none">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="dropdown-menu">
+      {% if not item.has_many_same_day %}
+        <span class="dropdown-item disabled" title="{% trans "There is no other transaction at the same day." context "Accounting|" as text %}{{ text|force_escape }}">
+          <i class="fas fa-sort"></i>
+          {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+        </span>
+      {% else %}
+        <a class="dropdown-item" href="{% url_with_return "accounting:transactions.sort" item.date %}">
+          <i class="fas fa-sort"></i>
+          {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#del-modal">
+    <i class="fas fa-trash"></i>
+    {% trans "Delete" context "Navigation|" as text %}{{ text|force_escape }}
+  </button>
 </div>
 
 <div class="row">
