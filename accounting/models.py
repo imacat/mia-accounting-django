@@ -96,10 +96,27 @@ class Transaction(models.Model):
         db_column="updatedby",
         related_name="updated_accounting_transactions")
 
+    _records = None
+
+    @property
+    def records(self):
+        """The records of the transaction.
+
+        Returns:
+            list[Record]: The records.
+        """
+        if self._records is None:
+            self._records = self.record_set.all()
+        return self._records
+
+    @records.setter
+    def records(self, value):
+        self._records = value
+
     @property
     def debit_records(self):
         """The debit records of this transaction."""
-        return [x for x in self.record_set.all() if not x.is_credit]
+        return [x for x in self.records if not x.is_credit]
 
     @property
     def debit_total(self):
@@ -109,7 +126,7 @@ class Transaction(models.Model):
     @property
     def credit_records(self):
         """The credit records of this transaction."""
-        return [x for x in self.record_set.all() if x.is_credit]
+        return [x for x in self.records if x.is_credit]
 
     @property
     def credit_total(self):
