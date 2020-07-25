@@ -855,7 +855,6 @@ def transaction_show(request, type, transaction):
     Returns:
         HttpResponse: The response.
     """
-    print(dir(request))
     return render(request, F"accounting/transactions/{type}/show.html", {
         "transaction_type": type,
         "item": transaction,
