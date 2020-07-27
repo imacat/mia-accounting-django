@@ -68,7 +68,7 @@ urlpatterns = [
     path("search",
          views.search, name="search"),
     path("transactions/<txn-type:type>/create",
-         mia_core_views.todo, name="transactions.create"),
+         views.transaction_create, name="transactions.create"),
     path("transactions/<txn-type:type>/store",
          mia_core_views.todo, name="transactions.store"),
     path("transactions/<txn-type:type>/<txn:transaction>",
@@ -95,4 +95,6 @@ urlpatterns = [
          mia_core_views.todo, name="accounts.update"),
     path("accounts/<str:account_code>/delete",
          mia_core_views.todo, name="accounts.delete"),
+    path("accounts/options",
+         mia_core_views.todo, name="accounts.options"),
 ]

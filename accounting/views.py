@@ -859,3 +859,26 @@ def transaction_show(request, type, transaction):
         "transaction_type": type,
         "item": transaction,
     })
+
+
+@require_GET
+@digest_login_required
+def transaction_create(request, type):
+    """The view to create an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        type (str): The transaction type.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    transaction = Transaction()
+    if len(transaction.debit_records) == 0:
+        transaction.records.append(Record(ord=1, is_credit=False))
+    if len(transaction.credit_records) == 0:
+        transaction.records.append(Record(ord=1, is_credit=True))
+    return render(request, F"accounting/transactions/{type}/edit.html", {
+        "transaction_type": type,
+        "item": transaction,
+    })

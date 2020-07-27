@@ -106,7 +106,7 @@ class Transaction(models.Model):
             list[Record]: The records.
         """
         if self._records is None:
-            self._records = self.record_set.all()
+            self._records = list(self.record_set.all())
         return self._records
 
     @records.setter
@@ -115,23 +115,33 @@ class Transaction(models.Model):
 
     @property
     def debit_records(self):
-        """The debit records of this transaction."""
+        """The debit records of this transaction.
+
+        Returns:
+            list[Record]: The records.
+        """
         return [x for x in self.records if not x.is_credit]
 
     @property
     def debit_total(self):
         """The total amount of the debit records."""
-        return sum([x.amount for x in self.debit_records])
+        return sum([x.amount for x in self.debit_records
+                    if isinstance(x.amount, int)])
 
     @property
     def credit_records(self):
-        """The credit records of this transaction."""
+        """The credit records of this transaction.
+
+        Returns:
+            list[Record]: The records.
+        """
         return [x for x in self.records if x.is_credit]
 
     @property
     def credit_total(self):
         """The total amount of the credit records."""
-        return sum([x.amount for x in self.credit_records])
+        return sum([x.amount for x in self.credit_records
+                    if isinstance(x.amount, int)])
 
     _is_balanced = None
 
