@@ -862,17 +862,19 @@ def transaction_show(request, type, transaction):
 
 @require_GET
 @digest_login_required
-def transaction_create(request, type):
+def transaction_create(request, type, transaction=None):
     """The view to create an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
         type (str): The transaction type.
+        transaction (Transaction: The transaction.
 
     Returns:
         HttpResponse: The response.
     """
-    transaction = Transaction()
+    if transaction is None:
+        transaction = Transaction()
     if len(transaction.debit_records) == 0:
         transaction.records.append(Record(ord=1, is_credit=False))
     if len(transaction.credit_records) == 0:

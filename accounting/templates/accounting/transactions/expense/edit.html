@@ -52,7 +52,7 @@ First written: 2020/7/23
       <label for="txn-date">{% trans "Date:" context "Accounting|" as text %}{{ text|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <input id="txn-date" class="form-control {% if errors.date %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date }}" required="required" />
+      <input id="txn-date" class="form-control {% if errors.date %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date|date:"Y-m-d" }}" required="required" />
       <div id="txn-date-error" class="invalid-feedback">{{ errors.date|default:"" }}</div>
     </div>
   </div>

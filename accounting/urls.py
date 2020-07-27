@@ -74,7 +74,7 @@ urlpatterns = [
     path("transactions/<txn-type:type>/<txn:transaction>",
          views.transaction_show, name="transactions.show"),
     path("transactions/<txn-type:type>/<txn:transaction>/edit",
-         mia_core_views.todo, name="transactions.edit"),
+         views.transaction_create, name="transactions.edit"),
     path("transactions/<txn-type:type>/<txn:transaction>/update",
          mia_core_views.todo, name="transactions.update"),
     path("transactions/<txn:transaction>/delete",
