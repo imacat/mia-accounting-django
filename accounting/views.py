@@ -862,8 +862,8 @@ def transaction_show(request, type, transaction):
 
 @require_GET
 @digest_login_required
-def transaction_create(request, type, transaction=None):
-    """The view to create an accounting transaction.
+def transaction_edit(request, type, transaction=None):
+    """The view to edit an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
