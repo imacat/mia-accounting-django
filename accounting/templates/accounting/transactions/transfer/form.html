@@ -39,7 +39,7 @@ First written: 2020/7/23
   </a>
 </div>
 
-<form id="txn-form" action="{% if transaction.pk %}{% url_keep_return "accounting:transactions.update" "transfer" item %}{% else %}{% url_keep_return "accounting:transactions.store" "transfer" %}{% endif %}" method="post">
+<form id="txn-form" action="{% if item.pk %}{% url_keep_return "accounting:transactions.update" "transfer" item %}{% else %}{% url_keep_return "accounting:transactions.store" "transfer" %}{% endif %}" method="post">
   {% csrf_token %}
   {# TODO: To be done #}
   <input id="l10n-messages" type="hidden" value="{{ l10n_messages }}" />
