@@ -856,7 +856,6 @@ def transaction_show(request, type, transaction):
         HttpResponse: The response.
     """
     return render(request, F"accounting/transactions/{type}/show.html", {
-        "transaction_type": type,
         "item": transaction,
     })
 
@@ -879,6 +878,5 @@ def transaction_create(request, type):
     if len(transaction.credit_records) == 0:
         transaction.records.append(Record(ord=1, is_credit=True))
     return render(request, F"accounting/transactions/{type}/edit.html", {
-        "transaction_type": type,
         "item": transaction,
     })
