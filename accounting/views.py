@@ -868,7 +868,7 @@ def transaction_edit(request, type, transaction=None):
     Args:
         request (HttpRequest): The request.
         type (str): The transaction type.
-        transaction (Transaction: The transaction.
+        transaction (Transaction): The transaction.
 
     Returns:
         HttpResponse: The response.
