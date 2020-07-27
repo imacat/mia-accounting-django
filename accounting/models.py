@@ -244,7 +244,7 @@ class Record(models.Model):
         Transaction, on_delete=models.CASCADE,
         db_column="transaction_sn")
     is_credit = models.BooleanField()
-    ord = models.PositiveSmallIntegerField(default=1)
+    ord = models.PositiveSmallIntegerField()
     account = models.ForeignKey(
         Account, on_delete=models.PROTECT, db_column="account_sn")
     summary = models.CharField(max_length=128, blank=True, null=True)
