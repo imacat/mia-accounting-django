@@ -26,6 +26,18 @@ from mia_core.utils import UrlBuilder
 
 
 def success_redirect(request, url, success):
+    """Redirects to a specific URL on error, with the status ID appended
+    as the query parameter I<s>.  The status will be loaded upon the
+    next request at L</before_dispatch>.  You have to return and exit
+    from the controller manually after the redirection.
+
+    Args:
+        url (str): The destination URL.
+        success (str): The success text message.
+
+    Returns:
+        HttpResponseRedirect: The redirect response.
+    """
     id = _store(request, {"success": success})
     return HttpResponseRedirect(str(UrlBuilder(url).add_param("s", id)))
 
