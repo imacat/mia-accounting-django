@@ -44,7 +44,7 @@ def _store(request, status):
     if "stored_status" not in request.session:
         request.session["stored_status"] = {}
     id = _new_status_id(request.session["stored_status"])
-    request.session["stored_status"]["id"] = status
+    request.session["stored_status"][id] = status
     return id
 
 
