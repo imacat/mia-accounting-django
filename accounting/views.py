@@ -27,15 +27,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import dateformat, timezone
-from django.utils.translation import pgettext
-from django.views.decorators.http import require_GET
+from django.utils.translation import pgettext, gettext_noop
+from django.views.decorators.http import require_GET, require_POST
 
+from mia_core.status import success_redirect
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
-from mia_core.utils import Pagination, get_multi_lingual_search
+from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder
 
 
 # noinspection PyUnusedLocal
@@ -882,3 +883,26 @@ def transaction_edit(request, type, transaction=None):
     return render(request, F"accounting/transactions/{type}/form.html", {
         "item": transaction,
     })
+
+
+@require_POST
+@digest_login_required
+def transaction_store(request, type, transaction=None):
+    """The view to store an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        type (str): The transaction type.
+        transaction (Transaction): The transaction.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    if transaction is None:
+        transaction = Transaction()
+    return success_redirect(
+        request,
+        str(UrlBuilder(reverse("accounting:transactions.show",
+                               args=(type, transaction)))
+            .add_param("r", request.GET.get("r"))),
+        gettext_noop("This transaction was saved successfully."))
