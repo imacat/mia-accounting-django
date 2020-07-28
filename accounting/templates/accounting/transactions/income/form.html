@@ -52,8 +52,8 @@ First written: 2020/7/23
       <label for="txn-date">{% trans "Date:" context "Accounting|" as text %}{{ text|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <input id="txn-date" class="form-control {% if errors.date %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date|date:"Y-m-d" }}" required="required" />
-      <div id="txn-date-error" class="invalid-feedback">{{ errors.date|default:"" }}</div>
+      <input id="txn-date" class="form-control {% if errors|dict:"date" %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date|date:"Y-m-d" }}" required="required" />
+      <div id="txn-date-error" class="invalid-feedback">{{ errors|dict:"date"|default:"" }}</div>
     </div>
   </div>
 
@@ -68,7 +68,8 @@ First written: 2020/7/23
                   <input type="hidden" name="credit-{{ forloop.counter }}-sn" value="{{ x.pk }}" />
                 {% endif %}
                 <input id="credit-{{ forloop.counter }}-ord" class="credit-ord" type="hidden" name="credit-{{ forloop.counter }}-ord" value="{{ x.ord }}" />
-                <select id="credit-{{ forloop.counter }}-account" class="form-control record-account credit-account {% if errors.credit.account|index:forloop.counter %} is-invalid {% endif %}" name="credit-{{ forloop.counter }}-account">
+                {% str_format "credit-{}-account" forloop.counter as field %}
+                <select id="{{ field }}" class="form-control record-account credit-account {% if errors|dict:field %} is-invalid {% endif %}" name="{{ field }}">
                   {% if x.account is not None %}
                     <option value="{{ x.account.pk }}" selected="selected">{{ x.account.code }} {{ x.account.title }}</option>
                   {% else %}
@@ -76,17 +77,19 @@ First written: 2020/7/23
                   {% endif %}
                   <option value="">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</option>
                 </select>
-                <div id="credit-{{ forloop.counter }}-account-error" class="invalid-feedback">{{ errors.credit.account|index:forloop.counter }}</div>
+                <div id="{{ field }}-error" class="invalid-feedback">{{ errors|dict:field|default:"" }}</div>
               </div>
               <div class="col-lg-6">
                 <div class="row">
                   <div class="col-sm-8">
-                    <input id="credit-{{ forloop.counter }}-summary" class="form-control record-summary {% if errors.credit.summary|index:forloop.counter %} is-invalid {% endif %}" type="text" name="credit-{{ forloop.counter }}-summary" value="{{ x.summary|default:"" }}" maxlength="128" />
-                    <div id="credit-{{ forloop.counter }}-summary-error" class="invalid-feedback">{{ errors.credit.summary|index:forloop.counter }}</div>
+                    {% str_format "credit-{}-summary" forloop.counter as field %}
+                    <input id="{{ field }}" class="form-control record-summary {% if errors|dict:field %} is-invalid {% endif %}" type="text" name="{{ field }}" value="{{ x.summary|default:"" }}" maxlength="128" />
+                    <div id="{{ field }}-error" class="invalid-feedback">{{ errors|dict:field|default:"" }}</div>
                   </div>
                   <div class="col-sm-4">
-                    <input id="credit-{{ forloop.counter }}-amount" class="form-control record-amount credit-to-sum {% if errors.credit.amount|index:forloop.counter %} is-invalid {% endif %}" type="number" min="1" name="credit-{{ forloop.counter }}-amount" value="{{ x.amount|default:"" }}" required="required" />
-                    <div id="credit-{{ forloop.counter }}-amount-error" class="invalid-feedback">{{ errors.credit.amount|index:forloop.counter }}</div>
+                    {% str_format "credit-{}-amount" forloop.counter as field %}
+                    <input id="{{ field }}" class="form-control record-amount credit-to-sum {% if errors|dict:field %} is-invalid {% endif %}" type="number" min="1" name="{{ field }}" value="{{ x.amount|default:"" }}" required="required" />
+                    <div id="{{ field }}-error" class="invalid-feedback">{{ errors|dict:field|default:"" }}</div>
                   </div>
                 </div>
               </div>
@@ -133,8 +136,8 @@ First written: 2020/7/23
       <label for="txn-note">{% trans "Notes:" context "Accounting|" as text %}{{ text|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <textarea id="txn-note" class="form-control {% if errors.notes %} is-invalid {% endif %}" name="note">{{ item.notes|default:"" }}</textarea>
-      <div id="txn-note-error" class="invalid-feedback">{{ errors.notes|default:"" }}</div>
+      <textarea id="txn-note" class="form-control {% if errors|dict:"notes" %} is-invalid {% endif %}" name="note">{{ item.notes|default:"" }}</textarea>
+      <div id="txn-note-error" class="invalid-feedback">{{ errors|dict:"notes"|default:"" }}</div>
     </div>
   </div>
 

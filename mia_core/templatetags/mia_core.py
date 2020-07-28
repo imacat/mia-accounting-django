@@ -134,6 +134,7 @@ def retrieve_status(context):
     if "success" in status:
         context.dicts[0]["success"] = status["success"]
     if "errors_by_field" in status:
+        context.dicts[0]["errors"] = status["errors_by_field"]
         if "" in status["errors_by_field"]:
             if "page_errors" not in context.dicts[0]:
                 context.dicts[0]["page_errors"] = []
@@ -200,5 +201,25 @@ def index(value, arg):
     if not isinstance(arg, int):
         return None
     if arg >= len(value):
+        return None
+    return value[arg]
+
+
+@register.filter(name="dict")
+def dict_value(value, arg):
+    """Returns an element in a dictionary.
+
+    Args:
+        value (dict): The dictionary.
+        arg (str): The key.
+
+    Returns:
+        any: The element in this dictionary.
+    """
+    if not isinstance(value, dict):
+        return None
+    if not isinstance(arg, str):
+        return None
+    if arg not in value:
         return None
     return value[arg]
