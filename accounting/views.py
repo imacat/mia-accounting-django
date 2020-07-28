@@ -30,10 +30,11 @@ from django.utils import dateformat, timezone
 from django.utils.translation import pgettext, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 
-from mia_core.status import success_redirect
+from mia_core.status import success_redirect, retrieve_status, error_redirect
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
-    find_imbalanced, find_order_holes, fill_transaction_from_previous_form
+    find_imbalanced, find_order_holes, fill_transaction_from_form, \
+    sort_form_transaction_records, fill_transaction_from_previous_form
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder
@@ -901,6 +902,23 @@ def transaction_store(request, type, transaction=None):
     """
     if transaction is None:
         transaction = Transaction()
+    form = request.POST.dict()
+    sort_form_transaction_records(form)
+    fill_transaction_from_form(transaction, form)
+    # TODO: To be done.
+    if transaction.pk is None:
+        url = reverse("accounting:transactions.create", args=(type,))
+    else:
+        url = reverse("accounting:transactions.edit", args=(type, transaction))
+    return error_redirect(
+        request,
+        str(UrlBuilder(url).add_param("r", request.GET.get("r"))),
+        form,
+        {
+            "date": "The date is error.",
+            "debit-2-amount": "The amount is error.",
+        }
+    )
     return success_redirect(
         request,
         str(UrlBuilder(reverse("accounting:transactions.show",

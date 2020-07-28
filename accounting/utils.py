@@ -294,19 +294,13 @@ def find_order_holes(records):
         record.has_order_hole = record.transaction.date in holes
 
 
-def fill_transaction_from_previous_form(request, transaction):
-    """Fills the transaction from the previously-stored form.
+def fill_transaction_from_form(transaction, form):
+    """Fills the transaction from the form.
 
     Args:
-        request (HttpRequest): The request.
         transaction (Transaction): The transaction.
+        form (dict): The form
     """
-    status = retrieve_status(request)
-    if status is None:
-        return
-    if "form" not in status:
-        return
-    form = status["form"]
     if "date" in form:
         transaction.date = form["date"]
     if "notes" in form:
@@ -353,3 +347,93 @@ def fill_transaction_from_previous_form(request, transaction):
             record.amount = form[F"credit-{no}-amount"]
         records.append(record)
     transaction.records = records
+
+
+def fill_transaction_from_previous_form(request, transaction):
+    """Fills the transaction from the previously-stored form.
+
+    Args:
+        request (HttpRequest): The request
+        transaction (Transaction): The transaction.
+    """
+    status = retrieve_status(request)
+    if status is None:
+        return
+    if "form" not in status:
+        return
+    form = status["form"]
+    fill_transaction_from_form(transaction, form)
+
+
+def sort_form_transaction_records(form):
+    """Sorts the records in the form by their specified order, so that the
+    form can be used to populate the data to return to the user.
+
+    Args:
+        form (dict): The POSTed form.
+    """
+    # Collects the available record numbers
+    debit_no = []
+    credit_no = []
+    for key in form.keys():
+        m = re.match(
+            "^debit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
+        if m is not None:
+            no = int(m.group(1))
+            if no not in debit_no:
+                debit_no.append(no)
+        m = re.match(
+            "^credit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
+        if m is not None:
+            no = int(m.group(1))
+            if no not in credit_no:
+                credit_no.append(no)
+    # Sorts these record numbers by their specified orders
+    debit_orders = {}
+    for no in debit_no:
+        try:
+            debit_orders[no] = int(form[F"debit-{no}-ord"])
+        except KeyError:
+            debit_orders[no] = 9999
+        except ValueError:
+            debit_orders[no] = 9999
+    debit_no.sort(key=lambda x: debit_orders[x])
+    credit_orders = {}
+    for no in credit_no:
+        try:
+            credit_orders[no] = int(form[F"credit-{no}-ord"])
+        except KeyError:
+            credit_orders[no] = 9999
+        except ValueError:
+            credit_orders[no] = 9999
+    credit_no.sort(key=lambda x: credit_orders[x])
+    # Constructed the sorted new form
+    new_form = {}
+    for i in range(len(debit_no)):
+        old_no = debit_no[i]
+        no = i + 1
+        new_form[F"debit-{no}-ord"] = no
+        for attr in ["sn", "account", "summary", "amount"]:
+            if F"debit-{old_no}-{attr}" in form:
+                new_form[F"debit-{no}-{attr}"]\
+                    = form[F"debit-{old_no}-{attr}"]
+    for i in range(len(credit_no)):
+        old_no = credit_no[i]
+        no = i + 1
+        new_form[F"credit-{no}-ord"] = no
+        for attr in ["sn", "account", "summary", "amount"]:
+            if F"credit-{old_no}-{attr}" in form:
+                new_form[F"credit-{no}-{attr}"]\
+                    = form[F"credit-{old_no}-{attr}"]
+    # Purges the old form and fills it with the new form
+    old_keys = []
+    for key in form.keys():
+        m = re.match(
+            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)",
+            key)
+        if m is not None:
+            old_keys.append(key)
+    for x in old_keys:
+        del form[x]
+    for key in new_form.keys():
+        form[key] = new_form[key]
