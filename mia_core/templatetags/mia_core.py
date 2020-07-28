@@ -185,26 +185,6 @@ def smart_month(value):
     return defaultfilters.date(value, "Y/n")
 
 
-@register.filter()
-def index(value, arg):
-    """Returns the arg-th element of the value list or tuple.
-
-    Args:
-        value (list|tuple): The list or tuple.
-        arg (int): The index.
-
-    Returns:
-        any: The arg-th element of the value
-    """
-    if not (isinstance(value, list) or isinstance(value, tuple)):
-        return None
-    if not isinstance(arg, int):
-        return None
-    if arg >= len(value):
-        return None
-    return value[arg]
-
-
 @register.filter(name="dict")
 def dict_value(value, arg):
     """Returns an element in a dictionary.
