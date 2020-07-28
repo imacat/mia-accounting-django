@@ -18,6 +18,7 @@
 """The utilities of the accounting application.
 
 """
+import re
 
 from django.conf import settings
 from django.db.models import Q, Sum, Case, When, F, Count, Max, Min
@@ -27,6 +28,7 @@ from django.utils.translation import pgettext
 
 from accounting.models import Account, Transaction, Record
 from mia_core.period import Period
+from mia_core.status import retrieve_status
 from mia_core.utils import new_pk
 
 
@@ -290,3 +292,62 @@ def find_order_holes(records):
              .filter(~Q(count=1))]
     for record in records:
         record.has_order_hole = record.transaction.date in holes
+
+
+def fill_transaction_from_previous_form(request, transaction):
+    """Fills the transaction from the previously-stored form.
+
+    Args:
+        request (HttpRequest): The request.
+        transaction (Transaction): The transaction.
+    """
+    status = retrieve_status(request)
+    if status is None:
+        return
+    if "form" not in status:
+        return
+    form = status["form"]
+    if "date" in form:
+        transaction.date = form["date"]
+    if "notes" in form:
+        transaction.notes = form["notes"]
+    # The records
+    max_debit_no = 0
+    max_credit_no = 0
+    for key in form.keys():
+        m = re.match("^debit-([1-9][0-9]*)-", key)
+        if m is not None:
+            no = int(m.group(1))
+            if max_debit_no < no:
+                max_debit_no = no
+        m = re.match("^credit-([1-9][0-9]*)-", key)
+        if m is not None:
+            no = int(m.group(1))
+            if max_credit_no < no:
+                max_credit_no = no
+    records = []
+    for i in range(max_debit_no):
+        no = i + 1
+        record = Record(ord=no, is_credit=False)
+        if F"debit-{no}-sn" in form:
+            record.pk = form[F"debit-{no}-sn"]
+        if F"debit-{no}-account" in form:
+            record.account = Account(pk=form[F"debit-{no}-account"])
+        if F"debit-{no}-summary" in form:
+            record.summary = form[F"debit-{no}-summary"]
+        if F"debit-{no}-amount" in form:
+            record.amount = form[F"debit-{no}-amount"]
+        records.append(record)
+    for i in range(max_credit_no):
+        no = i + 1
+        record = Record(ord=no, is_credit=True)
+        if F"credit-{no}-sn" in form:
+            record.pk = form[F"credit-{no}-sn"]
+        if F"credit-{no}-account" in form:
+            record.account = Account(pk=form[F"credit-{no}-account"])
+        if F"credit-{no}-summary" in form:
+            record.summary = form[F"credit-{no}-summary"]
+        if F"credit-{no}-amount" in form:
+            record.amount = form[F"credit-{no}-amount"]
+        records.append(record)
+    transaction.records = records

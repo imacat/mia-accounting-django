@@ -33,7 +33,7 @@ from django.views.decorators.http import require_GET, require_POST
 from mia_core.status import success_redirect
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
-    find_imbalanced, find_order_holes
+    find_imbalanced, find_order_holes, fill_transaction_from_previous_form
 from mia_core.digest_auth import digest_login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder
@@ -876,6 +876,7 @@ def transaction_edit(request, type, transaction=None):
     """
     if transaction is None:
         transaction = Transaction()
+    fill_transaction_from_previous_form(request, transaction)
     if len(transaction.debit_records) == 0:
         transaction.records.append(Record(ord=1, is_credit=False))
     if len(transaction.credit_records) == 0:
