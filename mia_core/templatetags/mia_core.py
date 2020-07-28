@@ -26,6 +26,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 
+from mia_core.status import _retrieve
 from mia_core.utils import UrlBuilder
 
 register = template.Library()
@@ -111,6 +112,31 @@ def url_keep_return(context, view_name, *args):
     """
     url = reverse(view_name, args=args)
     return str(UrlBuilder(url).set_param("r", context.request.GET.get("r")))
+
+
+@register.simple_tag(takes_context=True)
+def retrieve_status(context):
+    """Returns the success message from the previously-stored status.  The
+    success message is saved as "success", and the error messages are saved as
+    "errors" in the template variables.
+
+    Args:
+        context (RequestContext): The request context.
+
+    Returns:
+        str: An empty string.
+    """
+    if "s" not in context.request.GET:
+        return ""
+    status = _retrieve(context.request, context.request.GET["s"])
+    if status is None:
+        return ""
+    if "success" in status:
+        context.dicts[0]["success"] = status["success"]
+    if "errors" in status:
+        if "" in status["errors"]:
+            context.dicts[0]["errors"] = status["errors"][""]
+    return ""
 
 
 @register.filter
