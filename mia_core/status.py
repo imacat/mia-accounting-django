@@ -27,11 +27,11 @@ from mia_core.utils import UrlBuilder
 
 def success_redirect(request, url, success):
     """Redirects to a specific URL on error, with the status ID appended
-    as the query parameter I<s>.  The status will be loaded upon the
-    next request at L</before_dispatch>.  You have to return and exit
-    from the controller manually after the redirection.
+    as the query parameter "s".  The status will be loaded with the
+    retrieve_status template tag.
 
     Args:
+        request (HttpRequest): The request.
         url (str): The destination URL.
         success (str): The success text message.
 
@@ -42,13 +42,32 @@ def success_redirect(request, url, success):
     return HttpResponseRedirect(str(UrlBuilder(url).add_param("s", id)))
 
 
+def error_redirect(request, url, form, errors_by_field):
+    """Redirects to a specific URL on error, with the status ID appended
+    as the query parameter "s".  The status will be loaded with the
+    retrieve_status template tag.
+
+    Args:
+        request (HttpRequest): The request.
+        url (str): The destination URL.
+        form (dict[str]): The received POSTed form.
+        errors_by_field (dict[str]): The failed fields and their corresponding
+            error messages.
+
+    Returns:
+        HttpResponseRedirect: The redirect response.
+    """
+    id = _store(request, {"form": form, "errors_by_field": errors_by_field})
+    return HttpResponseRedirect(str(UrlBuilder(url).add_param("s", id)))
+
+
 def _store(request, status):
     """Stores the status into the session, and returns the status ID that can
     be used to retrieve the status later with retrieve().
 
     Args:
-        request (HttpRequest): The request
-        status (dict): The dict of the status
+        request (HttpRequest): The request.
+        status (dict): The dict of the status.
 
     Returns:
         str: The status ID
@@ -65,8 +84,8 @@ def _retrieve(request, id):
     be used to retrieve the status later with retrieve().
 
     Args:
-        request (HttpRequest): The request
-        id (str): The status ID
+        request (HttpRequest): The request.
+        id (str): The status ID.
 
     Returns:
         dict: The status, or None if the status does not exist.
@@ -79,6 +98,14 @@ def _retrieve(request, id):
 
 
 def _new_status_id(status_store):
+    """Generates and returns a new status ID that does not exist yet.
+
+    Args:
+        status_store (dict): The status storage.
+
+    Returns:
+        str: The newly-generated status ID.
+    """
     while True:
         id = ""
         while len(id) < 16:
