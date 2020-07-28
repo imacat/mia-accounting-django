@@ -202,4 +202,3 @@ def index(value, arg):
     if arg >= len(value):
         return None
     return value[arg]
-
