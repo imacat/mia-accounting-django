@@ -114,8 +114,8 @@ def url_keep_return(context, view_name, *args):
     return str(UrlBuilder(url).set_param("r", context.request.GET.get("r")))
 
 
-@register.simple_tag(takes_context=True)
-def retrieve_status(context):
+@register.simple_tag(takes_context=True, name="retrieve_status")
+def retrieve_status_tag(context):
     """Returns the success message from the previously-stored status.  The
     success message is saved as "success", and the error messages are saved as
     "errors" in the template variables.
