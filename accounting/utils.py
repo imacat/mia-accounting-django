@@ -315,12 +315,14 @@ def fill_transaction_from_previous_form(request, transaction):
     max_debit_no = 0
     max_credit_no = 0
     for key in form.keys():
-        m = re.match("^debit-([1-9][0-9]*)-", key)
+        m = re.match(
+            "^debit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
         if m is not None:
             no = int(m.group(1))
             if max_debit_no < no:
                 max_debit_no = no
-        m = re.match("^credit-([1-9][0-9]*)-", key)
+        m = re.match(
+            "^credit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
         if m is not None:
             no = int(m.group(1))
             if max_credit_no < no:
@@ -328,7 +330,7 @@ def fill_transaction_from_previous_form(request, transaction):
     records = []
     for i in range(max_debit_no):
         no = i + 1
-        record = Record(ord=no, is_credit=False)
+        record = Record(ord=no, is_credit=False, transaction=transaction)
         if F"debit-{no}-sn" in form:
             record.pk = form[F"debit-{no}-sn"]
         if F"debit-{no}-account" in form:
@@ -340,7 +342,7 @@ def fill_transaction_from_previous_form(request, transaction):
         records.append(record)
     for i in range(max_credit_no):
         no = i + 1
-        record = Record(ord=no, is_credit=True)
+        record = Record(ord=no, is_credit=False, transaction=transaction)
         if F"credit-{no}-sn" in form:
             record.pk = form[F"credit-{no}-sn"]
         if F"credit-{no}-account" in form:
