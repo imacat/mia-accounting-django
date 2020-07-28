@@ -133,9 +133,12 @@ def retrieve_status(context):
         return ""
     if "success" in status:
         context.dicts[0]["success"] = status["success"]
-    if "errors" in status:
-        if "" in status["errors"]:
-            context.dicts[0]["errors"] = status["errors"][""]
+    if "errors_by_field" in status:
+        if "" in status["errors_by_field"]:
+            if "page_errors" not in context.dicts[0]:
+                context.dicts[0]["page_errors"] = []
+            context.dicts[0]["page_errors"].append(
+                status["errors_by_field"][""])
     return ""
 
 
