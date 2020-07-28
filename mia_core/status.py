@@ -61,6 +61,20 @@ def error_redirect(request, url, form, errors_by_field):
     return HttpResponseRedirect(str(UrlBuilder(url).add_param("s", id)))
 
 
+def retrieve_status(request):
+    """Retrieves the previously-stored status.
+
+    Args:
+        request (HttpRequest): The request.
+
+    Returns:
+        dict: The previously-stored status.
+    """
+    if "s" not in request.GET:
+        return None
+    return _retrieve(request, request.GET["s"])
+
+
 def _store(request, status):
     """Stores the status into the session, and returns the status ID that can
     be used to retrieve the status later with retrieve().

@@ -26,7 +26,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 
-from mia_core.status import _retrieve
+from mia_core.status import _retrieve, retrieve_status
 from mia_core.utils import UrlBuilder
 
 register = template.Library()
@@ -126,9 +126,7 @@ def retrieve_status_tag(context):
     Returns:
         str: An empty string.
     """
-    if "s" not in context.request.GET:
-        return ""
-    status = _retrieve(context.request, context.request.GET["s"])
+    status = retrieve_status(context.request)
     if status is None:
         return ""
     if "success" in status:
