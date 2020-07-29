@@ -306,46 +306,36 @@ def fill_transaction_from_form(transaction, form):
     if "notes" in form:
         transaction.notes = form["notes"]
     # The records
-    max_debit_no = 0
-    max_credit_no = 0
+    max_no = {
+        "debit": 0,
+        "credit": 0,
+    }
     for key in form.keys():
         m = re.match(
-            "^debit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
+            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)$",
+            key)
         if m is not None:
-            no = int(m.group(1))
-            if max_debit_no < no:
-                max_debit_no = no
-        m = re.match(
-            "^credit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
-        if m is not None:
-            no = int(m.group(1))
-            if max_credit_no < no:
-                max_credit_no = no
+            rec_type = m.group(1)
+            no = int(m.group(2))
+            if max_no[rec_type] < no:
+                max_no[rec_type] = no
     records = []
-    for i in range(max_debit_no):
-        no = i + 1
-        record = Record(ord=no, is_credit=False, transaction=transaction)
-        if F"debit-{no}-sn" in form:
-            record.pk = form[F"debit-{no}-sn"]
-        if F"debit-{no}-account" in form:
-            record.account = Account(pk=form[F"debit-{no}-account"])
-        if F"debit-{no}-summary" in form:
-            record.summary = form[F"debit-{no}-summary"]
-        if F"debit-{no}-amount" in form:
-            record.amount = form[F"debit-{no}-amount"]
-        records.append(record)
-    for i in range(max_credit_no):
-        no = i + 1
-        record = Record(ord=no, is_credit=False, transaction=transaction)
-        if F"credit-{no}-sn" in form:
-            record.pk = form[F"credit-{no}-sn"]
-        if F"credit-{no}-account" in form:
-            record.account = Account(pk=form[F"credit-{no}-account"])
-        if F"credit-{no}-summary" in form:
-            record.summary = form[F"credit-{no}-summary"]
-        if F"credit-{no}-amount" in form:
-            record.amount = form[F"credit-{no}-amount"]
-        records.append(record)
+    for rec_type in max_no.keys():
+        for i in range(max_no[rec_type]):
+            no = i + 1
+            record = Record(
+                ord=no,
+                is_credit=(rec_type == "credit"),
+                transaction=transaction)
+            if F"{rec_type}-{no}-sn" in form:
+                record.pk = form[F"{rec_type}-{no}-sn"]
+            if F"{rec_type}-{no}-account" in form:
+                record.account = Account(pk=form[F"{rec_type}-{no}-account"])
+            if F"{rec_type}-{no}-summary" in form:
+                record.summary = form[F"{rec_type}-{no}-summary"]
+            if F"{rec_type}-{no}-amount" in form:
+                record.amount = form[F"{rec_type}-{no}-amount"]
+            records.append(record)
     transaction.records = records
 
 
