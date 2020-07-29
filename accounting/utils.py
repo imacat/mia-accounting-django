@@ -363,58 +363,42 @@ def sort_form_transaction_records(form):
         form (dict): The POSTed form.
     """
     # Collects the available record numbers
-    debit_no = []
-    credit_no = []
+    rec_no = {
+        "debit": [],
+        "credit": [],
+    }
     for key in form.keys():
         m = re.match(
-            "^debit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
-        if m is not None:
-            no = int(m.group(1))
-            if no not in debit_no:
-                debit_no.append(no)
-        m = re.match(
-            "^credit-([1-9][0-9]*)-(sn|ord|account|summary|amount)", key)
-        if m is not None:
-            no = int(m.group(1))
-            if no not in credit_no:
-                credit_no.append(no)
+            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)",
+            key)
+        if m is None:
+            continue
+        rec_type = m.group(1)
+        no = int(m.group(2))
+        if no not in rec_no[rec_type]:
+            rec_no[rec_type].append(no)
     # Sorts these record numbers by their specified orders
-    debit_orders = {}
-    for no in debit_no:
-        try:
-            debit_orders[no] = int(form[F"debit-{no}-ord"])
-        except KeyError:
-            debit_orders[no] = 9999
-        except ValueError:
-            debit_orders[no] = 9999
-    debit_no.sort(key=lambda x: debit_orders[x])
-    credit_orders = {}
-    for no in credit_no:
-        try:
-            credit_orders[no] = int(form[F"credit-{no}-ord"])
-        except KeyError:
-            credit_orders[no] = 9999
-        except ValueError:
-            credit_orders[no] = 9999
-    credit_no.sort(key=lambda x: credit_orders[x])
-    # Constructed the sorted new form
+    for rec_type in rec_no.keys():
+        orders = {}
+        for no in rec_no[rec_type]:
+            try:
+                orders[no] = int(form[F"{rec_type}-{no}-ord"])
+            except KeyError:
+                orders[no] = 9999
+            except ValueError:
+                orders[no] = 9999
+        rec_no[rec_type].sort(key=lambda x: orders[x])
+    # Constructs the sorted new form
     new_form = {}
-    for i in range(len(debit_no)):
-        old_no = debit_no[i]
-        no = i + 1
-        new_form[F"debit-{no}-ord"] = no
-        for attr in ["sn", "account", "summary", "amount"]:
-            if F"debit-{old_no}-{attr}" in form:
-                new_form[F"debit-{no}-{attr}"]\
-                    = form[F"debit-{old_no}-{attr}"]
-    for i in range(len(credit_no)):
-        old_no = credit_no[i]
-        no = i + 1
-        new_form[F"credit-{no}-ord"] = no
-        for attr in ["sn", "account", "summary", "amount"]:
-            if F"credit-{old_no}-{attr}" in form:
-                new_form[F"credit-{no}-{attr}"]\
-                    = form[F"credit-{old_no}-{attr}"]
+    for rec_type in rec_no.keys():
+        for i in range(len(rec_no[rec_type])):
+            old_no = rec_no[rec_type][i]
+            no = i + 1
+            new_form[F"{rec_type}-{no}-ord"] = no
+            for attr in ["sn", "account", "summary", "amount"]:
+                if F"{rec_type}-{old_no}-{attr}" in form:
+                    new_form[F"{rec_type}-{no}-{attr}"]\
+                        = form[F"{rec_type}-{old_no}-{attr}"]
     # Purges the old form and fills it with the new form
     old_keys = [x for x in form.keys() if re.match(
         "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)", x)]
