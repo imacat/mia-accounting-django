@@ -314,6 +314,15 @@ class Period:
             "defaultDate": self.chosen_month,
         })
 
+    @staticmethod
+    def default_spec():
+        """Returns the specification for the default period.
+
+        Returns:
+            str: The specification for the default period
+        """
+        return dateformat.format(timezone.localdate(), "Y-m")
+
     class Parser:
         """The period parser.
 

@@ -27,7 +27,6 @@ from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import dateformat, timezone
 from django.utils.translation import pgettext, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 
@@ -72,9 +71,8 @@ def cash_default(request):
     """
     account = Account.objects.get(
         code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
-    period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:cash", args=(account, period_spec)))
+        reverse("accounting:cash", args=(account, Period.default_spec())))
 
 
 @require_GET
@@ -296,9 +294,8 @@ def ledger_default(request):
     """
     account = Account.objects.get(
         code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
-    period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:ledger", args=(account, period_spec)))
+        reverse("accounting:ledger", args=(account, Period.default_spec())))
 
 
 @require_GET
@@ -441,9 +438,8 @@ def journal_default(request):
     Returns:
         HttpResponseRedirect: The redirection to the default month.
     """
-    period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:journal", args=(period_spec,)))
+        reverse("accounting:journal", args=(Period.default_spec(),)))
 
 
 @require_GET
@@ -528,9 +524,8 @@ def trial_balance_default(request):
     Returns:
         HttpResponseRedirect: The redirection to the default month.
     """
-    period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:trial-balance", args=(period_spec,)))
+        reverse("accounting:trial-balance", args=(Period.default_spec(),)))
 
 
 @require_GET
@@ -637,9 +632,8 @@ def income_statement_default(request):
     Returns:
         HttpResponseRedirect: The redirection to the default month.
     """
-    period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:income-statement", args=(period_spec,)))
+        reverse("accounting:income-statement", args=(Period.default_spec(),)))
 
 
 @require_GET
@@ -722,9 +716,8 @@ def balance_sheet_default(request):
     Returns:
         HttpResponseRedirect: The redirection to the default month.
     """
-    period_spec = dateformat.format(timezone.localdate(), "Y-m")
     return HttpResponseRedirect(
-        reverse("accounting:balance-sheet", args=(period_spec,)))
+        reverse("accounting:balance-sheet", args=(Period.default_spec(),)))
 
 
 @require_GET
