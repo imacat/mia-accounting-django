@@ -71,7 +71,7 @@ First written: 2020/7/23
                 {% str_format "debit-{}-account" forloop.counter as field %}
                 <select id="{{ field }}" class="form-control record-account debit-account {% if errors|dict:field %} is-invalid {% endif %}" name="{{ field }}">
                   {% if x.account is not None %}
-                    <option value="{{ x.account.pk }}" selected="selected">{{ x.account.code }} {{ x.account.title }}</option>
+                    <option value="{{ x.account.code }}" selected="selected">{{ x.account.code }} {{ x.account.title }}</option>
                   {% else %}
                     <option value=""></option>
                   {% endif %}
