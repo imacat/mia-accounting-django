@@ -847,30 +847,30 @@ def search(request):
 
 @require_GET
 @digest_login_required
-def transaction_show(request, type, transaction):
+def transaction_show(request, txn_type, transaction):
     """The view of an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
-        type (str): The transaction type.
+        txn_type (str): The transaction type.
         transaction (Transaction): The transaction.
 
     Returns:
         HttpResponse: The response.
     """
-    return render(request, F"accounting/transactions/{type}/view.html", {
+    return render(request, F"accounting/transactions/{txn_type}/view.html", {
         "item": transaction,
     })
 
 
 @require_GET
 @digest_login_required
-def transaction_edit(request, type, transaction=None):
+def transaction_edit(request, txn_type, transaction=None):
     """The view to edit an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
-        type (str): The transaction type.
+        txn_type (str): The transaction type.
         transaction (Transaction): The transaction.
 
     Returns:
@@ -883,19 +883,19 @@ def transaction_edit(request, type, transaction=None):
         transaction.records.append(Record(ord=1, is_credit=False))
     if len(transaction.credit_records) == 0:
         transaction.records.append(Record(ord=1, is_credit=True))
-    return render(request, F"accounting/transactions/{type}/form.html", {
+    return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": transaction,
     })
 
 
 @require_POST
 @digest_login_required
-def transaction_store(request, type, transaction=None):
+def transaction_store(request, txn_type, transaction=None):
     """The view to store an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
-        type (str): The transaction type.
+        txn_type (str): The transaction type.
         transaction (Transaction): The transaction.
 
     Returns:
@@ -968,10 +968,10 @@ def transaction_store(request, type, transaction=None):
                         "This record is not of the same transaction.")
     if len(errors) > 0:
         if transaction.pk is None:
-            url = reverse("accounting:transactions.create", args=(type,))
+            url = reverse("accounting:transactions.create", args=(txn_type,))
         else:
             url = reverse(
-                "accounting:transactions.edit", args=(type, transaction))
+                "accounting:transactions.edit", args=(txn_type, transaction))
         return error_redirect(
             request,
             str(UrlBuilder(url).add_param("r", request.GET.get("r"))),
@@ -980,6 +980,6 @@ def transaction_store(request, type, transaction=None):
     return success_redirect(
         request,
         str(UrlBuilder(reverse("accounting:transactions.show",
-                               args=(type, transaction)))
+                               args=(txn_type, transaction)))
             .add_param("r", request.GET.get("r"))),
         gettext_noop("This transaction was saved successfully."))
