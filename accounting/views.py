@@ -851,11 +851,7 @@ def transaction_store(request, txn_type, transaction=None):
     fill_transaction_from_form(transaction, form)
     errors = {}
     try:
-        transaction.full_clean(exclude=[
-            "sn",
-            "created_by",
-            "updated_by",
-        ])
+        transaction.full_clean(exclude=["sn", "created_by", "updated_by"])
     except ValidationError as e:
         errors = e.message_dict
     records = {
@@ -868,11 +864,7 @@ def transaction_store(request, txn_type, transaction=None):
             no = no + 1
             try:
                 x.full_clean(exclude=[
-                    "sn",
-                    "transaction",
-                    "account",
-                    "created_by",
-                    "updated_by",
+                    "sn", "transaction", "account", "created_by", "updated_by",
                 ])
             except ValidationError as e:
                 for key in e.message_dict:
