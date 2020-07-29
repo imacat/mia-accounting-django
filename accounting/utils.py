@@ -363,7 +363,7 @@ def sort_form_transaction_records(form):
         form (dict): The POSTed form.
     """
     # Collects the available record numbers
-    rec_no = {
+    record_no = {
         "debit": [],
         "credit": [],
     }
@@ -373,32 +373,32 @@ def sort_form_transaction_records(form):
             key)
         if m is None:
             continue
-        rec_type = m.group(1)
+        record_type = m.group(1)
         no = int(m.group(2))
-        if no not in rec_no[rec_type]:
-            rec_no[rec_type].append(no)
+        if no not in record_no[record_type]:
+            record_no[record_type].append(no)
     # Sorts these record numbers by their specified orders
-    for rec_type in rec_no.keys():
+    for record_type in record_no.keys():
         orders = {}
-        for no in rec_no[rec_type]:
+        for no in record_no[record_type]:
             try:
-                orders[no] = int(form[F"{rec_type}-{no}-ord"])
+                orders[no] = int(form[F"{record_type}-{no}-ord"])
             except KeyError:
                 orders[no] = 9999
             except ValueError:
                 orders[no] = 9999
-        rec_no[rec_type].sort(key=lambda x: orders[x])
+        record_no[record_type].sort(key=lambda x: orders[x])
     # Constructs the sorted new form
     new_form = {}
-    for rec_type in rec_no.keys():
-        for i in range(len(rec_no[rec_type])):
-            old_no = rec_no[rec_type][i]
+    for record_type in record_no.keys():
+        for i in range(len(record_no[record_type])):
+            old_no = record_no[record_type][i]
             no = i + 1
-            new_form[F"{rec_type}-{no}-ord"] = no
+            new_form[F"{record_type}-{no}-ord"] = no
             for attr in ["sn", "account", "summary", "amount"]:
-                if F"{rec_type}-{old_no}-{attr}" in form:
-                    new_form[F"{rec_type}-{no}-{attr}"]\
-                        = form[F"{rec_type}-{old_no}-{attr}"]
+                if F"{record_type}-{old_no}-{attr}" in form:
+                    new_form[F"{record_type}-{no}-{attr}"]\
+                        = form[F"{record_type}-{old_no}-{attr}"]
     # Purges the old form and fills it with the new form
     for x in [x for x in form.keys() if re.match(
             "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)",
