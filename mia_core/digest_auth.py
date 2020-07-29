@@ -57,7 +57,7 @@ class AccountBackend:
         return User.objects.filter(login_id=username).first()
 
 
-def digest_login_required(function=None):
+def login_required(function=None):
     """The decorator to check if the user has logged in, and send
     HTTP 401 if the user has not logged in.
     """

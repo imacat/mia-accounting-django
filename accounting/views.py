@@ -31,7 +31,7 @@ from django.utils.translation import pgettext, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import RedirectView
 
-from mia_core.digest_auth import digest_login_required
+from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.status import success_redirect, error_redirect
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder
@@ -42,7 +42,7 @@ from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class CashDefaultView(RedirectView):
     """The default cash account."""
     query_string = True
@@ -56,7 +56,7 @@ class CashDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def cash(request, account, period):
     """The cash account.
 
@@ -158,7 +158,7 @@ def cash(request, account, period):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class CashSummaryDefaultView(RedirectView):
     """The default cash account summary."""
     query_string = True
@@ -171,7 +171,7 @@ class CashSummaryDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def cash_summary(request, account):
     """The cash account summary.
 
@@ -255,7 +255,7 @@ def cash_summary(request, account):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class LedgerDefaultView(RedirectView):
     """The default ledger."""
     query_string = True
@@ -269,7 +269,7 @@ class LedgerDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def ledger(request, account, period):
     """The ledger.
 
@@ -331,7 +331,7 @@ def ledger(request, account, period):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class LedgerSummaryDefaultView(RedirectView):
     """The default ledger summary."""
     query_string = True
@@ -344,7 +344,7 @@ class LedgerSummaryDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def ledger_summary(request, account):
     """The ledger summary report.
 
@@ -393,7 +393,7 @@ def ledger_summary(request, account):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class JournalDefaultView(RedirectView):
     """The default journal."""
     query_string = True
@@ -405,7 +405,7 @@ class JournalDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def journal(request, period):
     """The journal.
 
@@ -475,7 +475,7 @@ def journal(request, period):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class TrialBalanceDefaultView(RedirectView):
     """The default trial balance."""
     query_string = True
@@ -487,7 +487,7 @@ class TrialBalanceDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def trial_balance(request, period):
     """The trial balance.
 
@@ -579,7 +579,7 @@ def trial_balance(request, period):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class IncomeStatementDefaultView(RedirectView):
     """The default income statement."""
     query_string = True
@@ -591,7 +591,7 @@ class IncomeStatementDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def income_statement(request, period):
     """The income statement.
 
@@ -659,7 +659,7 @@ def income_statement(request, period):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(digest_login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class BalanceSheetDefaultView(RedirectView):
     """The default balance sheet."""
     query_string = True
@@ -671,7 +671,7 @@ class BalanceSheetDefaultView(RedirectView):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def balance_sheet(request, period):
     """The balance sheet.
 
@@ -760,7 +760,7 @@ def balance_sheet(request, period):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def search(request):
     """The search.
 
@@ -789,7 +789,7 @@ def search(request):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def transaction_show(request, txn_type, transaction):
     """The view of an accounting transaction.
 
@@ -807,7 +807,7 @@ def transaction_show(request, txn_type, transaction):
 
 
 @require_GET
-@digest_login_required
+@login_required
 def transaction_edit(request, txn_type, transaction=None):
     """The view to edit an accounting transaction.
 
@@ -832,7 +832,7 @@ def transaction_edit(request, txn_type, transaction=None):
 
 
 @require_POST
-@digest_login_required
+@login_required
 def transaction_store(request, txn_type, transaction=None):
     """The view to store an accounting transaction.
 

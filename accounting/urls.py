@@ -24,7 +24,7 @@ from django.views.decorators.http import require_GET
 from django.views.generic import RedirectView
 
 from mia_core import views as mia_core_views
-from mia_core.digest_auth import digest_login_required
+from mia_core.digest_auth import login_required
 from . import converters, views
 
 register_converter(converters.PeriodConverter, "period")
@@ -36,7 +36,7 @@ register_converter(converters.DateConverter, "date")
 
 app_name = "accounting"
 urlpatterns = [
-    path("", require_GET(digest_login_required(RedirectView.as_view(
+    path("", require_GET(login_required(RedirectView.as_view(
         query_string = True,
         pattern_name = "accounting:cash.home",
     ))), name="home"),
