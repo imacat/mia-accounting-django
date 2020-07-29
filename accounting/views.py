@@ -21,6 +21,7 @@
 import re
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import Sum, Case, When, F, Q
 from django.db.models.functions import TruncMonth, Coalesce
 from django.http import HttpResponseRedirect
@@ -905,20 +906,77 @@ def transaction_store(request, type, transaction=None):
     form = request.POST.dict()
     sort_form_transaction_records(form)
     fill_transaction_from_form(transaction, form)
-    # TODO: To be done.
-    if transaction.pk is None:
-        url = reverse("accounting:transactions.create", args=(type,))
-    else:
-        url = reverse("accounting:transactions.edit", args=(type, transaction))
-    return error_redirect(
-        request,
-        str(UrlBuilder(url).add_param("r", request.GET.get("r"))),
-        form,
-        {
-            "date": "The date is error.",
-            "debit-2-amount": "The amount is error.",
-        }
-    )
+    errors = {}
+    try:
+        transaction.full_clean(exclude=[
+            "sn",
+            "created_by",
+            "updated_by",
+        ])
+    except ValidationError as e:
+        errors = e.message_dict
+    records = {
+        "debit": transaction.debit_records,
+        "credit": transaction.credit_records,
+    }
+    for record_type in records.keys():
+        no = 0
+        for x in records[record_type]:
+            no = no + 1
+            try:
+                x.full_clean(exclude=[
+                    "sn",
+                    "transaction",
+                    "account",
+                    "created_by",
+                    "updated_by",
+                ])
+            except ValidationError as e:
+                for key in e.message_dict:
+                    errors[F"{record_type}-{no}-{key}"] = e.message_dict[key]
+            # Validates the account
+            if x.account.code is None:
+                errors[F"{record_type}-{no}-account"] = gettext_noop(
+                    "Please select the account.")
+            elif x.account.code == "":
+                errors[F"{record_type}-{no}-account"] = gettext_noop(
+                    "Please select the account.")
+            else:
+                try:
+                    x.account = Account.objects.get(code=x.account.code)
+                except Account.DoesNotExist:
+                    errors[F"{record_type}-{no}-account"] = gettext_noop(
+                        "This account does not exist.")
+                else:
+                    child_account = Account.objects.filter(
+                        code__startswith=x.account.code).first()
+                    if child_account is not None:
+                        errors[F"{record_type}-{no}-account"] = gettext_noop(
+                            "You cannot choose a parent account.")
+            # Validates the transaction
+            if x.transaction is None:
+                x.transaction = transaction
+            if transaction.pk is None:
+                if x.transaction.pk is not None:
+                    errors[F"{record_type}-{no}-transaction"] = gettext_noop(
+                        "This record is not of the same transaction.")
+            else:
+                if x.transaction.pk is None:
+                    pass
+                elif x.transaction.pk != transaction.pk:
+                    errors[F"{record_type}-{no}-transaction"] = gettext_noop(
+                        "This record is not of the same transaction.")
+    if len(errors) > 0:
+        if transaction.pk is None:
+            url = reverse("accounting:transactions.create", args=(type,))
+        else:
+            url = reverse(
+                "accounting:transactions.edit", args=(type, transaction))
+        return error_redirect(
+            request,
+            str(UrlBuilder(url).add_param("r", request.GET.get("r"))),
+            form,
+            errors)
     return success_redirect(
         request,
         str(UrlBuilder(reverse("accounting:transactions.show",
