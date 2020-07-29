@@ -400,9 +400,9 @@ def sort_form_transaction_records(form):
                     new_form[F"{rec_type}-{no}-{attr}"]\
                         = form[F"{rec_type}-{old_no}-{attr}"]
     # Purges the old form and fills it with the new form
-    old_keys = [x for x in form.keys() if re.match(
-        "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)", x)]
-    for x in old_keys:
+    for x in [x for x in form.keys() if re.match(
+            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)",
+            x)]:
         del form[x]
     for key in new_form.keys():
         form[key] = new_form[key]
