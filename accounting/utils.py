@@ -330,7 +330,7 @@ def fill_transaction_from_form(transaction, form):
             if F"{rec_type}-{no}-sn" in form:
                 record.pk = form[F"{rec_type}-{no}-sn"]
             if F"{rec_type}-{no}-account" in form:
-                record.account = Account(pk=form[F"{rec_type}-{no}-account"])
+                record.account = Account(code=form[F"{rec_type}-{no}-account"])
             if F"{rec_type}-{no}-summary" in form:
                 record.summary = form[F"{rec_type}-{no}-summary"]
             if F"{rec_type}-{no}-amount" in form:
