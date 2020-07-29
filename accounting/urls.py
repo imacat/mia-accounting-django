@@ -20,8 +20,11 @@
 """
 
 from django.urls import path, register_converter
+from django.views.decorators.http import require_GET
+from django.views.generic import RedirectView
 
 from mia_core import views as mia_core_views
+from mia_core.digest_auth import digest_login_required
 from . import converters, views
 
 register_converter(converters.PeriodConverter, "period")
@@ -33,36 +36,41 @@ register_converter(converters.DateConverter, "date")
 
 app_name = "accounting"
 urlpatterns = [
-    path("", views.home, name="home"),
-    path("cash", views.cash_default, name="cash.home"),
+    path("", require_GET(digest_login_required(RedirectView.as_view(
+        query_string = True,
+        pattern_name = "accounting:cash.home",
+    ))), name="home"),
+    path("cash",
+         views.CashDefaultView.as_view(), name="cash.home"),
     path("cash/<cash-account:account>/<period:period>",
          views.cash, name="cash"),
     path("cash-summary",
-         views.cash_summary_default, name="cash-summary.home"),
+         views.CashSummaryDefaultView.as_view(), name="cash-summary.home"),
     path("cash-summary/<cash-account:account>",
          views.cash_summary, name="cash-summary"),
     path("ledger",
-         views.ledger_default, name="ledger.home"),
+         views.LedgerDefaultView.as_view(), name="ledger.home"),
     path("ledger/<ledger-account:account>/<period:period>",
          views.ledger, name="ledger"),
     path("ledger-summary",
-         views.ledger_summary_default, name="ledger-summary.home"),
+         views.LedgerSummaryDefaultView.as_view(), name="ledger-summary.home"),
     path("ledger-summary/<ledger-account:account>",
          views.ledger_summary, name="ledger-summary"),
     path("journal",
-         views.journal_default, name="journal.home"),
+         views.JournalDefaultView.as_view(), name="journal.home"),
     path("journal/<period:period>",
          views.journal, name="journal"),
     path("trial-balance",
-         views.trial_balance_default, name="trial-balance.home"),
+         views.TrialBalanceDefaultView.as_view(), name="trial-balance.home"),
     path("trial-balance/<period:period>",
          views.trial_balance, name="trial-balance"),
     path("income-statement",
-         views.income_statement_default, name="income-statement.home"),
+         views.IncomeStatementDefaultView.as_view(),
+         name="income-statement.home"),
     path("income-statement/<period:period>",
          views.income_statement, name="income-statement"),
     path("balance-sheet",
-         views.balance_sheet_default, name="balance-sheet.home"),
+         views.BalanceSheetDefaultView.as_view(), name="balance-sheet.home"),
     path("balance-sheet/<period:period>",
          views.balance_sheet, name="balance-sheet"),
     path("search",
