@@ -21,10 +21,11 @@
 import re
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum, Case, When, F, Count, Max, Min
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import pgettext
+from django.utils.translation import pgettext, gettext_noop
 
 from accounting.models import Account, Transaction, Record
 from mia_core.period import Period
@@ -406,3 +407,30 @@ def sort_form_transaction_records(form):
         del form[x]
     for key in new_form.keys():
         form[key] = new_form[key]
+
+
+def validate_account_code(record):
+    """Validates the account code.
+
+    Args:
+        record (Record): The accounting record.
+
+    Exceptions:
+        ValidationError: Thrown when validation fails.
+    """
+    if record.account.code is None:
+        raise ValidationError(gettext_noop(
+            "Please select the account."))
+    if record.account.code == "":
+        raise ValidationError(gettext_noop(
+            "Please select the account."))
+    try:
+        record.account = Account.objects.get(code=record.account.code)
+    except Account.DoesNotExist:
+        raise ValidationError(gettext_noop(
+            "This account does not exist."))
+    child_account = Account.objects.filter(
+        code__startswith=record.account.code).first()
+    if child_account is not None:
+        raise ValidationError(gettext_noop(
+            "You cannot choose a parent account."))

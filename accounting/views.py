@@ -38,7 +38,8 @@ from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_transaction_from_form, \
-    sort_form_transaction_records, fill_transaction_from_previous_form
+    sort_form_transaction_records, fill_transaction_from_previous_form, \
+    validate_account_code
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -870,24 +871,10 @@ def transaction_store(request, txn_type, transaction=None):
                 for key in e.message_dict:
                     errors[F"{record_type}-{no}-{key}"] = e.message_dict[key]
             # Validates the account
-            if x.account.code is None:
-                errors[F"{record_type}-{no}-account"] = gettext_noop(
-                    "Please select the account.")
-            elif x.account.code == "":
-                errors[F"{record_type}-{no}-account"] = gettext_noop(
-                    "Please select the account.")
-            else:
-                try:
-                    x.account = Account.objects.get(code=x.account.code)
-                except Account.DoesNotExist:
-                    errors[F"{record_type}-{no}-account"] = gettext_noop(
-                        "This account does not exist.")
-                else:
-                    child_account = Account.objects.filter(
-                        code__startswith=x.account.code).first()
-                    if child_account is not None:
-                        errors[F"{record_type}-{no}-account"] = gettext_noop(
-                            "You cannot choose a parent account.")
+            try:
+                validate_account_code(x)
+            except ValidationError as e:
+                errors[F"{record_type}-{no}-account"] = e.message
             # Validates the transaction
             if x.transaction is None:
                 x.transaction = transaction
