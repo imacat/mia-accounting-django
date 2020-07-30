@@ -34,7 +34,8 @@ from django.views.generic import RedirectView
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.status import success_redirect, error_redirect
-from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder
+from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
+    strip_form
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_transaction_from_form, \
@@ -848,6 +849,7 @@ def transaction_store(request, txn_type, transaction=None):
     if transaction is None:
         transaction = Transaction()
     form = request.POST.dict()
+    strip_form(form)
     sort_form_transaction_records(form)
     fill_transaction_from_form(transaction, form)
     errors = {}

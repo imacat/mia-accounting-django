@@ -43,6 +43,16 @@ def new_pk(cls):
             return id
 
 
+def strip_form(form):
+    """Strips the values of a form.  Empty strings are converted to None.
+
+    Args:
+        form (dict[str]): The form.
+    """
+    for key in form.keys():
+        form[key] = form[key].strip()
+
+
 class Language:
     """A language.
 
