@@ -64,7 +64,7 @@ First written: 2020/7/10
             <a class="btn btn-primary" role="button" href="{% url_period period.last_month %}">{% trans "Last Month" context "Period|" as text %}{{ text|force_escape }}</a>
           {% endif %}
           {% if period.since_last_month is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.since_last_month %}">{% trans "Last Month" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.since_last_month %}">{% trans "Since Last Month" context "Period|" as text %}{{ text|force_escape }}</a>
           {% endif %}
         </div>
         {% if period.has_months_to_choose %}
