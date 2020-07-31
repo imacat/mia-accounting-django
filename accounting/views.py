@@ -898,12 +898,12 @@ def transaction_store(request, txn_type, transaction=None):
                 "accounting:transactions.edit", args=(txn_type, transaction))
         return error_redirect(
             request,
-            str(UrlBuilder(url).add_param("r", request.GET.get("r"))),
+            str(UrlBuilder(url).add("r", request.GET.get("r"))),
             form,
             errors)
     return success_redirect(
         request,
         str(UrlBuilder(reverse("accounting:transactions.show",
                                args=(txn_type, transaction)))
-            .add_param("r", request.GET.get("r"))),
+            .add("r", request.GET.get("r"))),
         gettext_noop("This transaction was saved successfully."))

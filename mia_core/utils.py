@@ -174,7 +174,7 @@ class UrlBuilder:
             value = urllib.parse.unquote(piece[pos + 1:])
             self.params.append(self.Param(name, value))
 
-    def add_param(self, name, value):
+    def add(self, name, value):
         """Adds a query parameter.
 
         Args:
@@ -189,7 +189,7 @@ class UrlBuilder:
             self.params.append(self.Param(name, value))
         return self
 
-    def del_param(self, name):
+    def remove(self, name):
         """Removes a query parameter.
 
         Args:
@@ -202,7 +202,7 @@ class UrlBuilder:
         self.params = [x for x in self.params if x.name != name]
         return self
 
-    def set_param(self, name, value):
+    def set(self, name, value):
         """Sets a query parameter.  The current parameters with the
         same name will be replaced.
 
@@ -214,7 +214,7 @@ class UrlBuilder:
             UrlBuilder: The URL builder itself, with the parameter
                 modified.
         """
-        return self.del_param(name).add_param(name, value)
+        return self.remove(name).add(name, value)
 
     def clone(self):
         """Returns a copy of this URL builder.
@@ -313,15 +313,15 @@ class Pagination:
             self.page_size = int(request.GET["page-size"])
             if self.page_size == self.DEFAULT_PAGE_SIZE:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).del_param("page-size")))
+                    UrlBuilder(current_url).remove("page-size")))
             if self.page_size < 1:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).del_param("page-size")))
+                    UrlBuilder(current_url).remove("page-size")))
         except KeyError:
             self.page_size = self.DEFAULT_PAGE_SIZE
         except ValueError:
             raise PaginationException(str(
-                UrlBuilder(current_url).del_param("page-size")))
+                UrlBuilder(current_url).remove("page-size")))
         self.total_pages = int(
             (len(items) - 1) / self.page_size) + 1
         default_page_no = 1 if not is_reversed else self.total_pages
@@ -332,21 +332,21 @@ class Pagination:
             self.page_no = int(request.GET["page"])
             if not self.is_paged:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).del_param("page")))
+                    UrlBuilder(current_url).remove("page")))
             if self.page_no == default_page_no:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).del_param("page")))
+                    UrlBuilder(current_url).remove("page")))
             if self.page_no < 1:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).del_param("page")))
+                    UrlBuilder(current_url).remove("page")))
             if self.page_no > self.total_pages:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).del_param("page")))
+                    UrlBuilder(current_url).remove("page")))
         except KeyError:
             self.page_no = default_page_no
         except ValueError:
             raise PaginationException(str(
-                UrlBuilder(current_url).del_param("page")))
+                UrlBuilder(current_url).remove("page")))
 
         if not self.is_paged:
             self.page_no = 1
@@ -361,7 +361,7 @@ class Pagination:
     def links(self):
         """Returns the navigation links of the pagination bar."""
         if self._links is None:
-            base_url = UrlBuilder(self._current_url).del_param("page")
+            base_url = UrlBuilder(self._current_url).remove("page")
             self._links = []
             # The previous page
             link = self.Link()
@@ -371,10 +371,10 @@ class Pagination:
                     if not self.is_reversed:
                         link.url = str(base_url)
                     else:
-                        link.url = str(base_url.clone().add_param(
+                        link.url = str(base_url.clone().add(
                             "page", "1"))
                 else:
-                    link.url = str(base_url.clone().add_param(
+                    link.url = str(base_url.clone().add(
                         "page", str(self.page_no - 1)))
             link.is_small_screen = True
             self._links.append(link)
@@ -384,7 +384,7 @@ class Pagination:
             if not self.is_reversed:
                 link.url = str(base_url)
             else:
-                link.url = str(base_url.clone().add_param(
+                link.url = str(base_url.clone().add(
                     "page", "1"))
             if self.page_no == 1:
                 link.is_active = True
@@ -396,7 +396,7 @@ class Pagination:
                     link.title = pgettext("Pagination|", "...")
                 else:
                     link.title = "2"
-                    link.url = str(base_url.clone().add_param(
+                    link.url = str(base_url.clone().add(
                         "page", "2"))
                 self._links.append(link)
             # The nearby pages
@@ -405,7 +405,7 @@ class Pagination:
                     continue
                 link = self.Link()
                 link.title = str(no)
-                link.url = str(base_url.clone().add_param(
+                link.url = str(base_url.clone().add(
                     "page", str(no)))
                 if no == self.page_no:
                     link.is_active = True
@@ -417,7 +417,7 @@ class Pagination:
                     link.title = pgettext("Pagination|", "...")
                 else:
                     link.title = str(self.total_pages - 1)
-                    link.url = str(base_url.clone().add_param(
+                    link.url = str(base_url.clone().add(
                         "page", str(self.total_pages - 1)))
                 self._links.append(link)
             # The last page
@@ -426,7 +426,7 @@ class Pagination:
             if self.is_reversed:
                 link.url = str(base_url)
             else:
-                link.url = str(base_url.clone().add_param(
+                link.url = str(base_url.clone().add(
                     "page", str(self.total_pages)))
             if self.page_no == self.total_pages:
                 link.is_active = True
@@ -439,10 +439,10 @@ class Pagination:
                     if self.is_reversed:
                         link.url = str(base_url)
                     else:
-                        link.url = str(base_url.clone().add_param(
+                        link.url = str(base_url.clone().add(
                             "page", str(self.total_pages)))
                 else:
-                    link.url = str(base_url.clone().add_param(
+                    link.url = str(base_url.clone().add(
                         "page", str(self.page_no + 1)))
             link.is_small_screen = True
             self._links.append(link)
@@ -465,8 +465,8 @@ class Pagination:
 
     @property
     def page_size_options(self):
-        base_url = UrlBuilder(self._current_url).del_param(
-            "page").del_param("page-size")
+        base_url = UrlBuilder(self._current_url).remove(
+            "page").remove("page-size")
         return [self.PageSizeOption(x, self._page_size_url(base_url, x))
                 for x in [10, 100, 200]]
 
@@ -483,7 +483,7 @@ class Pagination:
         """
         if size == Pagination.DEFAULT_PAGE_SIZE:
             return str(base_url)
-        return str(base_url.clone().add_param("page-size", str(size)))
+        return str(base_url.clone().add("page-size", str(size)))
 
     class PageSizeOption:
         """A page size option.
