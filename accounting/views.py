@@ -26,6 +26,7 @@ from django.db.models import Sum, Case, When, F, Q
 from django.db.models.functions import TruncMonth, Coalesce
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import pgettext, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
@@ -124,7 +125,8 @@ def cash(request, account, period):
         balance = balance + sign * record.amount
         record.balance = balance
     record_sum = Record(
-        transaction=Transaction(date=records[-1].transaction.date),
+        transaction=Transaction(date=records[-1].transaction.date)
+        if len(records)>0 else Transaction(date=timezone.localdate()),
         account=account,
         summary=pgettext("Accounting|", "Total"),
         balance=balance
