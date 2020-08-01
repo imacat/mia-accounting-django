@@ -93,7 +93,6 @@ class RecordForm(forms.Form):
             except forms.ValidationError as e:
                 errors.append(e)
         if errors:
-            print(errors)
             raise forms.ValidationError(errors)
 
     def _validate_transaction(self):
@@ -132,7 +131,6 @@ class RecordForm(forms.Form):
         if "account" in self.errors:
             return
         if self.is_credit:
-            print(self.data["account"])
             if not re.match("^([123489]|7[1234])", self.data["account"]):
                 error = forms.ValidationError(
                     pgettext("Accounting|",
