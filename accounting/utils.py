@@ -348,7 +348,7 @@ def sort_form_transaction_records(form):
                 orders[no] = 9999
             except ValueError:
                 orders[no] = 9999
-        record_no[record_type].sort(key=lambda x: orders[x])
+        record_no[record_type].sort(key=lambda n: orders[n])
     # Constructs the sorted new form
     new_form = {}
     for record_type in record_no.keys():
