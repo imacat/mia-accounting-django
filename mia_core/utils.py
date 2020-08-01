@@ -36,11 +36,11 @@ def new_pk(cls):
          int: The new random ID.
     """
     while True:
-        id = random.randint(100000000, 999999999)
+        pk = random.randint(100000000, 999999999)
         try:
-            cls.objects.get(pk=id)
+            cls.objects.get(pk=pk)
         except cls.DoesNotExist:
-            return id
+            return pk
 
 
 def strip_form(form):
@@ -65,11 +65,6 @@ class Language:
         locale (str); The locale name of this language.
         is_default (bool): Whether this is the default language.
     """
-    id = None
-    db = None
-    locale = None
-    is_default = False
-
     def __init__(self, language):
         self.id = language
         self.db = "_" + language.lower().replace("-", "_")
@@ -153,9 +148,6 @@ class UrlBuilder:
         base_path (str): the base path
         params (list[Param]): The query parameters
     """
-    base_path = None
-    params = []
-
     def __init__(self, start_url):
         """Constructs a new URL builder.
 
@@ -165,6 +157,7 @@ class UrlBuilder:
         pos = start_url.find("?")
         if pos == -1:
             self.base_path = start_url
+            self.params = []
             return
         self.base_path = start_url[:pos]
         self.params = []
@@ -240,9 +233,6 @@ class UrlBuilder:
             name (str): The parameter name
             value (str): The parameter value
         """
-        name = None
-        value = None
-
         def __init__(self, name, value):
             """Constructs a new query parameter
 
@@ -270,58 +260,47 @@ class Pagination:
     """The pagination.
 
     Args:
-        request (HttpRequest): The request
-        items (list): All the items
-        page_no (int): The specified page number
-        page_size (int): The specified number of items per page
-        is_reversed (bool): Whether we should display the last
-                            page first
+        request (HttpRequest): The request.
+        items (list): All the items.
+        is_reversed (bool): Whether we should display the last page first.
 
     Raises:
         PaginationException: With invalid pagination parameters
 
     Attributes:
-        is_reversed (bool): Whether we should display the last
-                            page first
+        current_url (str): The current request URL.
+        is_reversed (bool): Whether we should display the last page first.
         page_size (int): The page size.
         total_pages (int): The total number of pages available.
         is_paged (bool): Whether there are more than one page.
         page_no (int): The current page number.
         items (list[Model]): The items in the current page.
-        links (list[Link]): The navigation links in the pagination
-                            bar.
-        page_size_options(list[PageSizeOptions]): The page size
-                                                  options
     """
-    _current_url = None
-    is_reversed = False
-    page_size = None
-    total_pages = None
-    is_paged = None
-    page_no = None
-    items = None
-
     DEFAULT_PAGE_SIZE = 10
 
     def __init__(self, request, items, is_reversed=False):
-        current_url = request.get_full_path()
-        self._current_url = current_url
+        self.current_url = request.get_full_path()
         self.is_reversed = is_reversed
+        self.page_size = self.DEFAULT_PAGE_SIZE
+        self.total_pages = None
+        self.is_paged = None
+        self.page_no = 1
+        self.items = []
 
         # The page size
         try:
             self.page_size = int(request.GET["page-size"])
             if self.page_size == self.DEFAULT_PAGE_SIZE:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).remove("page-size")))
+                    UrlBuilder(self.current_url).remove("page-size")))
             if self.page_size < 1:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).remove("page-size")))
+                    UrlBuilder(self.current_url).remove("page-size")))
         except KeyError:
             self.page_size = self.DEFAULT_PAGE_SIZE
         except ValueError:
             raise PaginationException(str(
-                UrlBuilder(current_url).remove("page-size")))
+                UrlBuilder(self.current_url).remove("page-size")))
         self.total_pages = int(
             (len(items) - 1) / self.page_size) + 1
         default_page_no = 1 if not is_reversed else self.total_pages
@@ -332,21 +311,21 @@ class Pagination:
             self.page_no = int(request.GET["page"])
             if not self.is_paged:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).remove("page")))
+                    UrlBuilder(self.current_url).remove("page")))
             if self.page_no == default_page_no:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).remove("page")))
+                    UrlBuilder(self.current_url).remove("page")))
             if self.page_no < 1:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).remove("page")))
+                    UrlBuilder(self.current_url).remove("page")))
             if self.page_no > self.total_pages:
                 raise PaginationException(str(
-                    UrlBuilder(current_url).remove("page")))
+                    UrlBuilder(self.current_url).remove("page")))
         except KeyError:
             self.page_no = default_page_no
         except ValueError:
             raise PaginationException(str(
-                UrlBuilder(current_url).remove("page")))
+                UrlBuilder(self.current_url).remove("page")))
 
         if not self.is_paged:
             self.page_no = 1
@@ -355,98 +334,98 @@ class Pagination:
         start_no = self.page_size * (self.page_no - 1)
         self.items = items[start_no:start_no + self.page_size]
 
-    _links = None
-
-    @property
     def links(self):
-        """Returns the navigation links of the pagination bar."""
-        if self._links is None:
-            base_url = UrlBuilder(self._current_url).remove("page")
-            self._links = []
-            # The previous page
-            link = self.Link()
-            link.title = pgettext("Pagination|", "Previous")
-            if self.page_no > 1:
-                if self.page_no - 1 == 1:
-                    if not self.is_reversed:
-                        link.url = str(base_url)
-                    else:
-                        link.url = str(base_url.clone().add(
-                            "page", "1"))
+        """Returns the navigation links of the pagination bar.
+
+        Returns:
+            list[Link]: The navigation links of the pagination bar.
+        """
+        base_url = UrlBuilder(self.current_url).remove("page")
+        links = []
+        # The previous page
+        link = self.Link()
+        link.title = pgettext("Pagination|", "Previous")
+        if self.page_no > 1:
+            if self.page_no - 1 == 1:
+                if not self.is_reversed:
+                    link.url = str(base_url)
                 else:
                     link.url = str(base_url.clone().add(
-                        "page", str(self.page_no - 1)))
-            link.is_small_screen = True
-            self._links.append(link)
-            # The first page
-            link = self.Link()
-            link.title = "1"
-            if not self.is_reversed:
-                link.url = str(base_url)
+                        "page", "1"))
             else:
                 link.url = str(base_url.clone().add(
-                    "page", "1"))
-            if self.page_no == 1:
-                link.is_active = True
-            self._links.append(link)
-            # The previous ellipsis
-            if self.page_no > 4:
-                link = self.Link()
-                if self.page_no > 5:
-                    link.title = pgettext("Pagination|", "...")
-                else:
-                    link.title = "2"
-                    link.url = str(base_url.clone().add(
-                        "page", "2"))
-                self._links.append(link)
-            # The nearby pages
-            for no in range(self.page_no - 2, self.page_no + 3):
-                if no <= 1 or no >= self.total_pages:
-                    continue
-                link = self.Link()
-                link.title = str(no)
-                link.url = str(base_url.clone().add(
-                    "page", str(no)))
-                if no == self.page_no:
-                    link.is_active = True
-                self._links.append(link)
-            # The next ellipsis
-            if self.page_no + 3 < self.total_pages:
-                link = self.Link()
-                if self.page_no + 4 < self.total_pages:
-                    link.title = pgettext("Pagination|", "...")
-                else:
-                    link.title = str(self.total_pages - 1)
-                    link.url = str(base_url.clone().add(
-                        "page", str(self.total_pages - 1)))
-                self._links.append(link)
-            # The last page
+                    "page", str(self.page_no - 1)))
+        link.is_small_screen = True
+        links.append(link)
+        # The first page
+        link = self.Link()
+        link.title = "1"
+        if not self.is_reversed:
+            link.url = str(base_url)
+        else:
+            link.url = str(base_url.clone().add(
+                "page", "1"))
+        if self.page_no == 1:
+            link.is_active = True
+        links.append(link)
+        # The previous ellipsis
+        if self.page_no > 4:
             link = self.Link()
-            link.title = str(self.total_pages)
-            if self.is_reversed:
-                link.url = str(base_url)
+            if self.page_no > 5:
+                link.title = pgettext("Pagination|", "...")
+            else:
+                link.title = "2"
+                link.url = str(base_url.clone().add(
+                    "page", "2"))
+            links.append(link)
+        # The nearby pages
+        for no in range(self.page_no - 2, self.page_no + 3):
+            if no <= 1 or no >= self.total_pages:
+                continue
+            link = self.Link()
+            link.title = str(no)
+            link.url = str(base_url.clone().add(
+                "page", str(no)))
+            if no == self.page_no:
+                link.is_active = True
+            links.append(link)
+        # The next ellipsis
+        if self.page_no + 3 < self.total_pages:
+            link = self.Link()
+            if self.page_no + 4 < self.total_pages:
+                link.title = pgettext("Pagination|", "...")
+            else:
+                link.title = str(self.total_pages - 1)
+                link.url = str(base_url.clone().add(
+                    "page", str(self.total_pages - 1)))
+            links.append(link)
+        # The last page
+        link = self.Link()
+        link.title = str(self.total_pages)
+        if self.is_reversed:
+            link.url = str(base_url)
+        else:
+            link.url = str(base_url.clone().add(
+                "page", str(self.total_pages)))
+        if self.page_no == self.total_pages:
+            link.is_active = True
+        links.append(link)
+        # The next page
+        link = self.Link()
+        link.title = pgettext("Pagination|", "Next")
+        if self.page_no < self.total_pages:
+            if self.page_no + 1 == self.total_pages:
+                if self.is_reversed:
+                    link.url = str(base_url)
+                else:
+                    link.url = str(base_url.clone().add(
+                        "page", str(self.total_pages)))
             else:
                 link.url = str(base_url.clone().add(
-                    "page", str(self.total_pages)))
-            if self.page_no == self.total_pages:
-                link.is_active = True
-            self._links.append(link)
-            # The next page
-            link = self.Link()
-            link.title = pgettext("Pagination|", "Next")
-            if self.page_no < self.total_pages:
-                if self.page_no + 1 == self.total_pages:
-                    if self.is_reversed:
-                        link.url = str(base_url)
-                    else:
-                        link.url = str(base_url.clone().add(
-                            "page", str(self.total_pages)))
-                else:
-                    link.url = str(base_url.clone().add(
-                        "page", str(self.page_no + 1)))
-            link.is_small_screen = True
-            self._links.append(link)
-        return self._links
+                    "page", str(self.page_no + 1)))
+        link.is_small_screen = True
+        links.append(link)
+        return links
 
     class Link:
         """A navigation link in the pagination bar.
@@ -458,14 +437,19 @@ class Pagination:
             is_small_screen (bool): Whether this link is for small
                                     screens
         """
-        url = None
-        title = None
-        is_active = False
-        is_small_screen = False
+        def __int__(self):
+            self.url = None
+            self.title = None
+            self.is_active = False
+            self.is_small_screen = False
 
-    @property
     def page_size_options(self):
-        base_url = UrlBuilder(self._current_url).remove(
+        """Returns the page size options.
+
+        Returns:
+            list[PageSizeOption]: The page size options.
+        """
+        base_url = UrlBuilder(self.current_url).remove(
             "page").remove("page-size")
         return [self.PageSizeOption(x, self._page_size_url(base_url, x))
                 for x in [10, 100, 200]]
@@ -496,9 +480,6 @@ class Pagination:
             size (int): The page size.
             url (str): The URL for this page size.
         """
-        size = None
-        url = None
-
         def __init__(self, size, url):
             self.size = size
             self.url = url
@@ -513,7 +494,5 @@ class PaginationException(Exception):
     Attributes:
         url (str): The canonical URL to redirect to.
     """
-    url = None
-
     def __init__(self, url):
         self.url = url

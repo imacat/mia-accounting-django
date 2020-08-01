@@ -77,10 +77,6 @@ class Period:
         month_picker_params (str): The month-picker parameters, as a
                                    JSON text string
     """
-    _period = None
-    _data_start = None
-    _data_end = None
-
     def __init__(self, spec=None, data_start=None, data_end=None):
         self._period = self.Parser(spec)
         self._data_start = data_start
@@ -337,13 +333,13 @@ class Period:
             error (str): The period specification format error, or
                          None on success.
         """
-        spec = None
-        start = None
-        end = None
-        description = None
-        error = None
-
         def __init__(self, spec):
+            self.spec = None
+            self.start = None
+            self.end = None
+            self.description = None
+            self.error = None
+
             if spec is None:
                 self.set_this_month()
                 return
