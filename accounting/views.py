@@ -38,9 +38,9 @@ from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
-    find_imbalanced, find_order_holes, fill_transaction_from_post, \
-    sort_form_transaction_records, make_transaction_form_from_status, \
-    make_transaction_form_from_model, make_transaction_form_from_post
+    find_imbalanced, find_order_holes, fill_txn_from_post, \
+    sort_post_txn_records, make_txn_form_from_status, \
+    make_txn_form_from_model, make_txn_form_from_post
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -822,7 +822,7 @@ def transaction_edit(request, txn_type, txn=None):
     Returns:
         HttpResponse: The response.
     """
-    form = make_transaction_form_from_status(request, txn_type, txn)
+    form = make_txn_form_from_status(request, txn_type, txn)
     if form is None:
         exists = txn is not None
         if txn is None:
@@ -831,7 +831,7 @@ def transaction_edit(request, txn_type, txn=None):
             txn.records.append(Record(ord=1, is_credit=False))
         if len(txn.credit_records) == 0:
             txn.records.append(Record(ord=1, is_credit=True))
-        form = make_transaction_form_from_model(txn, exists)
+        form = make_txn_form_from_model(txn, exists)
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": form,
     })
@@ -852,8 +852,8 @@ def transaction_store(request, txn_type, txn=None):
     """
     post = request.POST.dict()
     strip_form(post)
-    sort_form_transaction_records(post)
-    form = make_transaction_form_from_post(post, txn_type, txn)
+    sort_post_txn_records(post)
+    form = make_txn_form_from_post(post, txn_type, txn)
     if not form.is_valid():
         if txn is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
@@ -866,7 +866,7 @@ def transaction_store(request, txn_type, txn=None):
             post)
     if txn is None:
         txn = Transaction()
-    fill_transaction_from_post(txn, post)
+    fill_txn_from_post(txn, post)
     # TODO: Stores the data
     return success_redirect(
         request,

@@ -283,17 +283,17 @@ def find_order_holes(records):
         record.has_order_hole = record.transaction.date in holes
 
 
-def fill_transaction_from_post(transaction, post):
+def fill_txn_from_post(txn, post):
     """Fills the transaction from the POSTed data.
 
     Args:
-        transaction (Transaction): The transaction.
+        txn (Transaction): The transaction.
         post (dict): The POSTed data.
     """
     if "date" in post:
-        transaction.date = post["date"]
+        txn.date = post["date"]
     if "notes" in post:
-        transaction.notes = post["notes"]
+        txn.notes = post["notes"]
     # The records
     max_no = _find_max_record_no(post)
     records = []
@@ -303,7 +303,7 @@ def fill_transaction_from_post(transaction, post):
             record = Record(
                 ord=no,
                 is_credit=(rec_type == "credit"),
-                transaction=transaction)
+                transaction=txn)
             if F"{rec_type}-{no}-id" in post:
                 record.pk = post[F"{rec_type}-{no}-id"]
             if F"{rec_type}-{no}-account" in post:
@@ -313,22 +313,22 @@ def fill_transaction_from_post(transaction, post):
             if F"{rec_type}-{no}-amount" in post:
                 record.amount = post[F"{rec_type}-{no}-amount"]
             records.append(record)
-    transaction.records = records
+    txn.records = records
 
 
-def sort_form_transaction_records(form):
+def sort_post_txn_records(post):
     """Sorts the records in the form by their specified order, so that the
     form can be used to populate the data to return to the user.
 
     Args:
-        form (dict): The POSTed form.
+        post (dict): The POSTed form.
     """
     # Collects the available record numbers
     record_no = {
         "debit": [],
         "credit": [],
     }
-    for key in form.keys():
+    for key in post.keys():
         m = re.match(
             "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
             key)
@@ -343,47 +343,47 @@ def sort_form_transaction_records(form):
         orders = {}
         for no in record_no[record_type]:
             try:
-                orders[no] = int(form[F"{record_type}-{no}-ord"])
+                orders[no] = int(post[F"{record_type}-{no}-ord"])
             except KeyError:
                 orders[no] = 9999
             except ValueError:
                 orders[no] = 9999
         record_no[record_type].sort(key=lambda n: orders[n])
     # Constructs the sorted new form
-    new_form = {}
+    new_post = {}
     for record_type in record_no.keys():
         for i in range(len(record_no[record_type])):
             old_no = record_no[record_type][i]
             no = i + 1
-            new_form[F"{record_type}-{no}-ord"] = no
+            new_post[F"{record_type}-{no}-ord"] = no
             for attr in ["id", "account", "summary", "amount"]:
-                if F"{record_type}-{old_no}-{attr}" in form:
-                    new_form[F"{record_type}-{no}-{attr}"]\
-                        = form[F"{record_type}-{old_no}-{attr}"]
+                if F"{record_type}-{old_no}-{attr}" in post:
+                    new_post[F"{record_type}-{no}-{attr}"]\
+                        = post[F"{record_type}-{old_no}-{attr}"]
     # Purges the old form and fills it with the new form
-    for x in [x for x in form.keys() if re.match(
+    for x in [x for x in post.keys() if re.match(
             "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
             x)]:
-        del form[x]
-    for key in new_form.keys():
-        form[key] = new_form[key]
+        del post[x]
+    for key in new_post.keys():
+        post[key] = new_post[key]
 
 
-def make_transaction_form_from_model(transaction, exists):
+def make_txn_form_from_model(txn, exists):
     """Converts a transaction data model to a transaction form.
 
     Args:
-        transaction (Transaction): The transaction data model.
+        txn (Transaction): The transaction data model.
         exists (bool): Whether the current transaction exists.
 
     Returns:
         TransactionForm: The transaction form.
     """
-    transaction_form = TransactionForm(
-        {x: str(getattr(transaction, x)) for x in ["date", "notes"]
-         if getattr(transaction, x) is not None})
-    transaction_form.transaction = transaction if exists else None
-    for record in transaction.records:
+    form = TransactionForm(
+        {x: str(getattr(txn, x)) for x in ["date", "notes"]
+         if getattr(txn, x) is not None})
+    form.transaction = txn if exists else None
+    for record in txn.records:
         data = {x: getattr(record, x)
                 for x in ["summary", "amount"]
                 if getattr(record, x) is not None}
@@ -393,31 +393,31 @@ def make_transaction_form_from_model(transaction, exists):
         except AttributeError:
             pass
         record_form = RecordForm(data)
-        record_form.transaction = transaction_form.transaction
+        record_form.transaction = form.transaction
         record_form.is_credit = record.is_credit
         if record.is_credit:
-            transaction_form.credit_records.append(record_form)
+            form.credit_records.append(record_form)
         else:
-            transaction_form.debit_records.append(record_form)
-    return transaction_form
+            form.debit_records.append(record_form)
+    return form
 
 
-def make_transaction_form_from_post(post, txn_type, transaction):
+def make_txn_form_from_post(post, txn_type, txn):
     """Converts the POSTed data to a transaction form.
 
     Args:
         post (dict[str]): The POSTed data.
         txn_type (str): The transaction type.
-        transaction (Transaction|None): The current transaction, or None
+        txn (Transaction|None): The current transaction, or None
             if there is no current transaction.
 
     Returns:
         TransactionForm: The transaction form.
     """
-    transaction_form = TransactionForm(
+    form = TransactionForm(
         {x: post[x] for x in ("date", "notes") if x in post})
-    transaction_form.transaction = transaction
-    transaction_form.txn_type = txn_type
+    form.transaction = txn
+    form.txn_type = txn_type
     # The records
     max_no = _find_max_record_no(post)
     if max_no["debit"] == 0:
@@ -429,27 +429,27 @@ def make_transaction_form_from_post(post, txn_type, transaction):
         is_credit = (rec_type == "credit")
         for i in range(max_no[rec_type]):
             no = i + 1
-            record = RecordForm(
+            record_form = RecordForm(
                 {x: post[F"{rec_type}-{no}-{x}"]
                  for x in ["id", "account", "summary", "amount"]
                  if F"{rec_type}-{no}-{x}" in post})
-            record.transaction = transaction_form.transaction
-            record.is_credit = is_credit
-            records.append(record)
+            record_form.transaction = form.transaction
+            record_form.is_credit = is_credit
+            records.append(record_form)
         if rec_type == "debit":
-            transaction_form.debit_records = records
+            form.debit_records = records
         else:
-            transaction_form.credit_records = records
-    return transaction_form
+            form.credit_records = records
+    return form
 
 
-def make_transaction_form_from_status(request, txn_type, transaction):
+def make_txn_form_from_status(request, txn_type, txn):
     """Converts the previously-stored status to a transaction form.
 
     Args:
         request (HttpRequest): The request.
         txn_type (str): The transaction type.
-        transaction (Transaction|None): The current transaction, or None
+        txn (Transaction|None): The current transaction, or None
             if there is no current transaction.
 
     Returns:
@@ -461,8 +461,8 @@ def make_transaction_form_from_status(request, txn_type, transaction):
         return None
     if "form" not in status:
         return
-    return make_transaction_form_from_post(
-        status["form"], txn_type, transaction)
+    return make_txn_form_from_post(
+        status["form"], txn_type, txn)
 
 
 def _find_max_record_no(post):
@@ -484,8 +484,8 @@ def _find_max_record_no(post):
             "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
             key)
         if m is not None:
-            rec_type = m.group(1)
+            record_type = m.group(1)
             no = int(m.group(2))
-            if max_no[rec_type] < no:
-                max_no[rec_type] = no
+            if max_no[record_type] < no:
+                max_no[record_type] = no
     return max_no
