@@ -258,19 +258,6 @@ class Period:
             self._data_end.year, this_year, -1)]
         return after + before[::-1]
 
-    def is_chosen_year(self, year):
-        """Returns whether the specified year is the currently-chosen year.
-
-        Args:
-            year (str): the year.
-
-        Returns:
-            bool: True if the year is the currently-chosen year, or
-            False otherwise
-        """
-        if self._period.spec == str(year):
-            return True
-
     def today(self):
         """Returns the specification of today.
 
