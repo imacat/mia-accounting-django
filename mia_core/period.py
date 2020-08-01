@@ -118,7 +118,6 @@ class Period:
             year = year + 1
         return datetime.date(year, month, 1)
 
-    @property
     def this_month(self):
         """Returns the specification of this month.
 
@@ -135,7 +134,6 @@ class Period:
             return None
         return dateformat.format(today, "Y-m")
 
-    @property
     def last_month(self):
         """Returns the specification of last month.
 
@@ -152,7 +150,6 @@ class Period:
             return None
         return dateformat.format(last_month_start, "Y-m")
 
-    @property
     def since_last_month(self):
         """Returns the specification since last month.
 
@@ -160,12 +157,11 @@ class Period:
             str|None: The specification since last month, or None if there is
                 no data in or before last month.
         """
-        last_month = self.last_month
+        last_month = self.last_month()
         if last_month is None:
             return None
-        return self.last_month + "-"
+        return last_month + "-"
 
-    @property
     def has_months_to_choose(self):
         """Returns whether there are months to choose besides this month and
         last month.
@@ -182,7 +178,6 @@ class Period:
             return True
         return False
 
-    @property
     def chosen_month(self):
         """Returns the specification of the chosen month, or None if the
         current period is not a month or is out of available data range.
@@ -203,7 +198,6 @@ class Period:
             return None
         return self._period.spec
 
-    @property
     def this_year(self):
         """Returns the specification of this year.
 
@@ -218,7 +212,6 @@ class Period:
             return None
         return str(this_year)
 
-    @property
     def last_year(self):
         """Returns the specification of last year.
 
@@ -233,7 +226,6 @@ class Period:
             return None
         return str(last_year)
 
-    @property
     def has_years_to_choose(self):
         """Returns whether there are years to choose besides this year and
         last year.
@@ -251,7 +243,6 @@ class Period:
             return True
         return False
 
-    @property
     def years_to_choose(self):
         """Returns the years to choose besides this year and last year.
 
@@ -280,7 +271,6 @@ class Period:
         if self._period.spec == str(year):
             return True
 
-    @property
     def today(self):
         """Returns the specification of today.
 
@@ -295,7 +285,6 @@ class Period:
             return None
         return dateformat.format(today, "Y-m-d")
 
-    @property
     def yesterday(self):
         """Returns the specification of yesterday.
 
@@ -310,7 +299,6 @@ class Period:
             return None
         return dateformat.format(yesterday, "Y-m-d")
 
-    @property
     def chosen_day(self):
         """Returns the specification of the chosen day.
 
@@ -320,7 +308,6 @@ class Period:
         """
         return dateformat.format(self._period.start, "Y-m-d")
 
-    @property
     def has_days_to_choose(self):
         """Returns whether there are more than one day to choose from.
 
@@ -334,7 +321,6 @@ class Period:
             return False
         return True
 
-    @property
     def first_day(self):
         """Returns the specification of the available first day.
 
@@ -345,7 +331,6 @@ class Period:
             return None
         return dateformat.format(self._data_start, "Y-m-d")
 
-    @property
     def last_day(self):
         """Returns the specification of the available last day.
 
@@ -356,7 +341,6 @@ class Period:
             return None
         return dateformat.format(self._data_end, "Y-m-d")
 
-    @property
     def chosen_start(self):
         """Returns the specification of of the first day of the
         specified period.
@@ -372,7 +356,6 @@ class Period:
             else self._data_start
         return dateformat.format(day, "Y-m-d")
 
-    @property
     def chosen_end(self):
         """Returns the specification of of the last day of the
         specified period.
@@ -388,7 +371,6 @@ class Period:
             else self._data_end
         return dateformat.format(day, "Y-m-d")
 
-    @property
     def month_picker_params(self):
         """Returns the parameters for the month-picker, as a JSON text string.
 
@@ -402,7 +384,7 @@ class Period:
             "locale": Language.current().locale,
             "minDate": start,
             "maxDate": self._data_end,
-            "defaultDate": self.chosen_month,
+            "defaultDate": self.chosen_month(),
         })
 
     @staticmethod
