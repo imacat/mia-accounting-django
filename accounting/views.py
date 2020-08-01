@@ -793,7 +793,7 @@ def search(request):
 
 @require_GET
 @login_required
-def transaction_show(request, txn_type, txn):
+def txn_show(request, txn_type, txn):
     """The view of an accounting transaction.
 
     Args:
@@ -811,7 +811,7 @@ def transaction_show(request, txn_type, txn):
 
 @require_GET
 @login_required
-def transaction_edit(request, txn_type, txn=None):
+def txn_edit(request, txn_type, txn=None):
     """The view to edit an accounting transaction.
 
     Args:
@@ -839,7 +839,7 @@ def transaction_edit(request, txn_type, txn=None):
 
 @require_POST
 @login_required
-def transaction_store(request, txn_type, txn=None):
+def txn_store(request, txn_type, txn=None):
     """The view to store an accounting transaction.
 
     Args:
