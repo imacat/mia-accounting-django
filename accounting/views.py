@@ -38,7 +38,7 @@ from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
-    find_imbalanced, find_order_holes, fill_transaction_from_form, \
+    find_imbalanced, find_order_holes, fill_transaction_from_post, \
     sort_form_transaction_records, make_transaction_form_from_status, \
     make_transaction_form_from_model, make_transaction_form_from_post
 
@@ -866,7 +866,7 @@ def transaction_store(request, txn_type, transaction=None):
             post)
     if transaction is None:
         transaction = Transaction()
-    fill_transaction_from_form(transaction, post)
+    fill_transaction_from_post(transaction, post)
     # TODO: Stores the data
     return success_redirect(
         request,

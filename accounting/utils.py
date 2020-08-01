@@ -283,23 +283,23 @@ def find_order_holes(records):
         record.has_order_hole = record.transaction.date in holes
 
 
-def fill_transaction_from_form(transaction, form):
-    """Fills the transaction from the form.
+def fill_transaction_from_post(transaction, post):
+    """Fills the transaction from the POSTed data.
 
     Args:
         transaction (Transaction): The transaction.
-        form (dict): The form
+        post (dict): The POSTed data.
     """
-    if "date" in form:
-        transaction.date = form["date"]
-    if "notes" in form:
-        transaction.notes = form["notes"]
+    if "date" in post:
+        transaction.date = post["date"]
+    if "notes" in post:
+        transaction.notes = post["notes"]
     # The records
     max_no = {
         "debit": 0,
         "credit": 0,
     }
-    for key in form.keys():
+    for key in post.keys():
         m = re.match(
             "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
             key)
@@ -316,14 +316,14 @@ def fill_transaction_from_form(transaction, form):
                 ord=no,
                 is_credit=(rec_type == "credit"),
                 transaction=transaction)
-            if F"{rec_type}-{no}-id" in form:
-                record.pk = form[F"{rec_type}-{no}-id"]
-            if F"{rec_type}-{no}-account" in form:
-                record.account = Account(code=form[F"{rec_type}-{no}-account"])
-            if F"{rec_type}-{no}-summary" in form:
-                record.summary = form[F"{rec_type}-{no}-summary"]
-            if F"{rec_type}-{no}-amount" in form:
-                record.amount = form[F"{rec_type}-{no}-amount"]
+            if F"{rec_type}-{no}-id" in post:
+                record.pk = post[F"{rec_type}-{no}-id"]
+            if F"{rec_type}-{no}-account" in post:
+                record.account = Account(code=post[F"{rec_type}-{no}-account"])
+            if F"{rec_type}-{no}-summary" in post:
+                record.summary = post[F"{rec_type}-{no}-summary"]
+            if F"{rec_type}-{no}-amount" in post:
+                record.amount = post[F"{rec_type}-{no}-amount"]
             records.append(record)
     transaction.records = records
 
