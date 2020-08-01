@@ -295,19 +295,7 @@ def fill_transaction_from_post(transaction, post):
     if "notes" in post:
         transaction.notes = post["notes"]
     # The records
-    max_no = {
-        "debit": 0,
-        "credit": 0,
-    }
-    for key in post.keys():
-        m = re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
-            key)
-        if m is not None:
-            rec_type = m.group(1)
-            no = int(m.group(2))
-            if max_no[rec_type] < no:
-                max_no[rec_type] = no
+    max_no = _find_max_record_no(post)
     records = []
     for rec_type in max_no.keys():
         for i in range(max_no[rec_type]):
@@ -431,19 +419,7 @@ def make_transaction_form_from_post(post, txn_type, transaction):
     transaction_form.transaction = transaction
     transaction_form.txn_type = txn_type
     # The records
-    max_no = {
-        "debit": 0,
-        "credit": 0,
-    }
-    for key in post.keys():
-        m = re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
-            key)
-        if m is not None:
-            rec_type = m.group(1)
-            no = int(m.group(2))
-            if max_no[rec_type] < no:
-                max_no[rec_type] = no
+    max_no = _find_max_record_no(post)
     if max_no["debit"] == 0:
         max_no["debit"] = 1
     if max_no["credit"] == 0:
@@ -487,3 +463,29 @@ def make_transaction_form_from_status(request, txn_type, transaction):
         return
     return make_transaction_form_from_post(
         status["form"], txn_type, transaction)
+
+
+def _find_max_record_no(post):
+    """Finds the max debit and record numbers from the POSTed form.
+
+    Args:
+        post (dict[str,str]): The POSTed data.
+
+    Returns:
+        dict[str,int]: The max debit and record numbers from the POSTed form.
+
+    """
+    max_no = {
+        "debit": 0,
+        "credit": 0,
+    }
+    for key in post.keys():
+        m = re.match(
+            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
+            key)
+        if m is not None:
+            rec_type = m.group(1)
+            no = int(m.group(2))
+            if max_no[rec_type] < no:
+                max_no[rec_type] = no
+    return max_no
