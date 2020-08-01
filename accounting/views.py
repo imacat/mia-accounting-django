@@ -793,45 +793,45 @@ def search(request):
 
 @require_GET
 @login_required
-def transaction_show(request, txn_type, transaction):
+def transaction_show(request, txn_type, txn):
     """The view of an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
         txn_type (str): The transaction type.
-        transaction (Transaction): The transaction.
+        txn (Transaction): The transaction.
 
     Returns:
         HttpResponse: The response.
     """
     return render(request, F"accounting/transactions/{txn_type}/view.html", {
-        "item": transaction,
+        "item": txn,
     })
 
 
 @require_GET
 @login_required
-def transaction_edit(request, txn_type, transaction=None):
+def transaction_edit(request, txn_type, txn=None):
     """The view to edit an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
         txn_type (str): The transaction type.
-        transaction (Transaction): The transaction.
+        txn (Transaction): The transaction.
 
     Returns:
         HttpResponse: The response.
     """
-    form = make_transaction_form_from_status(request, txn_type, transaction)
+    form = make_transaction_form_from_status(request, txn_type, txn)
     if form is None:
-        exists = transaction is not None
-        if transaction is None:
-            transaction = Transaction(date=timezone.localdate())
-        if len(transaction.debit_records) == 0:
-            transaction.records.append(Record(ord=1, is_credit=False))
-        if len(transaction.credit_records) == 0:
-            transaction.records.append(Record(ord=1, is_credit=True))
-        form = make_transaction_form_from_model(transaction, exists)
+        exists = txn is not None
+        if txn is None:
+            txn = Transaction(date=timezone.localdate())
+        if len(txn.debit_records) == 0:
+            txn.records.append(Record(ord=1, is_credit=False))
+        if len(txn.credit_records) == 0:
+            txn.records.append(Record(ord=1, is_credit=True))
+        form = make_transaction_form_from_model(txn, exists)
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": form,
     })
@@ -839,13 +839,13 @@ def transaction_edit(request, txn_type, transaction=None):
 
 @require_POST
 @login_required
-def transaction_store(request, txn_type, transaction=None):
+def transaction_store(request, txn_type, txn=None):
     """The view to store an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
         txn_type (str): The transaction type.
-        transaction (Transaction): The transaction.
+        txn (Transaction): The transaction.
 
     Returns:
         HttpResponse: The response.
@@ -853,24 +853,24 @@ def transaction_store(request, txn_type, transaction=None):
     post = request.POST.dict()
     strip_form(post)
     sort_form_transaction_records(post)
-    form = make_transaction_form_from_post(post, txn_type, transaction)
+    form = make_transaction_form_from_post(post, txn_type, txn)
     if not form.is_valid():
-        if transaction is None:
+        if txn is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
         else:
             url = reverse(
-                "accounting:transactions.edit", args=(txn_type, transaction))
+                "accounting:transactions.edit", args=(txn_type, txn))
         return error_redirect(
             request,
             str(UrlBuilder(url).set("r", request.GET.get("r"))),
             post)
-    if transaction is None:
-        transaction = Transaction()
-    fill_transaction_from_post(transaction, post)
+    if txn is None:
+        txn = Transaction()
+    fill_transaction_from_post(txn, post)
     # TODO: Stores the data
     return success_redirect(
         request,
         str(UrlBuilder(reverse("accounting:transactions.show",
-                               args=(txn_type, transaction)))
+                               args=(txn_type, txn)))
             .add("r", request.GET.get("r"))),
         gettext_noop("This transaction was saved successfully."))
