@@ -33,7 +33,7 @@ def home(request):
         request (HttpRequest): The request.
 
     Returns:
-        HttpRedirectResponse: The redirect response.
+        HttpResponse: The response.
     """
     return render(request, "index.html")
 
