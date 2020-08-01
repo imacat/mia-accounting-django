@@ -22,7 +22,7 @@ import random
 
 from django.http import HttpResponseRedirect
 
-from mia_core.utils import UrlBuilder
+from .utils import UrlBuilder
 
 
 def success_redirect(request, url, success):
@@ -39,10 +39,10 @@ def success_redirect(request, url, success):
         HttpResponseRedirect: The redirect response.
     """
     id = _store(request, {"success": success})
-    return HttpResponseRedirect(str(UrlBuilder(url).add("s", id)))
+    return HttpResponseRedirect(str(UrlBuilder(url).set("s", id)))
 
 
-def error_redirect(request, url, form, errors_by_field):
+def error_redirect(request, url, form):
     """Redirects to a specific URL on error, with the status ID appended
     as the query parameter "s".  The status will be loaded with the
     retrieve_status template tag.
@@ -57,8 +57,8 @@ def error_redirect(request, url, form, errors_by_field):
     Returns:
         HttpResponseRedirect: The redirect response.
     """
-    id = _store(request, {"form": form, "errors_by_field": errors_by_field})
-    return HttpResponseRedirect(str(UrlBuilder(url).add("s", id)))
+    id = _store(request, {"form": form})
+    return HttpResponseRedirect(str(UrlBuilder(url).set("s", id)))
 
 
 def retrieve_status(request):

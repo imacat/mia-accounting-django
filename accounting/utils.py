@@ -21,13 +21,13 @@
 import re
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum, Case, When, F, Count, Max, Min
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import pgettext, gettext_noop
+from django.utils.translation import pgettext
 
-from accounting.models import Account, Transaction, Record
+from .forms import TransactionForm, RecordForm
+from .models import Account, Transaction, Record
 from mia_core.period import Period
 from mia_core.status import retrieve_status
 from mia_core.utils import new_pk
@@ -289,7 +289,7 @@ def find_order_holes(records):
              .filter(~(Q(max=F("count")) & Q(min=1)))] +\
             [x["date"] for x in Transaction.objects
              .values("date", "ord")
-             .annotate(count=Count("sn"))
+             .annotate(count=Count("pk"))
              .filter(~Q(count=1))]
     for record in records:
         record.has_order_hole = record.transaction.date in holes
@@ -313,7 +313,7 @@ def fill_transaction_from_form(transaction, form):
     }
     for key in form.keys():
         m = re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)$",
+            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
             key)
         if m is not None:
             rec_type = m.group(1)
@@ -328,8 +328,8 @@ def fill_transaction_from_form(transaction, form):
                 ord=no,
                 is_credit=(rec_type == "credit"),
                 transaction=transaction)
-            if F"{rec_type}-{no}-sn" in form:
-                record.pk = form[F"{rec_type}-{no}-sn"]
+            if F"{rec_type}-{no}-id" in form:
+                record.pk = form[F"{rec_type}-{no}-id"]
             if F"{rec_type}-{no}-account" in form:
                 record.account = Account(code=form[F"{rec_type}-{no}-account"])
             if F"{rec_type}-{no}-summary" in form:
@@ -338,22 +338,6 @@ def fill_transaction_from_form(transaction, form):
                 record.amount = form[F"{rec_type}-{no}-amount"]
             records.append(record)
     transaction.records = records
-
-
-def fill_transaction_from_previous_form(request, transaction):
-    """Fills the transaction from the previously-stored form.
-
-    Args:
-        request (HttpRequest): The request
-        transaction (Transaction): The transaction.
-    """
-    status = retrieve_status(request)
-    if status is None:
-        return
-    if "form" not in status:
-        return
-    form = status["form"]
-    fill_transaction_from_form(transaction, form)
 
 
 def sort_form_transaction_records(form):
@@ -370,7 +354,7 @@ def sort_form_transaction_records(form):
     }
     for key in form.keys():
         m = re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)",
+            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
             key)
         if m is None:
             continue
@@ -396,41 +380,122 @@ def sort_form_transaction_records(form):
             old_no = record_no[record_type][i]
             no = i + 1
             new_form[F"{record_type}-{no}-ord"] = no
-            for attr in ["sn", "account", "summary", "amount"]:
+            for attr in ["id", "account", "summary", "amount"]:
                 if F"{record_type}-{old_no}-{attr}" in form:
                     new_form[F"{record_type}-{no}-{attr}"]\
                         = form[F"{record_type}-{old_no}-{attr}"]
     # Purges the old form and fills it with the new form
     for x in [x for x in form.keys() if re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(sn|ord|account|summary|amount)",
+            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
             x)]:
         del form[x]
     for key in new_form.keys():
         form[key] = new_form[key]
 
 
-def validate_account_code(record):
-    """Validates the account code.
+def make_transaction_form_from_model(transaction, exists):
+    """Converts a transaction data model to a transaction form.
 
     Args:
-        record (Record): The accounting record.
+        transaction (Transaction): The transaction data model.
+        exists (bool): Whether the current transaction exists.
 
-    Exceptions:
-        ValidationError: Thrown when validation fails.
+    Returns:
+        TransactionForm: The transaction form.
     """
-    if record.account.code is None:
-        raise ValidationError(gettext_noop(
-            "Please select the account."))
-    if record.account.code == "":
-        raise ValidationError(gettext_noop(
-            "Please select the account."))
-    try:
-        record.account = Account.objects.get(code=record.account.code)
-    except Account.DoesNotExist:
-        raise ValidationError(gettext_noop(
-            "This account does not exist."))
-    child_account = Account.objects.filter(
-        code__startswith=record.account.code).first()
-    if child_account is not None:
-        raise ValidationError(gettext_noop(
-            "You cannot choose a parent account."))
+    transaction_form = TransactionForm(
+        {x: str(getattr(transaction, x)) for x in ["date", "notes"]
+         if getattr(transaction, x) is not None})
+    transaction_form.transaction = transaction if exists else None
+    for record in transaction.records:
+        data = {x: getattr(record, x)
+                for x in ["summary", "amount"]
+                if getattr(record, x) is not None}
+        data["id"] = record.pk
+        try:
+            data["account"] = record.account.code
+        except AttributeError:
+            pass
+        record_form = RecordForm(data)
+        record_form.transaction = transaction_form.transaction
+        record_form.is_credit = record.is_credit
+        if record.is_credit:
+            transaction_form.credit_records.append(record_form)
+        else:
+            transaction_form.debit_records.append(record_form)
+    return transaction_form
+
+
+def make_transaction_form_from_post(post, txn_type, transaction):
+    """Converts the POSTed data to a transaction form.
+
+    Args:
+        post (dict[str]): The POSTed data.
+        txn_type (str): The transaction type.
+        transaction (Transaction|None): The current transaction, or None
+            if there is no current transaction.
+
+    Returns:
+        TransactionForm: The transaction form.
+    """
+    transaction_form = TransactionForm(
+        {x: post[x] for x in ("date", "notes") if x in post})
+    transaction_form.transaction = transaction
+    transaction_form.txn_type = txn_type
+    # The records
+    max_no = {
+        "debit": 0,
+        "credit": 0,
+    }
+    for key in post.keys():
+        m = re.match(
+            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
+            key)
+        if m is not None:
+            rec_type = m.group(1)
+            no = int(m.group(2))
+            if max_no[rec_type] < no:
+                max_no[rec_type] = no
+    if max_no["debit"] == 0:
+        max_no["debit"] = 1
+    if max_no["credit"] == 0:
+        max_no["credit"] = 1
+    for rec_type in max_no.keys():
+        records = []
+        is_credit = (rec_type == "credit")
+        for i in range(max_no[rec_type]):
+            no = i + 1
+            record = RecordForm(
+                {x: post[F"{rec_type}-{no}-{x}"]
+                 for x in ["id", "account", "summary", "amount"]
+                 if F"{rec_type}-{no}-{x}" in post})
+            record.transaction = transaction_form.transaction
+            record.is_credit = is_credit
+            records.append(record)
+        if rec_type == "debit":
+            transaction_form.debit_records = records
+        else:
+            transaction_form.credit_records = records
+    return transaction_form
+
+
+def make_transaction_form_from_status(request, txn_type, transaction):
+    """Converts the previously-stored status to a transaction form.
+
+    Args:
+        request (HttpRequest): The request.
+        txn_type (str): The transaction type.
+        transaction (Transaction|None): The current transaction, or None
+            if there is no current transaction.
+
+    Returns:
+        TransactionForm: The transaction form, or None if there is no
+            previously-stored status.
+    """
+    status = retrieve_status(request)
+    if status is None:
+        return None
+    if "form" not in status:
+        return
+    return make_transaction_form_from_post(
+        status["form"], txn_type, transaction)

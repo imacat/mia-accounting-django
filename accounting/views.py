@@ -21,7 +21,6 @@
 import re
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db.models import Sum, Case, When, F, Q
 from django.db.models.functions import TruncMonth, Coalesce
 from django.shortcuts import render
@@ -40,8 +39,8 @@ from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_transaction_from_form, \
-    sort_form_transaction_records, fill_transaction_from_previous_form, \
-    validate_account_code
+    sort_form_transaction_records, make_transaction_form_from_status, \
+    make_transaction_form_from_model, make_transaction_form_from_post
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -823,15 +822,18 @@ def transaction_edit(request, txn_type, transaction=None):
     Returns:
         HttpResponse: The response.
     """
-    if transaction is None:
-        transaction = Transaction()
-    fill_transaction_from_previous_form(request, transaction)
-    if len(transaction.debit_records) == 0:
-        transaction.records.append(Record(ord=1, is_credit=False))
-    if len(transaction.credit_records) == 0:
-        transaction.records.append(Record(ord=1, is_credit=True))
+    form = make_transaction_form_from_status(request, txn_type, transaction)
+    if form is None:
+        exists = transaction is not None
+        if transaction is None:
+            transaction = Transaction(date=timezone.localdate())
+        if len(transaction.debit_records) == 0:
+            transaction.records.append(Record(ord=1, is_credit=False))
+        if len(transaction.credit_records) == 0:
+            transaction.records.append(Record(ord=1, is_credit=True))
+        form = make_transaction_form_from_model(transaction, exists)
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
-        "item": transaction,
+        "item": form,
     })
 
 
@@ -848,61 +850,24 @@ def transaction_store(request, txn_type, transaction=None):
     Returns:
         HttpResponse: The response.
     """
-    if transaction is None:
-        transaction = Transaction()
-    form = request.POST.dict()
-    strip_form(form)
-    sort_form_transaction_records(form)
-    fill_transaction_from_form(transaction, form)
-    errors = {}
-    try:
-        transaction.full_clean(exclude=["sn", "created_by", "updated_by"])
-    except ValidationError as e:
-        errors = e.message_dict
-    records = {
-        "debit": transaction.debit_records,
-        "credit": transaction.credit_records,
-    }
-    for record_type in records.keys():
-        no = 0
-        for x in records[record_type]:
-            no = no + 1
-            try:
-                x.full_clean(exclude=[
-                    "sn", "transaction", "account", "created_by", "updated_by",
-                ])
-            except ValidationError as e:
-                for key in e.message_dict:
-                    errors[F"{record_type}-{no}-{key}"] = e.message_dict[key]
-            # Validates the account
-            try:
-                validate_account_code(x)
-            except ValidationError as e:
-                errors[F"{record_type}-{no}-account"] = e.message
-            # Validates the transaction
-            if x.transaction is None:
-                x.transaction = transaction
-            if transaction.pk is None:
-                if x.transaction.pk is not None:
-                    errors[F"{record_type}-{no}-transaction"] = gettext_noop(
-                        "This record is not of the same transaction.")
-            else:
-                if x.transaction.pk is None:
-                    pass
-                elif x.transaction.pk != transaction.pk:
-                    errors[F"{record_type}-{no}-transaction"] = gettext_noop(
-                        "This record is not of the same transaction.")
-    if len(errors) > 0:
-        if transaction.pk is None:
+    post = request.POST.dict()
+    strip_form(post)
+    sort_form_transaction_records(post)
+    form = make_transaction_form_from_post(post, txn_type, transaction)
+    if not form.is_valid():
+        if transaction is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
         else:
             url = reverse(
                 "accounting:transactions.edit", args=(txn_type, transaction))
         return error_redirect(
             request,
-            str(UrlBuilder(url).add("r", request.GET.get("r"))),
-            form,
-            errors)
+            str(UrlBuilder(url).set("r", request.GET.get("r"))),
+            post)
+    if transaction is None:
+        transaction = Transaction()
+    fill_transaction_from_form(transaction, post)
+    # TODO: Stores the data
     return success_redirect(
         request,
         str(UrlBuilder(reverse("accounting:transactions.show",
