@@ -37,8 +37,8 @@ register_converter(converters.DateConverter, "date")
 app_name = "accounting"
 urlpatterns = [
     path("", require_GET(login_required(RedirectView.as_view(
-        query_string = True,
-        pattern_name = "accounting:cash.home",
+        query_string=True,
+        pattern_name="accounting:cash.home",
     ))), name="home"),
     path("cash",
          views.CashDefaultView.as_view(), name="cash.home"),

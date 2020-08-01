@@ -140,9 +140,9 @@ def get_multi_lingual_search(attr, query):
         return Q(**{attr + language.db + "__icontains": query})
     default = Language.default()
     q = (Q(**{attr + language.db + "__isnull": False})
-            & Q(**{attr + language.db + "__icontains": query}))\
-           | (Q(**{attr + language.db + "__isnull": True})
-              & Q(**{attr + default.db + "__icontains": query}))
+         & Q(**{attr + language.db + "__icontains": query}))\
+        | (Q(**{attr + language.db + "__isnull": True})
+           & Q(**{attr + default.db + "__icontains": query}))
     return q
 
 
