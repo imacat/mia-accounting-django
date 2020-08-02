@@ -73,7 +73,7 @@ First written: 2020/7/23
                   {% if x.id.value %}
                     <input type="hidden" name="debit-{{ forloop.counter }}-id" value="{{ x.id.value }}" />
                   {% endif %}
-                  <input id="debit-{{ forloop.counter }}-ord" class="debit-ord" type="hidden" name="debit-{{ forloop.counter }}-ord" value="{{ x.ord.value }}" />
+                  <input id="debit-{{ forloop.counter }}-ord" class="debit-ord" type="hidden" name="debit-{{ forloop.counter }}-ord" value="{{ forloop.counter }}" />
                   <select id="debit-{{ forloop.counter }}-account" class="form-control record-account debit-account {% if x.account.errors %} is-invalid {% endif %}" name="debit-{{ forloop.counter }}-account">
                     {% if x.account is not None %}
                       <option value="{{ x.account.value|default:"" }}" selected="selected">{{ x.account.value|default:"" }} {{ x.account_title|default:"" }}</option>
@@ -137,7 +137,7 @@ First written: 2020/7/23
                   {% if x.id.value %}
                     <input type="hidden" name="credit-{{ forloop.counter }}-id" value="{{ x.id.value }}" />
                   {% endif %}
-                  <input id="credit-{{ forloop.counter }}-ord" class="credit-ord" type="hidden" name="credit-{{ forloop.counter }}-ord" value="{{ x.ord.value }}" />
+                  <input id="credit-{{ forloop.counter }}-ord" class="credit-ord" type="hidden" name="credit-{{ forloop.counter }}-ord" value="{{ forloop.counter }}" />
                   <select id="credit-{{ forloop.counter }}-account" class="form-control record-account credit-account {% if x.account.errors %} is-invalid {% endif %}" name="credit-{{ forloop.counter }}-account">
                     {% if x.account is not None %}
                       <option value="{{ x.account.value|default:"" }}" selected="selected">{{ x.account.value|default:"" }} {{ x.account_title|default:"" }}</option>
