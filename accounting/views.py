@@ -22,8 +22,9 @@ import re
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Sum, Case, When, F, Q, Max
+from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -900,3 +901,41 @@ def txn_store(request, txn_type, txn=None):
     url = str(UrlBuilder(url).set("r", request.GET.get("r")))
     message = gettext_noop("This transaction was saved successfully.")
     return success_redirect(request, url, message)
+
+
+@require_GET
+@login_required
+def account_options(request):
+    """The view to return the account options.
+
+    Args:
+        request (HttpRequest): The request.
+
+    Returns:
+        JsonResponse: The response.
+    """
+    accounts = Account.objects\
+        .annotate(children_count=Count("child_set"))\
+        .filter(children_count=0)\
+        .annotate(record_count=Count("record"))\
+        .annotate(is_in_use=Case(
+            When(record_count__gt=0, then=True),
+            default=False,
+            output_field=BooleanField()))
+    for x in accounts:
+        x.is_for_debit = re.match("^([1235689]|7[5678])", x.code) is not None
+        x.is_for_credit = re.match("^([123489]|7[1234])", x.code) is not None
+    data = {
+        "header_in_use": pgettext("Accounting|", "---Accounts In Use---"),
+        "debit_in_use": [x.option_data for x in accounts
+                         if x.is_for_debit and x.is_in_use],
+        "credit_in_use": [x.option_data for x in accounts
+                          if x.is_for_credit and x.is_in_use],
+        "header_not_in_use": pgettext(
+            "Accounting|", "---Accounts Not In Use---"),
+        "debit_not_in_use": [x.option_data for x in accounts
+                             if x.is_for_debit and not x.is_in_use],
+        "credit_not_in_use": [x.option_data for x in accounts
+                              if x.is_for_credit and not x.is_in_use],
+    }
+    return JsonResponse(data)

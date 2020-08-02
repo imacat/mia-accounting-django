@@ -32,7 +32,7 @@ class Account(DirtyFieldsMixin, models.Model):
     sn = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True, blank=True,
-        db_column="parent_sn")
+        db_column="parent_sn", related_name="child_set")
     code = models.CharField(max_length=5, unique=True)
     title_zh_hant = models.CharField(
         max_length=32, db_column="title_zhtw")
@@ -61,6 +61,9 @@ class Account(DirtyFieldsMixin, models.Model):
         self.debit_amount = None
         self.credit_amount = None
         self.amount = None
+        self.is_for_debit = None
+        self.is_for_credit = None
+        self.is_in_use = None
 
     def __str__(self):
         """Returns the string representation of this account."""
@@ -76,6 +79,13 @@ class Account(DirtyFieldsMixin, models.Model):
     @title.setter
     def title(self, value):
         set_multi_lingual_attr(self, "title", value)
+
+    @property
+    def option_data(self):
+        return {
+            "code": self.code,
+            "title": self.title,
+        }
 
 
 class Transaction(DirtyFieldsMixin, models.Model):

@@ -95,6 +95,8 @@ urlpatterns = [
          mia_core_views.todo, name="accounts.create"),
     path("accounts/store",
          mia_core_views.todo, name="accounts.store"),
+    path("accounts/options",
+         views.account_options, name="accounts.options"),
     path("accounts/<str:account_code>",
          mia_core_views.todo, name="accounts.show"),
     path("accounts/<str:account_code>/edit",
@@ -103,6 +105,4 @@ urlpatterns = [
          mia_core_views.todo, name="accounts.update"),
     path("accounts/<str:account_code>/delete",
          mia_core_views.todo, name="accounts.delete"),
-    path("accounts/options",
-         mia_core_views.todo, name="accounts.options"),
 ]
