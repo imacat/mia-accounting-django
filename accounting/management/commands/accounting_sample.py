@@ -19,6 +19,7 @@
 
 """
 import random
+import sys
 
 from django.core.management import BaseCommand, CommandParser
 from django.db import transaction
@@ -47,8 +48,9 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
-        print("This may mess up your data.  Continue? [Y/N] ", end="")
-        if input().lower() not in ("y", "yes"):
+        if User.objects.first() is not None:
+            print("Refused to fill in sample data with existing data.",
+                  file=sys.stderr)
             return
 
         with transaction.atomic():
