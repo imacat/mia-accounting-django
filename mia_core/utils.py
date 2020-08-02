@@ -49,8 +49,10 @@ def strip_form(form):
     Args:
         form (dict[str]): The form.
     """
-    for key in form.keys():
+    for key in list(form.keys()):
         form[key] = form[key].strip()
+        if form[key] == "":
+            del form[key]
 
 
 class Language:
