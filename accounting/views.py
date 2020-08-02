@@ -858,19 +858,19 @@ def txn_store(request, txn_type, txn=None):
         if txn is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
         else:
-            url = reverse(
-                "accounting:transactions.edit", args=(txn_type, txn))
-        return error_redirect(
-            request,
-            str(UrlBuilder(url).set("r", request.GET.get("r"))),
-            post)
+            url = reverse("accounting:transactions.edit", args=(txn_type, txn))
+        url = str(UrlBuilder(url).set("r", request.GET.get("r")))
+        return error_redirect(request, url, post)
     if txn is None:
         txn = Transaction()
     fill_txn_from_post(txn, post)
+    if not txn.is_dirty():
+        url = reverse("accounting:transactions.show", args=(txn_type, txn))
+        url = str(UrlBuilder(url).set("r", request.GET.get("r")))
+        message = gettext_noop("This transaction was not modified.")
+        return success_redirect(request, url, message)
     # TODO: Stores the data
-    return success_redirect(
-        request,
-        str(UrlBuilder(reverse("accounting:transactions.show",
-                               args=(txn_type, txn)))
-            .add("r", request.GET.get("r"))),
-        gettext_noop("This transaction was saved successfully."))
+    url = reverse("accounting:transactions.show", args=(txn_type, txn))
+    url = str(UrlBuilder(url).set("r", request.GET.get("r")))
+    message = gettext_noop("This transaction was saved successfully.")
+    return success_redirect(request, url, message)
