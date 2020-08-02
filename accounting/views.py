@@ -130,18 +130,20 @@ def cash(request, account, period):
                      else Transaction(date=timezone.localdate())),
         account=account,
         summary=pgettext("Accounting|", "Total"),
-        balance=balance
     )
+    record_sum.balance = balance
     record_sum.credit_amount = sum([
         x.amount for x in records if x.is_credit])
     record_sum.debit_amount = sum([
         x.amount for x in records if not x.is_credit])
-    records.insert(0, Record(
+    record_balance_before = Record(
         transaction=Transaction(date=period.start),
         account=Account.objects.get(code="3351"),
         is_credit=balance_before >= 0,
         amount=abs(balance_before),
-        balance=balance_before))
+    )
+    record_balance_before.balance = balance_before
+    records.insert(0, record_balance_before)
     records.append(record_sum)
     pagination = Pagination(request, records, True)
     records = pagination.items
@@ -310,8 +312,8 @@ def ledger(request, account, period):
             summary=pgettext("Accounting|", "Brought Forward"),
             is_credit=balance < 0,
             amount=abs(balance),
-            balance=balance,
         )
+        record_brought_forward.balance = balance
     else:
         balance = 0
         record_brought_forward = None
