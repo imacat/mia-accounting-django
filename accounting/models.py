@@ -52,6 +52,8 @@ class Account(DirtyFieldsMixin, models.Model):
         db_column="updatedby",
         related_name="updated_accounting_accounts")
     CASH = "1111"
+    ACCUMULATED_BALANCE = "3351"
+    NET_CHANGE = "3353"
 
     def __init__(self, *args, **kwargs):
         super(Account, self).__init__(*args, **kwargs)

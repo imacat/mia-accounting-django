@@ -138,7 +138,7 @@ def cash(request, account, period):
         x.amount for x in records if not x.is_credit])
     record_balance_before = Record(
         transaction=Transaction(date=period.start),
-        account=Account.objects.get(code="3351"),
+        account=Account.objects.get(code=Account.ACCUMULATED_BALANCE),
         is_credit=balance_before >= 0,
         amount=abs(balance_before),
     )
@@ -459,14 +459,14 @@ def journal(request, period):
     if sum_debits < sum_credits:
         debit_records.append(Record(
             transaction=Transaction(date=period.start),
-            account=Account.objects.get(code="3351"),
+            account=Account.objects.get(code=Account.ACCUMULATED_BALANCE),
             is_credit=False,
             amount=sum_credits - sum_debits
         ))
     elif sum_debits > sum_credits:
         credit_records.append(Record(
             transaction=Transaction(date=period.start),
-            account=Account.objects.get(code="3351"),
+            account=Account.objects.get(code=Account.ACCUMULATED_BALANCE),
             is_credit=True,
             amount=sum_debits - sum_credits
         ))
@@ -533,7 +533,7 @@ def trial_balance(request, period):
             (Q(code__startswith="1")
              | Q(code__startswith="2")
              | Q(code__startswith="3")),
-            ~Q(code="3351"))
+            ~Q(code=Account.ACCUMULATED_BALANCE))
         .annotate(
             balance=Sum(Case(
                 When(record__is_credit=True, then=-1),
@@ -554,13 +554,14 @@ def trial_balance(request, period):
                  | Q(account__code__startswith="2")
                  | Q(account__code__startswith="3")))
             | (Q(transaction__date__lte=period.end)
-               & Q(account__code="3351"))) \
+               & Q(account__code=Account.ACCUMULATED_BALANCE))) \
         .aggregate(
             balance=Sum(Case(
                 When(is_credit=True, then=-1),
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        brought_forward = Account.objects.get(code="3351")
+        brought_forward = Account.objects.get(
+            code=Account.ACCUMULATED_BALANCE)
         if balance > 0:
             brought_forward.debit = balance
             brought_forward.credit = 0
@@ -633,7 +634,7 @@ def income_statement(request, period):
         "6": Account(title=pgettext("Accounting|", "Operating Income")),
         "7": Account(title=pgettext("Accounting|", "Before Tax Income")),
         "8": Account(title=pgettext("Accounting|", "After Tax Income")),
-        "9": Account.objects.get(code="3353"),
+        "9": Account.objects.get(code=Account.NET_CHANGE),
     }
     cumulative_total = 0
     for section in sections:
@@ -696,7 +697,7 @@ def balance_sheet(request, period):
             (Q(code__startswith="1")
              | Q(code__startswith="2")
              | Q(code__startswith="3")),
-            ~Q(code="3351"))
+            ~Q(code=Account.ACCUMULATED_BALANCE))
         .annotate(
             balance=Sum(Case(
                 When(record__is_credit=True, then=-1),
@@ -711,13 +712,14 @@ def balance_sheet(request, period):
             & ~((Q(account__code__startswith="1")
                  | Q(account__code__startswith="2")
                  | Q(account__code__startswith="3"))
-                & ~Q(account__code="3351"))) \
+                & ~Q(account__code=Account.ACCUMULATED_BALANCE))) \
         .aggregate(
             balance=Sum(Case(
                 When(is_credit=True, then=-1),
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        brought_forward = Account.objects.get(code="3351")
+        brought_forward = Account.objects.get(
+            code=Account.ACCUMULATED_BALANCE)
         brought_forward.balance = balance
         brought_forward.url = reverse(
             "accounting:income-statement", args=(period,))
@@ -729,17 +731,17 @@ def balance_sheet(request, period):
             & ~((Q(account__code__startswith="1")
                  | Q(account__code__startswith="2")
                  | Q(account__code__startswith="3"))
-                & ~Q(account__code="3351"))) \
+                & ~Q(account__code=Account.ACCUMULATED_BALANCE))) \
         .aggregate(
             balance=Sum(Case(
                 When(is_credit=True, then=-1),
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
-        net_income = Account.objects.get(code="3353")
-        net_income.balance = balance
-        net_income.url = reverse(
+        net_change = Account.objects.get(code=Account.NET_CHANGE)
+        net_change.balance = balance
+        net_change.url = reverse(
             "accounting:income-statement", args=(period,))
-        accounts.append(net_income)
+        accounts.append(net_change)
     for account in [x for x in accounts if x.code[0] in "23"]:
         account.balance = -account.balance
     groups = list(Account.objects.filter(
