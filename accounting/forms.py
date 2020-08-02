@@ -86,7 +86,9 @@ class RecordForm(forms.Form):
             ValidationError: When the validation fails.
         """
         errors = []
-        validators = [self._validate_transaction, self._validate_account_type]
+        validators = [self._validate_transaction,
+                      self._validate_account_type,
+                      self._validate_is_credit]
         for validator in validators:
             try:
                 validator()
@@ -146,6 +148,32 @@ class RecordForm(forms.Form):
                     code="not_debit")
                 self.add_error("account", error)
                 raise error
+
+    def _validate_is_credit(self):
+        """Validates whether debit and credit records are submitted correctly
+        as corresponding debit and credit records.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if "id" in self.errors:
+            return
+        if "id" not in self.data:
+            return
+        record = Record.objects.get(pk=self.data["id"])
+        if record.is_credit != self.is_credit:
+            if self.is_credit:
+                error = forms.ValidationError(
+                    pgettext("Accounting|",
+                             "This record is not a credit record."),
+                    code="not_credit")
+            else:
+                error = forms.ValidationError(
+                    pgettext("Accounting|",
+                             "This record is not a debit record."),
+                    code="not_debit")
+            self.add_error("id", error)
+            raise error
 
 
 class TransactionForm(forms.Form):
