@@ -143,6 +143,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """
         if self._records is None:
             self._records = list(self.record_set.all())
+            self._records.sort(key=lambda x: (x.is_credit, x.ord))
         return self._records
 
     @records.setter
