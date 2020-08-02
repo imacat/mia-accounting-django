@@ -51,6 +51,7 @@ class Account(DirtyFieldsMixin, models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
         db_column="updatedby",
         related_name="updated_accounting_accounts")
+    CASH = "1111"
 
     def __init__(self, *args, **kwargs):
         super(Account, self).__init__(*args, **kwargs)
@@ -225,7 +226,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """Whether this transaction is a cash income transaction."""
         debit_records = self.debit_records
         return (len(debit_records) == 1
-                and debit_records[0].account.code == "1111"
+                and debit_records[0].account.code == Account.CASH
                 and debit_records[0].summary is None)
 
     @property
@@ -233,7 +234,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """Whether this transaction is a cash expense transaction."""
         credit_records = self.credit_records
         return (len(credit_records) == 1
-                and credit_records[0].account.code == "1111"
+                and credit_records[0].account.code == Account.CASH
                 and credit_records[0].summary is None)
 
     @property

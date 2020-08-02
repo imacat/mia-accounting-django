@@ -185,7 +185,8 @@ class Populator:
                 the credit records.
         """
         amount = sum([x[2] for x in credit])
-        self.add_transfer_transaction(date, (("1111", None, amount),), credit)
+        self.add_transfer_transaction(
+            date, ((Account.CASH, None, amount),), credit)
 
     def add_expense_transaction(self, date, debit):
         """Adds a cash income transaction.
@@ -197,7 +198,8 @@ class Populator:
                 the debit records.
         """
         amount = sum([x[2] for x in debit])
-        self.add_transfer_transaction(date, debit, (("1111", None, amount),))
+        self.add_transfer_transaction(
+            date, debit, ((Account.CASH, None, amount),))
 
 
 def get_cash_accounts():
@@ -325,8 +327,7 @@ def fill_txn_from_post(txn_type, txn, post):
         else:
             record = txn.debit_records[0]
         record.ord = 1
-        # TODO: Store 1111 in the settings file
-        record.account = Account.objects.get(code="1111")
+        record.account = Account.objects.get(code=Account.CASH)
         record.summary = None
         record.amount = sum([x.amount for x in records])
         records.append(record)
