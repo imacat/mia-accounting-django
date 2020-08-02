@@ -21,8 +21,9 @@
 import re
 
 from django.conf import settings
-from django.db.models import Sum, Case, When, F, Q
-from django.db.models.functions import TruncMonth, Coalesce
+from django.db import transaction
+from django.db.models import Sum, Case, When, F, Q, Max
+from django.db.models.functions import TruncMonth, Coalesce, Now
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -35,7 +36,7 @@ from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.status import success_redirect, error_redirect
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
-    strip_form
+    strip_form, new_pk
 from .models import Record, Transaction, Account, RecordSummary
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
@@ -869,7 +870,32 @@ def txn_store(request, txn_type, txn=None):
         url = str(UrlBuilder(url).set("r", request.GET.get("r")))
         message = gettext_noop("This transaction was not modified.")
         return success_redirect(request, url, message)
-    # TODO: Stores the data
+    with transaction.atomic():
+        user = request.user
+        if txn.pk is None:
+            max_ord = Transaction.objects\
+                .filter(date=txn.date)\
+                .annotate(max=Max("ord"))\
+                .first()
+            txn.pk = new_pk(Transaction)
+            txn.ord = 1 if max_ord is None else max_ord.max + 1
+            txn.created_at = Now()
+            txn.created_by = user
+        txn.updated_at = Now()
+        txn.updated_by = user
+        txn.save()
+        existing = [x.pk for x in txn.records if x.pk is not None]
+        for record in [x for x in txn.record_set.all()
+                       if x.pk not in existing]:
+            record.delete()
+        for record in txn.records:
+            if record.pk is None:
+                record.pk = new_pk(Record)
+                record.created_at = Now()
+                record.created_by = user
+            record.updated_at = Now()
+            record.updated_by = user
+            record.save()
     url = reverse("accounting:transactions.show", args=(txn_type, txn))
     url = str(UrlBuilder(url).set("r", request.GET.get("r")))
     message = gettext_noop("This transaction was saved successfully.")
