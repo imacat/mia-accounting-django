@@ -102,6 +102,35 @@ class Transaction(DirtyFieldsMixin, models.Model):
         transaction."""
         return self.date.__str__() + " #" + self.ord.__str__()
 
+    def get_absolute_url(self):
+        """Returns the URL to view this transaction."""
+        if self.is_cash_expense:
+            return reverse(
+                "accounting:transactions.show", args=("expense", self))
+        elif self.is_cash_income:
+            return reverse(
+                "accounting:transactions.show", args=("income", self))
+        else:
+            return reverse(
+                "accounting:transactions.show", args=("transfer", self))
+
+    def is_dirty(self, **kwargs):
+        """Returns whether the data of this transaction is changed and need
+        to be saved into the database.
+
+        Returns:
+            bool: True if the data of this transaction is changed and need
+                to be saved into the database, or False otherwise.
+        """
+        if super(Transaction, self).is_dirty(**kwargs):
+            return True
+        if len([x for x in self.records if x.is_dirty(**kwargs)]) > 0:
+            return True
+        kept = [x.pk for x in self.records]
+        if len([x for x in self.record_set.all() if x.pk not in kept]) > 0:
+            return True
+        return False
+
     class Meta:
         db_table = "accounting_transactions"
 
@@ -218,35 +247,6 @@ class Transaction(DirtyFieldsMixin, models.Model):
             return "income"
         else:
             return "transfer"
-
-    def is_dirty(self, **kwargs):
-        """Returns whether the data of this transaction is changed and need
-        to be saved into the database.
-
-        Returns:
-            bool: True if the data of this transaction is changed and need
-                to be saved into the database, or False otherwise.
-        """
-        if super(Transaction, self).is_dirty(**kwargs):
-            return True
-        if len([x for x in self.records if x.is_dirty(**kwargs)]) > 0:
-            return True
-        kept = [x.pk for x in self.records]
-        if len([x for x in self.record_set.all() if x.pk not in kept]) > 0:
-            return True
-        return False
-
-    def get_absolute_url(self):
-        """Returns the URL to view this transaction."""
-        if self.is_cash_expense:
-            return reverse(
-                "accounting:transactions.show", args=("expense", self))
-        elif self.is_cash_income:
-            return reverse(
-                "accounting:transactions.show", args=("income", self))
-        else:
-            return reverse(
-                "accounting:transactions.show", args=("transfer", self))
 
 
 class Record(DirtyFieldsMixin, models.Model):
