@@ -284,14 +284,14 @@ def find_order_holes(records):
 
 
 def fill_txn_from_post(txn, post):
-    """Fills the transaction from the POSTed data.
+    """Fills the transaction from the POSTed data.  The POSTed data must be
+    validated and clean at this moment.
 
     Args:
         txn (Transaction): The transaction.
         post (dict): The POSTed data.
     """
-    if "date" in post:
-        txn.date = post["date"]
+    txn.date = post["date"]
     if "notes" in post:
         txn.notes = post["notes"]
     # The records
@@ -300,18 +300,18 @@ def fill_txn_from_post(txn, post):
     for rec_type in max_no.keys():
         for i in range(max_no[rec_type]):
             no = i + 1
-            record = Record(
-                ord=no,
-                is_credit=(rec_type == "credit"),
-                transaction=txn)
             if F"{rec_type}-{no}-id" in post:
-                record.pk = post[F"{rec_type}-{no}-id"]
-            if F"{rec_type}-{no}-account" in post:
-                record.account = Account(code=post[F"{rec_type}-{no}-account"])
+                record = Record.objects.get(pk=post[F"{rec_type}-{no}-id"])
+            else:
+                record = Record(
+                    is_credit=(rec_type == "credit"),
+                    transaction=txn)
+            record.ord = no
+            record.account = Account.objects.get(
+                code=post[F"{rec_type}-{no}-account"])
             if F"{rec_type}-{no}-summary" in post:
                 record.summary = post[F"{rec_type}-{no}-summary"]
-            if F"{rec_type}-{no}-amount" in post:
-                record.amount = post[F"{rec_type}-{no}-amount"]
+            record.amount = post[F"{rec_type}-{no}-amount"]
             records.append(record)
     txn.records = records
 
