@@ -825,14 +825,13 @@ def txn_edit(request, txn_type, txn=None):
     """
     form = make_txn_form_from_status(request, txn_type, txn)
     if form is None:
-        exists = txn is not None
         if txn is None:
             txn = Transaction(date=timezone.localdate())
         if len(txn.debit_records) == 0:
             txn.records.append(Record(ord=1, is_credit=False))
         if len(txn.credit_records) == 0:
             txn.records.append(Record(ord=1, is_credit=True))
-        form = make_txn_form_from_model(txn, exists)
+        form = make_txn_form_from_model(txn_type, txn)
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": form,
     })
@@ -864,7 +863,7 @@ def txn_store(request, txn_type, txn=None):
         return error_redirect(request, url, post)
     if txn is None:
         txn = Transaction()
-    fill_txn_from_post(txn, post)
+    fill_txn_from_post(txn_type, txn, post)
     if not txn.is_dirty():
         url = reverse("accounting:transactions.show", args=(txn_type, txn))
         url = str(UrlBuilder(url).set("r", request.GET.get("r")))

@@ -21,6 +21,7 @@
 import re
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Sum, Case, When, F, Count, Max, Min
 from django.urls import reverse
 from django.utils import timezone
@@ -283,11 +284,12 @@ def find_order_holes(records):
         record.has_order_hole = record.transaction.date in holes
 
 
-def fill_txn_from_post(txn, post):
+def fill_txn_from_post(txn_type, txn, post):
     """Fills the transaction from the POSTed data.  The POSTed data must be
     validated and clean at this moment.
 
     Args:
+        txn_type (str): The transaction type.
         txn (Transaction): The transaction.
         post (dict): The POSTed data.
     """
@@ -297,7 +299,7 @@ def fill_txn_from_post(txn, post):
     else:
         txn.notes = None
     # The records
-    max_no = _find_max_record_no(post)
+    max_no = _find_max_record_no(txn_type, post)
     records = []
     for record_type in max_no.keys():
         for i in range(max_no[record_type]):
@@ -315,8 +317,19 @@ def fill_txn_from_post(txn, post):
                 record.summary = post[F"{record_type}-{no}-summary"]
             else:
                 record.summary = None
-            record.amount = post[F"{record_type}-{no}-amount"]
+            record.amount = int(post[F"{record_type}-{no}-amount"])
             records.append(record)
+    if txn_type != "transfer":
+        if txn_type == "expense":
+            record = txn.credit_records[0]
+        else:
+            record = txn.debit_records[0]
+        record.ord = 1
+        # TODO: Store 1111 in the settings file
+        record.account = Account.objects.get(code="1111")
+        record.summary = None
+        record.amount = sum([x.amount for x in records])
+        records.append(record)
     txn.records = records
 
 
@@ -373,12 +386,12 @@ def sort_post_txn_records(post):
         post[key] = new_post[key]
 
 
-def make_txn_form_from_model(txn, exists):
+def make_txn_form_from_model(txn_type, txn):
     """Converts a transaction data model to a transaction form.
 
     Args:
+        txn_type (str): The transaction type.
         txn (Transaction): The transaction data model.
-        exists (bool): Whether the current transaction exists.
 
     Returns:
         TransactionForm: The transaction form.
@@ -386,15 +399,21 @@ def make_txn_form_from_model(txn, exists):
     form = TransactionForm(
         {x: str(getattr(txn, x)) for x in ["date", "notes"]
          if getattr(txn, x) is not None})
-    form.transaction = txn if exists else None
-    for record in txn.records:
+    form.transaction = txn if txn.pk is not None else None
+    records = []
+    if txn_type != "income":
+        records = records + txn.debit_records
+    if txn_type != "expense":
+        records = records + txn.credit_records
+    for record in records:
         data = {x: getattr(record, x)
                 for x in ["summary", "amount"]
                 if getattr(record, x) is not None}
-        data["id"] = record.pk
+        if record.pk is not None:
+            data["id"] = record.pk
         try:
             data["account"] = record.account.code
-        except AttributeError:
+        except ObjectDoesNotExist:
             pass
         record_form = RecordForm(data)
         record_form.transaction = form.transaction
@@ -423,11 +442,7 @@ def make_txn_form_from_post(post, txn_type, txn):
     form.transaction = txn
     form.txn_type = txn_type
     # The records
-    max_no = _find_max_record_no(post)
-    if max_no["debit"] == 0:
-        max_no["debit"] = 1
-    if max_no["credit"] == 0:
-        max_no["credit"] = 1
+    max_no = _find_max_record_no(txn_type, post)
     for record_type in max_no.keys():
         records = []
         is_credit = (record_type == "credit")
@@ -469,27 +484,32 @@ def make_txn_form_from_status(request, txn_type, txn):
         status["form"], txn_type, txn)
 
 
-def _find_max_record_no(post):
+def _find_max_record_no(txn_type, post):
     """Finds the max debit and record numbers from the POSTed form.
 
     Args:
+        txn_type (str): The transaction type.
         post (dict[str,str]): The POSTed data.
 
     Returns:
         dict[str,int]: The max debit and record numbers from the POSTed form.
 
     """
-    max_no = {
-        "debit": 0,
-        "credit": 0,
-    }
+    max_no = {}
+    if txn_type != "credit":
+        max_no["debit"] = 0
+    if txn_type != "debit":
+        max_no["credit"] = 0
     for key in post.keys():
         m = re.match(
             "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
             key)
-        if m is not None:
-            record_type = m.group(1)
-            no = int(m.group(2))
-            if max_no[record_type] < no:
-                max_no[record_type] = no
+        if m is None:
+            continue
+        record_type = m.group(1)
+        if record_type not in max_no:
+            continue
+        no = int(m.group(2))
+        if max_no[record_type] < no:
+            max_no[record_type] = no
     return max_no
