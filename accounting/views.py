@@ -719,7 +719,7 @@ def balance_sheet(request, period):
             code=Account.ACCUMULATED_BALANCE)
         brought_forward.amount = balance
         brought_forward.url = reverse(
-            "accounting:income-statement", args=(period,))
+            "accounting:income-statement", args=(period.period_before(),))
         accounts.append(brought_forward)
     balance = Record.objects \
         .filter(

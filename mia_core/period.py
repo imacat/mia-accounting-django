@@ -358,6 +358,24 @@ class Period:
             else self._data_end
         return dateformat.format(day, "Y-m-d")
 
+    def period_before(self):
+        """Returns the specification of the period before the current period.
+
+        Returns:
+            str|None: The specification of the period before the current
+                period, or None if there is no data before the current period.
+        """
+        if self._data_start is None:
+            return None
+        if self.start <= self._data_start:
+            return None
+        previous_day = self.start - datetime.timedelta(days=1)
+        if re.match("^[0-9]{4}$", self.spec):
+            return "-" + str(previous_day.year)
+        if re.match("^[0-9]{4}-[0-9]{2}$", self.spec):
+            return dateformat.format(previous_day, "-Y-m")
+        return dateformat.format(previous_day, "-Y-m-d")
+
     def month_picker_params(self):
         """Returns the parameters for the month-picker, as a JSON text string.
 
@@ -436,6 +454,21 @@ class Period:
                 self.description = gettext(
                     "Since %s") % self.get_month_text(year, month)
                 return
+            # Until a specific month
+            m = re.match("^-([0-9]{4})-([0-9]{2})$", spec)
+            if m is not None:
+                year = int(m.group(1))
+                month = int(m.group(2))
+                try:
+                    until_month = datetime.date(year, month, 1)
+                except ValueError:
+                    self.invalid_period()
+                    return
+                self.start = datetime.date(2000, 1, 1)
+                self.end = self.get_month_last_day(until_month)
+                self.description = gettext(
+                    "Until %s") % self.get_month_text(year, month)
+                return
             # A specific year
             m = re.match("^([0-9]{4})$", spec)
             if m is not None:
@@ -453,6 +486,25 @@ class Period:
                     self.description = gettext("Last Year")
                 else:
                     self.description = str(year)
+                return
+            # Until a specific year
+            m = re.match("^-([0-9]{4})$", spec)
+            if m is not None:
+                year = int(m.group(1))
+                try:
+                    self.end = datetime.date(year, 12, 31)
+                except ValueError:
+                    self.invalid_period()
+                    return
+                self.start = datetime.date(2000, 1, 1)
+                today = timezone.localdate()
+                if year == today.year:
+                    year_text = gettext("This Year")
+                elif year == today.year - 1:
+                    year_text = gettext("Last Year")
+                else:
+                    year_text = str(year)
+                self.description = gettext("Until %s") % year_text
                 return
             # All time
             if spec == "-":
@@ -523,6 +575,21 @@ class Period:
                 else:
                     self.spec = dateformat.format(self.start, "Y-m-d")
                     self.description = self.get_date_text(self.start)
+                return
+            # Until a specific day
+            m = re.match("^-([0-9]{4})-([0-9]{2})-([0-9]{2})$", spec)
+            if m is not None:
+                try:
+                    self.end = datetime.date(
+                        int(m.group(1)),
+                        int(m.group(2)),
+                        int(m.group(3)))
+                except ValueError:
+                    self.invalid_period()
+                    return
+                self.start = datetime.date(2000, 1, 1)
+                self.description = gettext(
+                    "Until %s") % self.get_date_text(self.end)
                 return
             # Wrong period format
             self.invalid_period()
