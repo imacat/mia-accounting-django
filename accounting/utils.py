@@ -373,7 +373,7 @@ def sort_post_txn_records(post):
         for i in range(len(record_no[record_type])):
             old_no = record_no[record_type][i]
             no = i + 1
-            new_post[F"{record_type}-{no}-ord"] = no
+            new_post[F"{record_type}-{no}-ord"] = str(no)
             for attr in ["id", "account", "summary", "amount"]:
                 if F"{record_type}-{old_no}-{attr}" in post:
                     new_post[F"{record_type}-{no}-{attr}"]\
