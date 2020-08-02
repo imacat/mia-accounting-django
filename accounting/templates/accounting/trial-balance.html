@@ -94,7 +94,7 @@ First written: 2020/7/19
           <tbody>
             {% for item in item_list %}
               <tr>
-                <td>{{ item.title }}</td>
+                <td>{{ item.title|title }}</td>
                 <td class="amount">{{ item.debit|accounting_amount }}</td>
                 <td class="amount">{{ item.credit|accounting_amount }}</td>
                 <td class="actions">
@@ -131,7 +131,7 @@ First written: 2020/7/19
           {% for item in item_list %}
             <li class="list-group-item">
               <a class="list-group-item-action d-flex justify-content-between align-items-center" href="{% url "accounting:ledger" item period %}">
-                {{ item.title }}
+                {{ item.title|title }}
                 <div>
                   {% if item.debit is not None %}
                     <span class="badge badge-success badge-pill">
