@@ -276,7 +276,7 @@ class Record(DirtyFieldsMixin, models.Model):
         super(Record, self).__init__(*args, **kwargs)
         self._debit_amount = None
         self._credit_amount = None
-        self._balance = None
+        self.balance = None
         self._is_balanced = None
         self._has_order_hole = None
         self._is_credit_card_paid = None
@@ -315,14 +315,6 @@ class Record(DirtyFieldsMixin, models.Model):
     @credit_amount.setter
     def credit_amount(self, value):
         self._credit_amount = value
-
-    @property
-    def balance(self):
-        return self._balance
-
-    @balance.setter
-    def balance(self, value):
-        self._balance = value
 
     @property
     def is_balanced(self):
