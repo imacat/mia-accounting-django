@@ -18,13 +18,13 @@
 """The data models of the Mia core application.
 
 """
-
+from dirtyfields import DirtyFieldsMixin
 from django.db import models
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 
-class Country(models.Model):
+class Country(DirtyFieldsMixin, models.Model):
     """A country."""
     sn = models.PositiveIntegerField(primary_key=True)
     code = models.CharField(max_length=2, unique=True)
@@ -62,7 +62,7 @@ class Country(models.Model):
         db_table = "countries"
 
 
-class User(models.Model):
+class User(DirtyFieldsMixin, models.Model):
     """A user."""
     sn = models.PositiveIntegerField(primary_key=True)
     login_id = models.CharField(max_length=32, unique=True, db_column="id")

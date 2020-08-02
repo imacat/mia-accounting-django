@@ -18,6 +18,7 @@
 """The data models of the accounting application.
 
 """
+from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
@@ -26,7 +27,7 @@ from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 
-class Account(models.Model):
+class Account(DirtyFieldsMixin, models.Model):
     """An account."""
     sn = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
@@ -71,7 +72,7 @@ class Account(models.Model):
         set_multi_lingual_attr(self, "title", value)
 
 
-class Transaction(models.Model):
+class Transaction(DirtyFieldsMixin, models.Model):
     """An accounting transaction."""
     sn = models.PositiveIntegerField(primary_key=True)
     date = models.DateField()
@@ -218,6 +219,23 @@ class Transaction(models.Model):
         else:
             return "transfer"
 
+    def is_dirty(self, **kwargs):
+        """Returns whether the data of this transaction is changed and need
+        to be saved into the database.
+
+        Returns:
+            bool: True if the data of this transaction is changed and need
+                to be saved into the database, or False otherwise.
+        """
+        if super(Transaction, self).is_dirty(**kwargs):
+            return True
+        if len([x for x in self.records if x.is_dirty(**kwargs)]) > 0:
+            return True
+        kept = [x.pk for x in self.records]
+        if len([x for x in self.record_set.all() if x.pk not in kept]) > 0:
+            return True
+        return False
+
     def get_absolute_url(self):
         """Returns the URL to view this transaction."""
         if self.is_cash_expense:
@@ -231,7 +249,7 @@ class Transaction(models.Model):
                 "accounting:transactions.show", args=("transfer", self))
 
 
-class Record(models.Model):
+class Record(DirtyFieldsMixin, models.Model):
     """An accounting record."""
     sn = models.PositiveIntegerField(primary_key=True)
     transaction = models.ForeignKey(
@@ -354,7 +372,7 @@ class Record(models.Model):
         self._is_existing_equipment = value
 
 
-class RecordSummary(models.Model):
+class RecordSummary(DirtyFieldsMixin, models.Model):
     """A summary record."""
     month = models.DateField(primary_key=True)
     credit = models.PositiveIntegerField()
