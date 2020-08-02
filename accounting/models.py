@@ -296,10 +296,10 @@ class Record(DirtyFieldsMixin, models.Model):
 
     @property
     def debit_amount(self):
-        """The debit amount of this accounting record"""
-        if self._debit_amount is not None:
-            return self._debit_amount
-        return self.amount if not self.is_credit else None
+        """The debit amount of this accounting record."""
+        if self._debit_amount is None:
+            self._debit_amount = self.amount if not self.is_credit else None
+        return self._debit_amount
 
     @debit_amount.setter
     def debit_amount(self, value):
@@ -307,10 +307,10 @@ class Record(DirtyFieldsMixin, models.Model):
 
     @property
     def credit_amount(self):
-        """The credit amount of this accounting record"""
-        if self._credit_amount is not None:
-            return self._credit_amount
-        return self.amount if self.is_credit else None
+        """The credit amount of this accounting record."""
+        if self._credit_amount is None:
+            self._credit_amount = self.amount if self.is_credit else None
+        return self._credit_amount
 
     @credit_amount.setter
     def credit_amount(self, value):
