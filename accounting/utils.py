@@ -299,23 +299,23 @@ def fill_txn_from_post(txn, post):
     # The records
     max_no = _find_max_record_no(post)
     records = []
-    for rec_type in max_no.keys():
-        for i in range(max_no[rec_type]):
+    for record_type in max_no.keys():
+        for i in range(max_no[record_type]):
             no = i + 1
-            if F"{rec_type}-{no}-id" in post:
-                record = Record.objects.get(pk=post[F"{rec_type}-{no}-id"])
+            if F"{record_type}-{no}-id" in post:
+                record = Record.objects.get(pk=post[F"{record_type}-{no}-id"])
             else:
                 record = Record(
-                    is_credit=(rec_type == "credit"),
+                    is_credit=(record_type == "credit"),
                     transaction=txn)
             record.ord = no
             record.account = Account.objects.get(
-                code=post[F"{rec_type}-{no}-account"])
-            if F"{rec_type}-{no}-summary" in post:
-                record.summary = post[F"{rec_type}-{no}-summary"]
+                code=post[F"{record_type}-{no}-account"])
+            if F"{record_type}-{no}-summary" in post:
+                record.summary = post[F"{record_type}-{no}-summary"]
             else:
                 record.summary = None
-            record.amount = post[F"{rec_type}-{no}-amount"]
+            record.amount = post[F"{record_type}-{no}-amount"]
             records.append(record)
     txn.records = records
 
@@ -428,19 +428,19 @@ def make_txn_form_from_post(post, txn_type, txn):
         max_no["debit"] = 1
     if max_no["credit"] == 0:
         max_no["credit"] = 1
-    for rec_type in max_no.keys():
+    for record_type in max_no.keys():
         records = []
-        is_credit = (rec_type == "credit")
-        for i in range(max_no[rec_type]):
+        is_credit = (record_type == "credit")
+        for i in range(max_no[record_type]):
             no = i + 1
             record_form = RecordForm(
-                {x: post[F"{rec_type}-{no}-{x}"]
+                {x: post[F"{record_type}-{no}-{x}"]
                  for x in ["id", "account", "summary", "amount"]
-                 if F"{rec_type}-{no}-{x}" in post})
+                 if F"{record_type}-{no}-{x}" in post})
             record_form.transaction = form.transaction
             record_form.is_credit = is_credit
             records.append(record_form)
-        if rec_type == "debit":
+        if record_type == "debit":
             form.debit_records = records
         else:
             form.credit_records = records
