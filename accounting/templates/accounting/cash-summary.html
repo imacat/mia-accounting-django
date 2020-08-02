@@ -29,8 +29,7 @@ First written: 2020/7/15
 {% block settings %}
   {% blocktrans asvar title with account=account.title|title context "Accounting|" %}Cash Summary for {{ account }}{% endblocktrans %}
   {% setvar "title" title %}
-  {% static "accounting/css/report.css" as css %}
-  {% setvar "css" css %}
+  {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
 
 {% block content %}

@@ -114,6 +114,42 @@ def url_keep_return(context, view_name, *args):
     return str(UrlBuilder(url).set("r", context.request.GET.get("r")))
 
 
+@register.simple_tag(takes_context=True)
+def add_css(context, url):
+    """Adds a local CSS file.  The file is added to the "css" template
+    list variable.
+
+    Args:
+        context (RequestContext): The request context.
+        url (str): The URL or path of the CSS file.
+
+    Returns:
+        str: An empty string
+    """
+    if "css" not in context.dicts[0]:
+        context.dicts[0]["css"] = []
+    context.dicts[0]["css"].append(url)
+    return ""
+
+
+@register.simple_tag(takes_context=True)
+def add_js(context, url):
+    """Adds a local JavaScript file.  The file is added to the "js" template
+    list variable.
+
+    Args:
+        context (RequestContext): The request context.
+        url (str): The URL or path of the JavaScript file.
+
+    Returns:
+        str: An empty string
+    """
+    if "js" not in context.dicts[0]:
+        context.dicts[0]["js"] = []
+    context.dicts[0]["js"].append(url)
+    return ""
+
+
 @register.simple_tag(takes_context=True, name="retrieve_status")
 def retrieve_status_tag(context):
     """Returns the success message from the previously-stored status.  The

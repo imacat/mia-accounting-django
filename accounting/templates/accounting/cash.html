@@ -30,8 +30,7 @@ First written: 2020/7/1
   {% blocktrans asvar title with account=account.title|title period=period.description context "Accounting|" %}Cash Account for {{ account }} in {{ period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
-  {% static "accounting/css/report.css" as css %}
-  {% setvar "css" css %}
+  {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
 
 {% block content %}
