@@ -158,7 +158,6 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """
         return [x for x in self.records if not x.is_credit]
 
-    @property
     def debit_total(self):
         """The total amount of the debit records."""
         return sum([x.amount for x in self.debit_records
@@ -173,7 +172,6 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """
         return [x for x in self.records if x.is_credit]
 
-    @property
     def credit_total(self):
         """The total amount of the credit records."""
         return sum([x.amount for x in self.credit_records
@@ -193,7 +191,6 @@ class Transaction(DirtyFieldsMixin, models.Model):
     def is_balanced(self, value):
         self._is_balanced = value
 
-    @property
     def has_many_same_day(self):
         """whether there are more than one transactions at this day,
         so that the user can sort their orders. """
