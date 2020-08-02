@@ -514,16 +514,16 @@ def trial_balance(request, period):
               | Q(code__startswith="2")
               | Q(code__startswith="3")))
         .annotate(
-            balance=Sum(Case(
+            amount=Sum(Case(
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
-        .filter(balance__isnull=False)
+        .filter(amount__isnull=False)
         .annotate(
-            debit=Case(
-                When(balance__gt=0, then=F("balance")),
+            debit_amount=Case(
+                When(amount__gt=0, then=F("amount")),
                 default=None),
-            credit=Case(
-                When(balance__lt=0, then=-F("balance")),
+            credit_amount=Case(
+                When(amount__lt=0, then=-F("amount")),
                 default=None))
         .order_by("code"))
     real = list(
@@ -535,16 +535,16 @@ def trial_balance(request, period):
              | Q(code__startswith="3")),
             ~Q(code=Account.ACCUMULATED_BALANCE))
         .annotate(
-            balance=Sum(Case(
+            amount=Sum(Case(
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
-        .filter(balance__isnull=False)
+        .filter(amount__isnull=False)
         .annotate(
-            debit=Case(
-                When(balance__gt=0, then=F("balance")),
+            debit_amount=Case(
+                When(amount__gt=0, then=F("amount")),
                 default=None),
-            credit=Case(
-                When(balance__lt=0, then=-F("balance")),
+            credit_amount=Case(
+                When(amount__lt=0, then=-F("amount")),
                 default=None))
         .order_by("code"))
     balance = Record.objects \
@@ -563,20 +563,20 @@ def trial_balance(request, period):
         brought_forward = Account.objects.get(
             code=Account.ACCUMULATED_BALANCE)
         if balance > 0:
-            brought_forward.debit = balance
-            brought_forward.credit = 0
+            brought_forward.debit_amount = balance
+            brought_forward.credit_amount = None
         else:
-            brought_forward.debit = None
-            brought_forward.credit = -balance
+            brought_forward.debit_amount = None
+            brought_forward.credit_amount = -balance
         real.append(brought_forward)
     accounts = nominal + real
     accounts.sort(key=lambda x: x.code)
     total_account = Account()
     total_account.title = pgettext("Accounting|", "Total")
-    total_account.debit = sum([x.debit for x in accounts
-                               if x.debit is not None])
-    total_account.credit = sum([x.credit for x in accounts
-                                if x.credit is not None])
+    total_account.debit_amount = sum([x.debit_amount for x in accounts
+                                      if x.debit_amount is not None])
+    total_account.credit_amount = sum([x.credit_amount for x in accounts
+                                       if x.credit_amount is not None])
     return render(request, "accounting/trial-balance.html", {
         "item_list": accounts,
         "total_item": total_account,
@@ -619,10 +619,10 @@ def income_statement(request, period):
               | Q(code__startswith="2")
               | Q(code__startswith="3")))
         .annotate(
-            balance=Sum(Case(
+            amount=Sum(Case(
                 When(record__is_credit=True, then=1),
                 default=-1) * F("record__amount")))
-        .filter(balance__isnull=False)
+        .filter(amount__isnull=False)
         .order_by("code"))
     groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
@@ -643,17 +643,14 @@ def income_statement(request, period):
         for group in section.groups:
             group.details = [x for x in accounts
                              if x.code[:2] == group.code]
-            group.balance = None
-            group.total = sum([x.balance
-                               for x in group.details])
-        section.balance = None
-        section.total = sum([x.total for x in section.groups])
-        cumulative_total = cumulative_total + section.total
+            group.amount = sum([x.amount
+                                for x in group.details])
+        section.amount = sum([x.amount for x in section.groups])
+        cumulative_total = cumulative_total + section.amount
         if section.code in cumulative_accounts:
             section.cumulative_total \
                 = cumulative_accounts[section.code]
-            section.cumulative_total.balance = None
-            section.cumulative_total.total = cumulative_total
+            section.cumulative_total.amount = cumulative_total
         else:
             section.cumulative_total = None
         section.has_next = True
@@ -699,10 +696,10 @@ def balance_sheet(request, period):
              | Q(code__startswith="3")),
             ~Q(code=Account.ACCUMULATED_BALANCE))
         .annotate(
-            balance=Sum(Case(
+            amount=Sum(Case(
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
-        .filter(balance__isnull=False)
+        .filter(amount__isnull=False)
         .order_by("code"))
     for account in accounts:
         account.url = reverse("accounting:ledger", args=(account, period))
@@ -720,7 +717,7 @@ def balance_sheet(request, period):
     if balance is not None and balance != 0:
         brought_forward = Account.objects.get(
             code=Account.ACCUMULATED_BALANCE)
-        brought_forward.balance = balance
+        brought_forward.amount = balance
         brought_forward.url = reverse(
             "accounting:income-statement", args=(period,))
         accounts.append(brought_forward)
@@ -738,12 +735,12 @@ def balance_sheet(request, period):
                 default=1) * F("amount")))["balance"]
     if balance is not None and balance != 0:
         net_change = Account.objects.get(code=Account.NET_CHANGE)
-        net_change.balance = balance
+        net_change.amount = balance
         net_change.url = reverse(
             "accounting:income-statement", args=(period,))
         accounts.append(net_change)
     for account in [x for x in accounts if x.code[0] in "23"]:
-        account.balance = -account.balance
+        account.amount = -account.amount
     groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
     sections = list(Account.objects.filter(
@@ -754,9 +751,9 @@ def balance_sheet(request, period):
         for group in section.groups:
             group.details = [x for x in accounts
                              if x.code[:2] == group.code]
-            group.balance = sum([x.balance
-                                 for x in group.details])
-        section.balance = sum([x.balance for x in section.groups])
+            group.amount = sum([x.amount
+                                for x in group.details])
+        section.amount = sum([x.amount for x in section.groups])
     by_code = {x.code: x for x in sections}
     return render(request, "accounting/balance-sheet.html", {
         "assets": by_code["1"],

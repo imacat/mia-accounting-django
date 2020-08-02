@@ -95,7 +95,7 @@ First written: 2020/7/20
             {% for item in group.details %}
               <tr>
                 <td><div class="account">{{ item.title|title }}</div></td>
-                <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
+                <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
@@ -126,7 +126,7 @@ First written: 2020/7/20
             {% for item in group.details %}
               <tr>
                 <td><div class="account">{{ item.title|title }}</div></td>
-                <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
+                <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
@@ -140,8 +140,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="amount {% if liabilities.balance < 0 %} text-danger {% endif %}">
-              {{ liabilities.balance|accounting_amount }}
+            <td class="amount {% if liabilities.amount < 0 %} text-danger {% endif %}">
+              {{ liabilities.amount|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -163,7 +163,7 @@ First written: 2020/7/20
             {% for item in group.details %}
               <tr>
                 <td><div class="account">{{ item.title|title }}</div></td>
-                <td class="amount {% if item.balance < 0 %} text-danger {% endif %}">{{ item.balance|accounting_amount }}</td>
+                <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
@@ -177,8 +177,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="amount {% if owners_equity.balance < 0 %} text-danger {% endif %}">
-              {{ owners_equity.balance|accounting_amount }}
+            <td class="amount {% if owners_equity.amount < 0 %} text-danger {% endif %}">
+              {{ owners_equity.amount|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -192,8 +192,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td class="align-middle">{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="text-right align-middle font-italic {% if assets.balance < 0 %} text-danger {% endif %}">
-              {{ assets.balance|accounting_amount }}
+            <td class="text-right align-middle font-italic {% if assets.amount < 0 %} text-danger {% endif %}">
+              {{ assets.amount|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -205,8 +205,8 @@ First written: 2020/7/20
         <tfoot>
           <tr class="total">
             <td class="align-middle">{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-            <td class="text-right align-middle font-italic {% if liabilities.balance|add:owners_equity.balance < 0 %} text-danger {% endif %}">
-              {{ liabilities.balance|add:owners_equity.balance|accounting_amount }}
+            <td class="text-right align-middle font-italic {% if liabilities.amount|add:owners_equity.amount < 0 %} text-danger {% endif %}">
+              {{ liabilities.amount|add:owners_equity.amount|accounting_amount }}
             </td>
           </tr>
         </tfoot>
@@ -236,8 +236,8 @@ First written: 2020/7/20
               <a class="list-group-item-action" href="{{ item.url }}">
                 {{ item.title|title }}
                 <div class="float-right">
-                  <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
-                    {{ item.balance|accounting_amount }}
+                  <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
+                    {{ item.amount|accounting_amount }}
                   </span>
                 </div>
               </a>
@@ -246,8 +246,8 @@ First written: 2020/7/20
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center grand-total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if assets.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ assets.balance|accounting_amount }}
+          <span class="badge {% if assets.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ assets.amount|accounting_amount }}
           </span>
         </li>
       </ul>
@@ -267,8 +267,8 @@ First written: 2020/7/20
               <a class="list-group-item-action" href="{{ item.url }}">
                 {{ item.title|title }}
                 <div class="float-right">
-                  <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
-                    {{ item.balance|accounting_amount }}
+                  <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
+                    {{ item.amount|accounting_amount }}
                   </span>
                 </div>
               </a>
@@ -277,8 +277,8 @@ First written: 2020/7/20
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if liabilities.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ liabilities.balance|accounting_amount }}
+          <span class="badge {% if liabilities.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ liabilities.amount|accounting_amount }}
           </span>
         </li>
       </ul>
@@ -297,8 +297,8 @@ First written: 2020/7/20
               <a class="list-group-item-action" href="{{ item.url }}">
                 {{ item.title|title }}
                 <div class="float-right">
-                  <span class="badge {% if item.balance < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
-                    {{ item.balance|accounting_amount }}
+                  <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
+                    {{ item.amount|accounting_amount }}
                   </span>
                 </div>
               </a>
@@ -307,8 +307,8 @@ First written: 2020/7/20
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if owners_equity.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ owners_equity.balance|accounting_amount }}
+          <span class="badge {% if owners_equity.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ owners_equity.amount|accounting_amount }}
           </span>
         </li>
       </ul>
@@ -316,8 +316,8 @@ First written: 2020/7/20
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item d-flex justify-content-between align-items-center grand-total">
           {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
-          <span class="badge {% if liabilities.balance|add:owners_equity.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-            {{ liabilities.balance|add:owners_equity.balance|accounting_amount }}
+          <span class="badge {% if liabilities.amount|add:owners_equity.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
+            {{ liabilities.amount|add:owners_equity.amount|accounting_amount }}
           </span>
         </li>
       </ul>

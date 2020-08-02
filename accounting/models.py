@@ -58,6 +58,9 @@ class Account(DirtyFieldsMixin, models.Model):
     def __init__(self, *args, **kwargs):
         super(Account, self).__init__(*args, **kwargs)
         self.url = None
+        self.debit_amount = None
+        self.credit_amount = None
+        self.amount = None
 
     def __str__(self):
         """Returns the string representation of this account."""

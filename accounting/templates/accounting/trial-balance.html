@@ -95,8 +95,8 @@ First written: 2020/7/19
             {% for item in item_list %}
               <tr>
                 <td>{{ item.title|title }}</td>
-                <td class="amount">{{ item.debit|accounting_amount }}</td>
-                <td class="amount">{{ item.credit|accounting_amount }}</td>
+                <td class="amount">{{ item.debit_amount|accounting_amount }}</td>
+                <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{% url "accounting:ledger" item period %}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
@@ -109,8 +109,8 @@ First written: 2020/7/19
           <tfoot>
             <tr>
               <td>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
-              <td class="amount">{{ total_item.debit|accounting_amount }}</td>
-              <td class="amount">{{ total_item.credit|accounting_amount }}</td>
+              <td class="amount">{{ total_item.debit_amount|accounting_amount }}</td>
+              <td class="amount">{{ total_item.credit_amount|accounting_amount }}</td>
               <td></td>
             </tr>
           </tfoot>
@@ -133,14 +133,14 @@ First written: 2020/7/19
               <a class="list-group-item-action d-flex justify-content-between align-items-center" href="{% url "accounting:ledger" item period %}">
                 {{ item.title|title }}
                 <div>
-                  {% if item.debit is not None %}
+                  {% if item.debit_amount is not None %}
                     <span class="badge badge-success badge-pill">
-                      {{ item.debit|intcomma:False }}
+                      {{ item.debit_amount|intcomma:False }}
                     </span>
                   {% endif %}
-                  {% if item.credit is not None %}
+                  {% if item.credit_amount is not None %}
                     <span class="badge badge-warning badge-pill">
-                      {{ item.credit|intcomma:False }}
+                      {{ item.credit_amount|intcomma:False }}
                     </span>
                   {% endif %}
                 </div>
@@ -151,10 +151,10 @@ First written: 2020/7/19
             {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
             <div>
               <span class="badge badge-success badge-pill">
-                {{ total_item.debit|intcomma:False }}
+                {{ total_item.debit_amount|intcomma:False }}
               </span>
               <span class="badge badge-warning badge-pill">
-                {{ total_item.credit|intcomma:False }}
+                {{ total_item.credit_amount|intcomma:False }}
               </span>
             </div>
           </li>
