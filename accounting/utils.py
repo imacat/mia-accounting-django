@@ -294,6 +294,8 @@ def fill_txn_from_post(txn, post):
     txn.date = post["date"]
     if "notes" in post:
         txn.notes = post["notes"]
+    else:
+        txn.notes = None
     # The records
     max_no = _find_max_record_no(post)
     records = []
@@ -311,6 +313,8 @@ def fill_txn_from_post(txn, post):
                 code=post[F"{rec_type}-{no}-account"])
             if F"{rec_type}-{no}-summary" in post:
                 record.summary = post[F"{rec_type}-{no}-summary"]
+            else:
+                record.summary = None
             record.amount = post[F"{rec_type}-{no}-amount"]
             records.append(record)
     txn.records = records
