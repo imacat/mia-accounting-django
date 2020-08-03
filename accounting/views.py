@@ -241,13 +241,14 @@ def cash_summary(request, account):
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
-    months.append(RecordSummary(
-        label=pgettext("Accounting|", "Total"),
+    total = RecordSummary(
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
         cumulative_balance=cumulative_balance,
-    ))
+    )
+    total.label = pgettext("Accounting|", "Total")
+    months.append(total)
     pagination = Pagination(request, months, True)
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash-summary.html", {
@@ -383,13 +384,14 @@ def ledger_summary(request, account):
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
-    months.append(RecordSummary(
-        label=pgettext("Accounting|", "Total"),
+    total = RecordSummary(
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
         cumulative_balance=cumulative_balance,
-    ))
+    )
+    total.label = pgettext("Accounting|", "Total")
+    months.append(total)
     pagination = Pagination(request, months, True)
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,
