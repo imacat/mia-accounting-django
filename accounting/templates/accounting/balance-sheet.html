@@ -27,7 +27,7 @@ First written: 2020/7/20
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with period=period.description context "Accounting|" %}Balance Sheet in {{ period }}{% endblocktrans %}
+  {% blocktrans asvar title with prep_period=period.prep_desc context "Accounting|" %}Balance Sheet {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}

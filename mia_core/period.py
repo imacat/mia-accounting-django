@@ -82,6 +82,17 @@ class Period:
         """
         return self._period.description
 
+    @property
+    def prep_desc(self):
+        """Returns the text description with preposition of the
+        currently-specified period.
+
+        Returns:
+            str: The text description with preposition of the
+                currently-specified period
+        """
+        return self._period.prep_desc
+
     @staticmethod
     def _get_last_month_start():
         """Returns the first day of the last month.
@@ -409,6 +420,7 @@ class Period:
             start (datetime.date): The start of the period.
             end (datetime.date): The end of the period.
             description (str): The text description of the period.
+            prep_desc (str): The text description with preposition.
         """
         VERY_START = datetime.date(1990, 1, 1)
 
@@ -417,6 +429,7 @@ class Period:
             self.start = None
             self.end = None
             self.description = None
+            self.prep_desc = None
 
             if spec is None:
                 self._set_this_month()
@@ -431,6 +444,7 @@ class Period:
                 self.start = datetime.date(year, month, 1)
                 self.end = self._month_last_day(self.start)
                 self.description = self._month_text(year, month)
+                self.prep_desc = gettext("In %s") % self.description
                 return
             # From a specific month
             m = re.match("^([0-9]{4})-([0-9]{2})-$", spec)
@@ -442,6 +456,7 @@ class Period:
                 self.end = self._month_last_day(timezone.localdate())
                 self.description = gettext("Since %s")\
                                    % self._month_text(year, month)
+                self.prep_desc = self.description
                 return
             # Until a specific month
             m = re.match("^-([0-9]{4})-([0-9]{2})$", spec)
@@ -454,6 +469,7 @@ class Period:
                 self.end = self._month_last_day(until_month)
                 self.description = gettext("Until %s")\
                                    % self._month_text(year, month)
+                self.prep_desc = self.description
                 return
             # A specific year
             m = re.match("^([0-9]{4})$", spec)
@@ -463,6 +479,7 @@ class Period:
                 self.start = datetime.date(year, 1, 1)
                 self.end = datetime.date(year, 12, 31)
                 self.description = self._year_text(year)
+                self.prep_desc = gettext("In %s") % self.description
                 return
             # Until a specific year
             m = re.match("^-([0-9]{4})$", spec)
@@ -473,12 +490,14 @@ class Period:
                 self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
                                    % self._year_text(year)
+                self.prep_desc = self.description
                 return
             # All time
             if spec == "-":
                 self.start = Period.Parser.VERY_START
                 self.end = self._month_last_day(timezone.localdate())
-                self.description = gettext("All")
+                self.description = gettext("All Time")
+                self.prep_desc = gettext("In %s") % self.description
                 return
             # A specific date
             m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$",
@@ -491,6 +510,7 @@ class Period:
                     int(m.group(3)))
                 self.end = self.start
                 self.description = self._date_text(self.start)
+                self.prep_desc = gettext("In %s") % self.description
                 return
             # A specific date period
             m = re.match(("^([0-9]{4})-([0-9]{2})-([0-9]{2})"
@@ -536,6 +556,7 @@ class Period:
                 else:
                     self.spec = dateformat.format(self.start, "Y-m-d")
                     self.description = self._date_text(self.start)
+                self.prep_desc = gettext("In %s") % self.description
                 return
             # Until a specific day
             m = re.match("^-([0-9]{4})-([0-9]{2})-([0-9]{2})$", spec)
@@ -548,6 +569,7 @@ class Period:
                 self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
                                    % self._date_text(self.end)
+                self.prep_desc = self.description
                 return
             # Wrong period format
             raise ValueError
