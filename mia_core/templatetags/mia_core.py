@@ -217,23 +217,3 @@ def smart_month(value):
     if value.year == year and value.month == month:
         return gettext("Last Month")
     return defaultfilters.date(value, "Y/n")
-
-
-@register.filter(name="dict")
-def dict_value(value, arg):
-    """Returns an element in a dictionary.
-
-    Args:
-        value (dict): The dictionary.
-        arg (str): The key.
-
-    Returns:
-        any: The element in this dictionary.
-    """
-    if not isinstance(value, dict):
-        return None
-    if not isinstance(arg, str):
-        return None
-    if arg not in value:
-        return None
-    return value[arg]
