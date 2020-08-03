@@ -36,8 +36,12 @@ class Period:
         spec (str): The current period specification
         data_start (datetime.date): The available first day of the data.
         data_end (datetime.date): The available last day of the data.
+
+    Raises:
+        ValueError: When the period specification is invalid.
     """
     def __init__(self, spec=None, data_start=None, data_end=None):
+        # Raises ValueError
         self._period = self.Parser(spec)
         self._data_start = data_start
         self._data_end = data_end
@@ -407,6 +411,9 @@ class Period:
         Args:
             spec (str|None): The period specification.
 
+        Raises:
+            ValueError: When the period specification is invalid.
+
         Attributes:
             spec (str): The currently-using period specification.
             start (datetime.date): The start of the period.
@@ -433,11 +440,8 @@ class Period:
             if m is not None:
                 year = int(m.group(1))
                 month = int(m.group(2))
-                try:
-                    self.start = datetime.date(year, month, 1)
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.start = datetime.date(year, month, 1)
                 self.end = self._month_last_day(self.start)
                 self.description = self._month_text(year, month)
                 return
@@ -446,11 +450,8 @@ class Period:
             if m is not None:
                 year = int(m.group(1))
                 month = int(m.group(2))
-                try:
-                    self.start = datetime.date(year, month, 1)
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.start = datetime.date(year, month, 1)
                 self.end = self._month_last_day(timezone.localdate())
                 self.description = gettext("Since %s")\
                                    % self._month_text(year, month)
@@ -460,11 +461,8 @@ class Period:
             if m is not None:
                 year = int(m.group(1))
                 month = int(m.group(2))
-                try:
-                    until_month = datetime.date(year, month, 1)
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                until_month = datetime.date(year, month, 1)
                 self.start = Period.Parser.VERY_START
                 self.end = self._month_last_day(until_month)
                 self.description = gettext("Until %s")\
@@ -474,11 +472,8 @@ class Period:
             m = re.match("^([0-9]{4})$", spec)
             if m is not None:
                 year = int(m.group(1))
-                try:
-                    self.start = datetime.date(year, 1, 1)
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.start = datetime.date(year, 1, 1)
                 self.end = datetime.date(year, 12, 31)
                 self.description = self._year_text(year)
                 return
@@ -486,11 +481,8 @@ class Period:
             m = re.match("^-([0-9]{4})$", spec)
             if m is not None:
                 year = int(m.group(1))
-                try:
-                    self.end = datetime.date(year, 12, 31)
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.end = datetime.date(year, 12, 31)
                 self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
                                    % self._year_text(year)
@@ -505,14 +497,11 @@ class Period:
             m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$",
                          spec)
             if m is not None:
-                try:
-                    self.start = datetime.date(
-                        int(m.group(1)),
-                        int(m.group(2)),
-                        int(m.group(3)))
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.start = datetime.date(
+                    int(m.group(1)),
+                    int(m.group(2)),
+                    int(m.group(3)))
                 self.end = self.start
                 self.description = self._date_text(self.start)
                 return
@@ -521,18 +510,15 @@ class Period:
                           "-([0-9]{4})-([0-9]{2})-([0-9]{2})$"),
                          spec)
             if m is not None:
-                try:
-                    self.start = datetime.date(
-                        int(m.group(1)),
-                        int(m.group(2)),
-                        int(m.group(3)))
-                    self.end = datetime.date(
-                        int(m.group(4)),
-                        int(m.group(5)),
-                        int(m.group(6)))
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.start = datetime.date(
+                    int(m.group(1)),
+                    int(m.group(2)),
+                    int(m.group(3)))
+                self.end = datetime.date(
+                    int(m.group(4)),
+                    int(m.group(5)),
+                    int(m.group(6)))
                 today = timezone.localdate()
                 # Spans several years
                 if self.start.year != self.end.year:
@@ -567,20 +553,17 @@ class Period:
             # Until a specific day
             m = re.match("^-([0-9]{4})-([0-9]{2})-([0-9]{2})$", spec)
             if m is not None:
-                try:
-                    self.end = datetime.date(
-                        int(m.group(1)),
-                        int(m.group(2)),
-                        int(m.group(3)))
-                except ValueError:
-                    self.invalid_period()
-                    return
+                # Raises ValueError
+                self.end = datetime.date(
+                    int(m.group(1)),
+                    int(m.group(2)),
+                    int(m.group(3)))
                 self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
                                    % self._date_text(self.end)
                 return
             # Wrong period format
-            self.invalid_period()
+            raise ValueError
 
         def set_this_month(self):
             """Sets the period to this month."""
@@ -589,13 +572,6 @@ class Period:
             self.start = datetime.date(today.year, today.month, 1)
             self.end = self._month_last_day(self.start)
             self.description = gettext("This Month")
-
-        def invalid_period(self):
-            """Sets the period when the period specification is
-            invalid.
-            """
-            self.error = gettext("Invalid period.")
-            self.set_this_month()
 
         @staticmethod
         def _month_last_day(day):

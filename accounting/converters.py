@@ -52,15 +52,16 @@ class PeriodConverter:
 
         Returns:
             Period: The period.
+
+        Raises:
+            ValueError: When the period specification is invalid.
         """
         first_txn = Transaction.objects.order_by("date").first()
         data_start = first_txn.date if first_txn is not None else None
         last_txn = Transaction.objects.order_by("-date").first()
         data_end = last_txn.date if last_txn is not None else None
-        period = Period(value, data_start, data_end)
-        if period.error is not None:
-            raise ValueError
-        return period
+        # Raises ValueError
+        return Period(value, data_start, data_end)
 
     def to_url(self, value):
         """Returns the specification of a period.
