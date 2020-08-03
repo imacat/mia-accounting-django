@@ -415,6 +415,8 @@ class Period:
             error (str): The period specification format error, or
                          None on success.
         """
+        VERY_START = datetime.date(1990, 1, 1)
+
         def __init__(self, spec):
             self.spec = None
             self.start = None
@@ -463,7 +465,7 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                self.start = datetime.date(2000, 1, 1)
+                self.start = Period.Parser.VERY_START
                 self.end = self._month_last_day(until_month)
                 self.description = gettext("Until %s")\
                                    % self._month_text(year, month)
@@ -489,13 +491,13 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                self.start = datetime.date(2000, 1, 1)
+                self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
                                    % self._year_text(year)
                 return
             # All time
             if spec == "-":
-                self.start = datetime.date(2000, 1, 1)
+                self.start = Period.Parser.VERY_START
                 self.end = self._month_last_day(timezone.localdate())
                 self.description = gettext("All")
                 return
@@ -573,7 +575,7 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                self.start = datetime.date(2000, 1, 1)
+                self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
                                    % self._date_text(self.end)
                 return
