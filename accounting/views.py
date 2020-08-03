@@ -863,6 +863,7 @@ def txn_store(request, txn_type, txn=None):
             url = reverse("accounting:transactions.edit", args=(txn_type, txn))
         url = str(UrlBuilder(url).set("r", request.GET.get("r")))
         return error_redirect(request, url, post)
+
     if txn is None:
         txn = Transaction()
     fill_txn_from_post(txn_type, txn, post)
@@ -871,31 +872,36 @@ def txn_store(request, txn_type, txn=None):
         url = str(UrlBuilder(url).set("r", request.GET.get("r")))
         message = gettext_noop("This transaction was not modified.")
         return success_redirect(request, url, message)
+
+    # Prepares the data
+    user = request.user
+    # TODO: Set transaction order when date changed.
+    if txn.pk is None:
+        max_ord = Transaction.objects\
+            .filter(date=txn.date)\
+            .annotate(max=Max("ord"))\
+            .first()
+        txn.pk = new_pk(Transaction)
+        txn.ord = 1 if max_ord is None else max_ord.max + 1
+        txn.created_at = Now()
+        txn.created_by = user
+    txn.updated_at = Now()
+    txn.updated_by = user
+    for record in txn.records:
+        if record.pk is None:
+            record.pk = new_pk(Record)
+            record.created_at = Now()
+            record.created_by = user
+        record.updated_at = Now()
+        record.updated_by = user
+    to_keep = [x.pk for x in txn.records if x.pk is not None]
+    to_delete = [x for x in txn.record_set.all() if x.pk not in to_keep]
+    # Runs the update
     with transaction.atomic():
-        user = request.user
-        if txn.pk is None:
-            max_ord = Transaction.objects\
-                .filter(date=txn.date)\
-                .annotate(max=Max("ord"))\
-                .first()
-            txn.pk = new_pk(Transaction)
-            txn.ord = 1 if max_ord is None else max_ord.max + 1
-            txn.created_at = Now()
-            txn.created_by = user
-        txn.updated_at = Now()
-        txn.updated_by = user
         txn.save()
-        existing = [x.pk for x in txn.records if x.pk is not None]
-        for record in [x for x in txn.record_set.all()
-                       if x.pk not in existing]:
+        for record in to_delete:
             record.delete()
         for record in txn.records:
-            if record.pk is None:
-                record.pk = new_pk(Record)
-                record.created_at = Now()
-                record.created_by = user
-            record.updated_at = Now()
-            record.updated_by = user
             record.save()
     url = reverse("accounting:transactions.show", args=(txn_type, txn))
     url = str(UrlBuilder(url).set("r", request.GET.get("r")))
