@@ -432,7 +432,7 @@ class Period:
             self.error = None
 
             if spec is None:
-                self.set_this_month()
+                self._set_this_month()
                 return
             self.spec = spec
             # A specific month
@@ -565,7 +565,7 @@ class Period:
             # Wrong period format
             raise ValueError
 
-        def set_this_month(self):
+        def _set_this_month(self):
             """Sets the period to this month."""
             today = timezone.localdate()
             self.spec = dateformat.format(today, "Y-m")
