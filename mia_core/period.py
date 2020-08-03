@@ -479,13 +479,7 @@ class Period:
                     self.invalid_period()
                     return
                 self.end = datetime.date(year, 12, 31)
-                today = timezone.localdate()
-                if year == today.year:
-                    self.description = gettext("This Year")
-                elif year == today.year - 1:
-                    self.description = gettext("Last Year")
-                else:
-                    self.description = str(year)
+                self.description = self._get_year_text(year)
                 return
             # Until a specific year
             m = re.match("^-([0-9]{4})$", spec)
@@ -497,14 +491,8 @@ class Period:
                     self.invalid_period()
                     return
                 self.start = datetime.date(2000, 1, 1)
-                today = timezone.localdate()
-                if year == today.year:
-                    year_text = gettext("This Year")
-                elif year == today.year - 1:
-                    year_text = gettext("Last Year")
-                else:
-                    year_text = str(year)
-                self.description = gettext("Until %s") % year_text
+                self.description = gettext(
+                    "Until %s") % self._get_year_text(year)
                 return
             # All time
             if spec == "-":
@@ -650,6 +638,23 @@ class Period:
             if year == prev.year and month == prev.month:
                 return gettext("Last Month")
             return "%d/%d" % (year, month)
+
+        @staticmethod
+        def _get_year_text(year):
+            """Returns the text description of a year.
+
+            Args:
+                year (int): The year.
+
+            Returns:
+                str: The description of the year.
+            """
+            this_year = timezone.localdate().year
+            if year == this_year:
+                return gettext("This Year")
+            if year == this_year - 1:
+                return gettext("Last Year")
+            return str(year)
 
         @staticmethod
         def _get_date_text(day):
