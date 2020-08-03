@@ -409,8 +409,8 @@ class Period:
 
         Attributes:
             spec (str): The currently-using period specification.
-            start (date): The start of the period.
-            end (date): The end of the period.
+            start (datetime.date): The start of the period.
+            end (datetime.date): The end of the period.
             description (str): The text description of the period.
             error (str): The period specification format error, or
                          None on success.
@@ -600,7 +600,7 @@ class Period:
             """Calculates and returns the last day of a month.
 
             Args:
-                day (date): A day in the month.
+                day (datetime.date): A day in the month.
 
             Returns:
                 date: The last day in the month
@@ -659,7 +659,7 @@ class Period:
             """Returns the text description of a day.
 
             Args:
-                day (date): The date.
+                day (datetime.date): The date.
 
             Returns:
                 str: The description of the day.
