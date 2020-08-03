@@ -437,7 +437,7 @@ class Period:
                     self.invalid_period()
                     return
                 self.end = self.get_month_last_day(self.start)
-                self.description = self.get_month_text(year, month)
+                self.description = self._get_month_text(year, month)
                 return
             # From a specific month
             m = re.match("^([0-9]{4})-([0-9]{2})-$", spec)
@@ -452,7 +452,7 @@ class Period:
                 self.end = self.get_month_last_day(
                     timezone.localdate())
                 self.description = gettext(
-                    "Since %s") % self.get_month_text(year, month)
+                    "Since %s") % self._get_month_text(year, month)
                 return
             # Until a specific month
             m = re.match("^-([0-9]{4})-([0-9]{2})$", spec)
@@ -467,7 +467,7 @@ class Period:
                 self.start = datetime.date(2000, 1, 1)
                 self.end = self.get_month_last_day(until_month)
                 self.description = gettext(
-                    "Until %s") % self.get_month_text(year, month)
+                    "Until %s") % self._get_month_text(year, month)
                 return
             # A specific year
             m = re.match("^([0-9]{4})$", spec)
@@ -526,7 +526,7 @@ class Period:
                     self.invalid_period()
                     return
                 self.end = self.start
-                self.description = self.get_date_text(self.start)
+                self.description = self._get_date_text(self.start)
                 return
             # A specific date period
             m = re.match(("^([0-9]{4})-([0-9]{2})-([0-9]{2})"
@@ -574,7 +574,7 @@ class Period:
                 # At the same day
                 else:
                     self.spec = dateformat.format(self.start, "Y-m-d")
-                    self.description = self.get_date_text(self.start)
+                    self.description = self._get_date_text(self.start)
                 return
             # Until a specific day
             m = re.match("^-([0-9]{4})-([0-9]{2})-([0-9]{2})$", spec)
@@ -589,7 +589,7 @@ class Period:
                     return
                 self.start = datetime.date(2000, 1, 1)
                 self.description = gettext(
-                    "Until %s") % self.get_date_text(self.end)
+                    "Until %s") % self._get_date_text(self.end)
                 return
             # Wrong period format
             self.invalid_period()
@@ -628,7 +628,7 @@ class Period:
                 next_year, next_month, 1) - datetime.timedelta(days=1)
 
         @staticmethod
-        def get_month_text(year, month):
+        def _get_month_text(year, month):
             """Returns the text description of a month.
 
             Args:
@@ -652,7 +652,7 @@ class Period:
             return "%d/%d" % (year, month)
 
         @staticmethod
-        def get_date_text(day):
+        def _get_date_text(day):
             """Returns the text description of a day.
 
             Args:
