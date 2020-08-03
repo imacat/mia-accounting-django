@@ -436,7 +436,7 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                self.end = self.get_month_last_day(self.start)
+                self.end = self._month_last_day(self.start)
                 self.description = self._month_text(year, month)
                 return
             # From a specific month
@@ -449,8 +449,7 @@ class Period:
                 except ValueError:
                     self.invalid_period()
                     return
-                self.end = self.get_month_last_day(
-                    timezone.localdate())
+                self.end = self._month_last_day(timezone.localdate())
                 self.description = gettext("Since %s")\
                                    % self._month_text(year, month)
                 return
@@ -465,7 +464,7 @@ class Period:
                     self.invalid_period()
                     return
                 self.start = datetime.date(2000, 1, 1)
-                self.end = self.get_month_last_day(until_month)
+                self.end = self._month_last_day(until_month)
                 self.description = gettext("Until %s")\
                                    % self._month_text(year, month)
                 return
@@ -497,8 +496,7 @@ class Period:
             # All time
             if spec == "-":
                 self.start = datetime.date(2000, 1, 1)
-                self.end = self.get_month_last_day(
-                    timezone.localdate())
+                self.end = self._month_last_day(timezone.localdate())
                 self.description = gettext("All")
                 return
             # A specific date
@@ -587,7 +585,7 @@ class Period:
             today = timezone.localdate()
             self.spec = dateformat.format(today, "Y-m")
             self.start = datetime.date(today.year, today.month, 1)
-            self.end = self.get_month_last_day(self.start)
+            self.end = self._month_last_day(self.start)
             self.description = gettext("This Month")
 
         def invalid_period(self):
@@ -598,7 +596,7 @@ class Period:
             self.set_this_month()
 
         @staticmethod
-        def get_month_last_day(day):
+        def _month_last_day(day):
             """Calculates and returns the last day of a month.
 
             Args:
