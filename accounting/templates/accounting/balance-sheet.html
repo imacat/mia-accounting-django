@@ -73,7 +73,7 @@ First written: 2020/7/20
 {# The table for large screens #}
 <div class="d-none d-lg-block report-block report-block-lg">
   <div class="row justify-content-center">
-    <h2>{{ title|escape }}</h2>
+    <h2>{{ title|title_case }}</h2>
   </div>
 
   <div class="row">
@@ -81,19 +81,19 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-table">
         <thead>
           <tr>
-            <th colspan="3" scope="col">{{ assets.title|title }}</th>
+            <th colspan="3" scope="col">{{ assets.title|title_case }}</th>
           </tr>
         </thead>
         <tbody>
           {% for group in assets.groups %}
             <tr class="group-title">
-              <td><div>{{ group.title|title }}</div></td>
+              <td><div>{{ group.title|title_case }}</div></td>
               <td class="amount"></td>
               <td class="actions"></td>
             </tr>
             {% for item in group.details %}
               <tr>
-                <td><div class="account">{{ item.title|title }}</div></td>
+                <td><div class="account">{{ item.title|title_case }}</div></td>
                 <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
@@ -112,19 +112,19 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-table">
         <thead>
           <tr>
-            <th colspan="3" scope="col">{{ liabilities.title|title }}</th>
+            <th colspan="3" scope="col">{{ liabilities.title|title_case }}</th>
           </tr>
         </thead>
         <tbody>
           {% for group in liabilities.groups %}
             <tr class="group-title">
-              <td><div>{{ group.title|title }}</div></td>
+              <td><div>{{ group.title|title_case }}</div></td>
               <td class="amount"></td>
               <td class="actions"></td>
             </tr>
             {% for item in group.details %}
               <tr>
-                <td><div class="account">{{ item.title|title }}</div></td>
+                <td><div class="account">{{ item.title|title_case }}</div></td>
                 <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
@@ -149,19 +149,19 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-table">
         <thead>
           <tr>
-            <th colspan="3" scope="col">{{ owners_equity.title|title }}</th>
+            <th colspan="3" scope="col">{{ owners_equity.title|title_case }}</th>
           </tr>
         </thead>
         <tbody>
           {% for group in owners_equity.groups %}
             <tr class="group-title">
-              <td><div>{{ group.title|title }}</div></td>
+              <td><div>{{ group.title|title_case }}</div></td>
               <td class="amount"></td>
               <td class="actions"></td>
             </tr>
             {% for item in group.details %}
               <tr>
-                <td><div class="account">{{ item.title|title }}</div></td>
+                <td><div class="account">{{ item.title|title_case }}</div></td>
                 <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
@@ -224,16 +224,16 @@ First written: 2020/7/20
     <div class="col-sm-6">
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item section-title">
-          {{ assets.title|title }}
+          {{ assets.title|title_case }}
         </li>
         {% for group in assets.groups %}
           <li class="list-group-item d-flex justify-content-between align-items-center group-title">
-            {{ group.title|title }}
+            {{ group.title|title_case }}
           </li>
           {% for item in group.details %}
             <li class="list-group-item d-flex justify-content-between align-items-center account">
               <a class="list-group-item-action" href="{{ item.url }}">
-                {{ item.title|title }}
+                {{ item.title|title_case }}
                 <div class="float-right">
                   <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
                     {{ item.amount|accounting_amount }}
@@ -255,16 +255,16 @@ First written: 2020/7/20
     <div class="col-sm-6">
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item section-title">
-          {{ liabilities.title|title }}
+          {{ liabilities.title|title_case }}
         </li>
         {% for group in liabilities.groups %}
           <li class="list-group-item d-flex justify-content-between align-items-center group-title">
-            {{ group.title|title }}
+            {{ group.title|title_case }}
           </li>
           {% for item in group.details %}
             <li class="list-group-item d-flex justify-content-between align-items-center account">
               <a class="list-group-item-action" href="{{ item.url }}">
-                {{ item.title|title }}
+                {{ item.title|title_case }}
                 <div class="float-right">
                   <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
                     {{ item.amount|accounting_amount }}
@@ -284,16 +284,16 @@ First written: 2020/7/20
 
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item section-title">
-          {{ owners_equity.title|title }}
+          {{ owners_equity.title|title_case }}
         </li>
         {% for group in owners_equity.groups %}
           <li class="list-group-item d-flex justify-content-between align-items-center group-title">
-            {{ group.title|title }}
+            {{ group.title|title_case }}
           </li>
           {% for item in group.details %}
             <li class="list-group-item d-flex justify-content-between align-items-center account">
               <a class="list-group-item-action" href="{{ item.url }}">
-                {{ item.title|title }}
+                {{ item.title|title_case }}
                 <div class="float-right">
                   <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
                     {{ item.amount|accounting_amount }}

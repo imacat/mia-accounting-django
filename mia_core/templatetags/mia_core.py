@@ -20,6 +20,7 @@
 """
 from datetime import date
 
+import titlecase
 from django import template
 from django.template import defaultfilters
 from django.urls import reverse
@@ -217,3 +218,16 @@ def smart_month(value):
     if value.year == year and value.month == month:
         return gettext("Last Month")
     return defaultfilters.date(value, "Y/n")
+
+
+@register.filter
+def title_case(value):
+    """Formats the title in a proper American-English case.
+
+    Args:
+        value (str): The title.
+
+    Returns:
+        str: The title in a proper American-English case.
+    """
+    return titlecase.titlecase(value)

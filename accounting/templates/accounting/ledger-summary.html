@@ -27,7 +27,7 @@ First written: 2020/7/16
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with account=account.title|title context "Accounting|" %}Ledger Summary for {{ account }}{% endblocktrans %}
+  {% blocktrans asvar title with account=account.title context "Accounting|" %}Ledger Summary for {{ account }}{% endblocktrans %}
   {% setvar "title" title %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
@@ -62,13 +62,13 @@ First written: 2020/7/16
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ account.title|title }}</span>
+      <span class="d-none d-md-inline">{{ account.title|title_case }}</span>
       <span class="d-md-none">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</span>
     </button>
     <div class="dropdown-menu account-picker">
       {% for x in accounts %}
         <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:ledger-summary" x %}">
-          {{ x.title|title }}
+          {{ x.title|title_case }}
         </a>
       {% endfor %}
     </div>

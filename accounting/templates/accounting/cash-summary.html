@@ -27,7 +27,7 @@ First written: 2020/7/15
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with account=account.title|title context "Accounting|" %}Cash Summary for {{ account }}{% endblocktrans %}
+  {% blocktrans asvar title with account=account.title context "Accounting|" %}Cash Summary for {{ account }}{% endblocktrans %}
   {% setvar "title" title %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
@@ -62,20 +62,20 @@ First written: 2020/7/15
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ account.title|title }}</span>
+      <span class="d-none d-md-inline">{{ account.title|title_case }}</span>
       <span class="d-md-none">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</span>
     </button>
     <div class="dropdown-menu account-picker">
       <div class="dropdown-header">{% trans "Shortcuts" context "Accounting|Account|" as text %}{{ text|force_escape }}</div>
       {% for x in shortcut_accounts %}
         <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:cash-summary" x %}">
-          {{ x.title|title }}
+          {{ x.title|title_case }}
         </a>
       {% endfor %}
       <div class="dropdown-header">{% trans "All" context "Accounting|Account|" as text %}{{ text|force_escape }}</div>
       {% for x in all_accounts %}
         <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:cash-summary" x %}">
-          {{ x.code }} {{ x.title|title }}
+          {{ x.code }} {{ x.title|title_case }}
         </a>
       {% endfor %}
     </div>

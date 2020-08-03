@@ -76,7 +76,7 @@ First written: 2020/7/19
   {# The table for large screens #}
   <div class="d-none d-sm-block report-block report-block-lg">
     <div class="row justify-content-center">
-      <h2>{{ title|force_escape }}</h2>
+      <h2>{{ title|title_case }}</h2>
     </div>
 
     <div class="row">
@@ -93,7 +93,7 @@ First written: 2020/7/19
           <tbody>
             {% for item in item_list %}
               <tr>
-                <td>{{ item.title|title }}</td>
+                <td>{{ item.title|title_case }}</td>
                 <td class="amount">{{ item.debit_amount|accounting_amount }}</td>
                 <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
                 <td class="actions">
@@ -130,7 +130,7 @@ First written: 2020/7/19
           {% for item in item_list %}
             <li class="list-group-item">
               <a class="list-group-item-action d-flex justify-content-between align-items-center" href="{% url "accounting:ledger" item period %}">
-                {{ item.title|title }}
+                {{ item.title|title_case }}
                 <div>
                   {% if item.debit_amount is not None %}
                     <span class="badge badge-success badge-pill">

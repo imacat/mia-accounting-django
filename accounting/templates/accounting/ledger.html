@@ -27,7 +27,7 @@ First written: 2020/7/16
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with account=account.title|title prep_period=period.prep_desc context "Accounting|" %}Ledger for {{ account }} {{ prep_period }}{% endblocktrans %}
+  {% blocktrans asvar title with account=account.title prep_period=period.prep_desc context "Accounting|" %}Ledger for {{ account }} {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -63,13 +63,13 @@ First written: 2020/7/16
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ account.title|title }}</span>
+      <span class="d-none d-md-inline">{{ account.title|title_case }}</span>
       <span class="d-md-none">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</span>
     </button>
     <div class="dropdown-menu account-picker">
       {% for x in accounts %}
         <a class="dropdown-item {% if x.code == account.code %} active {% endif %}" href="{% url "accounting:ledger" x period %}">
-          {{ x.code }} {{ x.title|title }}
+          {{ x.code }} {{ x.title|title_case }}
         </a>
       {% endfor %}
     </div>
@@ -103,7 +103,7 @@ First written: 2020/7/16
       {% for item in item_list %}
         <tr class="{% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} table-danger {% endif %}{% if item.is_existing_equipment %} table-info {% endif %}">
           <td>{{ item.transaction.date|smart_date }}</td>
-          <td>{{ item.account.title|title }}</td>
+          <td>{{ item.account.title|title_case }}</td>
           <td>{{ item.summary|default:"" }}{% if not item.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {% trans "Unbalanced" context "Accounting|" as text %}
@@ -148,7 +148,7 @@ First written: 2020/7/16
         {% if item.pk is not None %}
           <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}">
             <div class="date-account-line">
-              {{ item.transaction.date|smart_date }} {{ item.account.title|title }}
+              {{ item.transaction.date|smart_date }} {{ item.account.title|title_case }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div>
@@ -197,7 +197,7 @@ First written: 2020/7/16
           </a>
         {% else %}
           <div class="date-account-line">
-            {{ item.transaction.date|smart_date }} {{ item.account.title|title }}
+            {{ item.transaction.date|smart_date }} {{ item.account.title|title_case }}
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <div>

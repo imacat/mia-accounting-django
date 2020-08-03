@@ -134,7 +134,7 @@ First written: 2020/7/23
   <tbody>
     {% for x in item.credit_records %}
       <tr>
-        <td>{{ x.account.title|title }}</td>
+        <td>{{ x.account.title|title_case }}</td>
         <td>{{ x.summary|default:"" }}</td>
         <td class="amount">{{ x.amount|accounting_amount }}</td>
       </tr>
@@ -152,7 +152,7 @@ First written: 2020/7/23
   {% for x in item.credit_records %}
     <li class="list-group-item">
       <div class="d-flex justify-content-between align-items-center subject-line">
-        {{ x.account.title|title }}
+        {{ x.account.title|title_case }}
         <span class="badge badge-info">{{ x.amount|accounting_amount }}</span>
       </div>
       <div>{{ x.summary|default:"" }}</div>
