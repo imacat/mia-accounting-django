@@ -245,8 +245,8 @@ def cash_summary(request, account):
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
-        cumulative_balance=cumulative_balance,
     )
+    total.cumulative_balance = cumulative_balance
     total.label = pgettext("Accounting|", "Total")
     months.append(total)
     pagination = Pagination(request, months, True)
@@ -388,8 +388,8 @@ def ledger_summary(request, account):
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
-        cumulative_balance=cumulative_balance,
     )
+    total.cumulative_balance = cumulative_balance
     total.label = pgettext("Accounting|", "Total")
     months.append(total)
     pagination = Pagination(request, months, True)

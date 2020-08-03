@@ -388,7 +388,7 @@ class RecordSummary(DirtyFieldsMixin, models.Model):
     def __init__(self, *args, **kwargs):
         super(RecordSummary, self).__init__(*args, **kwargs)
         self._label = None
-        self._cumulative_balance = None
+        self.cumulative_balance = None
 
     class Meta:
         db_table = None
@@ -403,11 +403,3 @@ class RecordSummary(DirtyFieldsMixin, models.Model):
     @label.setter
     def label(self, value):
         self._label = value
-
-    @property
-    def cumulative_balance(self):
-        return self._cumulative_balance
-
-    @cumulative_balance.setter
-    def cumulative_balance(self, value):
-        self._cumulative_balance = value
