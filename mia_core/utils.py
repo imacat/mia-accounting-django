@@ -197,19 +197,21 @@ class UrlBuilder:
         self.params = [x for x in self.params if x.name != name]
         return self
 
-    def set(self, name, value):
-        """Sets a query parameter.  The current parameters with the
-        same name will be replaced.
-
-        Args:
-            name (str): The parameter name
-            value (str): The parameter value
-
-        Returns:
-            UrlBuilder: The URL builder itself, with the parameter
-                modified.
+    def query(self, **kwargs):
+        """A keyword-styled query parameter setter.  The existing values are
+        always replaced.  Multiple-values are added when the value is a list or
+        tuple.  The existing values are dropped when the value is None.
         """
-        return self.remove(name).add(name, value)
+        for key in kwargs:
+            self.remove(key)
+            if isinstance(kwargs[key], list) or isinstance(kwargs[key], tuple):
+                for value in kwargs[key]:
+                    self.add(key, value)
+            elif kwargs[key] is None:
+                pass
+            else:
+                self.add(key, kwargs[key])
+        return self
 
     def clone(self):
         """Returns a copy of this URL builder.

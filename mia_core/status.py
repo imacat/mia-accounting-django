@@ -38,8 +38,8 @@ def success_redirect(request, url, success):
     Returns:
         HttpResponseRedirect: The redirect response.
     """
-    id = _store(request, {"success": success})
-    return HttpResponseRedirect(str(UrlBuilder(url).set("s", id)))
+    status_id = _store(request, {"success": success})
+    return HttpResponseRedirect(str(UrlBuilder(url).query(s=status_id)))
 
 
 def error_redirect(request, url, form):
@@ -57,8 +57,8 @@ def error_redirect(request, url, form):
     Returns:
         HttpResponseRedirect: The redirect response.
     """
-    id = _store(request, {"form": form})
-    return HttpResponseRedirect(str(UrlBuilder(url).set("s", id)))
+    status_id = _store(request, {"form": form})
+    return HttpResponseRedirect(str(UrlBuilder(url).query(s=status_id)))
 
 
 def retrieve_status(request):
