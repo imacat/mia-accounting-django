@@ -38,11 +38,11 @@ from mia_core.period import Period
 from mia_core.status import success_redirect, error_redirect
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk
-from .models import Record, Transaction, Account, RecordSummary
+from .models import Record, Transaction, Account
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
     sort_post_txn_records, make_txn_form_from_status, \
-    make_txn_form_from_model, make_txn_form_from_post
+    make_txn_form_from_model, make_txn_form_from_post, MonthlySummary
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -194,7 +194,7 @@ def cash_summary(request, account):
     accounts = get_cash_accounts()
     # The month summaries
     if account.code == "0":
-        months = [RecordSummary(**x) for x in Record.objects
+        months = [MonthlySummary(**x) for x in Record.objects
                   .filter(
                     Q(transaction__in=Transaction.objects.filter(
                         Q(record__account__code__startswith="11") |
@@ -219,7 +219,7 @@ def cash_summary(request, account):
                         When(is_credit=False, then=-F("amount")),
                         default=F("amount"))))]
     else:
-        months = [RecordSummary(**x) for x in Record.objects
+        months = [MonthlySummary(**x) for x in Record.objects
                   .filter(
                     Q(transaction__in=Transaction.objects.filter(
                         record__account__code__startswith=account.code)),
@@ -241,14 +241,13 @@ def cash_summary(request, account):
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
-    total = RecordSummary(
+    months.append(MonthlySummary(
+        label=pgettext("Accounting|", "Total"),
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
-    )
-    total.cumulative_balance = cumulative_balance
-    total.label = pgettext("Accounting|", "Total")
-    months.append(total)
+        cumulative_balance=cumulative_balance,
+    ))
     pagination = Pagination(request, months, True)
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash-summary.html", {
@@ -365,7 +364,7 @@ def ledger_summary(request, account):
         HttpResponse: The response.
     """
     # The month summaries
-    months = [RecordSummary(**x) for x in Record.objects
+    months = [MonthlySummary(**x) for x in Record.objects
               .filter(account__code__startswith=account.code)
               .annotate(month=TruncMonth("transaction__date"))
               .values("month")
@@ -384,14 +383,13 @@ def ledger_summary(request, account):
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
-    total = RecordSummary(
+    months.append(MonthlySummary(
+        label=pgettext("Accounting|", "Total"),
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
-    )
-    total.cumulative_balance = cumulative_balance
-    total.label = pgettext("Accounting|", "Total")
-    months.append(total)
+        cumulative_balance=cumulative_balance,
+    ))
     pagination = Pagination(request, months, True)
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,

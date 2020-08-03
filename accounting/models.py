@@ -23,7 +23,6 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
-from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 
@@ -376,30 +375,3 @@ class Record(DirtyFieldsMixin, models.Model):
     @is_existing_equipment.setter
     def is_existing_equipment(self, value):
         self._is_existing_equipment = value
-
-
-class RecordSummary(DirtyFieldsMixin, models.Model):
-    """A summary record."""
-    month = models.DateField(primary_key=True)
-    credit = models.PositiveIntegerField()
-    debit = models.PositiveIntegerField()
-    balance = models.IntegerField()
-
-    def __init__(self, *args, **kwargs):
-        super(RecordSummary, self).__init__(*args, **kwargs)
-        self._label = None
-        self.cumulative_balance = None
-
-    class Meta:
-        db_table = None
-        managed = False
-
-    @property
-    def label(self):
-        if self._label is None:
-            self._label = smart_month(self.month)
-        return self._label
-
-    @label.setter
-    def label(self, value):
-        self._label = value

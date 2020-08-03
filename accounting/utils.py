@@ -29,9 +29,42 @@ from django.utils.translation import pgettext
 
 from .forms import TransactionForm, RecordForm
 from .models import Account, Transaction, Record
+from mia_core.templatetags.mia_core import smart_month
 from mia_core.period import Period
 from mia_core.status import retrieve_status
 from mia_core.utils import new_pk
+
+
+class MonthlySummary:
+    """A summary record.
+
+    Args:
+        month (datetime.date): The month.
+        label (str): The text label.
+        credit (int): The credit amount.
+        debit (int): The debit amount.
+        balance (int): The balance.
+        cumulative_balance (int): The cumulative balance.
+
+    Attributes:
+        month (datetime.date): The month.
+        label (str): The text label.
+        credit (int): The credit amount.
+        debit (int): The debit amount.
+        balance (int): The balance.
+        cumulative_balance (int): The cumulative balance.
+    """
+
+    def __init__(self, month=None, label=None, credit=None, debit=None,
+                 balance=None, cumulative_balance=None):
+        self.month = month
+        self.label = label
+        self.credit = credit
+        self.debit = debit
+        self.balance = balance
+        self.cumulative_balance = cumulative_balance
+        if self.label is None and self.month is not None:
+            self.label = smart_month(self.month)
 
 
 class ReportUrl:
