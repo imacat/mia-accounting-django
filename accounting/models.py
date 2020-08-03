@@ -28,10 +28,10 @@ from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 class Account(DirtyFieldsMixin, models.Model):
     """An account."""
-    sn = models.PositiveIntegerField(primary_key=True)
+    id = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True, blank=True,
-        db_column="parent_sn", related_name="child_set")
+        related_name="child_set")
     code = models.CharField(max_length=5, unique=True)
     title_zh_hant = models.CharField(
         max_length=32, db_column="title_zhtw")
@@ -89,7 +89,7 @@ class Account(DirtyFieldsMixin, models.Model):
 
 class Transaction(DirtyFieldsMixin, models.Model):
     """An accounting transaction."""
-    sn = models.PositiveIntegerField(primary_key=True)
+    id = models.PositiveIntegerField(primary_key=True)
     date = models.DateField()
     ord = models.PositiveSmallIntegerField(default=1)
     notes = models.CharField(max_length=128, null=True, blank=True)
@@ -264,14 +264,13 @@ class Transaction(DirtyFieldsMixin, models.Model):
 
 class Record(DirtyFieldsMixin, models.Model):
     """An accounting record."""
-    sn = models.PositiveIntegerField(primary_key=True)
+    id = models.PositiveIntegerField(primary_key=True)
     transaction = models.ForeignKey(
-        Transaction, on_delete=models.CASCADE,
-        db_column="transaction_sn")
+        Transaction, on_delete=models.CASCADE)
     is_credit = models.BooleanField()
     ord = models.PositiveSmallIntegerField()
     account = models.ForeignKey(
-        Account, on_delete=models.PROTECT, db_column="account_sn")
+        Account, on_delete=models.PROTECT)
     summary = models.CharField(max_length=128, blank=True, null=True)
     amount = models.PositiveIntegerField()
     created_at = models.DateTimeField(
