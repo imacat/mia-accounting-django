@@ -82,16 +82,6 @@ class Period:
         """
         return self._period.description
 
-    @property
-    def error(self):
-        """Returns the error of the period specification format.
-
-        Returns:
-            str|None: The error of the period specification format, or None on
-                success.
-        """
-        return self._period.error
-
     @staticmethod
     def _get_last_month_start():
         """Returns the first day of the last month.
@@ -419,8 +409,6 @@ class Period:
             start (datetime.date): The start of the period.
             end (datetime.date): The end of the period.
             description (str): The text description of the period.
-            error (str): The period specification format error, or
-                         None on success.
         """
         VERY_START = datetime.date(1990, 1, 1)
 
@@ -429,7 +417,6 @@ class Period:
             self.start = None
             self.end = None
             self.description = None
-            self.error = None
 
             if spec is None:
                 self._set_this_month()
