@@ -85,24 +85,33 @@ urlpatterns = [
          views.txn_edit, name="transactions.edit"),
     path("transactions/<txn-type:txn_type>/<txn:txn>/update",
          views.txn_store, name="transactions.update"),
+    # TODO: To be done
     path("transactions/<txn:txn>/delete",
          mia_core_views.todo, name="transactions.delete"),
+    # TODO: To be done
     path("transactions/sort/<date:date>",
          mia_core_views.todo, name="transactions.sort"),
+    # TODO: To be done
     path("accounts",
          mia_core_views.todo, name="accounts"),
+    # TODO: To be done
     path("accounts/create",
          mia_core_views.todo, name="accounts.create"),
+    # TODO: To be done
     path("accounts/store",
          mia_core_views.todo, name="accounts.store"),
     path("accounts/options",
          views.account_options, name="accounts.options"),
+    # TODO: To be done
     path("accounts/<str:account_code>",
          mia_core_views.todo, name="accounts.show"),
+    # TODO: To be done
     path("accounts/<str:account_code>/edit",
          mia_core_views.todo, name="accounts.edit"),
+    # TODO: To be done
     path("accounts/<str:account_code>/update",
          mia_core_views.todo, name="accounts.update"),
+    # TODO: To be done
     path("accounts/<str:account_code>/delete",
          mia_core_views.todo, name="accounts.delete"),
 ]
