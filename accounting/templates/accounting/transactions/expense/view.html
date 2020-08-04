@@ -152,7 +152,7 @@ First written: 2020/7/23
 <ul class="list-group d-sm-none">
   {% for x in item.debit_records %}
     <li class="list-group-item">
-      <div class="d-flex justify-content-between align-items-center subject-line">
+      <div class="d-flex justify-content-between align-items-center account-line">
         {{ x.account.title|title_case }}
         <span class="badge badge-info">{{ x.amount|accounting_amount }}</span>
       </div>
@@ -160,7 +160,7 @@ First written: 2020/7/23
     </li>
   {% endfor %}
   <li class="list-group-item">
-    <div class="d-flex justify-content-between align-items-center subject-line">
+    <div class="d-flex justify-content-between align-items-center account-line">
       {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
       <span class="badge badge-info">{{ item.debit_total|accounting_amount }}</span>
     </div>
