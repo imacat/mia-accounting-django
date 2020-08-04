@@ -44,9 +44,7 @@ First written: 2020/7/23
   {# TODO: To be done #}
   <input id="l10n-messages" type="hidden" value="{{ l10n_messages }}" />
   <input id="account-option-url" type="hidden" value="{% url "accounting:accounts.options" %}" />
-  <input id="credit-general-categories" type="hidden" value="{{ credit_general_categories }}" />
-  <input id="credit-travel-categories" type="hidden" value="{{ credit_travel_categories }}" />
-  <input id="credit-bus-categories" type="hidden" value="{{ credit_bus_categories }}" />
+  <input id="summary-categories" type="hidden" value="{{ summary_categories }}" />
   <div class="row form-group">
     <div class="col-sm-2">
       <label for="txn-date">{% trans "Date:" context "Accounting|" as text %}{{ text|force_escape }}</label>

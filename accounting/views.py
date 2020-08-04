@@ -42,7 +42,8 @@ from .models import Record, Transaction, Account
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
     sort_post_txn_records, make_txn_form_from_status, \
-    make_txn_form_from_model, make_txn_form_from_post, MonthlySummary
+    make_txn_form_from_model, make_txn_form_from_post, MonthlySummary, \
+    get_summary_categories
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -836,6 +837,7 @@ def txn_edit(request, txn_type, txn=None):
         form = make_txn_form_from_model(txn_type, txn)
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": form,
+        "summary_categories": get_summary_categories,
     })
 
 

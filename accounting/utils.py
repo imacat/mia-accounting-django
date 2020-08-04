@@ -18,11 +18,14 @@
 """The utilities of the accounting application.
 
 """
+import json
 import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, Sum, Case, When, F, Count, Max, Min
+from django.db.models import Q, Sum, Case, When, F, Count, Max, Min, Value, \
+    CharField
+from django.db.models.functions import StrIndex, Left
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import pgettext
@@ -317,6 +320,52 @@ def find_order_holes(records):
              .filter(~Q(count=1))]
     for record in records:
         record.has_order_hole = record.transaction.date in holes
+
+
+def get_summary_categories():
+    """Finds and returns the summary categories and their corresponding account
+    hints.
+
+    Returns:
+        dict[str,str]: The summary categories and their account hints, by
+            their record types and category types.
+    """
+    filters = {
+        "general": Q(summary__contains="—") & ~Q(summary__regex=".+—.+→.+"),
+        "travel": Q(summary__regex=".+—.+→.+")
+                  & ~Q(summary__regex=".+—.+—.+→.+"),
+        "bus": Q(summary__regex=".+—.+—.+→.+"),
+    }
+    categories = {
+        "credit": {},
+        "debit": {},
+    }
+    for cat_type in filters:
+        rows = Record.objects\
+            .filter(
+                ~Q(account__code__startswith="114"),
+                ~Q(account__code__startswith="214"),
+                ~Q(account__code__startswith="128"),
+                ~Q(account__code__startswith="228"),
+                filters[cat_type])\
+            .annotate(category=Left("summary",
+                                    StrIndex("summary", Value("—")) - 1,
+                                    output_field=CharField()))\
+            .values("category", "account__code", "is_credit")\
+            .annotate(count=Count("category"))\
+            .order_by("category", "is_credit", "-count", "account__code")
+        for row in rows:
+            rec_type = "credit" if row["is_credit"] else "debit"
+            if cat_type not in categories[rec_type]:
+                categories[rec_type][cat_type] = {}
+            if row["category"] not in categories[rec_type][cat_type]:
+                categories[rec_type][cat_type][row["category"]]\
+                    = row["account__code"]
+    return {F"{r}-{t}": json.dumps(
+                [{"category": c, "account": categories[r][t][c]}
+                 for c in categories[r][t]])
+               for r in categories
+               for t in categories[r]}
 
 
 def fill_txn_from_post(txn_type, txn, post):
