@@ -868,6 +868,8 @@ def txn_store(request, txn_type, txn=None):
 
     if txn is None:
         txn = Transaction()
+    old_date = txn.date
+    old_ord = txn.ord
     fill_txn_from_post(txn_type, txn, post)
     if not txn.is_dirty():
         url = reverse("accounting:transactions.show", args=(txn_type, txn))
@@ -877,16 +879,20 @@ def txn_store(request, txn_type, txn=None):
 
     # Prepares the data
     user = request.user
-    # TODO: Set transaction order when date changed.
     if txn.pk is None:
-        max_ord = Transaction.objects\
-            .filter(date=txn.date)\
-            .annotate(max=Max("ord"))\
-            .first()
         txn.pk = new_pk(Transaction)
-        txn.ord = 1 if max_ord is None else max_ord.max + 1
         txn.created_at = Now()
         txn.created_by = user
+    txn_to_sort = []
+    if txn.date != old_date:
+        if old_date is not None:
+            txn_to_sort = Transaction.objects\
+                .filter(date=old_date, ord__gt=old_ord)\
+                .order_by("ord")
+        max_ord = Transaction.objects\
+            .filter(date=txn.date)\
+            .aggregate(max=Max("ord"))["max"]
+        txn.ord = 1 if max_ord is None else max_ord + 1
     txn.updated_at = Now()
     txn.updated_by = user
     for record in txn.records:
@@ -896,6 +902,8 @@ def txn_store(request, txn_type, txn=None):
             record.created_by = user
         record.updated_at = Now()
         record.updated_by = user
+    for x in txn_to_sort:
+        x.ord = x.ord - 1
     to_keep = [x.pk for x in txn.records if x.pk is not None]
     to_delete = [x for x in txn.record_set.all() if x.pk not in to_keep]
     # Runs the update
@@ -905,6 +913,8 @@ def txn_store(request, txn_type, txn=None):
             record.delete()
         for record in txn.records:
             record.save()
+        for x in txn_to_sort:
+            x.save()
     url = reverse("accounting:transactions.show", args=(txn_type, txn))
     url = str(UrlBuilder(url).query(r=request.GET.get("r")))
     message = gettext_noop("This transaction was saved successfully.")
