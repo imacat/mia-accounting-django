@@ -158,9 +158,17 @@ class Command(BaseCommand):
                 ((6273, "電影—復仇者聯盟", 80),),
                 ((2141, "電影—復仇者聯盟", 80),))
             p.add_transfer_transaction(
+                -13,
+                ((6273, "電影—2001太空漫遊", 80),),
+                ((2141, "電影—2001太空漫遊", 80),))
+            p.add_transfer_transaction(
                 -11,
                 ((2141, "電影—復仇者聯盟", 80),),
                 ((1113, "電影—復仇者聯盟", 80),))
+
+            p.add_expense_transaction(
+                -13,
+                ((6273, "公車—262—民生社區→頂溪捷運站", 30),))
 
             p.add_expense_transaction(
                 -2,
