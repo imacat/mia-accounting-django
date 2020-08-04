@@ -1,0 +1,164 @@
+{% comment %}
+The Mia Accounting Application
+summary-helper.html: The view of the summary-helper dialog
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/4/3
+{% endcomment %}
+{% load i18n %}
+
+<!-- the summary helper dialog -->
+<!-- The Modal -->
+<form id="summary-helper-form" action="" method="get">
+  <input id="summary-record" type="hidden" value="" />
+  <div class="modal" id="summary-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">
+            <label for="summary-summary">
+              <i class="fas fa-edit"></i>
+              {% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}
+            </label>
+          </h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="summary-container">
+            <input id="summary-summary" class="form-control" value="" />
+          </div>
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <span id="summary-tab-category" class="summary-tab nav-link active">{% trans "General" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+            </li>
+            <li class="nav-item">
+              <span id="summary-tab-travel" class="summary-tab nav-link">{% trans "Travel" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+            </li>
+            <li class="nav-item">
+              <span id="summary-tab-bus" class="summary-tab nav-link">{% trans "Bus" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+            </li>
+            <li class="nav-item">
+              <span id="summary-tab-regular" class="summary-tab nav-link">{% trans "Regular" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+            </li>
+            <li class="nav-item">
+              <span id="summary-tab-count" class="summary-tab nav-link">{% trans "Count" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+            </li>
+          </ul>
+
+          <!-- A general category -->
+          <div id="summary-tab-content-category" class="summary-tab-content">
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-general-category">{% trans "Category:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-general-category" class="form-control summary-helper-input" type="text" value="" />
+                <div id="summary-general-categories-known" class="summary-categories-known"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- A general travel route -->
+          <div id="summary-tab-content-travel" class="summary-tab-content d-none">
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-travel-category">{% trans "Category:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-travel-category" class="form-control summary-helper-input summary-travel-part" type="text" value="" />
+                <div id="summary-travel-categories-known" class="summary-categories-known"></div>
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-travel-from">{% trans "From:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-travel-from" class="form-control summary-helper-input summary-travel-part" type="text" value="" />
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-travel-direction">{% trans "Direction:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-travel-direction" class="summary-helper-input" type="hidden" value="" />
+                <span id="btn-summary-one-way" class="btn btn-outline-primary btn-summary-helper btn-summary-travel-direction"><%="→"%></span>
+                <span class="btn btn-outline-primary btn-summary-helper btn-summary-travel-direction"><%="↔"%></span>
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-travel-to">{% trans "To:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-travel-to" class="form-control summary-helper-input summary-travel-part" type="text" value="" />
+              </div>
+            </div>
+          </div>
+
+          <!-- A bus route -->
+          <div id="summary-tab-content-bus" class="summary-tab-content d-none">
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-bus-category">{% trans "Category:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-bus-category" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
+                <div id="summary-bus-categories-known" class="summary-categories-known"></div>
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-bus-route">{% trans "Route:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-bus-route" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-bus-from">{% trans "From:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-bus-from" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
+              </div>
+            </div>
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-bus-to">{% trans "To:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-bus-to" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Regular payments -->
+          <div id="summary-tab-content-regular" class="summary-tab-content d-none">
+            <div class="row">
+              <div class="col-sm-12">
+                <div id="summary-regular-payments" class="summary-categories-known"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="summary-tab-content-count" class="summary-tab-content d-none">
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="summary-count">{% trans "Count:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <div class="col-sm-10">
+                <input id="summary-count" class="form-control summary-helper-input" type="number" min="1" value="" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button id="summary-confirm" class="btn btn-danger" type="submit" data-dismiss="modal">{{ _("Confirm") }}</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _("Cancel") }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,5 +1,5 @@
 /* The Mia Website
- * transaction.css: The style sheet for the current transaction
+ * summary-helper.css: The style sheet for the summary helper
  */
 
 /*  Copyright (c) 2019-2020 imacat.
@@ -18,19 +18,19 @@
  */
 
 /* Author: imacat@mail.imacat.idv.tw (imacat)
- * First written: 2019/9/17
+ * First written: 2020/4/3
  */
 
-.account-line {
-    font-size: 0.833em;
+.summary-container {
+    padding: 0 0 1em 0;
 }
-.amount {
-    font-style: italic;
-    text-align: right;
+.summary-tab-content {
+    padding-top: 1em;
 }
-#txn-form .amount {
-    font-style: italic;
+.summary-categories-known {
+    max-height: 200px;
+    overflow-y: scroll;
 }
-.balance-row {
-    border-color: transparent;
+.summary-categories-known .btn-summary-helper {
+    margin: 0.1em;
 }

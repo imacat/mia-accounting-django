@@ -28,9 +28,17 @@ First written: 2020/7/23
 {% block settings %}
   {% trans "Cash Expense Transaction" context "Accounting|" as title %}
   {% setvar "title" title %}
+  {% setvar "use_jqueryui" True %}
+  {% static "accounting/css/transactions.css" as file %}{% add_css file %}
+  {% static "accounting/css/summary-helper.css" as file %}{% add_css file %}
+  {% static "accounting/js/transaction-form.js" as file %}{% add_js file %}
+  {% static "accounting/js/regular-payments.js" as file %}{% add_js file %}
+  {% static "accounting/js/summary-helper.js" as file %}{% add_js file %}
 {% endblock %}
 
 {% block content %}
+
+{% include "accounting/include/summary-helper.html" %}
 
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{% if item.transaction %}{% url_keep_return "accounting:transactions.show" "expense" item.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">

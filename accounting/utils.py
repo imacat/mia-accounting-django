@@ -18,6 +18,7 @@
 """The utilities of the accounting application.
 
 """
+import datetime
 import json
 import re
 
@@ -374,7 +375,11 @@ def fill_txn_from_post(txn_type, txn, post):
         txn (Transaction): The transaction.
         post (dict): The POSTed data.
     """
-    txn.date = post["date"]
+    m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", post["date"])
+    txn.date = datetime.date(
+        int(m.group(1)),
+        int(m.group(2)),
+        int(m.group(3)))
     if "notes" in post:
         txn.notes = post["notes"]
     else:
