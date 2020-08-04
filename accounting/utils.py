@@ -330,42 +330,39 @@ def get_summary_categories():
         dict[str,str]: The summary categories and their account hints, by
             their record types and category types.
     """
-    filters = {
-        "general": Q(summary__contains="—") & ~Q(summary__regex=".+—.+→.+"),
-        "travel": Q(summary__regex=".+—.+→.+")
-                  & ~Q(summary__regex=".+—.+—.+→.+"),
-        "bus": Q(summary__regex=".+—.+—.+→.+"),
-    }
-    categories = {
-        "credit": {},
-        "debit": {},
-    }
-    for cat_type in filters:
-        rows = Record.objects\
-            .filter(
+    rows = Record.objects\
+        .filter(Q(summary__contains="—"),
                 ~Q(account__code__startswith="114"),
                 ~Q(account__code__startswith="214"),
                 ~Q(account__code__startswith="128"),
-                ~Q(account__code__startswith="228"),
-                filters[cat_type])\
-            .annotate(category=Left("summary",
-                                    StrIndex("summary", Value("—")) - 1,
-                                    output_field=CharField()))\
-            .values("category", "account__code", "is_credit")\
-            .annotate(count=Count("category"))\
-            .order_by("category", "is_credit", "-count", "account__code")
-        for row in rows:
-            rec_type = "credit" if row["is_credit"] else "debit"
-            if cat_type not in categories[rec_type]:
-                categories[rec_type][cat_type] = {}
-            if row["category"] not in categories[rec_type][cat_type]:
-                categories[rec_type][cat_type][row["category"]]\
-                    = row["account__code"]
-    return {F"{r}-{t}": json.dumps(
-                [{"category": c, "account": categories[r][t][c]}
-                 for c in categories[r][t]])
-               for r in categories
-               for t in categories[r]}
+                ~Q(account__code__startswith="228"))\
+        .annotate(rec_type=Case(When(is_credit=True, then=Value("credit")),
+                                default=Value("debit"),
+                                output_field=CharField()),
+                  cat_type=Case(
+                      When(summary__regex=".+—.+—.+→.+", then=Value("bus")),
+                      When(summary__regex=".+—.+→.+", then=Value("travel")),
+                      default=Value("general"),
+                      output_field=CharField()),
+                  category=Left("summary",
+                                StrIndex("summary", Value("—")) - 1,
+                                output_field=CharField()))\
+        .values("rec_type", "cat_type", "category", "account__code")\
+        .annotate(count=Count("category"))\
+        .order_by("rec_type", "cat_type", "category", "-count",
+                  "account__code")
+    # Sorts the rows by the record type and the category type
+    categories = {}
+    for row in rows:
+        key = "%s-%s" % (row["rec_type"], row["cat_type"])
+        if key not in categories:
+            categories[key] = {}
+        # Keeps only the first account with most records
+        if row["category"] not in categories[key]:
+            categories[key][row["category"]] = row["account__code"]
+    # Converts the dictionary to a list, as the category may not be US-ASCII
+    return {t: [[c, categories[t][c]] for c in categories[t]]
+            for t in categories.keys()}
 
 
 def fill_txn_from_post(txn_type, txn, post):
