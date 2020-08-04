@@ -28,6 +28,7 @@ First written: 2020/7/23
 {% block settings %}
   {% trans "Cash Income Transaction" context "Accounting|" as title %}
   {% setvar "title" title %}
+  {% static "accounting/css/transactions.css" as file %}{% add_css file %}
 {% endblock %}
 
 {% block content %}
