@@ -361,8 +361,8 @@ def get_summary_categories():
         if row["category"] not in categories[key]:
             categories[key][row["category"]] = row["account__code"]
     # Converts the dictionary to a list, as the category may not be US-ASCII
-    return {t: [[c, categories[t][c]] for c in categories[t]]
-            for t in categories.keys()}
+    return json.dumps({t: [[c, categories[t][c]] for c in categories[t]]
+                       for t in categories.keys()})
 
 
 def fill_txn_from_post(txn_type, txn, post):
