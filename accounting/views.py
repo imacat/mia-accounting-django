@@ -888,8 +888,9 @@ def txn_store(request, txn_type, txn=None):
     txn_to_sort = []
     if txn.date != old_date:
         if old_date is not None:
-            txn_same_day = list(Transaction.objects\
-                .filter(Q(date=old_date), ~Q(pk=txn.pk))\
+            txn_same_day = list(
+                Transaction.objects
+                .filter(Q(date=old_date), ~Q(pk=txn.pk))
                 .order_by("ord"))
             for i in range(len(txn_same_day)):
                 txn_same_day[i].ord = i + 1
@@ -937,8 +938,9 @@ def txn_delete(request, txn):
     Returns:
         HttpResponse: The response.
     """
-    txn_same_day = list(Transaction.objects\
-        .filter(Q(date=txn.date), ~Q(pk=txn.pk))\
+    txn_same_day = list(
+        Transaction.objects
+        .filter(Q(date=txn.date), ~Q(pk=txn.pk))
         .order_by("ord"))
     txn_to_sort = []
     for i in range(len(txn_same_day)):
