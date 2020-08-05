@@ -67,30 +67,6 @@ $(function () {
 });
 
 /**
- * The localized messages
- * @type {Array.}
- * @private
- */
-let l10n = null;
-
-/**
- * Returns the localization of a message.
- *
- * @param {string} key the message key
- * @returns {string} the localized message
- * @private
- */
-function __(key) {
-    if (l10n === null) {
-        l10n = JSON.parse($("#l10n-messages").val());
-    }
-    if (key in l10n) {
-        return l10n[key];
-    }
-    return key;
-}
-
-/**
  * Returns whether this is a transfer transaction.
  *
  * @returns {boolean} true if this is a transfer transaction, or false
@@ -390,7 +366,7 @@ function validateDate() {
     const errorMessage = $("#txn-date-error");
     if (date.value === "") {
         date.classList.add("is-invalid");
-        errorMessage.text(__("Please fill in the date."));
+        errorMessage.text(gettext("Please fill in the date."));
         return false;
     }
     date.classList.remove("is-invalid");
@@ -410,7 +386,7 @@ function validateAccount(account) {
     const errorMessage = $("#" + account.id + "-error");
     if (account.value === "") {
         account.classList.add("is-invalid");
-        errorMessage.text(__("Please select the account."));
+        errorMessage.text(gettext("Please select the account."));
         return false;
     }
     account.classList.remove("is-invalid");
@@ -431,7 +407,7 @@ function validateSummary(summary) {
     summary.value = summary.value.trim();
     if (summary.value.length > 128) {
         summary.classList.add("is-invalid");
-        errorMessage.text(__("This summary is too long (max. 128 characters)."));
+        errorMessage.text(gettext("This summary is too long (max. 128 characters)."));
         return false;
     }
     summary.classList.remove("is-invalid");
@@ -452,7 +428,7 @@ function validateAmount(amount) {
     amount.value = amount.value.trim();
     if (amount.value === "") {
         amount.classList.add("is-invalid");
-        errorMessage.text(__("Please fill in the amount."));
+        errorMessage.text(gettext("Please fill in the amount."));
         return false;
     }
     amount.classList.remove("is-invalid");
@@ -484,7 +460,7 @@ function validateBalance() {
     });
     if (debitTotal !== creditTotal) {
         balanceRows.addClass("is-invalid");
-        errorMessages.text(__("The sum of debit and credit are inconsistent."))
+        errorMessages.text(gettext("The total amount of debit and credit records are inconsistent."))
         return false;
     }
     balanceRows.removeClass("is-invalid");
@@ -505,7 +481,7 @@ function validateNote() {
     note.value = note.value.trim();
     if (note.value.length > 128) {
         note.classList.add("is-invalid");
-        errorMessage.text(__("This note is too long (max. 128 characters)."));
+        errorMessage.text(gettext("This note is too long (max. 128 characters)."));
         return false;
     }
     note.classList.remove("is-invalid");
