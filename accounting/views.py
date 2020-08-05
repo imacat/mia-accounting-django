@@ -869,7 +869,6 @@ def txn_store(request, txn_type, txn=None):
     if txn is None:
         txn = Transaction()
     old_date = txn.date
-    old_ord = txn.ord
     fill_txn_from_post(txn_type, txn, post)
     if not txn.is_dirty():
         url = reverse("accounting:transactions.show", args=(txn_type, txn))
@@ -886,9 +885,13 @@ def txn_store(request, txn_type, txn=None):
     txn_to_sort = []
     if txn.date != old_date:
         if old_date is not None:
-            txn_to_sort = Transaction.objects\
-                .filter(date=old_date, ord__gt=old_ord)\
-                .order_by("ord")
+            txn_same_day = list(Transaction.objects\
+                .filter(Q(date=old_date), ~Q(pk=txn.pk))\
+                .order_by("ord"))
+            for i in range(len(txn_same_day)):
+                txn_same_day[i].ord = i + 1
+                if txn_same_day[i].is_dirty():
+                    txn_to_sort.append(txn_same_day[i])
         max_ord = Transaction.objects\
             .filter(date=txn.date)\
             .aggregate(max=Max("ord"))["max"]
@@ -902,8 +905,6 @@ def txn_store(request, txn_type, txn=None):
             record.created_by = user
         record.updated_at = Now()
         record.updated_by = user
-    for x in txn_to_sort:
-        x.ord = x.ord - 1
     to_keep = [x.pk for x in txn.records if x.pk is not None]
     to_delete = [x for x in txn.record_set.all() if x.pk not in to_keep]
     # Runs the update
