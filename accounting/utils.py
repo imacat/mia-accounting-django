@@ -29,7 +29,7 @@ from django.db.models import Q, Sum, Case, When, F, Count, Max, Min, Value, \
 from django.db.models.functions import StrIndex, Left
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import pgettext
+from django.utils.translation import gettext as _
 
 from .forms import TransactionForm, RecordForm
 from .models import Account, Transaction, Record
@@ -258,8 +258,7 @@ def get_cash_accounts():
         .order_by("code"))
     accounts.insert(0, Account(
         code="0",
-        title=pgettext(
-            "Accounting|", "current assets and liabilities"),
+        title=_("current assets and liabilities"),
     ))
     return accounts
 

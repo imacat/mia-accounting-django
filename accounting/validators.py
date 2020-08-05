@@ -20,7 +20,7 @@
 """
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.utils.translation import pgettext
+from django.utils.translation import gettext as _
 
 from .models import Account, Record
 
@@ -37,9 +37,8 @@ def validate_record_id(value):
     try:
         Record.objects.get(pk=value)
     except Record.DoesNotExist:
-        raise ValidationError(
-            pgettext("Accounting|", "This record does not exists."),
-            code="not_exist")
+        raise ValidationError(_("This record does not exists."),
+                              code="not_exist")
 
 
 def validate_record_account_code(value):
@@ -54,14 +53,12 @@ def validate_record_account_code(value):
     try:
         Account.objects.get(code=value)
     except Account.DoesNotExist:
-        raise ValidationError(
-            pgettext("Accounting|", "This account does not exist."),
-            code="not_exist")
+        raise ValidationError(_("This account does not exist."),
+                              code="not_exist")
     child = Account.objects.filter(
         Q(code__startswith=value),
         ~Q(code=value),
     ).first()
     if child is not None:
-        raise ValidationError(
-            pgettext("Accounting|", "You cannot select a parent account."),
-            code="parent_account")
+        raise ValidationError(_("You cannot select a parent account."),
+                              code="parent_account")

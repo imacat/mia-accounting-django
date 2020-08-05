@@ -25,8 +25,7 @@ First written: 2020/7/23
 {% load mia_core %}
 
 {% block settings %}
-  {% trans "Transfer Transaction" context "Accounting|" as title %}
-  {% setvar "title" title %}
+  {% setvar "title" _("Transfer Transaction") %}
   {% setvar "use_jqueryui" True %}
   {% static "accounting/css/transactions.css" as file %}{% add_css file %}
   {% static "accounting/css/summary-helper.css" as file %}{% add_css file %}
@@ -55,7 +54,7 @@ First written: 2020/7/23
   {% csrf_token %}
   <div class="row form-group">
     <div class="col-sm-2">
-      <label for="txn-date">{% trans "Date:" context "Accounting|" as text %}{{ text|force_escape }}</label>
+      <label for="txn-date">{{ _("Date:") }}</label>
     </div>
     <div class="col-sm-10">
       <input id="txn-date" class="form-control {% if item.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date.value }}" required="required" />
@@ -65,7 +64,7 @@ First written: 2020/7/23
 
   <div class="row form-group">
     <div class="col-sm-6">
-      <h2>{% trans "Debit" context "Accounting|" as text %}{{ text|force_escape }}</h2>
+      <h2>{{ _("Debit") }}</h2>
 
       <ul id="debit-records" class="list-group">
         {% for record in item.debit_records %}
@@ -82,7 +81,7 @@ First written: 2020/7/23
         </li>
         <li class="list-group-item">
           <div id="debit-total-row" class="d-flex justify-content-between align-items-center form-control {% if item.balance_error %} is-invalid {% endif %} balance-row">
-            {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+            {{ _("Total") }}
             <span id="debit-total" class="amount">{{ item.debit_total }}</span>
           </div>
           <div id="debit-total-error" class="invalid-feedback balance-error">{{ item.balance_error|default:"" }}</div>
@@ -91,7 +90,7 @@ First written: 2020/7/23
     </div>
 
     <div class="col-sm-6">
-      <h2>{% trans "Credit" context "Accounting|" as text %}{{ text|force_escape }}</h2>
+      <h2>{{ _("Credit") }}</h2>
 
       <ul id="credit-records" class="list-group">
         {% for record in item.credit_records %}
@@ -108,7 +107,7 @@ First written: 2020/7/23
         </li>
         <li class="list-group-item">
           <div id="credit-total-row" class="d-flex justify-content-between align-items-center form-control {% if item.balance_error %} is-invalid {% endif %} balance-row">
-            {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+            {{ _("Total") }}
             <span id="credit-total" class="amount">{{ item.credit_total }}</span>
           </div>
           <div id="credit-total-error" class="invalid-feedback balance-error">{{ item.balance_error|default:"" }}</div>
@@ -119,7 +118,7 @@ First written: 2020/7/23
 
   <div class="row form-group">
     <div class="col-sm-2">
-      <label for="txn-note">{% trans "Notes:" context "Accounting|" as text %}{{ text|force_escape }}</label>
+      <label for="txn-note">{{ _("Notes:") }}</label>
     </div>
     <div class="col-sm-10">
       <textarea id="txn-note" class="form-control {% if item.notes.errors %} is-invalid {% endif %}" name="notes">{{ item.notes.value|default:"" }}</textarea>
@@ -131,7 +130,7 @@ First written: 2020/7/23
     <div class="col-sm-12">
       <button class="btn btn-primary" type="submit">
         <i class="fas fa-save"></i>
-        {% trans "Save" context "Accounting|" as text %}{{ text|force_escape }}
+        {{ _("Save") }}
       </button>
     </div>
   </div>

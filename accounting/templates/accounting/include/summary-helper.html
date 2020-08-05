@@ -34,7 +34,7 @@ First written: 2020/4/3
           <h4 class="modal-title">
             <label for="summary-summary">
               <i class="fas fa-edit"></i>
-              {% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}
+              {{ _("Summary") }}
             </label>
           </h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -47,26 +47,26 @@ First written: 2020/4/3
           </div>
           <ul class="nav nav-tabs">
             <li class="nav-item">
-              <span id="summary-tab-category" class="summary-tab nav-link active">{% trans "General" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+              <span id="summary-tab-category" class="summary-tab nav-link active">{{ _("General") }}</span>
             </li>
             <li class="nav-item">
-              <span id="summary-tab-travel" class="summary-tab nav-link">{% trans "Travel" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+              <span id="summary-tab-travel" class="summary-tab nav-link">{{ _("Travel") }}</span>
             </li>
             <li class="nav-item">
-              <span id="summary-tab-bus" class="summary-tab nav-link">{% trans "Bus" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+              <span id="summary-tab-bus" class="summary-tab nav-link">{{ _("Bus") }}</span>
             </li>
             <li class="nav-item">
-              <span id="summary-tab-regular" class="summary-tab nav-link">{% trans "Regular" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+              <span id="summary-tab-regular" class="summary-tab nav-link">{{ _("Regular") }}</span>
             </li>
             <li class="nav-item">
-              <span id="summary-tab-count" class="summary-tab nav-link">{% trans "Count" context "Accounting|Summary|" as text %}{{ text|force_escape }}</span>
+              <span id="summary-tab-count" class="summary-tab nav-link">{{ _("Count") }}</span>
             </li>
           </ul>
 
           <!-- A general category -->
           <div id="summary-tab-content-category" class="summary-tab-content">
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-general-category">{% trans "Category:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-general-category">{{ _("Category:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-general-category" class="form-control summary-helper-input" type="text" value="" />
                 <div id="summary-general-categories-known" class="summary-categories-known"></div>
@@ -77,20 +77,20 @@ First written: 2020/4/3
           <!-- A general travel route -->
           <div id="summary-tab-content-travel" class="summary-tab-content d-none">
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-travel-category">{% trans "Category:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-travel-category">{{ _("Category:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-travel-category" class="form-control summary-helper-input summary-travel-part" type="text" value="" />
                 <div id="summary-travel-categories-known" class="summary-categories-known"></div>
               </div>
             </div>
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-travel-from">{% trans "From:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-travel-from">{{ _("From:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-travel-from" class="form-control summary-helper-input summary-travel-part" type="text" value="" />
               </div>
             </div>
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-travel-direction">{% trans "Direction:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-travel-direction">{{ _("Direction:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-travel-direction" class="summary-helper-input" type="hidden" value="" />
                 <span id="btn-summary-one-way" class="btn btn-outline-primary btn-summary-helper btn-summary-travel-direction"><%="→"%></span>
@@ -98,7 +98,7 @@ First written: 2020/4/3
               </div>
             </div>
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-travel-to">{% trans "To:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-travel-to">{{ _("To:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-travel-to" class="form-control summary-helper-input summary-travel-part" type="text" value="" />
               </div>
@@ -108,26 +108,26 @@ First written: 2020/4/3
           <!-- A bus route -->
           <div id="summary-tab-content-bus" class="summary-tab-content d-none">
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-bus-category">{% trans "Category:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-bus-category">{{ _("Category:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-bus-category" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
                 <div id="summary-bus-categories-known" class="summary-categories-known"></div>
               </div>
             </div>
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-bus-route">{% trans "Route:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-bus-route">{{ _("Route:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-bus-route" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
               </div>
             </div>
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-bus-from">{% trans "From:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-bus-from">{{ _("From:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-bus-from" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
               </div>
             </div>
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-bus-to">{% trans "To:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-bus-to">{{ _("To:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-bus-to" class="form-control summary-helper-input summary-bus-part" type="text" value="" />
               </div>
@@ -145,7 +145,7 @@ First written: 2020/4/3
 
           <div id="summary-tab-content-count" class="summary-tab-content d-none">
             <div class="row">
-              <label class="col-sm-2 col-form-label" for="summary-count">{% trans "Count:" context "Accounting|Summary|" as text %}{{ text|force_escape }}</label>
+              <label class="col-sm-2 col-form-label" for="summary-count">{{ _("Count:") }}</label>
               <div class="col-sm-10">
                 <input id="summary-count" class="form-control summary-helper-input" type="number" min="1" value="" />
               </div>

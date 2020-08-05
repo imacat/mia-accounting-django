@@ -26,8 +26,7 @@ First written: 2020/7/23
 {% load accounting %}
 
 {% block settings %}
-  {% trans "Transfer Transaction" context "Accounting|" as title %}
-  {% setvar "title" title %}
+  {% setvar "title" _("Transfer Transaction") %}
   {% static "accounting/css/transactions.css" as file %}{% add_css file %}
 {% endblock %}
 
@@ -36,7 +35,7 @@ First written: 2020/7/23
 {% if item.has_order_hole %}
   <div class="alert alert-danger alert-dismissible fade show">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>{{ _("Error:") }}</strong> {% trans "The transactions on this day are not well-ordered.  Please reorder them." context "Accounting|" as text %}{{ text|force_escape }}
+    <strong>{{ _("Error:") }}</strong> {{ _("The transactions on this day are not well-ordered.  Please reorder them.") }}
   </div>
 {% endif %}
 
@@ -50,12 +49,12 @@ First written: 2020/7/23
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">{% trans "Transfer Transaction Deletion Confirmation" context "Accounting|" as text %}{{ text|force_escape }}</h4>
+          <h4 class="modal-title">{{ _("Transfer Transaction Deletion Confirmation") }}</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
         <!-- Modal body -->
-        <div class="modal-body">{% trans "Do you really want to delete this transfer transaction?" context "Accounting|" as text %}{{ text|force_escape }}</div>
+        <div class="modal-body">{{ _("Do you really want to delete this transfer transaction?") }}</div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
@@ -77,7 +76,7 @@ First written: 2020/7/23
     {% trans "Edit" context "Navigation|" as text %}{{ text|force_escape }}
   </a>
   {% if not item.has_many_same_day %}
-    <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{% trans "There is no other transaction at the same day." context "Accounting|" as text %}{{ text|force_escape }}">
+    <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{{ _("There is no other transaction at the same day.") }}">
       <i class="fas fa-sort"></i>
       {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
     </button>
@@ -93,7 +92,7 @@ First written: 2020/7/23
     </button>
     <div class="dropdown-menu">
       {% if not item.has_many_same_day %}
-        <span class="dropdown-item disabled" title="{% trans "There is no other transaction at the same day." context "Accounting|" as text %}{{ text|force_escape }}">
+        <span class="dropdown-item disabled" title="{{ _("There is no other transaction at the same day.") }}">
           <i class="fas fa-sort"></i>
           {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
         </span>
@@ -112,20 +111,20 @@ First written: 2020/7/23
 </div>
 
 <div class="row">
-  <div class="col-sm-2">{% trans "Date:" context "Accounting|" as text %}{{ text|force_escape }}</div>
+  <div class="col-sm-2">{{ _("Date:") }}</div>
   <div class="col-sm-10">{{ item.date|smart_date }}</div>
 </div>
 
 <div class="row">
   <div class="col-sm-6">
-    <h2>{% trans "Debit" context "Accounting|" as text %}{{ text|force_escape }}</h2>
+    <h2>{{ _("Debit") }}</h2>
 
     <table class="table table-striped table-hover d-none d-lg-table">
       <thead>
         <tr>
-          <th scope="col">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</th>
-          <th scope="col">{% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}</th>
-          <th class="amount" scope="col">{% trans "$" context "Accounting|" as text %}{{ text|force_escape }}</th>
+          <th scope="col">{{ _("Account") }}</th>
+          <th scope="col">{{ _("Summary") }}</th>
+          <th class="amount" scope="col">{{ _("$") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -139,7 +138,7 @@ First written: 2020/7/23
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="2">{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
+          <td colspan="2">{{ _("Total") }}</td>
           <td class="amount">{{ item.debit_total|accounting_amount }}</td>
         </tr>
       </tfoot>
@@ -157,7 +156,7 @@ First written: 2020/7/23
       {% endfor %}
       <li class="list-group-item">
         <div class="d-flex justify-content-between align-items-center account-line">
-          {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+          {{ _("Total") }}
           <span class="badge badge-info">{{ item.debit_total|accounting_amount }}</span>
         </div>
       </li>
@@ -165,14 +164,14 @@ First written: 2020/7/23
   </div>
 
   <div class="col-sm-6">
-    <h2>{% trans "Credit" context "Accounting|" as text %}{{ text|force_escape }}</h2>
+    <h2>{{ _("Credit") }}</h2>
 
     <table class="table table-striped table-hover d-none d-lg-table">
       <thead>
         <tr>
-          <th scope="col">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</th>
-          <th scope="col">{% trans "Summary" context "Accounting|" as text %}{{ text|force_escape }}</th>
-          <th class="amount" scope="col">{% trans "$" context "Accounting|" as text %}{{ text|force_escape }}</th>
+          <th scope="col">{{ _("Account") }}</th>
+          <th scope="col">{{ _("Summary") }}</th>
+          <th class="amount" scope="col">{{ _("$") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -186,7 +185,7 @@ First written: 2020/7/23
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="2">{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
+          <td colspan="2">{{ _("Total") }}</td>
           <td class="amount">{{ item.credit_total|accounting_amount }}</td>
         </tr>
       </tfoot>
@@ -205,7 +204,7 @@ First written: 2020/7/23
       {% endfor %}
       <li class="list-group-item">
         <div class="d-flex justify-content-between align-items-center account-line">
-          {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+          {{ _("Total") }}
           <span class="badge badge-info">{{ item.credit_total|accounting_amount }}</span>
         </div>
       </li>
@@ -215,7 +214,7 @@ First written: 2020/7/23
 
 {% if item.notes %}
   <div class="row">
-    <div class="col-sm-2">{% trans "Notes:" context "Accounting|" as text %}{{ text|force_escape }}</div>
+    <div class="col-sm-2">{{ _("Notes:") }}</div>
     <div class="col-sm-10">{{ item.notes }}</div>
   </div>
 {% endif %}

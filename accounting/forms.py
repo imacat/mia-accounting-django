@@ -21,7 +21,7 @@
 import re
 
 from django import forms
-from django.utils.translation import pgettext
+from django.utils.translation import gettext as _
 
 from .models import Account, Record
 from .validators import validate_record_account_code, validate_record_id
@@ -37,27 +37,26 @@ class RecordForm(forms.Form):
     id = forms.IntegerField(
         required=False,
         error_messages={
-            "invalid": pgettext("Accounting|", "This record is not valid."),
+            "invalid": _("This record is not valid."),
         },
         validators=[validate_record_id])
     account = forms.CharField(
         error_messages={
-            "required": pgettext("Accounting|", "Please select the account."),
+            "required": _("Please select the account."),
         },
         validators=[validate_record_account_code])
     summary = forms.CharField(
         required=False,
         max_length=128,
         error_messages={
-            "max_length": pgettext("Accounting|", "This summary is too long."),
+            "max_length": _("This summary is too long."),
         })
     amount = forms.IntegerField(
         min_value=1,
         error_messages={
-            "required": pgettext("Accounting|", "Please fill in the amount."),
-            "invalid": pgettext("Accounting|", "Please fill in a number."),
-            "min_value": pgettext(
-                "Accounting|", "The amount must be at least 1."),
+            "required": _("Please fill in the amount."),
+            "invalid": _("Please fill in a number."),
+            "min_value": _("The amount must be at least 1."),
         })
 
     def __init__(self, *args, **kwargs):
@@ -108,8 +107,7 @@ class RecordForm(forms.Form):
         if self.transaction is None:
             if "id" in self.data:
                 error = forms.ValidationError(
-                    pgettext("Accounting|",
-                             "This record is not for this transaction."),
+                    _("This record is not for this transaction."),
                     code="not_belong")
                 self.add_error("id", error)
                 raise error
@@ -118,8 +116,7 @@ class RecordForm(forms.Form):
                 record = Record.objects.get(pk=self.data["id"])
                 if record.transaction.pk != self.transaction.pk:
                     error = forms.ValidationError(
-                        pgettext("Accounting|",
-                                 "This record is not for this transaction."),
+                        _("This record is not for this transaction."),
                         code="not_belong")
                     self.add_error("id", error)
                     raise error
@@ -135,16 +132,14 @@ class RecordForm(forms.Form):
         if self.is_credit:
             if not re.match("^([123489]|7[1234])", self.data["account"]):
                 error = forms.ValidationError(
-                    pgettext("Accounting|",
-                             "This account is not for credit records."),
+                    _("This account is not for credit records."),
                     code="not_credit")
                 self.add_error("account", error)
                 raise error
         else:
             if not re.match("^([1235689]|7[5678])", self.data["account"]):
                 error = forms.ValidationError(
-                    pgettext("Accounting|",
-                             "This account is not for debit records."),
+                    _("This account is not for debit records."),
                     code="not_debit")
                 self.add_error("account", error)
                 raise error
@@ -164,13 +159,11 @@ class RecordForm(forms.Form):
         if record.is_credit != self.is_credit:
             if self.is_credit:
                 error = forms.ValidationError(
-                    pgettext("Accounting|",
-                             "This record is not a credit record."),
+                    _("This record is not a credit record."),
                     code="not_credit")
             else:
                 error = forms.ValidationError(
-                    pgettext("Accounting|",
-                             "This record is not a debit record."),
+                    _("This record is not a debit record."),
                     code="not_debit")
             self.add_error("id", error)
             raise error
@@ -188,13 +181,13 @@ class TransactionForm(forms.Form):
     date = forms.DateField(
         required=True,
         error_messages={
-            "invalid": pgettext("Accounting|", "This date is not valid.")
+            "invalid": _("This date is not valid.")
         })
     notes = forms.CharField(
         required=False,
         max_length=128,
         error_messages={
-            "max_length": pgettext("Accounting|", "This notes is too long.")
+            "max_length": _("This notes is too long.")
         })
 
     def __init__(self, *args, **kwargs):
@@ -223,9 +216,8 @@ class TransactionForm(forms.Form):
             return
         if self.debit_total() == self.credit_total():
             return
-        raise forms.ValidationError(pgettext(
-            "Accounting|",
-            "The total amount of debit and credit records are inconsistent."),
+        raise forms.ValidationError(
+            _("The total amount of debit and credit records are inconsistent."),
             code="balance")
 
     def is_valid(self):

@@ -27,7 +27,7 @@ First written: 2020/7/19
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with prep_period=period.prep_desc context "Accounting|" %}Trial Balance {{ prep_period }}{% endblocktrans %}
+  {% blocktrans asvar title with prep_period=period.prep_desc %}Trial Balance {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -39,26 +39,21 @@ First written: 2020/7/19
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
       <i class="fas fa-edit"></i>
-      {% trans "New" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("New")|force_escape }}
     </button>
     <div class="dropdown-menu">
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
-        {% trans "Cash Expense" context "Accounting|" as text %}
-        {{ text|force_escape }}
+        {{ _("Cash Expense")|force_escape }}
       </a>
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
-        {% trans "Cash Income" context "Accounting|" as text %}
-        {{ text|force_escape }}
+        {{ _("Cash Income")|force_escape }}
       </a>
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
-        {% trans "Transfer" context "Accounting|" as text %}
-        {{ text|force_escape }}
+        {{ _("Transfer")|force_escape }}
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-balance-scale-right" %}
-    {% trans "Trial Balance" context "Accounting|" as current_report_title %}
+  {% with current_report_icon="fas fa-balance-scale-right" current_report_title=_("Trial Balance") %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
@@ -84,10 +79,10 @@ First written: 2020/7/19
         <table class="table table-borderless table-hover trial-balance-table">
           <thead>
             <tr>
-            <th scope="col">{% trans "Account" context "Accounting|" as text %}{{ text|force_escape }}</th>
-            <th class="amount" scope="col">{% trans "Debit" context "Accounting|" as text %}{{ text|force_escape }}</th>
-            <th class="amount" scope="col">{% trans "Credit" context "Accounting|" as text %}{{ text|force_escape }}</th>
-            <th class="actions" scope="col">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</th>
+            <th scope="col">{{ _("Account") }}</th>
+            <th class="amount" scope="col">{{ _("Debit") }}</th>
+            <th class="amount" scope="col">{{ _("Credit") }}</th>
+            <th class="actions" scope="col">{{ _("View") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -99,7 +94,7 @@ First written: 2020/7/19
                 <td class="actions">
                   <a href="{% url "accounting:ledger" item period %}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
-                    <span class="d-none d-lg-inline">{% trans "View" context "Accounting|" as text %}{{ text|force_escape }}</span>
+                    <span class="d-none d-lg-inline">{{ _("View") }}</span>
                   </a>
                 </td>
               </tr>
@@ -107,7 +102,7 @@ First written: 2020/7/19
           </tbody>
           <tfoot>
             <tr>
-              <td>{% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}</td>
+              <td>{{ _("Total") }}</td>
               <td class="amount">{{ total_item.debit_amount|accounting_amount }}</td>
               <td class="amount">{{ total_item.credit_amount|accounting_amount }}</td>
               <td></td>
@@ -147,7 +142,7 @@ First written: 2020/7/19
             </li>
           {% endfor %}
           <li class="list-group-item d-flex justify-content-between align-items-center total">
-            {% trans "Total" context "Accounting|" as text %}{{ text|force_escape }}
+            {{ _("Total") }}
             <div>
               <span class="badge badge-success badge-pill">
                 {{ total_item.debit_amount|intcomma:False }}

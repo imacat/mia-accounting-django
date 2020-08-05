@@ -30,22 +30,21 @@ First written: 2020/7/9
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">{% trans "Search Accounting Records" context "Accounting|" as text %}{{ text|force_escape }}</h4>
+          <h4 class="modal-title">{{ _("Search Accounting Records") }}</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
         <!-- Modal body -->
         <div class="modal-body">
-          <label for="accounting-query">{% trans "Search:" context "Accounting|" as text %}{{ text|force_escape }}</label>
-          {% trans "e.g. Coffee" context "Accounting|" as text %}
-          <input id="accounting-query" type="text" name="q" value="{% if request.resolver_match.url_name == "search" %}{{ request.GET.q }}{% endif %}" placeholder="{{ text|force_escape }}" required="required" />
+          <label for="accounting-query">{{ _("Search:") }}</label>
+          <input id="accounting-query" type="text" name="q" value="{% if request.resolver_match.url_name == "search" %}{{ request.GET.q }}{% endif %}" placeholder="{{ _("e.g. Coffee") }}" required="required" />
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
           <button class="btn btn-primary" type="submit">
             <i class="fas fa-search"></i>
-            {% trans "Search" context "Accounting|" as text %}{{ text|force_escape }}
+            {{ _("Search") }}
           </button>
         </div>
       </div>
@@ -60,58 +59,48 @@ First written: 2020/7/9
       <i class="{{ current_report_icon }}"></i>
       {{ current_report_title }}
     </span>
-    <span class="d-md-none">{% trans "Book" context "Accounting|" as text %}{{ text|force_escape }}</span>
+    <span class="d-md-none">{{ _("Book") }}</span>
   </button>
   <div class="dropdown-menu account-picker">
     <a class="dropdown-item {% if request.resolver_match.url_name == "cash" %} active {% endif %}" href="{{ reports.cash }}">
       <i class="fas fa-money-bill-wave"></i>
-      {% trans "Cash Account" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Cash Account") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "cash-summary" %} active {% endif %}" href="{{ reports.cash_summary }}">
       <i class="fas fa-money-bill-wave"></i>
-      {% trans "Cash Summary" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Cash Summary") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "ledger" %} active {% endif %}" href="{{ reports.ledger }}">
       <i class="fas fa-file-invoice-dollar"></i>
-      {% trans "Ledger" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Ledger") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "ledger-summary" %} active {% endif %}" href="{{ reports.ledger_summary }}">
       <i class="fas fa-file-invoice-dollar"></i>
-      {% trans "Ledger Summary" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Ledger Summary") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "journal" %} active {% endif %}" href="{{ reports.journal }}">
       <i class="fas fa-book"></i>
-      {% trans "Journal" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Journal") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "trial-balance" %} active {% endif %}" href="{{ reports.trial_balance }}">
       <i class="fas fa-balance-scale-right"></i>
-      {% trans "Trial Balance" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Trial Balance") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "income-statement" %} active {% endif %}" href="{{ reports.income_statement }}">
       <i class="fas fa-file-invoice"></i>
-      {% trans "Income Statement" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Income Statement") }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "balance-sheet" %} active {% endif %}" href="{{ reports.balance_sheet }}">
       <i class="fas fa-balance-scale"></i>
-      {% trans "Balance Sheet" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Balance Sheet") }}
     </a>
     <span class="dropdown-item dropdown-search {% if request.resolver_match.url_name == "search" %} active {% endif %}"  data-toggle="modal" data-target="#accounting-search-modal">
       <i class="fas fa-search"></i>
-      {% trans "Search" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Search") }}
     </span>
     <a class="dropdown-item {% if request.resolver_match.url_name == "accounts" %} active {% endif %}" href="{% url "accounting:accounts" %}">
       <i class="fas fa-list-ol"></i>
-      {% trans "Accounts" context "Accounting|" as text %}
-      {{ text|force_escape }}
+      {{ _("Accounts") }}
     </a>
   </div>
 </div>

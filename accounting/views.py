@@ -31,7 +31,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.translation import pgettext, gettext_noop
+from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import RedirectView
 
@@ -133,7 +133,7 @@ def cash(request, account, period):
                      if len(records) > 0
                      else Transaction(date=timezone.localdate())),
         account=account,
-        summary=pgettext("Accounting|", "Total"),
+        summary=_("Total"),
     )
     record_sum.balance = balance
     record_sum.credit_amount = sum([
@@ -248,7 +248,7 @@ def cash_summary(request, account):
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
     months.append(MonthlySummary(
-        label=pgettext("Accounting|", "Total"),
+        label=_("Total"),
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
@@ -319,7 +319,7 @@ def ledger(request, account, period):
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
             account=account,
-            summary=pgettext("Accounting|", "Brought Forward"),
+            summary=_("Brought Forward"),
             is_credit=balance < 0,
             amount=abs(balance),
         )
@@ -396,7 +396,7 @@ def ledger_summary(request, account):
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
     months.append(MonthlySummary(
-        label=pgettext("Accounting|", "Total"),
+        label=_("Total"),
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
         balance=sum([x.balance for x in months]),
@@ -591,7 +591,7 @@ def trial_balance(request, period):
     accounts = nominal + real
     accounts.sort(key=lambda x: x.code)
     total_account = Account()
-    total_account.title = pgettext("Accounting|", "Total")
+    total_account.title = _("Total")
     total_account.debit_amount = sum([x.debit_amount for x in accounts
                                       if x.debit_amount is not None])
     total_account.credit_amount = sum([x.credit_amount for x in accounts
@@ -649,10 +649,10 @@ def income_statement(request, period):
         Q(code="4") | Q(code="5") | Q(code="6")
         | Q(code="7") | Q(code="8") | Q(code="9")).order_by("code"))
     cumulative_accounts = {
-        "5": Account(title=pgettext("Accounting|", "Gross Income")),
-        "6": Account(title=pgettext("Accounting|", "Operating Income")),
-        "7": Account(title=pgettext("Accounting|", "Before Tax Income")),
-        "8": Account(title=pgettext("Accounting|", "After Tax Income")),
+        "5": Account(title=_("Gross Income")),
+        "6": Account(title=_("Operating Income")),
+        "7": Account(title=_("Before Tax Income")),
+        "8": Account(title=_("After Tax Income")),
         "9": Account.objects.get(code=Account.NET_CHANGE),
     }
     cumulative_total = 0
@@ -1011,13 +1011,12 @@ def account_options(request):
         x.is_for_debit = re.match("^([1235689]|7[5678])", x.code) is not None
         x.is_for_credit = re.match("^([123489]|7[1234])", x.code) is not None
     data = {
-        "header_in_use": pgettext("Accounting|", "---Accounts In Use---"),
+        "header_in_use": _("---Accounts In Use---"),
         "debit_in_use": [x.option_data for x in accounts
                          if x.is_for_debit and x.is_in_use],
         "credit_in_use": [x.option_data for x in accounts
                           if x.is_for_credit and x.is_in_use],
-        "header_not_in_use": pgettext(
-            "Accounting|", "---Accounts Not In Use---"),
+        "header_not_in_use": _("---Accounts Not In Use---"),
         "debit_not_in_use": [x.option_data for x in accounts
                              if x.is_for_debit and not x.is_in_use],
         "credit_not_in_use": [x.option_data for x in accounts

@@ -21,7 +21,7 @@
 import datetime
 import re
 
-from django.utils.translation import pgettext
+from django.utils.translation import gettext as _
 
 from .models import Transaction, Record, Account
 from mia_core.period import Period
@@ -124,8 +124,7 @@ class CashAccountConverter:
         if value == "0":
             return Account(
                 code="0",
-                title=pgettext(
-                    "Accounting|", "current assets and liabilities"),
+                title=_("current assets and liabilities"),
             )
         try:
             account = Account.objects.get(code=value)
