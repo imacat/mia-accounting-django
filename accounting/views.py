@@ -948,10 +948,7 @@ def txn_delete(request, txn):
         txn.delete()
         for x in txn_to_sort:
             x.save()
-    if "r" in request.GET:
-        url = request.GET.get("r")
-    else:
-        url = reverse("accounting:home")
+    url = request.GET.get("r") or reverse("accounting:home")
     message = gettext_noop("This transaction was deleted successfully.")
     return success_redirect(request, url, message)
 
