@@ -27,7 +27,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 
-from mia_core.status import _retrieve, retrieve_status
+from mia_core.status import retrieve_status
 from mia_core.utils import UrlBuilder
 
 register = template.Library()
