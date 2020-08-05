@@ -955,6 +955,7 @@ def txn_delete(request, txn):
     message = gettext_noop("This transaction was deleted successfully.")
     return success_redirect(request, url, message)
 
+
 @require_GET
 @login_required
 def account_options(request):
