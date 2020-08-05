@@ -252,7 +252,10 @@ def cash_summary(request, account):
         balance=sum([x.balance for x in months]),
         cumulative_balance=cumulative_balance,
     ))
-    pagination = Pagination(request, months, True)
+    try:
+        pagination = Pagination(request, months, True)
+    except PaginationException as e:
+        return HttpResponseRedirect(e.url)
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash-summary.html", {
         "item_list": pagination.items,
@@ -328,7 +331,10 @@ def ledger(request, account, period):
         record.balance = balance
     if record_brought_forward is not None:
         records.insert(0, record_brought_forward)
-    pagination = Pagination(request, records, True)
+    try:
+        pagination = Pagination(request, records, True)
+    except PaginationException as e:
+        return HttpResponseRedirect(e.url)
     records = pagination.items
     find_imbalanced(records)
     find_order_holes(records)
@@ -394,7 +400,10 @@ def ledger_summary(request, account):
         balance=sum([x.balance for x in months]),
         cumulative_balance=cumulative_balance,
     ))
-    pagination = Pagination(request, months, True)
+    try:
+        pagination = Pagination(request, months, True)
+    except PaginationException as e:
+        return HttpResponseRedirect(e.url)
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
@@ -476,7 +485,10 @@ def journal(request, period):
             amount=sum_debits - sum_credits
         ))
     records = list(debit_records) + list(credit_records) + list(records)
-    pagination = Pagination(request, records, True)
+    try:
+        pagination = Pagination(request, records, True)
+    except PaginationException as e:
+        return HttpResponseRedirect(e.url)
     return render(request, "accounting/journal.html", {
         "item_list": pagination.items,
         "pagination": pagination,
@@ -790,7 +802,10 @@ def search(request):
             | Q(account__code__icontains=query)
             | Q(summary__icontains=query)
             | Q(transaction__note__icontains=query))
-    pagination = Pagination(request, records, True)
+    try:
+        pagination = Pagination(request, records, True)
+    except PaginationException as e:
+        return HttpResponseRedirect(e.url)
     return render(request, "accounting/search.html", {
         "item_list": pagination.items,
         "pagination": pagination,
