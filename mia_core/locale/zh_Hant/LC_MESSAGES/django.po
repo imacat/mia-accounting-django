@@ -1,0 +1,162 @@
+# Traditional Chinese PO file for the Mia Website
+# Copyright (C) 2020 imacat
+# This file is distributed under the same license as the Mia package.
+# imacat <imacat@mail.imacat.idv.tw>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mia 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-06 00:00+0800\n"
+"PO-Revision-Date: 2020-08-05 23:59+0800\n"
+"Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
+"Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
+"Language: Traditional Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: mia_core/period.py:447 mia_core/period.py:482 mia_core/period.py:500
+#: mia_core/period.py:513 mia_core/period.py:559
+#, python-format
+msgid "In %s"
+msgstr "%s"
+
+#: mia_core/period.py:457
+#, python-format
+msgid "Since %s"
+msgstr "%s至今"
+
+#: mia_core/period.py:470 mia_core/period.py:491 mia_core/period.py:570
+#, python-format
+msgid "Until %s"
+msgstr "至%s前"
+
+#: mia_core/period.py:499
+msgid "All Time"
+msgstr "全部"
+
+#: mia_core/period.py:583 mia_core/period.py:616
+#: mia_core/templatetags/mia_core.py:212
+msgid "This Month"
+msgstr "這個月"
+
+#: mia_core/period.py:624 mia_core/templatetags/mia_core.py:219
+msgid "Last Month"
+msgstr "上個月"
+
+#: mia_core/period.py:639
+msgid "This Year"
+msgstr "今年"
+
+#: mia_core/period.py:641
+msgid "Last Year"
+msgstr "去年"
+
+#: mia_core/period.py:656 mia_core/templatetags/mia_core.py:192
+msgid "Today"
+msgstr "今天"
+
+#: mia_core/period.py:658 mia_core/templatetags/mia_core.py:194
+msgid "Yesterday"
+msgstr "昨天"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:37
+msgctxt "Period|"
+msgid "Choosing Your Period"
+msgstr "選擇時間區間"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:46
+msgctxt "Period|"
+msgid "Month"
+msgstr "月"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:49
+msgctxt "Period|"
+msgid "Year"
+msgstr "年"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:52
+msgctxt "Period|"
+msgid "Day"
+msgstr "日"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:55
+msgctxt "Period|"
+msgid "Custom"
+msgstr "自訂"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:61
+msgctxt "Period|"
+msgid "This Month"
+msgstr "這個月"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:64
+msgctxt "Period|"
+msgid "Last Month"
+msgstr "上個月"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:67
+msgctxt "Period|"
+msgid "Since Last Month"
+msgstr "上個月至今"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:77
+msgctxt "Period|"
+msgid "This Year"
+msgstr "今年"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:80
+msgctxt "Period|"
+msgid "Last Year"
+msgstr "去年"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:96
+msgctxt "Period|"
+msgid "Today"
+msgstr "今天"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:99
+msgctxt "Period|"
+msgid "Yesterday"
+msgstr "昨天"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:104
+msgctxt "Period|"
+msgid "Date:"
+msgstr "日期："
+
+#: mia_core/templates/mia_core/include/period-chooser.html:108
+#: mia_core/templates/mia_core/include/period-chooser.html:126
+msgid "Confirm"
+msgstr "確定"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:114
+msgctxt "Period|"
+msgid "All"
+msgstr "全部"
+
+#: mia_core/templates/mia_core/include/period-chooser.html:118
+msgctxt "Period|"
+msgid "From:"
+msgstr "從："
+
+#: mia_core/templates/mia_core/include/period-chooser.html:122
+msgctxt "Period|"
+msgid "To:"
+msgstr "到："
+
+#: mia_core/utils.py:343
+msgctxt "Pagination|"
+msgid "Previous"
+msgstr "上一頁"
+
+#: mia_core/utils.py:371 mia_core/utils.py:392
+msgctxt "Pagination|"
+msgid "..."
+msgstr "…"
+
+#: mia_core/utils.py:411
+msgctxt "Pagination|"
+msgid "Next"
+msgstr "下一頁"
