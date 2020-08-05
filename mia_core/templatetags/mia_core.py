@@ -95,7 +95,8 @@ def url_with_return(context, view_name, *args):
         str: The URL.
     """
     url = reverse(view_name, args=args)
-    return str(UrlBuilder(url).query(r=context.request.get_full_path()))
+    return str(UrlBuilder(url).query(
+        r=str(UrlBuilder(context.request.get_full_path()).remove("s"))))
 
 
 @register.simple_tag(takes_context=True)
