@@ -25,6 +25,7 @@ from django import template
 from django.template import defaultfilters
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext
 
 from mia_core.status import retrieve_status
@@ -230,4 +231,7 @@ def title_case(value):
     Returns:
         str: The title in a proper American-English case.
     """
+    value = str(value)
+    if isinstance(value, SafeString):
+        value = value + ""
     return titlecase.titlecase(value)
