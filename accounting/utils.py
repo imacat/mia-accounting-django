@@ -320,7 +320,8 @@ def find_order_holes(records):
              .annotate(count=Count("pk"))
              .filter(~Q(count=1))]
     for record in records:
-        record.has_order_hole = record.transaction.date in holes
+        record.has_order_hole = record.pk is not None\
+                                and record.transaction.date in holes
 
 
 def get_summary_categories():
