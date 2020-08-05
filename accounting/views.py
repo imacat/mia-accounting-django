@@ -921,6 +921,39 @@ def txn_store(request, txn_type, txn=None):
     return success_redirect(request, url, message)
 
 
+@require_POST
+@login_required
+def txn_delete(request, txn):
+    """The view to delete an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        txn (Transaction): The transaction.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    txn_same_day = list(Transaction.objects\
+        .filter(Q(date=txn.date), ~Q(pk=txn.pk))\
+        .order_by("ord"))
+    txn_to_sort = []
+    for i in range(len(txn_same_day)):
+        txn_same_day[i].ord = i + 1
+        if txn_same_day[i].is_dirty():
+            txn_to_sort.append(txn_same_day[i])
+    with transaction.atomic():
+        for record in txn.records:
+            record.delete()
+        txn.delete()
+        for x in txn_to_sort:
+            x.save()
+    if "r" in request.GET:
+        url = request.GET.get("r")
+    else:
+        url = reverse("accounting:home")
+    message = gettext_noop("This transaction was deleted successfully.")
+    return success_redirect(request, url, message)
+
 @require_GET
 @login_required
 def account_options(request):

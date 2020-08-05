@@ -85,9 +85,8 @@ urlpatterns = [
          views.txn_edit, name="transactions.edit"),
     path("transactions/<txn-type:txn_type>/<txn:txn>/update",
          views.txn_store, name="transactions.update"),
-    # TODO: To be done
     path("transactions/<txn:txn>/delete",
-         mia_core_views.todo, name="transactions.delete"),
+         views.txn_delete, name="transactions.delete"),
     # TODO: To be done
     path("transactions/sort/<date:date>",
          mia_core_views.todo, name="transactions.sort"),
