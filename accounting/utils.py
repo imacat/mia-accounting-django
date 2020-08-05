@@ -407,9 +407,15 @@ def fill_txn_from_post(txn_type, txn, post):
             records.append(record)
     if txn_type != "transfer":
         if txn_type == "expense":
-            record = txn.credit_records[0]
+            if len(txn.credit_records) > 0:
+                record = txn.credit_records[0]
+            else:
+                record = Record(is_credit=True, transaction=txn)
         else:
-            record = txn.debit_records[0]
+            if len(txn.debit_records) > 0:
+                record = txn.debit_records[0]
+            else:
+                record = Record(is_credit=False, transaction=txn)
         record.ord = 1
         record.account = Account.objects.get(code=Account.CASH)
         record.summary = None
