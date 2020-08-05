@@ -272,7 +272,7 @@ class Pagination:
         PaginationException: With invalid pagination parameters
 
     Attributes:
-        current_url (str): The current request URL.
+        current_url (UrlBuilder): The current request URL.
         is_reversed (bool): Whether we should display the last page first.
         page_size (int): The page size.
         total_pages (int): The total number of pages available.
@@ -283,7 +283,7 @@ class Pagination:
     DEFAULT_PAGE_SIZE = 10
 
     def __init__(self, request, items, is_reversed=False):
-        self.current_url = request.get_full_path()
+        self.current_url = UrlBuilder(request.get_full_path())
         self.is_reversed = is_reversed
         self.page_size = self.DEFAULT_PAGE_SIZE
         self.total_pages = None
@@ -295,16 +295,13 @@ class Pagination:
         try:
             self.page_size = int(request.GET["page-size"])
             if self.page_size == self.DEFAULT_PAGE_SIZE:
-                raise PaginationException(str(
-                    UrlBuilder(self.current_url).remove("page-size")))
+                raise PaginationException(self.current_url.remove("page-size"))
             if self.page_size < 1:
-                raise PaginationException(str(
-                    UrlBuilder(self.current_url).remove("page-size")))
+                raise PaginationException(self.current_url.remove("page-size"))
         except KeyError:
             self.page_size = self.DEFAULT_PAGE_SIZE
         except ValueError:
-            raise PaginationException(str(
-                UrlBuilder(self.current_url).remove("page-size")))
+            raise PaginationException(self.current_url.remove("page-size"))
         self.total_pages = int(
             (len(items) - 1) / self.page_size) + 1
         default_page_no = 1 if not is_reversed else self.total_pages
@@ -314,22 +311,17 @@ class Pagination:
         try:
             self.page_no = int(request.GET["page"])
             if not self.is_paged:
-                raise PaginationException(str(
-                    UrlBuilder(self.current_url).remove("page")))
+                raise PaginationException(self.current_url.remove("page"))
             if self.page_no == default_page_no:
-                raise PaginationException(str(
-                    UrlBuilder(self.current_url).remove("page")))
+                raise PaginationException(self.current_url.remove("page"))
             if self.page_no < 1:
-                raise PaginationException(str(
-                    UrlBuilder(self.current_url).remove("page")))
+                raise PaginationException(self.current_url.remove("page"))
             if self.page_no > self.total_pages:
-                raise PaginationException(str(
-                    UrlBuilder(self.current_url).remove("page")))
+                raise PaginationException(self.current_url.remove("page"))
         except KeyError:
             self.page_no = default_page_no
         except ValueError:
-            raise PaginationException(str(
-                UrlBuilder(self.current_url).remove("page")))
+            raise PaginationException(self.current_url.remove("page"))
 
         if not self.is_paged:
             self.page_no = 1
@@ -344,7 +336,7 @@ class Pagination:
         Returns:
             list[Link]: The navigation links of the pagination bar.
         """
-        base_url = UrlBuilder(self.current_url).remove("page")
+        base_url = self.current_url.clone().remove("page").remove("s")
         links = []
         # The previous page
         link = self.Link()
@@ -453,8 +445,7 @@ class Pagination:
         Returns:
             list[PageSizeOption]: The page size options.
         """
-        base_url = UrlBuilder(self.current_url).remove(
-            "page").remove("page-size")
+        base_url = self.current_url.remove("page").remove("page-size")
         return [self.PageSizeOption(x, self._page_size_url(base_url, x))
                 for x in [10, 100, 200]]
 
@@ -493,10 +484,10 @@ class PaginationException(Exception):
     """The exception thrown with invalid pagination parameters.
 
     Args:
-        url (str): The canonical URL to redirect to.
+        url_builder (UrlBuilder): The canonical URL to redirect to.
 
     Attributes:
         url (str): The canonical URL to redirect to.
     """
-    def __init__(self, url):
-        self.url = url
+    def __init__(self, url_builder):
+        self.url = str(url_builder)
