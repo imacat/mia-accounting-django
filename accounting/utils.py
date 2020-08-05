@@ -359,12 +359,19 @@ def get_summary_categories():
         key = "%s-%s" % (row["rec_type"], row["cat_type"])
         if key not in categories:
             categories[key] = {}
-        # Keeps only the first account with most records
         if row["category"] not in categories[key]:
-            categories[key][row["category"]] = row["account__code"]
+            categories[key][row["category"]] = []
+        categories[key][row["category"]].append(row)
+    for key in categories:
+        # Keeps only the first account with most records
+        categories[key] = [categories[key][x][0] for x in categories[key]]
+        # Sorts the categories by the frequency
+        categories[key].sort(key=lambda x: (-x["count"], x["category"]))
+        # Keeps only the category and the account
+        categories[key] = [[x["category"], x["account__code"]]
+                           for x in categories[key]]
     # Converts the dictionary to a list, as the category may not be US-ASCII
-    return json.dumps({t: [[c, categories[t][c]] for c in categories[t]]
-                       for t in categories.keys()})
+    return json.dumps(categories)
 
 
 def fill_txn_from_post(txn_type, txn, post):
