@@ -29,8 +29,6 @@ $(function () {
             return false;
         });
     $(".record-summary")
-        .attr("data-toggle", "modal")
-        .attr("data-target", "#summary-modal")
         .on("click", function () {
             startSummaryHelper(this);
         });

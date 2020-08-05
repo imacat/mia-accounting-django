@@ -1,0 +1,63 @@
+{% comment %}
+The Mia Accounting Application
+form-record-transfer.html: The template for a record in the transfer transaction form
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/8/5
+{% endcomment %}
+
+<li id="{{ record_type }}-{{ no }}" class="list-group-item d-flex draggable-record {{ record_type }}-record">
+  <div>
+    <div class="row">
+      <div class="col-sm-12">
+        {% if record.id.value %}
+          <input type="hidden" name="{{ record_type }}-{{ no }}-id" value="{{ record.id.value }}" />
+        {% endif %}
+        <input id="{{ record_type }}-{{ no }}-ord" class="{{ record_type }}-ord" type="hidden" name="{{ record_type }}-{{ no }}-ord" value="{{ order }}" />
+        <select id="{{ record_type }}-{{ no }}-account" class="form-control record-account {{ record_type }}-account {% if record.account.errors %} is-invalid {% endif %}" name="{{ record_type }}-{{ no }}-account">
+          {% if record.account is not None %}
+            <option value="{{ record.account.value|default:"" }}" selected="selected">{{ record.account.value|default:"" }} {{ record.account_title|default:"" }}</option>
+          {% else %}
+            <option value=""></option>
+          {% endif %}
+          <option value="">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</option>
+        </select>
+        <div id="{{ record_type }}-{{ no }}-account-error" class="invalid-feedback">{{ record.account.errors.0|default:"" }}</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-8">
+        <input id="{{ record_type }}-{{ no }}-summary" class="form-control record-summary {% if record.summary.errors %} is-invalid {% endif %}" type="text" name="{{ record_type }}-{{ no }}-summary" value="{{ record.summary.value|default:"" }}" maxlength="128" data-toggle="modal" data-target="#summary-modal" />
+        <div id="{{ record_type }}-{{ no }}-summary-error" class="invalid-feedback">{{ record.summary.errors.0|default:"" }}</div>
+      </div>
+      <div class="col-lg-4">
+        <input id="{{ record_type }}-{{ no }}-amount" class="form-control record-amount {{ record_type }}-to-sum {% if record.amount.errors %} is-invalid {% endif %}" type="number" min="1" name="{{ record_type }}-{{ no }}-amount" value="{{ record.amount.value|default:"" }}" required="required" />
+        <div id="{{ record_type }}-{{ no }}-amount-error" class="invalid-feedback">{{ record.amount.errors.0|default:"" }}</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="btn-group-vertical btn-actions-{{ record_type }}">
+      <button class="btn btn-outline-secondary btn-sort-{{ record_type }}" type="button">
+        <i class="fas fa-sort"></i>
+      </button>
+      <button id="{{ record_type }}-{{ no }}-m-delete" type="button" class="btn btn-danger btn-del-record btn-del-{{ record_type }}">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </div>
+</li>

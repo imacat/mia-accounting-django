@@ -18,6 +18,7 @@
 """The view controllers of the accounting application.
 
 """
+import json
 import re
 
 from django.conf import settings
@@ -26,6 +27,7 @@ from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -853,9 +855,22 @@ def txn_edit(request, txn_type, txn=None):
         if len(txn.credit_records) == 0:
             txn.records.append(Record(ord=1, is_credit=True))
         form = make_txn_form_from_model(txn_type, txn)
+    new_record_context = {"record": Record(),
+                          "record_type": "TTT",
+                          "no": "NNN",
+                          "order": ""}
+    if txn_type == "transfer":
+        new_record_template = json.dumps(render_to_string(
+            "accounting/transactions/form-record-transfer.html",
+            new_record_context))
+    else:
+        new_record_template = json.dumps(render_to_string(
+            "accounting/transactions/form-record-non-transfer.html",
+            new_record_context))
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": form,
         "summary_categories": get_summary_categories,
+        "new_record_template": new_record_template,
     })
 
 

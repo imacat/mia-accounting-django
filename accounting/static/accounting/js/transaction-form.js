@@ -254,121 +254,11 @@ function addNewRecord(button) {
  * @private
  */
 function insertNewRecord(type, newNo) {
-    if (isTransfer()) {
-        insertNewTransferRecord(type, newNo);
-    } else {
-        insertNewNonTransferRecord(type, newNo);
-    }
-}
-
-/**
- * Inserts a new accounting record for a transfer transaction.
- *
- * @param {string} type the record type, either "debit" or "credit"
- * @param {number} newNo the number of this new accounting record
- * @private
- */
-function insertNewTransferRecord(type, newNo) {
-    const divAccount = createAccountBlock(type, newNo)
-        .addClass("col-sm-12");
-    const divAccountRow = $("<div/>")
-        .addClass("row")
-        .append(divAccount);
-
-    const divSummary = createSummaryBlock(type, newNo)
-        .addClass("col-lg-8");
-    const divAmount = createAmountBlock(type, newNo)
-        .addClass("col-lg-4");
-    const divSummaryAmountRow = $("<div/>")
-        .addClass("row")
-        .append(divSummary, divAmount);
-
-    const divContent = $("<div/>")
-        .append(divAccountRow)
-        .append(divSummaryAmountRow);
-
-    const divBtnGroup = createActionButtonBlock(
-        type, newNo, type + "-" + newNo + "-delete")
-        .addClass("btn-group-vertical");
-    const divActions = $("<div/>")
-        .append(divBtnGroup);
-
-    $("<li/>")
-        .attr("id", type + "-" + newNo)
-        .addClass("list-group-item")
-        .addClass("d-flex")
-        .addClass(type + "-record")
-        .append(divContent, divActions)
-        .appendTo("#" + type + "-records");
-}
-
-/**
- * Inserts a new accounting record for a non-transfer transaction.
- *
- * @param {string} type the record type, either "debit" or "credit"
- * @param {number} newNo the number of this new accounting record
- * @private
- */
-function insertNewNonTransferRecord(type, newNo) {
-    const divAccount = createAccountBlock(type, newNo)
-        .addClass("col-lg-6");
-
-    const divSummary = createSummaryBlock(type, newNo)
-        .addClass("col-sm-8");
-    const divAmount = createAmountBlock(type, newNo)
-        .addClass("col-sm-4");
-    const divSummaryAmountRow = $("<div/>")
-        .addClass("row")
-        .append(divSummary, divAmount);
-    const divSummaryAmount = $("<div/>")
-        .addClass("col-lg-6")
-        .append(divSummaryAmountRow);
-
-    const divContent = $("<div/>")
-        .addClass("row")
-        .append(divAccount, divSummaryAmount);
-
-    const divBtnGroup = createActionButtonBlock(
-        type, newNo, type + "-" + newNo + "-delete")
-        .addClass("btn-group")
-        .addClass("d-none d-lg-flex");
-    const divBtnGroupVertical = createActionButtonBlock(
-        type, newNo, type + "-" + newNo + "-m-delete")
-        .addClass("btn-group-vertical")
-        .addClass("d-lg-none");
-    const divActions = $("<div/>")
-        .append(divBtnGroup, divBtnGroupVertical);
-
-    $("<li/>")
-        .attr("id", type + "-" + newNo)
-        .addClass("list-group-item")
-        .addClass("d-flex")
-        .addClass("justify-content-between")
-        .addClass(type + "-record")
-        .append(divContent, divActions)
-        .appendTo("#" + type + "-records");
-}
-
-/**
- * Creates and returns a new <div></div> account block.
- *
- * @param {string} type the record type, either "debit" or "credit"
- * @param {number} newNo the number of this new accounting record
- * @returns {JQuery<HTMLElement>} the new <div></div> account block
- * @private
- */
-function createAccountBlock(type, newNo) {
-    const order = $("<input/>")
-        .attr("id", type + "-" + newNo + "-ord")
-        .attr("type", "hidden")
-        .attr("name", type + "-" + newNo + "-ord")
-        .addClass(type + "-ord");
-    const account = $("<select/>")
-        .attr("id", type + "-" + newNo + "-account")
-        .attr("name", type + "-" + newNo + "-account")
-        .addClass("form-control")
-        .addClass("record-account")
-        .addClass(type + "-account")
+    $("#" + type + "-records").append(
+        JSON.parse($("#new-record-template").val())
+            .replace(/TTT/g, type)
+            .replace(/NNN/g, String(newNo)));
+    $("#" + type + "-" + newNo + "-account")
         .on("focus", function () {
             removeBlankOption(this);
         })
@@ -378,64 +268,16 @@ function createAccountBlock(type, newNo) {
         .each(function () {
             initializeAccountOptions(this);
         });
-    const accountError = $("<div/>")
-        .attr("id", type + "-" + newNo + "-account-error")
-        .addClass("invalid-feedback");
-    return $("<div/>")
-        .append(order, account, accountError);
-}
-
-/**
- * Creates and returns a new <div></div> summary block.
- *
- * @param {string} type the record type, either "debit" or "credit"
- * @param {number} newNo the number of this new accounting record
- * @returns {JQuery<HTMLElement>} the new <div></div> summary block
- * @private
- */
-function createSummaryBlock(type, newNo) {
-    const summary = $("<input/>")
-        .attr("id", type + "-" + newNo + "-summary")
-        .attr("type", "text")
-        .attr("name", type + "-" + newNo + "-summary")
-        .addClass("form-control")
-        .addClass("record-summary")
+    $("#" + type + "-" + newNo + "-summary")
         .on("blur", function () {
             validateSummary(this);
-        });
-    if (typeof startSummaryHelper === "function") {
-        summary
-            .attr("data-toggle", "modal")
-            .attr("data-target", "#summary-modal")
-            .on("click", function () {
+        })
+        .on("click", function () {
+            if (typeof startSummaryHelper === "function") {
                 startSummaryHelper(this);
-            });
-    }
-    const summaryError = $("<div/>")
-        .attr("id", type + "-" + newNo + "-summary-error")
-        .addClass("invalid-feedback");
-    return $("<div/>")
-        .append(summary, summaryError);
-}
-
-/**
- * Creates and returns a new <div></div> amount block.
- *
- * @param {string} type the record type, either "debit" or "credit"
- * @param {number} newNo the number of this new accounting record
- * @returns {JQuery<HTMLElement>} the new <div></div> amount block
- * @private
- */
-function createAmountBlock(type, newNo) {
-    const amount = $("<input/>")
-        .attr("id", type + "-" + newNo + "-amount")
-        .attr("type", "number")
-        .attr("name", type + "-" + newNo + "-amount")
-        .attr("min", 1)
-        .attr("required", "required")
-        .addClass("form-control")
-        .addClass("record-amount")
-        .addClass(type + "-to-sum")
+            }
+        });
+    $("#" + type + "-" + newNo + "-amount")
         .on("blur", function () {
             validateAmount(this);
         })
@@ -443,41 +285,10 @@ function createAmountBlock(type, newNo) {
             updateTotalAmount(this);
             validateBalance();
         });
-    const amountError = $("<div/>")
-        .attr("id", type + "-" + newNo + "-amount-error")
-        .addClass("invalid-feedback");
-    return $("<div/>")
-        .append(amount, amountError);
-}
-
-/**
- * Creates and returns a new <div></div> action button block.
- *
- * @param {string} type the record type, either "debit" or "credit"
- * @param {number} newNo the number of this new accounting record
- * @param {string} btnDelId the ID of the delete button
- * @returns {JQuery<HTMLElement>} the new <div></div> button block
- * @private
- */
-function createActionButtonBlock(type, newNo, btnDelId) {
-    const btnSort = $("<button/>")
-        .attr("type", "button")
-        .addClass("btn btn-outline-secondary")
-        .addClass("btn-sort-" + type)
-        .append($("<i/>").addClass("fas fa-sort"));
-    const btnDelete = $("<button/>")
-        .attr("id", btnDelId)
-        .attr("type", "button")
-        .addClass("btn btn-danger")
-        .addClass("btn-del-record")
-        .addClass("btn-del-" + type)
+    $("#" + type + "-" + newNo + "-delete")
         .on("click", function () {
             deleteRecord(this);
-        })
-        .append($("<i/>").addClass("fas fa-trash"));
-    return $("<div/>")
-        .addClass("btn-actions-" + type)
-        .append(btnSort, btnDelete);
+        });
 }
 
 /**
