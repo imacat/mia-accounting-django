@@ -24,7 +24,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -37,7 +37,7 @@ from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.status import success_redirect, error_redirect
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
-    strip_form, new_pk
+    strip_form, new_pk, PaginationException
 from .models import Record, Transaction, Account
 from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
@@ -147,7 +147,10 @@ def cash(request, account, period):
     record_balance_before.balance = balance_before
     records.insert(0, record_balance_before)
     records.append(record_sum)
-    pagination = Pagination(request, records, True)
+    try:
+        pagination = Pagination(request, records, True)
+    except PaginationException as e:
+        return HttpResponseRedirect(e.url)
     records = pagination.items
     find_imbalanced(records)
     find_order_holes(records)
