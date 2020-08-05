@@ -481,7 +481,7 @@ function validateNote() {
     note.value = note.value.trim();
     if (note.value.length > 128) {
         note.classList.add("is-invalid");
-        errorMessage.text(gettext("This note is too long (max. 128 characters)."));
+        errorMessage.text(gettext("These notes are too long (max. 128 characters)."));
         return false;
     }
     note.classList.remove("is-invalid");

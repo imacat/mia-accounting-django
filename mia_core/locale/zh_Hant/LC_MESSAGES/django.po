@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 00:48+0800\n"
-"PO-Revision-Date: 2020-08-06 00:40+0800\n"
+"POT-Creation-Date: 2020-08-06 01:42+0800\n"
+"PO-Revision-Date: 2020-08-06 01:46+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -37,11 +37,11 @@ msgid "All Time"
 msgstr "全部"
 
 #: mia_core/period.py:583 mia_core/period.py:616
-#: mia_core/templatetags/mia_core.py:212
+#: mia_core/templatetags/mia_core.py:213
 msgid "This Month"
 msgstr "這個月"
 
-#: mia_core/period.py:624 mia_core/templatetags/mia_core.py:219
+#: mia_core/period.py:624 mia_core/templatetags/mia_core.py:220
 msgid "Last Month"
 msgstr "上個月"
 
@@ -53,11 +53,11 @@ msgstr "今年"
 msgid "Last Year"
 msgstr "去年"
 
-#: mia_core/period.py:656 mia_core/templatetags/mia_core.py:192
+#: mia_core/period.py:656 mia_core/templatetags/mia_core.py:193
 msgid "Today"
 msgstr "今天"
 
-#: mia_core/period.py:658 mia_core/templatetags/mia_core.py:194
+#: mia_core/period.py:658 mia_core/templatetags/mia_core.py:195
 msgid "Yesterday"
 msgstr "昨天"
 

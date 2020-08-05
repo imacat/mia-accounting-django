@@ -49,7 +49,7 @@ class RecordForm(forms.Form):
         required=False,
         max_length=128,
         error_messages={
-            "max_length": _("This summary is too long."),
+            "max_length": _("This summary is too long (max. 128 characters)."),
         })
     amount = forms.IntegerField(
         min_value=1,
@@ -181,13 +181,14 @@ class TransactionForm(forms.Form):
     date = forms.DateField(
         required=True,
         error_messages={
+            "required": _("Please fill in the date."),
             "invalid": _("This date is not valid.")
         })
     notes = forms.CharField(
         required=False,
         max_length=128,
         error_messages={
-            "max_length": _("This notes is too long.")
+            "max_length": _("These notes are too long (max. 128 characters).")
         })
 
     def __init__(self, *args, **kwargs):

@@ -5,16 +5,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: mia 1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 00:48+0800\n"
-"PO-Revision-Date: 2020-08-06 00:40+0800\n"
+"Project-Id-Version: mia-js 1.0\n"
+"Report-Msgid-Bugs-To: imacat <imacat@mail.imacat.idv.tw>\n"
+"POT-Creation-Date: 2020-08-06 01:42+0800\n"
+"PO-Revision-Date: 2020-08-06 01:46+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: accounting/converters.py:127 accounting/utils.py:261
 msgid "current assets and liabilities"
@@ -29,8 +30,8 @@ msgid "Please select the account."
 msgstr "請選擇會計科目。"
 
 #: accounting/forms.py:52
-msgid "This summary is too long."
-msgstr "摘要太長了。"
+msgid "This summary is too long (max. 128 characters)."
+msgstr "摘要太長了（最長128個字）。"
 
 #: accounting/forms.py:57
 msgid "Please fill in the amount."
@@ -65,14 +66,18 @@ msgid "This record is not a debit record."
 msgstr "這不是借方的會計記錄。"
 
 #: accounting/forms.py:184
+msgid "Please fill in the date."
+msgstr "請填寫日期。"
+
+#: accounting/forms.py:185
 msgid "This date is not valid."
 msgstr "請依正確日期格式填寫日期。"
 
-#: accounting/forms.py:190
-msgid "This notes is too long."
-msgstr "註記太長了。"
+#: accounting/forms.py:191
+msgid "These notes are too long (max. 128 characters)."
+msgstr "註記太長了（最長128個字）。"
 
-#: accounting/forms.py:220
+#: accounting/forms.py:221
 msgid "The total amount of debit and credit records are inconsistent."
 msgstr "借方和貸方合計不符。"
 
