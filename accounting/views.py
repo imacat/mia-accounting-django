@@ -920,6 +920,8 @@ def txn_store(request, txn_type, txn=None):
         txn.pk = new_pk(Transaction)
         txn.created_at = Now()
         txn.created_by = user
+    txn.updated_at = Now()
+    txn.updated_by = user
     txn_to_sort = []
     if txn.date != old_date:
         if old_date is not None:
@@ -935,8 +937,6 @@ def txn_store(request, txn_type, txn=None):
             .filter(date=txn.date)\
             .aggregate(max=Max("ord"))["max"]
         txn.ord = 1 if max_ord is None else max_ord + 1
-    txn.updated_at = Now()
-    txn.updated_by = user
     for record in txn.records:
         if record.pk is None:
             record.pk = new_pk(Record)
