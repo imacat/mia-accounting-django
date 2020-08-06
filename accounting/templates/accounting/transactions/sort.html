@@ -40,7 +40,7 @@ First written: 2020/8/6
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{% if "r" in request.GET %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
-    {% trans "Back" context "Navigation|" as text %}{{ text|force_escape }}
+    {{ _("Back")|force_escape }}
   </a>
 </div>
 

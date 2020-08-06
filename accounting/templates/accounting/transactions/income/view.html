@@ -69,26 +69,26 @@ First written: 2020/7/23
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{% if "r" in request.GET %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
-    {% trans "Back" context "Navigation|" as text %}{{ text|force_escape }}
+    {{ _("Back")|force_escape }}
   </a>
   <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" "income" item %}">
     <i class="fas fa-edit"></i>
-    {% trans "Edit" context "Navigation|" as text %}{{ text|force_escape }}
+    {{ _("Edit")|force_escape }}
   </a>
   {% if not item.has_many_same_day %}
     <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{{ _("There is no other transaction at the same day.")|force_escape }}">
       <i class="fas fa-sort"></i>
-      {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+      {{ _("Sort")|force_escape }}
     </button>
   {% else %}
     <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url_with_return "accounting:transactions.sort" item.date %}">
       <i class="fas fa-sort"></i>
-      {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+      {{ _("Sort")|force_escape }}
     </a>
   {% endif %}
   <a class="btn btn-primary d-none d-sm-inline" href="{% url_keep_return "accounting:transactions.show" "transfer" item %}">
     <i class="fas fa-exchange-alt"></i>
-    {% trans "To Transfer" context "Navigation|" as text %}{{ text|force_escape }}
+    {{ _("To Transfer")|force_escape }}
   </a>
   <div class="btn-group d-sm-none">
     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
@@ -98,23 +98,23 @@ First written: 2020/7/23
       {% if not item.has_many_same_day %}
         <span class="dropdown-item disabled" title="{{ _("There is no other transaction at the same day.")|force_escape }}">
           <i class="fas fa-sort"></i>
-          {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+          {{ _("Sort")|force_escape }}
         </span>
       {% else %}
         <a class="dropdown-item" href="{% url_with_return "accounting:transactions.sort" item.date %}">
           <i class="fas fa-sort"></i>
-          {% trans "Sort" context "Navigation|" as text %}{{ text|force_escape }}
+          {{ _("Sort")|force_escape }}
         </a>
       {% endif %}
       <a class="dropdown-item" href="{% url_keep_return "accounting:transactions.show" "transfer" item %}">
         <i class="fas fa-exchange-alt"></i>
-        {% trans "To Transfer" context "Navigation|" as text %}{{ text|force_escape }}
+        {{ _("To Transfer")|force_escape }}
       </a>
     </div>
   </div>
   <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#del-modal">
     <i class="fas fa-trash"></i>
-    {% trans "Delete" context "Navigation|" as text %}{{ text|force_escape }}
+    {{ _("Delete")|force_escape }}
   </button>
 </div>
 

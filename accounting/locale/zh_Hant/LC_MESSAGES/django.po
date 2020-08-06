@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 23:47+0800\n"
-"PO-Revision-Date: 2020-08-06 23:48+0800\n"
+"POT-Creation-Date: 2020-08-06 23:59+0800\n"
+"PO-Revision-Date: 2020-08-07 00:01+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -148,7 +148,6 @@ msgstr "資產負債表"
 #: accounting/templates/accounting/journal.html:62
 #: accounting/templates/accounting/ledger.html:75
 #: accounting/templates/accounting/trial-balance.html:62
-msgctxt "Period|"
 msgid "Period"
 msgstr "期間"
 
@@ -522,7 +521,6 @@ msgstr "現金支出傳票"
 #: accounting/templates/accounting/transactions/sort.html:43
 #: accounting/templates/accounting/transactions/transfer/form.html:44
 #: accounting/templates/accounting/transactions/transfer/view.html:72
-msgctxt "Navigation|"
 msgid "Back"
 msgstr "回上頁"
 
@@ -576,7 +574,6 @@ msgstr "您真的要刪掉這張現金支出傳票嗎？"
 #: accounting/templates/accounting/transactions/expense/view.html:76
 #: accounting/templates/accounting/transactions/income/view.html:76
 #: accounting/templates/accounting/transactions/transfer/view.html:76
-msgctxt "Navigation|"
 msgid "Edit"
 msgstr "編輯"
 
@@ -601,7 +598,6 @@ msgstr "當天沒有其他會計傳票。"
 #: accounting/templates/accounting/transactions/transfer/view.html:86
 #: accounting/templates/accounting/transactions/transfer/view.html:97
 #: accounting/templates/accounting/transactions/transfer/view.html:102
-msgctxt "Navigation|"
 msgid "Sort"
 msgstr "排序"
 
@@ -609,14 +605,12 @@ msgstr "排序"
 #: accounting/templates/accounting/transactions/expense/view.html:111
 #: accounting/templates/accounting/transactions/income/view.html:91
 #: accounting/templates/accounting/transactions/income/view.html:111
-msgctxt "Navigation|"
 msgid "To Transfer"
 msgstr "改轉帳"
 
 #: accounting/templates/accounting/transactions/expense/view.html:117
 #: accounting/templates/accounting/transactions/income/view.html:117
 #: accounting/templates/accounting/transactions/transfer/view.html:109
-msgctxt "Navigation|"
 msgid "Delete"
 msgstr "刪除"
 

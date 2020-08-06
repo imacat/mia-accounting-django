@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 23:47+0800\n"
-"PO-Revision-Date: 2020-08-06 01:46+0800\n"
+"POT-Creation-Date: 2020-08-06 23:59+0800\n"
+"PO-Revision-Date: 2020-08-07 00:01+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -37,112 +37,81 @@ msgid "All Time"
 msgstr "全部"
 
 #: mia_core/period.py:583 mia_core/period.py:616
+#: mia_core/templates/mia_core/include/period-chooser.html:60
 #: mia_core/templatetags/mia_core.py:213
 msgid "This Month"
 msgstr "這個月"
 
-#: mia_core/period.py:624 mia_core/templatetags/mia_core.py:220
+#: mia_core/period.py:624
+#: mia_core/templates/mia_core/include/period-chooser.html:63
+#: mia_core/templatetags/mia_core.py:220
 msgid "Last Month"
 msgstr "上個月"
 
 #: mia_core/period.py:639
+#: mia_core/templates/mia_core/include/period-chooser.html:76
 msgid "This Year"
 msgstr "今年"
 
 #: mia_core/period.py:641
+#: mia_core/templates/mia_core/include/period-chooser.html:79
 msgid "Last Year"
 msgstr "去年"
 
-#: mia_core/period.py:656 mia_core/templatetags/mia_core.py:193
+#: mia_core/period.py:656
+#: mia_core/templates/mia_core/include/period-chooser.html:95
+#: mia_core/templatetags/mia_core.py:193
 msgid "Today"
 msgstr "今天"
 
-#: mia_core/period.py:658 mia_core/templatetags/mia_core.py:195
+#: mia_core/period.py:658
+#: mia_core/templates/mia_core/include/period-chooser.html:98
+#: mia_core/templatetags/mia_core.py:195
 msgid "Yesterday"
 msgstr "昨天"
 
 #: mia_core/templates/mia_core/include/period-chooser.html:37
-msgctxt "Period|"
 msgid "Choosing Your Period"
 msgstr "選擇時間區間"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:46
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:45
 msgid "Month"
 msgstr "月"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:49
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:48
 msgid "Year"
 msgstr "年"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:52
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:51
 msgid "Day"
 msgstr "日"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:55
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:54
 msgid "Custom"
 msgstr "自訂"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:61
-msgctxt "Period|"
-msgid "This Month"
-msgstr "這個月"
-
-#: mia_core/templates/mia_core/include/period-chooser.html:64
-msgctxt "Period|"
-msgid "Last Month"
-msgstr "上個月"
-
-#: mia_core/templates/mia_core/include/period-chooser.html:67
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:66
 msgid "Since Last Month"
 msgstr "上個月至今"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:77
-msgctxt "Period|"
-msgid "This Year"
-msgstr "今年"
-
-#: mia_core/templates/mia_core/include/period-chooser.html:80
-msgctxt "Period|"
-msgid "Last Year"
-msgstr "去年"
-
-#: mia_core/templates/mia_core/include/period-chooser.html:96
-msgctxt "Period|"
-msgid "Today"
-msgstr "今天"
-
-#: mia_core/templates/mia_core/include/period-chooser.html:99
-msgctxt "Period|"
-msgid "Yesterday"
-msgstr "昨天"
-
-#: mia_core/templates/mia_core/include/period-chooser.html:104
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:103
 msgid "Date:"
 msgstr "日期："
 
-#: mia_core/templates/mia_core/include/period-chooser.html:108
-#: mia_core/templates/mia_core/include/period-chooser.html:126
+#: mia_core/templates/mia_core/include/period-chooser.html:107
+#: mia_core/templates/mia_core/include/period-chooser.html:125
 msgid "Confirm"
 msgstr "確定"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:114
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:113
 msgid "All"
 msgstr "全部"
 
-#: mia_core/templates/mia_core/include/period-chooser.html:118
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:117
 msgid "From:"
 msgstr "從："
 
-#: mia_core/templates/mia_core/include/period-chooser.html:122
-msgctxt "Period|"
+#: mia_core/templates/mia_core/include/period-chooser.html:121
 msgid "To:"
 msgstr "到："
 

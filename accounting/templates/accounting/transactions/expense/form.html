@@ -41,7 +41,7 @@ First written: 2020/7/23
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{% if item.transaction %}{% url_keep_return "accounting:transactions.show" "expense" item.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
-    {% trans "Back" context "Navigation|" as text %}{{ text|force_escape }}
+    {{ _("Back")|force_escape }}
   </a>
 </div>
 

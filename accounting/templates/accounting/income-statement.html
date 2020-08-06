@@ -59,7 +59,7 @@ First written: 2020/7/19
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
     <i class="far fa-calendar-alt"></i>
     <span class="d-none d-md-inline">{{ period.description }}</span>
-    <span class="d-md-none">{% trans "Period" context "Period|" as text %}{{ text|force_escape }}</span>
+    <span class="d-md-none">{{ _("Period")|force_escape }}</span>
   </button>
 </div>
 

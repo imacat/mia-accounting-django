@@ -34,8 +34,7 @@ First written: 2020/7/10
       <div class="modal-header">
         <h4 class="modal-title">
           <i class="far fa-calendar-alt"></i>
-          {% trans "Choosing Your Period" context "Period|" as text %}
-          {{ text|force_escape }}
+          {{ _("Choosing Your Period")|force_escape }}
         </h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
@@ -43,28 +42,28 @@ First written: 2020/7/10
       <!-- Modal body -->
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <span id="period-tab-month" class="period-tab nav-link active">{% trans "Month" context "Period|" as text %}{{ text|force_escape }}</span>
+          <span id="period-tab-month" class="period-tab nav-link active">{{ _("Month")|force_escape }}</span>
         </li>
         <li class="nav-item">
-          <span id="period-tab-year" class="period-tab nav-link">{% trans "Year" context "Period|" as text %}{{ text|force_escape }}</span>
+          <span id="period-tab-year" class="period-tab nav-link">{{ _("Year")|force_escape }}</span>
         </li>
         <li class="nav-item">
-          <span id="period-tab-day" class="period-tab nav-link">{% trans "Day" context "Period|" as text %}{{ text|force_escape }}</span>
+          <span id="period-tab-day" class="period-tab nav-link">{{ _("Day")|force_escape }}</span>
         </li>
         <li class="nav-item">
-          <span id="period-tab-custom" class="period-tab nav-link">{% trans "Custom" context "Period|" as text %}{{ text|force_escape }}</span>
+          <span id="period-tab-custom" class="period-tab nav-link">{{ _("Custom")|force_escape }}</span>
         </li>
       </ul>
       <div id="period-content-month" class="period-content modal-body">
         <div class="period-shortcuts">
           {% if period.this_month is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.this_month %}">{% trans "This Month" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.this_month %}">{{ _("This Month")|force_escape }}</a>
           {% endif %}
           {% if period.last_month is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.last_month %}">{% trans "Last Month" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.last_month %}">{{ _("Last Month")|force_escape }}</a>
           {% endif %}
           {% if period.since_last_month is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.since_last_month %}">{% trans "Since Last Month" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.since_last_month %}">{{ _("Since Last Month")|force_escape }}</a>
           {% endif %}
         </div>
         {% if period.has_months_to_choose %}
@@ -74,10 +73,10 @@ First written: 2020/7/10
       <div id="period-content-year" class="period-content modal-body d-none">
         <div class="period-shortcuts">
           {% if period.this_year is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.this_year %}">{% trans "This Year" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.this_year %}">{{ _("This Year")|force_escape }}</a>
           {% endif %}
           {% if period.last_year is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.last_year %}">{% trans "Last Year" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.last_year %}">{{ _("Last Year")|force_escape }}</a>
           {% endif %}
         </div>
         {% if period.has_years_to_choose %}
@@ -93,15 +92,15 @@ First written: 2020/7/10
       <div id="period-content-day" class="period-content modal-body d-none">
         <div class="period-shortcuts">
           {% if period.today is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.today %}">{% trans "Today" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.today %}">{{ _("Today")|force_escape }}</a>
           {% endif %}
           {% if period.yesterday is not None %}
-            <a class="btn btn-primary" role="button" href="{% url_period period.yesterday %}">{% trans "Yesterday" context "Period|" as text %}{{ text|force_escape }}</a>
+            <a class="btn btn-primary" role="button" href="{% url_period period.yesterday %}">{{ _("Yesterday")|force_escape }}</a>
           {% endif %}
         </div>
         {% if period.has_days_to_choose %}
           <div>
-            <label for="day-picker">{% trans "Date:" context "Period|" as text %}{{ text|force_escape }}</label>
+            <label for="day-picker">{{ _("Date:")|force_escape }}</label>
             <input id="day-picker" type="date" value="{{ period.chosen_day }}" min="{{ period.data_start }}" max="{{ period.data_end }}" required="required" />
           </div>
           <div>
@@ -111,15 +110,15 @@ First written: 2020/7/10
       </div>
       <div id="period-content-custom" class="period-content modal-body d-none">
         <div class="period-shortcuts">
-          <a class="btn btn-primary" role="button" href="{% url_period "-" %}">{% trans "All" context "Period|" as text %}{{ text|force_escape }}</a>
+          <a class="btn btn-primary" role="button" href="{% url_period "-" %}">{{ _("All")|force_escape }}</a>
         </div>
         {% if period.has_days_to_choose %}
           <div>
-            <label for="period-start">{% trans "From:" context "Period|" as text %}{{ text|force_escape }}</label>
+            <label for="period-start">{{ _("From:")|force_escape }}</label>
             <input id="period-start" type="date" value="{{ period.chosen_start }}" min="{{ period.data_start }}" max="{{ period.chosen_end }}" required="required" />
           </div>
           <div>
-            <label for="period-end">{% trans "To:" context "Period|" as text %}{{ text|force_escape }}</label>
+            <label for="period-end">{{ _("To:")|force_escape }}</label>
             <input id="period-end" type="date" value="{{ period.chosen_end }}" min="{{ period.chosen_start }}" max="{{ period.data_end }}" required="required" />
           </div>
           <div>
