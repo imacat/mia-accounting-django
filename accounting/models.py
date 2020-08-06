@@ -21,6 +21,7 @@
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum, Case, When, F, Q
 from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
@@ -322,8 +323,9 @@ class Record(DirtyFieldsMixin, models.Model):
         self.balance = None
         self._is_balanced = None
         self._has_order_hole = None
-        self._is_credit_card_paid = None
+        self._is_payable = None
         self._is_existing_equipment = None
+        self.is_payable = False
 
     def __str__(self):
         """Returns the string representation of this accounting
@@ -381,17 +383,6 @@ class Record(DirtyFieldsMixin, models.Model):
     @has_order_hole.setter
     def has_order_hole(self, value):
         self._has_order_hole = value
-
-    @property
-    def is_credit_card_paid(self):
-        # TODO: To be done
-        if self._is_credit_card_paid is None:
-            self._is_credit_card_paid = True
-        return self._is_credit_card_paid
-
-    @is_credit_card_paid.setter
-    def is_credit_card_paid(self, value):
-        self._is_credit_card_paid = value
 
     @property
     def is_existing_equipment(self):

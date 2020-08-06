@@ -45,7 +45,7 @@ from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
     sort_post_txn_records, make_txn_form_from_status, \
     make_txn_form_from_model, make_txn_form_from_post, MonthlySummary, \
-    get_summary_categories
+    get_summary_categories, find_payable_records
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -340,6 +340,7 @@ def ledger(request, account, period):
     records = pagination.items
     find_imbalanced(records)
     find_order_holes(records)
+    find_payable_records(account, records)
     return render(request, "accounting/ledger.html", {
         "item_list": records,
         "pagination": pagination,

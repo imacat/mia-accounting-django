@@ -96,7 +96,7 @@ First written: 2020/7/16
     </thead>
     <tbody>
       {% for item in item_list %}
-        <tr class="{% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} table-danger {% endif %}{% if item.is_existing_equipment %} table-info {% endif %}">
+        <tr class="{% if not item.is_balanced or item.has_order_hole or item.is_payable %} table-danger {% endif %}{% if item.is_existing_equipment %} table-info {% endif %}">
           <td>{{ item.transaction.date|smart_date }}</td>
           <td>{{ item.account.title|title_case }}</td>
           <td>{{ item.summary|default:"" }}{% if not item.is_balanced %}
@@ -107,9 +107,9 @@ First written: 2020/7/16
             <span class="badge badge-danger badge-pill">
               {{ _("Need Reorder")|force_escape }}
             </span>
-          {% endif %}{% if not item.is_credit_card_paid %}
+          {% endif %}{% if item.is_payable %}
             <span class="badge badge-danger badge-pill">
-              {{ _("Unpaid")|force_escape }}
+              {{ _("Payable")|force_escape }}
             </span>
           {% endif %}{% if item.is_existing_equipment %}
             <span class="badge badge-info badge-pill">
@@ -135,7 +135,7 @@ First written: 2020/7/16
   {# The list for small screens #}
   <ul class="list-group d-md-none">
     {% for item in item_list %}
-      <li class="list-group-item {% if not item.is_balanced or item.has_order_hole or not item.is_credit_card_paid %} list-group-item-danger {% endif %}{% if item.is_existing_equipment %} list-group-item-info {% endif %}">
+      <li class="list-group-item {% if not item.is_balanced or item.has_order_hole or item.is_payable %} list-group-item-danger {% endif %}{% if item.is_existing_equipment %} list-group-item-info {% endif %}">
         {% if item.pk is not None %}
           <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}">
             <div class="date-account-line">
@@ -154,9 +154,9 @@ First written: 2020/7/16
                     {{ _("Need Reorder")|force_escape }}
                   </span>
                 {% endif %}
-                {% if not item.is_credit_card_paid %}
+                {% if item.is_payable %}
                   <span class="badge badge-danger badge-pill">
-                    {{ _("Unpaid")|force_escape }}
+                    {{ _("Payable")|force_escape }}
                   </span>
                 {% endif %}
                 {% if item.is_existing_equipment %}

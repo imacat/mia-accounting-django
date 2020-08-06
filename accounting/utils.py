@@ -323,6 +323,35 @@ def find_order_holes(records):
                                 and record.transaction.date in holes
 
 
+def find_payable_records(account, records):
+    """Finds and sets the whether the payable record is paid.
+
+    Args:
+        account (Account): The current ledger account.
+        records (list[Record]): The accounting records.
+    """
+    if "PAYABLE_ACCOUNTS" not in settings.ACCOUNTING:
+        return
+    if not isinstance(settings.ACCOUNTING["PAYABLE_ACCOUNTS"], list):
+        return
+    if account.code not in settings.ACCOUNTING["PAYABLE_ACCOUNTS"]:
+        return
+    rows = Record.objects\
+        .filter(
+            account__code__in=settings.ACCOUNTING["PAYABLE_ACCOUNTS"],
+            summary__isnull=False)\
+        .values("account__code", "summary")\
+        .annotate(
+            balance=Sum(Case(When(is_credit=True, then=1), default=-1)
+                        * F("amount")))\
+        .filter(~Q(balance=0))
+    keys = ["%s-%s" % (x["account__code"], x["summary"]) for x in rows]
+    for x in [x for x in records
+              if x.pk is not None
+                 and F"{x.account.code}-{x.summary}" in keys]:
+        x.is_payable = True
+
+
 def get_summary_categories():
     """Finds and returns the summary categories and their corresponding account
     hints.
