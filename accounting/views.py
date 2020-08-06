@@ -25,7 +25,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -989,6 +989,64 @@ def txn_delete(request, txn):
     url = request.GET.get("r") or reverse("accounting:home")
     message = gettext_noop("This transaction was deleted successfully.")
     return success_redirect(request, url, message)
+
+
+@login_required
+def txn_sort(request, date):
+    """The view for the form to sort the transactions in a same day.
+
+    Args:
+        request (HttpRequest): The request.
+        date (datetime.date): The day.
+
+    Returns:
+        HttpResponse: The response.
+
+    Raises:
+        Http404: When ther are less than two transactions in this day.
+    """
+    transactions = Transaction.objects.filter(date=date).order_by("ord")
+    if len(transactions) < 2:
+        raise Http404
+    if request.method != "POST":
+        return render(request, "accounting/transactions/sort.html", {
+            "item_list": transactions,
+            "date": date,
+        })
+    else:
+        post = request.POST.dict()
+        errors = {}
+        for txn in transactions:
+            key = F"transaction-{txn.pk}-ord"
+            if key not in post:
+                errors[key] = gettext_noop("Invalid arguments.")
+            elif not re.match("^[1-9][0-9]*", post[key]):
+                errors[key] = gettext_noop("Invalid order.")
+
+        if len(errors) > 0:
+            return error_redirect(
+                request, reverse("accounting:transactions.sort"), post)
+
+        keys = [F"transaction-{x.pk}-ord" for x in transactions]
+        keys.sort(key=lambda x: int(post[x]))
+        for i in range(len(keys)):
+            post[keys[i]] = i + 1
+        for txn in transactions:
+            txn.ord = post[F"transaction-{txn.pk}-ord"]
+        modified = [x for x in transactions if x.is_dirty()]
+
+        if len(modified) == 0:
+            url = request.GET.get("r") or reverse("accounting:home")
+            message = gettext_noop("The transaction orders were not modified.")
+            return success_redirect(request, url, message)
+
+        with transaction.atomic():
+            for txn in modified:
+                txn.save()
+        url = request.GET.get("r") or reverse("accounting:home")
+        message = gettext_noop(
+            "The transaction orders were saved successfully.")
+        return success_redirect(request, url, message)
 
 
 @require_GET

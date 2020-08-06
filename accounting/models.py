@@ -180,6 +180,16 @@ class Transaction(DirtyFieldsMixin, models.Model):
                     if isinstance(x.amount, int)])
 
     @property
+    def debit_summaries(self):
+        """The summaries of the debit records.
+
+        Returns:
+            list[str]: The summaries of the debit records.
+        """
+        return [x.account.title if x.summary is None else x.summary
+                for x in self.debit_records]
+
+    @property
     def credit_records(self):
         """The credit records of this transaction.
 
@@ -192,6 +202,25 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """The total amount of the credit records."""
         return sum([x.amount for x in self.credit_records
                     if isinstance(x.amount, int)])
+
+    @property
+    def credit_summaries(self):
+        """The summaries of the credit records.
+
+        Returns:
+            list[str]: The summaries of the credit records.
+        """
+        return [x.account.title if x.summary is None else x.summary
+                for x in self.credit_records]
+
+    @property
+    def amount(self):
+        """The amount of this transaction.
+
+        Returns:
+            int: The amount of this transaction.
+        """
+        return self.debit_total()
 
     @property
     def is_balanced(self):

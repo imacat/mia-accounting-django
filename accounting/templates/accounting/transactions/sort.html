@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% comment %}
+The Mia Accounting Application
+sort.html: The template to sort transactions in a same day
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/8/6
+{% endcomment %}
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+{% load mia_core %}
+{% load accounting %}
+
+{% block settings %}
+  {% blocktrans asvar title with date=date|smart_date %}Reorder the Transactions in {{ date }}{% endblocktrans %}
+  {% setvar "title" title %}
+  {% setvar "use_jqueryui" True %}
+  {% static "accounting/css/report.css" as file %}{% add_css file %}
+  {% static "accounting/css/transactions-sort.css" as file %}{% add_css file %}
+  {% static "accounting/js/transaction-sort.js" as file %}{% add_js file %}
+{% endblock %}
+
+{% block content %}
+
+<div class="btn-group btn-actions">
+  <a class="btn btn-primary" role="button" href="{% if "r" in request.GET %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
+    <i class="fas fa-chevron-circle-left"></i>
+    {% trans "Back" context "Navigation|" as text %}{{ text|force_escape }}
+  </a>
+</div>
+
+<div class="form-group row">
+  <div class="col-sm-2">
+    <label for="txn-date">{{ _("Date:") }}</label>
+  </div>
+
+  <div id="txn-date" class="col-sm-10">
+    {{ date|smart_date }}
+  </div>
+</div>
+
+{% if item_list|length > 1 %}
+  <form action="{% url_keep_return "accounting:transactions.sort" date %}" method="post">
+    {% csrf_token %}
+    <table class="table general-journal-table">
+      <thead>
+        <tr>
+          <th class="actions" scope="col"></th>
+          <th scope="col">{{ _("Type") }}</th>
+          <th scope="col">{{ _("Content") }}</th>
+          <th class="amount" scope="col">{{ _("Amount") }}</th>
+          <th scope="col">{{ _("Notes") }}</th>
+        </tr>
+      </thead>
+      <tbody id="transactions">
+        {% for item in item_list %}
+          <tr id="transaction-{{ item.pk }}" class="transaction {% if not item.is_balanced %} table-danger {% endif %}">
+            <td class="actions">
+              <div class="btn-group">
+                <button class="btn btn-outline-secondary" type="button">
+                  <i class="fas fa-sort"></i>
+                </button>
+                <a class="btn btn-primary" role="button" href="{% url_with_return "accounting:transactions.show" item.type item %}">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+            </td>
+            <td>
+              {% if item.is_cash_expense %}
+                {{ _("Cash Expense") }}
+              {% elif item.is_cash_income %}
+                {{ _("Cash Income") }}
+              {% else %}
+                {{ _("Transfer") }}
+              {% endif %}
+            </td>
+            <td>
+              <input id="transaction-{{ item.pk }}-ord" type="hidden" name="transaction-{{ item.pk }}-ord" value="{{ forloop.counter }}" />
+              {% if item.is_cash_expense %}
+                <ul class="txn-content-expense">
+                  {% for summary in item.debit_sumaries %}
+                    <li>{{ summary }}</li>
+                  {% endfor %}
+                </ul>
+              {% elif item.is_cash_income %}
+                <ul class="txn-content-income">
+                  {% for summary in item.credit_summaries %}
+                    <li>{{ summary }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <ul class="txn-content-expense">
+                  {% for summary in item.debit_sumaries %}
+                    <li>{{ summary }}</li>
+                  {% endfor %}
+                </ul>
+                <ul class="txn-content-income">
+                  {% for summary in item.credit_summaries %}
+                    <li>{{ summary }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% if not item.is_balanced %}
+                <span class="badge badge-danger badge-pill">
+                  {{ _("Unbalanced") }}
+                </span>
+              {% endif %}
+            </td>
+            <td class="amount">
+              {{ item.amount|accounting_amount }}
+            </td>
+            <td>{{ item.notes|default:"" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="form-group row">
+      <div class="col-sm-12">
+        <button class="btn btn-primary" type="submit">
+          <i class="fas fa-save"></i>
+          {{ _("Save") }}
+        </button>
+      </div>
+    </div>
+  </form>
+{% endif %}
+
+{% endblock %}
