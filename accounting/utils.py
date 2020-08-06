@@ -498,6 +498,7 @@ def make_txn_form_from_model(txn_type, txn):
         {x: str(getattr(txn, x)) for x in ["date", "notes"]
          if getattr(txn, x) is not None})
     form.transaction = txn if txn.pk is not None else None
+    form.txn_type = txn_type
     records = []
     if txn_type != "income":
         records = records + txn.debit_records
