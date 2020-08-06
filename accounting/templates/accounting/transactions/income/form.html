@@ -52,7 +52,7 @@ First written: 2020/7/23
   {% csrf_token %}
   <div class="row form-group">
     <div class="col-sm-2">
-      <label for="txn-date">{{ _("Date:") }}</label>
+      <label for="txn-date">{{ _("Date:")|force_escape }}</label>
     </div>
     <div class="col-sm-10">
       <input id="txn-date" class="form-control {% if should_validate and item.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date.value }}" required="required" />
@@ -77,7 +77,7 @@ First written: 2020/7/23
         </li>
         <li class="list-group-item">
           <div class="d-flex justify-content-between align-items-center">
-            {{ _("Total") }}
+            {{ _("Total")|force_escape }}
             <span id="credit-total" class="amount">{{ item.credit_total }}</span>
           </div>
         </li>
@@ -87,7 +87,7 @@ First written: 2020/7/23
 
   <div class="row form-group">
     <div class="col-sm-2">
-      <label for="txn-note">{{ _("Notes:") }}</label>
+      <label for="txn-note">{{ _("Notes:")|force_escape }}</label>
     </div>
     <div class="col-sm-10">
       <textarea id="txn-note" class="form-control {% if should_validate and item.notes.errors %} is-invalid {% endif %}" name="notes">{{ item.notes.value|default:"" }}</textarea>
@@ -99,7 +99,7 @@ First written: 2020/7/23
     <div class="col-sm-12">
       <button class="btn btn-primary" type="submit">
         <i class="fas fa-save"></i>
-        {{ _("Save") }}
+        {{ _("Save")|force_escape }}
       </button>
     </div>
   </div>

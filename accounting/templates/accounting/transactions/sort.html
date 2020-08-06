@@ -46,7 +46,7 @@ First written: 2020/8/6
 
 <div class="form-group row">
   <div class="col-sm-2">
-    <label for="txn-date">{{ _("Date:") }}</label>
+    <label for="txn-date">{{ _("Date:")|force_escape }}</label>
   </div>
 
   <div id="txn-date" class="col-sm-10">
@@ -61,10 +61,10 @@ First written: 2020/8/6
       <thead>
         <tr>
           <th class="actions" scope="col"></th>
-          <th scope="col">{{ _("Type") }}</th>
-          <th scope="col">{{ _("Content") }}</th>
-          <th class="amount" scope="col">{{ _("Amount") }}</th>
-          <th scope="col">{{ _("Notes") }}</th>
+          <th scope="col">{{ _("Type")|force_escape }}</th>
+          <th scope="col">{{ _("Content")|force_escape }}</th>
+          <th class="amount" scope="col">{{ _("Amount")|force_escape }}</th>
+          <th scope="col">{{ _("Notes")|force_escape }}</th>
         </tr>
       </thead>
       <tbody id="transactions">
@@ -82,11 +82,11 @@ First written: 2020/8/6
             </td>
             <td>
               {% if item.is_cash_expense %}
-                {{ _("Cash Expense") }}
+                {{ _("Cash Expense")|force_escape }}
               {% elif item.is_cash_income %}
-                {{ _("Cash Income") }}
+                {{ _("Cash Income")|force_escape }}
               {% else %}
-                {{ _("Transfer") }}
+                {{ _("Transfer")|force_escape }}
               {% endif %}
             </td>
             <td>
@@ -117,7 +117,7 @@ First written: 2020/8/6
               {% endif %}
               {% if not item.is_balanced %}
                 <span class="badge badge-danger badge-pill">
-                  {{ _("Unbalanced") }}
+                  {{ _("Unbalanced")|force_escape }}
                 </span>
               {% endif %}
             </td>
@@ -134,7 +134,7 @@ First written: 2020/8/6
       <div class="col-sm-12">
         <button class="btn btn-primary" type="submit">
           <i class="fas fa-save"></i>
-          {{ _("Save") }}
+          {{ _("Save")|force_escape }}
         </button>
       </div>
     </div>

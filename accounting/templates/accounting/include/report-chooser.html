@@ -30,21 +30,21 @@ First written: 2020/7/9
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">{{ _("Search Accounting Records") }}</h4>
+          <h4 class="modal-title">{{ _("Search Accounting Records")|force_escape }}</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
         <!-- Modal body -->
         <div class="modal-body">
-          <label for="accounting-query">{{ _("Search:") }}</label>
-          <input id="accounting-query" type="text" name="q" value="{% if request.resolver_match.url_name == "search" %}{{ request.GET.q }}{% endif %}" placeholder="{{ _("e.g. Coffee") }}" required="required" />
+          <label for="accounting-query">{{ _("Search:")|force_escape }}</label>
+          <input id="accounting-query" type="text" name="q" value="{% if request.resolver_match.url_name == "search" %}{{ request.GET.q }}{% endif %}" placeholder="{{ _("e.g. Coffee")|force_escape }}" required="required" />
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
           <button class="btn btn-primary" type="submit">
             <i class="fas fa-search"></i>
-            {{ _("Search") }}
+            {{ _("Search")|force_escape }}
           </button>
         </div>
       </div>
@@ -59,48 +59,48 @@ First written: 2020/7/9
       <i class="{{ current_report_icon }}"></i>
       {{ current_report_title }}
     </span>
-    <span class="d-md-none">{{ _("Book") }}</span>
+    <span class="d-md-none">{{ _("Book")|force_escape }}</span>
   </button>
   <div class="dropdown-menu account-picker">
     <a class="dropdown-item {% if request.resolver_match.url_name == "cash" %} active {% endif %}" href="{{ reports.cash }}">
       <i class="fas fa-money-bill-wave"></i>
-      {{ _("Cash Account") }}
+      {{ _("Cash Account")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "cash-summary" %} active {% endif %}" href="{{ reports.cash_summary }}">
       <i class="fas fa-money-bill-wave"></i>
-      {{ _("Cash Summary") }}
+      {{ _("Cash Summary")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "ledger" %} active {% endif %}" href="{{ reports.ledger }}">
       <i class="fas fa-file-invoice-dollar"></i>
-      {{ _("Ledger") }}
+      {{ _("Ledger")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "ledger-summary" %} active {% endif %}" href="{{ reports.ledger_summary }}">
       <i class="fas fa-file-invoice-dollar"></i>
-      {{ _("Ledger Summary") }}
+      {{ _("Ledger Summary")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "journal" %} active {% endif %}" href="{{ reports.journal }}">
       <i class="fas fa-book"></i>
-      {{ _("Journal") }}
+      {{ _("Journal")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "trial-balance" %} active {% endif %}" href="{{ reports.trial_balance }}">
       <i class="fas fa-balance-scale-right"></i>
-      {{ _("Trial Balance") }}
+      {{ _("Trial Balance")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "income-statement" %} active {% endif %}" href="{{ reports.income_statement }}">
       <i class="fas fa-file-invoice"></i>
-      {{ _("Income Statement") }}
+      {{ _("Income Statement")|force_escape }}
     </a>
     <a class="dropdown-item {% if request.resolver_match.url_name == "balance-sheet" %} active {% endif %}" href="{{ reports.balance_sheet }}">
       <i class="fas fa-balance-scale"></i>
-      {{ _("Balance Sheet") }}
+      {{ _("Balance Sheet")|force_escape }}
     </a>
     <span class="dropdown-item dropdown-search {% if request.resolver_match.url_name == "search" %} active {% endif %}"  data-toggle="modal" data-target="#accounting-search-modal">
       <i class="fas fa-search"></i>
-      {{ _("Search") }}
+      {{ _("Search")|force_escape }}
     </span>
     <a class="dropdown-item {% if request.resolver_match.url_name == "accounts" %} active {% endif %}" href="{% url "accounting:accounts" %}">
       <i class="fas fa-list-ol"></i>
-      {{ _("Accounts") }}
+      {{ _("Accounts")|force_escape }}
     </a>
   </div>
 </div>

@@ -105,7 +105,7 @@ First written: 2020/7/10
             <input id="day-picker" type="date" value="{{ period.chosen_day }}" min="{{ period.data_start }}" max="{{ period.data_end }}" required="required" />
           </div>
           <div>
-            <button id="button-period-day" class="btn btn-primary" type="submit">{{ _("Confirm") }}</button>
+            <button id="button-period-day" class="btn btn-primary" type="submit">{{ _("Confirm")|force_escape }}</button>
           </div>
         {% endif %}
       </div>
@@ -123,7 +123,7 @@ First written: 2020/7/10
             <input id="period-end" type="date" value="{{ period.chosen_end }}" min="{{ period.chosen_start }}" max="{{ period.data_end }}" required="required" />
           </div>
           <div>
-            <button id="button-period-custom" class="btn btn-primary" type="submit">{{ _("Confirm") }}</button>
+            <button id="button-period-custom" class="btn btn-primary" type="submit">{{ _("Confirm")|force_escape }}</button>
           </div>
         {% endif %}
       </div>

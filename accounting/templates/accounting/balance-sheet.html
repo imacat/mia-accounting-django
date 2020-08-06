@@ -93,7 +93,7 @@ First written: 2020/7/20
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
-                    {{ _("View") }}
+                    {{ _("View")|force_escape }}
                   </a>
                 </td>
               </tr>
@@ -124,7 +124,7 @@ First written: 2020/7/20
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
-                    {{ _("View") }}
+                    {{ _("View")|force_escape }}
                   </a>
                 </td>
               </tr>
@@ -133,7 +133,7 @@ First written: 2020/7/20
         </tbody>
         <tfoot>
           <tr class="total">
-            <td>{{ _("Total") }}</td>
+            <td>{{ _("Total")|force_escape }}</td>
             <td class="amount {% if liabilities.amount < 0 %} text-danger {% endif %}">
               {{ liabilities.amount|accounting_amount }}
             </td>
@@ -161,7 +161,7 @@ First written: 2020/7/20
                 <td class="actions">
                   <a href="{{ item.url }}" class="btn btn-info" role="button">
                     <i class="fas fa-eye"></i>
-                    {{ _("View") }}
+                    {{ _("View")|force_escape }}
                   </a>
                 </td>
               </tr>
@@ -170,7 +170,7 @@ First written: 2020/7/20
         </tbody>
         <tfoot>
           <tr class="total">
-            <td>{{ _("Total") }}</td>
+            <td>{{ _("Total")|force_escape }}</td>
             <td class="amount {% if owners_equity.amount < 0 %} text-danger {% endif %}">
               {{ owners_equity.amount|accounting_amount }}
             </td>
@@ -185,7 +185,7 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-total-table">
         <tfoot>
           <tr class="total">
-            <td class="align-middle">{{ _("Total") }}</td>
+            <td class="align-middle">{{ _("Total")|force_escape }}</td>
             <td class="text-right align-middle font-italic {% if assets.amount < 0 %} text-danger {% endif %}">
               {{ assets.amount|accounting_amount }}
             </td>
@@ -198,7 +198,7 @@ First written: 2020/7/20
       <table class="table table-borderless table-hover table-sm balance-sheet-total-table">
         <tfoot>
           <tr class="total">
-            <td class="align-middle">{{ _("Total") }}</td>
+            <td class="align-middle">{{ _("Total")|force_escape }}</td>
             <td class="text-right align-middle font-italic {% if liabilities.amount|add:owners_equity.amount < 0 %} text-danger {% endif %}">
               {{ liabilities.amount|add:owners_equity.amount|accounting_amount }}
             </td>
@@ -239,7 +239,7 @@ First written: 2020/7/20
           {% endfor %}
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center grand-total">
-          {{ _("Total") }}
+          {{ _("Total")|force_escape }}
           <span class="badge {% if assets.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
             {{ assets.amount|accounting_amount }}
           </span>
@@ -270,7 +270,7 @@ First written: 2020/7/20
           {% endfor %}
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center total">
-          {{ _("Total") }}
+          {{ _("Total")|force_escape }}
           <span class="badge {% if liabilities.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
             {{ liabilities.amount|accounting_amount }}
           </span>
@@ -299,7 +299,7 @@ First written: 2020/7/20
           {% endfor %}
         {% endfor %}
         <li class="list-group-item d-flex justify-content-between align-items-center total">
-          {{ _("Total") }}
+          {{ _("Total")|force_escape }}
           <span class="badge {% if owners_equity.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
             {{ owners_equity.amount|accounting_amount }}
           </span>
@@ -308,7 +308,7 @@ First written: 2020/7/20
 
       <ul class="list-group balance-sheet-list">
         <li class="list-group-item d-flex justify-content-between align-items-center grand-total">
-          {{ _("Total") }}
+          {{ _("Total")|force_escape }}
           <span class="badge {% if liabilities.amount|add:owners_equity.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
             {{ liabilities.amount|add:owners_equity.amount|accounting_amount }}
           </span>

@@ -39,17 +39,17 @@ First written: 2020/7/1
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
       <i class="fas fa-edit"></i>
-      {{ _("New") }}
+      {{ _("New")|force_escape }}
     </button>
     <div class="dropdown-menu">
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
-        {{ _("Cash Expense") }}
+        {{ _("Cash Expense")|force_escape }}
       </a>
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
-        {{ _("Cash Income") }}
+        {{ _("Cash Income")|force_escape }}
       </a>
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
-        {{ _("Transfer") }}
+        {{ _("Transfer")|force_escape }}
       </a>
     </div>
   </div>
@@ -59,16 +59,16 @@ First written: 2020/7/1
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
       <span class="d-none d-md-inline">{{ account.title|title_case }}</span>
-      <span class="d-md-none">{{ _("Account") }}</span>
+      <span class="d-md-none">{{ _("Account")|force_escape }}</span>
     </button>
     <div class="dropdown-menu account-picker">
-      <div class="dropdown-header">{{ _("Shortcuts") }}</div>
+      <div class="dropdown-header">{{ _("Shortcuts")|force_escape }}</div>
       {% for x in shortcut_accounts %}
         <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:cash" x period %}">
           {{ x.title|title_case }}
         </a>
       {% endfor %}
-      <div class="dropdown-header">{{ _("All") }}</div>
+      <div class="dropdown-header">{{ _("All")|force_escape }}</div>
       {% for x in all_accounts %}
         <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:cash" x period %}">
           {{ x.code }} {{ x.title|title_case }}
@@ -92,13 +92,13 @@ First written: 2020/7/1
   <table class="table table-striped table-hover d-none d-md-table general-journal-table">
     <thead>
       <tr>
-        <th scope="col">{{ _("Date") }}</th>
-        <th scope="col">{{ _("Account") }}</th>
-        <th scope="col">{{ _("Summary") }}</th>
-        <th class="amount" scope="col">{{ _("Income") }}</th>
-        <th class="amount" scope="col">{{ _("Expense") }}</th>
-        <th class="amount" scope="col">{{ _("Balance") }}</th>
-        <th class="actions" scope="col">{{ _("View") }}</th>
+        <th scope="col">{{ _("Date")|force_escape }}</th>
+        <th scope="col">{{ _("Account")|force_escape }}</th>
+        <th scope="col">{{ _("Summary")|force_escape }}</th>
+        <th class="amount" scope="col">{{ _("Income")|force_escape }}</th>
+        <th class="amount" scope="col">{{ _("Expense")|force_escape }}</th>
+        <th class="amount" scope="col">{{ _("Balance")|force_escape }}</th>
+        <th class="actions" scope="col">{{ _("View")|force_escape }}</th>
       </tr>
     </thead>
     <tbody>
@@ -108,11 +108,11 @@ First written: 2020/7/1
           <td>{{ item.account.title|title_case }}</td>
           <td>{{ item.summary|default:"" }}{% if not item.is_balanced %}
             <span class="badge badge-danger badge-pill">
-              {{ _("Unbalanced") }}
+              {{ _("Unbalanced")|force_escape }}
             </span>
           {% endif %}{% if item.has_order_hole %}
             <span class="badge badge-danger badge-pill">
-              {{ _("Need Reorder") }}
+              {{ _("Need Reorder")|force_escape }}
             </span>
           {% endif %}</td>
           <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
@@ -122,7 +122,7 @@ First written: 2020/7/1
             {% if item.pk is not None %}
               <a href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}" class="btn btn-info" role="button">
                 <i class="fas fa-eye"></i>
-                <span class="d-none d-lg-inline">{{ _("View") }}</span>
+                <span class="d-none d-lg-inline">{{ _("View")|force_escape }}</span>
               </a>
             {% endif %}
           </td>
@@ -145,12 +145,12 @@ First written: 2020/7/1
                 {{ item.summary|default:"" }}
                 {% if not item.is_balanced %}
                   <span class="badge badge-danger badge-pill">
-                    {{ _("Unbalanced") }}
+                    {{ _("Unbalanced")|force_escape }}
                   </span>
                 {% endif %}
                 {% if item.has_order_hole %}
                   <span class="badge badge-danger badge-pill">
-                    {{ _("Need Reorder") }}
+                    {{ _("Need Reorder")|force_escape }}
                   </span>
                 {% endif %}
               </div>

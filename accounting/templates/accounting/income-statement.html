@@ -77,7 +77,7 @@ First written: 2020/7/19
         <thead>
           <tr>
             <th scope="col"></th>
-            <th class="amount" colspan="2" scope="col">{{ _("Amount") }}</th>
+            <th class="amount" colspan="2" scope="col">{{ _("Amount")|force_escape }}</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -105,13 +105,13 @@ First written: 2020/7/19
                     <td class="actions">
                       <a href="{% url "accounting:ledger" item period %}" class="btn btn-info" role="button">
                         <i class="fas fa-eye"></i>
-                        <span class="d-none d-lg-inline">{{ _("View") }}</span>
+                        <span class="d-none d-lg-inline">{{ _("View")|force_escape }}</span>
                       </a>
                     </td>
                   </tr>
                 {% endfor %}
                 <tr class="total">
-                  <td><div>{{ _("Total") }}</div></td>
+                  <td><div>{{ _("Total")|force_escape }}</div></td>
                   <td class="amount"></td>
                   <td class="amount {% if group.amount < 0 %} text-danger {% endif %}">{{ group.amount|accounting_amount }}</td>
                   <td class="actions"></td>
@@ -119,7 +119,7 @@ First written: 2020/7/19
               {% endfor %}
             {% else %}
               <tr class="total">
-                <td><div>{{ _("Total") }}</div></td>
+                <td><div>{{ _("Total")|force_escape }}</div></td>
                 <td class="amount"></td>
                 <td class="amount">-</td>
                 <td class="actions"></td>
@@ -174,7 +174,7 @@ First written: 2020/7/19
                 </li>
               {% endfor %}
               <li class="list-group-item d-flex justify-content-between align-items-center total">
-                {{ _("Total") }}
+                {{ _("Total")|force_escape }}
                 <div class="float-right">
                   <span class="badge {% if group.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
                     {{ group.amount|accounting_amount }}
@@ -184,7 +184,7 @@ First written: 2020/7/19
             {% endfor %}
           {% else %}
             <li class="list-group-item d-flex justify-content-between align-items-center total">
-              {{ _("Total") }}
+              {{ _("Total")|force_escape }}
               <div class="float-right">
                 <span class="badge {% if group.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">-</span>
               </div>
