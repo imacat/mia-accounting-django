@@ -90,6 +90,9 @@ class Command(BaseCommand):
                  "基金及长期投资"),
                 (131, "基金", "funds", "基金"),
                 (1314, "退休基金", "pension fund", "退休基金"),
+                (14, "固定資產", "property , plant, and equipment", "固定资产"),
+                (144, "機(器)具及設備", "machinery and equipment", "机(器)具及设备"),
+                (1441, "機(器)具", "machinery", "机(器)具"),
 
                 (21, "流動負債", "current liabilities", "流动负债"),
                 (214, "應付帳款", "accounts payable", "应付帐款"),
