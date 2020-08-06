@@ -57,8 +57,8 @@ First written: 2020/7/23
       <label for="txn-date">{{ _("Date:") }}</label>
     </div>
     <div class="col-sm-10">
-      <input id="txn-date" class="form-control {% if item.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date.value }}" required="required" />
-      <div id="txn-date-error" class="invalid-feedback">{{ item.date.errors.0|default:"" }}</div>
+      <input id="txn-date" class="form-control {% if should_validate and item.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ item.date.value }}" required="required" />
+      <div id="txn-date-error" class="invalid-feedback">{% if should_validate %}{{ item.date.errors.0|default:"" }}{% endif %}</div>
     </div>
   </div>
 
@@ -92,8 +92,8 @@ First written: 2020/7/23
       <label for="txn-note">{{ _("Notes:") }}</label>
     </div>
     <div class="col-sm-10">
-      <textarea id="txn-note" class="form-control {% if item.notes.errors %} is-invalid {% endif %}" name="notes">{{ item.notes.value|default:"" }}</textarea>
-      <div id="txn-note-error" class="invalid-feedback">{{ item.notes.errors.0|default:"" }}</div>
+      <textarea id="txn-note" class="form-control {% if should_validate and item.notes.errors %} is-invalid {% endif %}" name="notes">{{ item.notes.value|default:"" }}</textarea>
+      <div id="txn-note-error" class="invalid-feedback">{% if should_validate %}{{ item.notes.errors.0|default:"" }}{% endif %}</div>
     </div>
   </div>
 

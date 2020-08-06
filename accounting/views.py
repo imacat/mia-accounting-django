@@ -847,9 +847,11 @@ def txn_edit(request, txn_type, txn=None):
         HttpResponse: The response.
     """
     form = make_txn_form_from_status(request, txn_type, txn)
+    should_validate = True
     if form is None:
         if txn is None:
             txn = Transaction(date=timezone.localdate())
+            should_validate = False
         if len(txn.debit_records) == 0:
             txn.records.append(Record(ord=1, is_credit=False))
         if len(txn.credit_records) == 0:
@@ -870,6 +872,7 @@ def txn_edit(request, txn_type, txn=None):
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
         "item": form,
         "summary_categories": get_summary_categories,
+        "should_validate": should_validate,
         "new_record_template": new_record_template,
     })
 
