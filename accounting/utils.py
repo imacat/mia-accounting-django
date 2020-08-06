@@ -352,6 +352,35 @@ def find_payable_records(account, records):
         x.is_payable = True
 
 
+def find_existing_equipments(account, records):
+    """Finds and sets the equipments that still exist.
+
+    Args:
+        account (Account): The current ledger account.
+        records (list[Record]): The accounting records.
+    """
+    if "EQUIPMENT_ACCOUNTS" not in settings.ACCOUNTING:
+        return
+    if not isinstance(settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"], list):
+        return
+    if account.code not in settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"]:
+        return
+    rows = Record.objects\
+        .filter(
+            account__code__in=settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"],
+            summary__isnull=False)\
+        .values("account__code", "summary")\
+        .annotate(
+            balance=Sum(Case(When(is_credit=True, then=1), default=-1)
+                        * F("amount")))\
+        .filter(~Q(balance=0))
+    keys = ["%s-%s" % (x["account__code"], x["summary"]) for x in rows]
+    for x in [x for x in records
+              if x.pk is not None
+                 and F"{x.account.code}-{x.summary}" in keys]:
+        x.is_existing_equipment = True
+
+
 def get_summary_categories():
     """Finds and returns the summary categories and their corresponding account
     hints.

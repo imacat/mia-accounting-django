@@ -326,6 +326,7 @@ class Record(DirtyFieldsMixin, models.Model):
         self._is_payable = None
         self._is_existing_equipment = None
         self.is_payable = False
+        self.is_existing_equipment = False
 
     def __str__(self):
         """Returns the string representation of this accounting
@@ -383,14 +384,3 @@ class Record(DirtyFieldsMixin, models.Model):
     @has_order_hole.setter
     def has_order_hole(self, value):
         self._has_order_hole = value
-
-    @property
-    def is_existing_equipment(self):
-        # TODO: To be done
-        if self._is_existing_equipment is None:
-            self._is_existing_equipment = False
-        return self._is_existing_equipment
-
-    @is_existing_equipment.setter
-    def is_existing_equipment(self, value):
-        self._is_existing_equipment = value
