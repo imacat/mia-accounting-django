@@ -1072,7 +1072,7 @@ def account_options(request):
     for x in accounts:
         x.is_for_debit = re.match("^([1235689]|7[5678])", x.code) is not None
         x.is_for_credit = re.match("^([123489]|7[1234])", x.code) is not None
-    data = {
+    return JsonResponse({
         "header_in_use": _("---Accounts In Use---"),
         "debit_in_use": [x.option_data for x in accounts
                          if x.is_for_debit and x.is_in_use],
@@ -1083,5 +1083,4 @@ def account_options(request):
                              if x.is_for_debit and not x.is_in_use],
         "credit_not_in_use": [x.option_data for x in accounts
                               if x.is_for_credit and not x.is_in_use],
-    }
-    return JsonResponse(data)
+    })

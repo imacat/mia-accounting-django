@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-07 00:37+0800\n"
+"POT-Creation-Date: 2020-08-07 10:34+0800\n"
 "PO-Revision-Date: 2020-08-07 00:38+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounting/converters.py:127 accounting/utils.py:261
+#: accounting/converters.py:157 accounting/utils.py:253
 msgid "current assets and liabilities"
 msgstr "流動資產與負債"
 
@@ -81,11 +81,13 @@ msgstr "註記太長了（最長128個字）。"
 msgid "The total amount of debit and credit records are inconsistent."
 msgstr "借方和貸方合計不符。"
 
-#: accounting/templates/accounting/balance-sheet.html:30
-#, python-format
-msgid "Balance Sheet %(prep_period)s"
-msgstr "%(prep_period)s的資產負債表"
+#: accounting/templates/accounting/accounts/index.html:29
+#: accounting/templates/accounting/accounts/index.html:40
+#: accounting/templates/accounting/include/report-chooser.html:105
+msgid "Accounts"
+msgstr "會計科目"
 
+#: accounting/templates/accounting/accounts/index.html:38
 #: accounting/templates/accounting/balance-sheet.html:42
 #: accounting/templates/accounting/cash-summary.html:41
 #: accounting/templates/accounting/cash.html:42
@@ -97,6 +99,59 @@ msgstr "%(prep_period)s的資產負債表"
 #: accounting/templates/accounting/trial-balance.html:42
 msgid "New"
 msgstr "記帳"
+
+#: accounting/templates/accounting/accounts/index.html:49
+msgid "Code"
+msgstr ""
+
+#: accounting/templates/accounting/accounts/index.html:50
+msgid "Title"
+msgstr ""
+
+#: accounting/templates/accounting/accounts/index.html:51
+#: accounting/templates/accounting/accounts/index.html:69
+#: accounting/templates/accounting/balance-sheet.html:96
+#: accounting/templates/accounting/balance-sheet.html:127
+#: accounting/templates/accounting/balance-sheet.html:164
+#: accounting/templates/accounting/cash-summary.html:92
+#: accounting/templates/accounting/cash-summary.html:107
+#: accounting/templates/accounting/cash.html:101
+#: accounting/templates/accounting/cash.html:125
+#: accounting/templates/accounting/income-statement.html:108
+#: accounting/templates/accounting/journal.html:81
+#: accounting/templates/accounting/journal.html:105
+#: accounting/templates/accounting/ledger-summary.html:85
+#: accounting/templates/accounting/ledger-summary.html:100
+#: accounting/templates/accounting/ledger.html:94
+#: accounting/templates/accounting/ledger.html:126
+#: accounting/templates/accounting/search.html:83
+#: accounting/templates/accounting/search.html:106
+#: accounting/templates/accounting/trial-balance.html:85
+#: accounting/templates/accounting/trial-balance.html:97
+msgid "View"
+msgstr "查閱"
+
+#: accounting/templates/accounting/accounts/index.html:62
+#, fuzzy
+#| msgid "---Accounts In Use---"
+msgid "Parent Account In Use"
+msgstr "-----使用中科目-----"
+
+#: accounting/templates/accounting/accounts/index.html:77
+#: accounting/templates/accounting/cash-summary.html:161
+#: accounting/templates/accounting/cash.html:201
+#: accounting/templates/accounting/journal.html:188
+#: accounting/templates/accounting/ledger-summary.html:160
+#: accounting/templates/accounting/ledger.html:214
+#: accounting/templates/accounting/search.html:157
+#: accounting/templates/accounting/trial-balance.html:160
+msgid "There is currently no data."
+msgstr "目前沒有資料。"
+
+#: accounting/templates/accounting/balance-sheet.html:30
+#, python-format
+msgid "Balance Sheet %(prep_period)s"
+msgstr "%(prep_period)s的資產負債表"
 
 #: accounting/templates/accounting/balance-sheet.html:46
 #: accounting/templates/accounting/cash-summary.html:45
@@ -138,7 +193,7 @@ msgid "Transfer"
 msgstr "轉帳"
 
 #: accounting/templates/accounting/balance-sheet.html:56
-#: accounting/templates/accounting/include/report-chooser.html:95
+#: accounting/templates/accounting/include/report-chooser.html:97
 msgid "Balance Sheet"
 msgstr "資產負債表"
 
@@ -150,27 +205,6 @@ msgstr "資產負債表"
 #: accounting/templates/accounting/trial-balance.html:62
 msgid "Period"
 msgstr "期間"
-
-#: accounting/templates/accounting/balance-sheet.html:96
-#: accounting/templates/accounting/balance-sheet.html:127
-#: accounting/templates/accounting/balance-sheet.html:164
-#: accounting/templates/accounting/cash-summary.html:92
-#: accounting/templates/accounting/cash-summary.html:107
-#: accounting/templates/accounting/cash.html:101
-#: accounting/templates/accounting/cash.html:125
-#: accounting/templates/accounting/income-statement.html:108
-#: accounting/templates/accounting/journal.html:81
-#: accounting/templates/accounting/journal.html:105
-#: accounting/templates/accounting/ledger-summary.html:85
-#: accounting/templates/accounting/ledger-summary.html:100
-#: accounting/templates/accounting/ledger.html:94
-#: accounting/templates/accounting/ledger.html:126
-#: accounting/templates/accounting/search.html:83
-#: accounting/templates/accounting/search.html:106
-#: accounting/templates/accounting/trial-balance.html:85
-#: accounting/templates/accounting/trial-balance.html:97
-msgid "View"
-msgstr "查閱"
 
 #: accounting/templates/accounting/balance-sheet.html:136
 #: accounting/templates/accounting/balance-sheet.html:173
@@ -198,8 +232,8 @@ msgstr "查閱"
 #: accounting/templates/accounting/transactions/transfer/view.html:207
 #: accounting/templates/accounting/trial-balance.html:105
 #: accounting/templates/accounting/trial-balance.html:145
-#: accounting/views.py:136 accounting/views.py:251 accounting/views.py:399
-#: accounting/views.py:594
+#: accounting/views.py:136 accounting/views.py:250 accounting/views.py:398
+#: accounting/views.py:591
 msgid "Total"
 msgstr "合計"
 
@@ -209,7 +243,7 @@ msgid "Cash Summary for %(account)s"
 msgstr "%(account)s的現金帳摘要"
 
 #: accounting/templates/accounting/cash-summary.html:55
-#: accounting/templates/accounting/include/report-chooser.html:71
+#: accounting/templates/accounting/include/report-chooser.html:73
 msgid "Cash Summary"
 msgstr "現金帳摘要"
 
@@ -266,23 +300,13 @@ msgstr "餘額"
 msgid "Cumulative Balance"
 msgstr "累計餘額"
 
-#: accounting/templates/accounting/cash-summary.html:161
-#: accounting/templates/accounting/cash.html:201
-#: accounting/templates/accounting/journal.html:188
-#: accounting/templates/accounting/ledger-summary.html:160
-#: accounting/templates/accounting/ledger.html:214
-#: accounting/templates/accounting/search.html:157
-#: accounting/templates/accounting/trial-balance.html:160
-msgid "There is currently no data."
-msgstr "目前沒有資料。"
-
 #: accounting/templates/accounting/cash.html:30
 #, python-format
 msgid "Cash Account for %(account)s %(prep_period)s"
 msgstr "%(prep_period)s%(account)s的現金帳"
 
 #: accounting/templates/accounting/cash.html:56
-#: accounting/templates/accounting/include/report-chooser.html:67
+#: accounting/templates/accounting/include/report-chooser.html:69
 msgid "Cash Account"
 msgstr "現金帳"
 
@@ -329,57 +353,53 @@ msgstr "借貸不平衡"
 msgid "Need Reorder"
 msgstr "需排序"
 
-#: accounting/templates/accounting/include/report-chooser.html:33
+#: accounting/templates/accounting/include/report-chooser.html:34
 msgid "Search Accounting Records"
 msgstr "搜尋會計帳"
 
-#: accounting/templates/accounting/include/report-chooser.html:39
+#: accounting/templates/accounting/include/report-chooser.html:40
 msgid "Search:"
 msgstr "搜尋："
 
-#: accounting/templates/accounting/include/report-chooser.html:40
+#: accounting/templates/accounting/include/report-chooser.html:41
 msgid "e.g. Coffee"
 msgstr "如：咖啡"
 
-#: accounting/templates/accounting/include/report-chooser.html:47
-#: accounting/templates/accounting/include/report-chooser.html:99
+#: accounting/templates/accounting/include/report-chooser.html:48
+#: accounting/templates/accounting/include/report-chooser.html:101
 #: accounting/templates/accounting/search.html:56
 #: accounting/templates/accounting/search.html:64
 msgid "Search"
 msgstr "搜尋"
 
-#: accounting/templates/accounting/include/report-chooser.html:62
+#: accounting/templates/accounting/include/report-chooser.html:63
 msgid "Book"
 msgstr "帳簿"
 
-#: accounting/templates/accounting/include/report-chooser.html:75
+#: accounting/templates/accounting/include/report-chooser.html:77
 #: accounting/templates/accounting/ledger.html:56
 msgid "Ledger"
 msgstr "分類帳"
 
-#: accounting/templates/accounting/include/report-chooser.html:79
+#: accounting/templates/accounting/include/report-chooser.html:81
 #: accounting/templates/accounting/ledger-summary.html:55
 msgid "Ledger Summary"
 msgstr "分類帳摘要"
 
-#: accounting/templates/accounting/include/report-chooser.html:83
+#: accounting/templates/accounting/include/report-chooser.html:85
 #: accounting/templates/accounting/journal.html:56
 msgid "Journal"
 msgstr "日記簿"
 
-#: accounting/templates/accounting/include/report-chooser.html:87
+#: accounting/templates/accounting/include/report-chooser.html:89
 #: accounting/templates/accounting/trial-balance.html:56
 msgid "Trial Balance"
 msgstr "試算表"
 
-#: accounting/templates/accounting/include/report-chooser.html:91
+#: accounting/templates/accounting/include/report-chooser.html:93
 #: accounting/templates/accounting/income-statement.html:56
 msgid "Income Statement"
 msgstr "損益表"
-
-#: accounting/templates/accounting/include/report-chooser.html:103
-msgid "Accounts"
-msgstr "會計科目"
 
 #: accounting/templates/accounting/include/summary-helper.html:50
 msgid "General"
@@ -701,59 +721,59 @@ msgstr "沒有這個會計科目。"
 msgid "You cannot select a parent account."
 msgstr "請勿選擇上層會計科目。"
 
-#: accounting/views.py:322
+#: accounting/views.py:320
 msgid "Brought Forward"
 msgstr "上期結轉"
 
-#: accounting/views.py:652
+#: accounting/views.py:648
 msgid "Gross Income"
 msgstr "營業毛利"
 
-#: accounting/views.py:653
+#: accounting/views.py:649
 msgid "Operating Income"
 msgstr "營業淨利"
 
-#: accounting/views.py:654
+#: accounting/views.py:650
 msgid "Before Tax Income"
 msgstr "稅前淨利"
 
-#: accounting/views.py:655
+#: accounting/views.py:651
 msgid "After Tax Income"
 msgstr "稅後淨利"
 
-#: accounting/views.py:912
+#: accounting/views.py:905
 msgid "This transaction was not modified."
 msgstr "會計傳票未異動。"
 
-#: accounting/views.py:958
+#: accounting/views.py:951
 msgid "This transaction was saved successfully."
 msgstr "會計傳票已存檔。"
 
-#: accounting/views.py:990
+#: accounting/views.py:983
 msgid "This transaction was deleted successfully."
 msgstr "會計傳票已刪除。"
 
-#: accounting/views.py:1022
+#: accounting/views.py:1015
 msgid "Invalid arguments."
 msgstr "參數無效。"
 
-#: accounting/views.py:1024
+#: accounting/views.py:1017
 msgid "Invalid order."
 msgstr "次序格式錯誤。"
 
-#: accounting/views.py:1040
+#: accounting/views.py:1033
 msgid "The transaction orders were not modified."
 msgstr "會計傳票次序未異動。"
 
-#: accounting/views.py:1048
+#: accounting/views.py:1041
 msgid "The transaction orders were saved successfully."
 msgstr "會計傳票次序已儲存。"
 
-#: accounting/views.py:1075
+#: accounting/views.py:1076
 msgid "---Accounts In Use---"
 msgstr "-----使用中科目-----"
 
-#: accounting/views.py:1080
+#: accounting/views.py:1081
 msgid "---Accounts Not In Use---"
 msgstr "-----未使用科目-----"
 
