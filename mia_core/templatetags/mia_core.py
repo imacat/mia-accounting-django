@@ -169,13 +169,6 @@ def retrieve_status_tag(context):
         return ""
     if "success" in status:
         context.dicts[0]["success"] = status["success"]
-    if "errors_by_field" in status:
-        context.dicts[0]["errors"] = status["errors_by_field"]
-        if "" in status["errors_by_field"]:
-            if "page_errors" not in context.dicts[0]:
-                context.dicts[0]["page_errors"] = []
-            context.dicts[0]["page_errors"].append(
-                status["errors_by_field"][""])
     return ""
 
 
