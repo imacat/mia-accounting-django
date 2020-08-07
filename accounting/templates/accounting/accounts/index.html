@@ -26,7 +26,8 @@ First written: 2020/7/1
 {% load accounting %}
 
 {% block settings %}
-  {% setvar "title" _("Accounts") %}
+  {% trans "Accounts" context "Accounting" as text %}
+  {% setvar "title" text %}
   {% setvar "use_datatables" True %}
 {% endblock %}
 
@@ -37,7 +38,8 @@ First written: 2020/7/1
     <i class="fas fa-plus"></i>
     {{ _("New")|force_escape }}
   </a>
-  {% with current_report_icon="fas fa-list-ol" current_report_title=_("Accounts") %}
+  {% trans "Accounts" context "Accounting" as text %}
+  {% with current_report_icon="fas fa-list-ol" current_report_title=text %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
 </div>

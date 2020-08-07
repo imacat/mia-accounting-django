@@ -102,7 +102,7 @@ First written: 2020/7/9
     </span>
     <a class="dropdown-item {% if request.resolver_match.url_name == "accounts" %} active {% endif %}" href="{% url "accounting:accounts" %}">
       <i class="fas fa-list-ol"></i>
-      {{ _("Accounts")|force_escape }}
+      {% trans "Accounts" context "Accounting" as text %}{{ text|force_escape }}
     </a>
   </div>
 </div>

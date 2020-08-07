@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-07 10:34+0800\n"
-"PO-Revision-Date: 2020-08-07 00:38+0800\n"
+"POT-Creation-Date: 2020-08-07 10:40+0800\n"
+"PO-Revision-Date: 2020-08-07 10:40+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -82,12 +82,13 @@ msgid "The total amount of debit and credit records are inconsistent."
 msgstr "借方和貸方合計不符。"
 
 #: accounting/templates/accounting/accounts/index.html:29
-#: accounting/templates/accounting/accounts/index.html:40
+#: accounting/templates/accounting/accounts/index.html:41
 #: accounting/templates/accounting/include/report-chooser.html:105
+msgctxt "Accounting"
 msgid "Accounts"
 msgstr "會計科目"
 
-#: accounting/templates/accounting/accounts/index.html:38
+#: accounting/templates/accounting/accounts/index.html:39
 #: accounting/templates/accounting/balance-sheet.html:42
 #: accounting/templates/accounting/cash-summary.html:41
 #: accounting/templates/accounting/cash.html:42
@@ -100,16 +101,16 @@ msgstr "會計科目"
 msgid "New"
 msgstr "記帳"
 
-#: accounting/templates/accounting/accounts/index.html:49
-msgid "Code"
-msgstr ""
-
-#: accounting/templates/accounting/accounts/index.html:50
-msgid "Title"
-msgstr ""
-
 #: accounting/templates/accounting/accounts/index.html:51
-#: accounting/templates/accounting/accounts/index.html:69
+msgid "Code"
+msgstr "代碼"
+
+#: accounting/templates/accounting/accounts/index.html:52
+msgid "Title"
+msgstr "標題"
+
+#: accounting/templates/accounting/accounts/index.html:53
+#: accounting/templates/accounting/accounts/index.html:71
 #: accounting/templates/accounting/balance-sheet.html:96
 #: accounting/templates/accounting/balance-sheet.html:127
 #: accounting/templates/accounting/balance-sheet.html:164
@@ -131,13 +132,11 @@ msgstr ""
 msgid "View"
 msgstr "查閱"
 
-#: accounting/templates/accounting/accounts/index.html:62
-#, fuzzy
-#| msgid "---Accounts In Use---"
+#: accounting/templates/accounting/accounts/index.html:64
 msgid "Parent Account In Use"
-msgstr "-----使用中科目-----"
+msgstr "使用中的上層科目"
 
-#: accounting/templates/accounting/accounts/index.html:77
+#: accounting/templates/accounting/accounts/index.html:79
 #: accounting/templates/accounting/cash-summary.html:161
 #: accounting/templates/accounting/cash.html:201
 #: accounting/templates/accounting/journal.html:188
