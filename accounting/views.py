@@ -33,7 +33,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, ListView
 
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
@@ -1049,6 +1049,14 @@ def txn_sort(request, date):
         message = gettext_noop(
             "The transaction orders were saved successfully.")
         return success_redirect(request, url, message)
+
+
+@method_decorator(require_GET, name="dispatch")
+@method_decorator(login_required, name="dispatch")
+class AccountListView(ListView):
+    """The view to list the accounts."""
+    queryset = Account.objects.order_by("code")
+    template_name = "accounting/accounts/index.html"
 
 
 @require_GET
