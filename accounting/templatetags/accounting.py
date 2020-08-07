@@ -22,6 +22,10 @@ import re
 
 from django import template
 
+from accounting.models import Account
+from accounting.utils import ReportUrl
+from mia_core.period import Period
+
 register = template.Library()
 
 
@@ -40,3 +44,18 @@ def accounting_amount(value):
     if value < 0:
         s = "(%s)" % (s)
     return s
+
+
+@register.simple_tag
+def report_url(cash=None, ledger=None, period=None):
+    """Returns accounting report URL helper.
+
+    Args:
+        cash (Account): The current cash account.
+        ledger (Account): The current ledger account.
+        period (Period): The period.
+
+    Returns:
+        ReportUrl: The accounting report URL helper.
+    """
+    return ReportUrl(cash=cash, ledger=ledger, period=period)
