@@ -1047,7 +1047,6 @@ def txn_sort(request, date):
 class AccountListView(ListView):
     """The view to list the accounts."""
     queryset = Account.objects.order_by("code")
-    template_name = "accounting/accounts/index.html"
 
 
 @require_GET
