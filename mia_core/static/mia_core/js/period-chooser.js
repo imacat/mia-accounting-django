@@ -25,7 +25,7 @@
 $(function () {
     $(".period-tab")
         .on("click", function () {
-            switchPeriodTab(this);
+            switchPeriodTab($(this));
         });
     $("#button-period-day")
         .on("click", function () {
@@ -86,24 +86,13 @@ function monthPickerChanged(newDate) {
 /**
  * Switch the period chooser to tab.
  *
- * @param {HTMLElement} tab the navigation tab corresponding to a type
- *                          of period
+ * @param {jQuery} tab the navigation tab corresponding to a type
+ *                     of period
  * @private
  */
 function switchPeriodTab(tab) {
-    const tabName = tab.id.substr("period-tab-".length);
-    $(".period-content").each(function () {
-        if (this.id === "period-content-" + tabName) {
-            this.classList.remove("d-none");
-        } else {
-            this.classList.add("d-none");
-        }
-    });
-    $(".period-tab").each(function () {
-        if (this.id === tab.id) {
-            this.classList.add("active");
-        } else {
-            this.classList.remove("active");
-        }
-    });
+    $(".period-content").addClass("d-none");
+    $("#period-content-" + tab.data("tab")).removeClass("d-none");
+    $(".period-tab").removeClass("active");
+    tab.addClass("active");
 }

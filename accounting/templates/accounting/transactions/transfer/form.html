@@ -73,7 +73,7 @@ First written: 2020/7/23
       </ul>
       <ul class="list-group">
         <li class="list-group-item">
-          <button id="debit-new" class="btn btn-primary btn-new" type="button">
+          <button class="btn btn-primary btn-new" type="button" data-type="debit">
             <i class="fas fa-plus"></i>
           </button>
         </li>
@@ -93,13 +93,13 @@ First written: 2020/7/23
       <ul id="credit-records" class="list-group">
         {% for record in item.credit_records %}
           {% with record_type="credit" no=forloop.counter order=forloop.counter %}
-            {% include "accounting/transactions/../../include/form-record-transfer.html" %}
+            {% include "accounting/include/form-record-transfer.html" %}
           {% endwith %}
         {% endfor %}
       </ul>
       <ul class="list-group">
         <li class="list-group-item">
-          <button id="credit-new" class="btn btn-primary btn-new" type="button">
+          <button class="btn btn-primary btn-new" type="button" data-type="credit">
             <i class="fas fa-plus"></i>
           </button>
         </li>

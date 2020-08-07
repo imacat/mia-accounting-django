@@ -30,7 +30,7 @@ $(function () {
         });
     $(".record-summary")
         .on("click", function () {
-            startSummaryHelper(this);
+            startSummaryHelper($(this));
         });
     $("#summary-summary")
         .on("change", function () {
@@ -39,7 +39,7 @@ $(function () {
         });
     $(".summary-tab")
         .on("click", function () {
-            switchSummaryTab(this);
+            switchSummaryTab($(this));
         });
     // The general categories
     $("#summary-general-category")
@@ -136,17 +136,17 @@ function loadSummaryCategoryData() {
 /**
  * Starts the summary helper.
  *
- * @param {HTMLInputElement} summary the summary input element
+ * @param {jQuery} summary the summary input element
  */
 function startSummaryHelper(summary) {
-    const type = summary.id.substring(0, summary.id.indexOf("-"));
-    const no = parseInt(summary.id.substring(type.length + 1, summary.id.indexOf("-", type.length + 1)));
-    $("#summary-record").get(0).value = type + "-" + no;
-    $("#summary-summary").get(0).value = summary.value;
+    const type = summary.data("type");
+    const no = summary.data("no");
+    $("#summary-record").val(type + "-" + no);
+    $("#summary-summary").val(summary.val());
     // Loads the know summary categories into the summary helper
     loadKnownSummaryCategories(type);
     // Parses the summary and sets up the summary helper
-    parseSummaryForHelper(summary.value);
+    parseSummaryForHelper(summary.val());
     // Focus on the summary input
     setTimeout(function () {
         $("#summary-summary").get(0).focus();
@@ -274,7 +274,7 @@ function parseSummaryForCategoryHelpers(summary) {
         $("#summary-bus-route").get(0).value = matchBus[2];
         $("#summary-bus-from").get(0).value = matchBus[3];
         $("#summary-bus-to").get(0).value = matchBus[4];
-        switchSummaryTab($("#summary-tab-bus").get(0));
+        switchSummaryTab($("#summary-tab-bus"));
         return;
     }
 
@@ -288,12 +288,12 @@ function parseSummaryForCategoryHelpers(summary) {
         $("#summary-travel-direction").get(0).value = matchTravel[3];
         setSummaryTravelDirectionButtons(matchTravel[3]);
         $("#summary-travel-to").get(0).value = matchTravel[4];
-        switchSummaryTab($("#summary-tab-travel").get(0));
+        switchSummaryTab($("#summary-tab-travel"));
         return;
     }
 
     // A general category
-    const generalCategoryTab = $("#summary-tab-category").get(0);
+    const generalCategoryTab = $("#summary-tab-category");
     const matchCategory = summary.match(/^(.+)—.+(?:×[0-9]+)?$/);
     if (matchCategory !== null) {
         $("#summary-general-category").get(0).value = matchCategory[1];
@@ -312,26 +312,15 @@ function parseSummaryForCategoryHelpers(summary) {
 /**
  * Switch the summary helper to tab.
  *
- * @param {HTMLElement} tab the navigation tab corresponding to a type
- *                          of helper
+ * @param {jQuery} tab the navigation tab corresponding to a type
+ *                     of helper
  * @private
  */
 function switchSummaryTab(tab) {
-    const tabName = tab.id.substr("summary-tab-".length);  // "summary-tab-"
-    $(".summary-tab-content").each(function () {
-        if (this.id === "summary-tab-content-" + tabName) {
-            this.classList.remove("d-none");
-        } else {
-            this.classList.add("d-none");
-        }
-    });
-    $(".summary-tab").each(function () {
-        if (this.id === tab.id) {
-            this.classList.add("active");
-        } else {
-            this.classList.remove("active");
-        }
-    });
+    $(".summary-tab-content").addClass("d-none");
+    $("#summary-tab-content-" + tab.data("tab")).removeClass("d-none");
+    $(".summary-tab").removeClass("active");
+    tab.addClass("active");
 }
 
 /**

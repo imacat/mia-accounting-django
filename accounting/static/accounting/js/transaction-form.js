@@ -45,7 +45,7 @@ $(function () {
             validateAmount(this);
         })
         .on("change", function () {
-            updateTotalAmount(this);
+            updateTotalAmount($(this));
             validateBalance();
         });
     $("#txn-note")
@@ -58,11 +58,11 @@ $(function () {
         });
     $(".btn-new")
         .on("click", function () {
-            addNewRecord(this);
+            addNewRecord($(this));
         });
     $(".btn-del-record")
         .on("click", function () {
-            deleteRecord(this);
+            deleteRecord($(this));
         });
 });
 
@@ -95,7 +95,7 @@ function getAccountOptions() {
         if (this.readyState === 4 && this.status === 200) {
             accountOptions = JSON.parse(this.responseText);
             $(".record-account").each(function () {
-                initializeAccountOptions(this);
+                initializeAccountOptions($(this));
             });
         }
     };
@@ -106,27 +106,26 @@ function getAccountOptions() {
 /**
  * Initialize the account options.
  *
- * @param {HTMLSelectElement} account the account select element
+ * @param {jQuery} account the account select element
  * @private
  */
 function initializeAccountOptions(account) {
-    const jAccount = $(account);
-    const type = account.id.substring(0, account.id.indexOf("-"));
-    const selectedAccount = account.value;
+    const type = account.data("type");
+    const selectedAccount = account.val();
     let isCash = false;
     if (type === "debit") {
         isCash = ($(".credit-record").length === 0);
     } else if (type === "credit") {
         isCash = ($(".debit-record").length === 0);
     }
-    jAccount.html("");
+    account.html("");
     if (selectedAccount === "") {
-        jAccount.append($("<option/>"));
+        account.append($("<option/>"));
     }
     const headerInUse = $("<option/>")
         .attr("disabled", "disabled")
         .text(accountOptions["header_in_use"]);
-    jAccount.append(headerInUse);
+    account.append(headerInUse);
     accountOptions[type + "_in_use"].forEach(function (item) {
         // Skips the cash account on cash transactions.
         if (item["code"] === 1111 && isCash) {
@@ -138,12 +137,12 @@ function initializeAccountOptions(account) {
         if (String(item["code"]) === selectedAccount) {
             option.attr("selected", "selected");
         }
-        jAccount.append(option);
+        account.append(option);
     });
     const headerNotInUse = $("<option/>")
         .attr("disabled", "disabled")
         .text(accountOptions["header_not_in_use"]);
-    jAccount.append(headerNotInUse);
+    account.append(headerNotInUse);
     accountOptions[type + "_not_in_use"].forEach(function (item) {
         const option = $("<option/>")
             .attr("value", item["code"])
@@ -151,7 +150,7 @@ function initializeAccountOptions(account) {
         if (String(item["code"]) === selectedAccount) {
             option.attr("selected", "selected");
         }
-        jAccount.append(option);
+        account.append(option);
     });
 }
 
@@ -172,16 +171,12 @@ function removeBlankOption(select) {
 /**
  * Updates the total amount.
  *
- * @param {HTMLButtonElement|HTMLInputElement} element the amount
- *                                                     element that
- *                                                     changed, or the
- *                                                     button that
- *                                                     was hit to
- *                                                     delete a record
+ * @param {jQuery} element the amount element that changed, or the
+ *                         button that was hit to delete a record
  * @private
  */
 function updateTotalAmount(element) {
-    const type = element.id.substring(0, element.id.indexOf("-"));
+    const type = element.data("type")
     let total = 0;
     $("." + type + "-to-sum").each(function () {
         if (this.value !== "") {
@@ -198,16 +193,16 @@ function updateTotalAmount(element) {
 /**
  * Adds a new accounting record.
  *
- * @param {HTMLButtonElement} button the button element that was hit
- *                                   to add a new record
+ * @param {jQuery} button the button element that was hit to add a
+ *                        new record
  * @private
  */
 function addNewRecord(button) {
-    const type = button.id.substring(0, button.id.indexOf("-"));
+    const type = button.data("type");
     // Finds the new number that is the maximum number plus 1.
     let newNo = 0;
     $("." + type + "-record").each(function () {
-        const no = parseInt(this.id.substring(type.length + 1));
+        const no = parseInt($(this).data("no"));
         if (newNo < no) {
             newNo = no;
         }
@@ -242,7 +237,7 @@ function insertNewRecord(type, newNo) {
             validateAccount(this);
         })
         .each(function () {
-            initializeAccountOptions(this);
+            initializeAccountOptions($(this));
         });
     $("#" + type + "-" + newNo + "-summary")
         .on("blur", function () {
@@ -258,25 +253,30 @@ function insertNewRecord(type, newNo) {
             validateAmount(this);
         })
         .on("change", function () {
-            updateTotalAmount(this);
+            updateTotalAmount($(this));
             validateBalance();
         });
     $("#" + type + "-" + newNo + "-delete")
         .on("click", function () {
-            deleteRecord(this);
+            deleteRecord($(this));
+        });
+    $("#" + type + "-" + newNo + "-m-delete")
+        .on("click", function () {
+            deleteRecord($(this));
         });
 }
 
 /**
  * Deletes a record.
  *
- * @param {HTMLButtonElement} button the button element that was hit
- *                            to delete this record
+ * @param {jQuery} button the button element that was hit to delete
+ *                        this record
  * @private
  */
 function deleteRecord(button) {
-    const type = button.id.substring(0, button.id.indexOf("-"));
-    const no = parseInt(button.id.substring(type.length + 1, button.id.indexOf("-", type.length + 1)));
+    const type = button.data("type");
+    const no = button.data("no");
+    console.log("#" + type + "-" + no);
     $("#" + type + "-" + no).remove();
     resetRecordOrders(type);
     resetRecordButtons();

@@ -42,16 +42,16 @@ First written: 2020/7/10
       <!-- Modal body -->
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <span id="period-tab-month" class="period-tab nav-link active">{{ _("Month")|force_escape }}</span>
+          <span class="period-tab nav-link active" data-tab="month">{{ _("Month")|force_escape }}</span>
         </li>
         <li class="nav-item">
-          <span id="period-tab-year" class="period-tab nav-link">{{ _("Year")|force_escape }}</span>
+          <span class="period-tab nav-link" data-tab="year">{{ _("Year")|force_escape }}</span>
         </li>
         <li class="nav-item">
-          <span id="period-tab-day" class="period-tab nav-link">{{ _("Day")|force_escape }}</span>
+          <span class="period-tab nav-link" data-tab="day">{{ _("Day")|force_escape }}</span>
         </li>
         <li class="nav-item">
-          <span id="period-tab-custom" class="period-tab nav-link">{{ _("Custom")|force_escape }}</span>
+          <span class="period-tab nav-link" data-tab="custom">{{ _("Custom")|force_escape }}</span>
         </li>
       </ul>
       <div id="period-content-month" class="period-content modal-body">
