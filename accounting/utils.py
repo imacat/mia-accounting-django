@@ -392,7 +392,7 @@ def get_summary_categories():
                                 output_field=CharField()),
                   cat_type=Case(
                       When(summary__regex=".+—.+—.+→.+", then=Value("bus")),
-                      When(summary__regex=".+—.+→.+", then=Value("travel")),
+                      When(summary__regex=".+—.+[→↔].+", then=Value("travel")),
                       default=Value("general"),
                       output_field=CharField()),
                   category=Left("summary",
