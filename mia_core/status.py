@@ -51,8 +51,6 @@ def error_redirect(request, url, form):
         request (HttpRequest): The request.
         url (str): The destination URL.
         form (dict[str]): The received POSTed form.
-        errors_by_field (dict[str]): The failed fields and their corresponding
-            error messages.
 
     Returns:
         HttpResponseRedirect: The redirect response.
