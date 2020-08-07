@@ -29,6 +29,7 @@ First written: 2020/7/1
   {% trans "Accounts" context "Accounting" as text %}
   {% setvar "title" text %}
   {% setvar "use_datatables" True %}
+  {% static "accounting/js/account-list.js" as file %}{% add_js file %}
 {% endblock %}
 
 {% block content %}
@@ -78,13 +79,5 @@ First written: 2020/7/1
 {% else %}
   <p>{{ _("There is currently no data.")|force_escape }}</p>
 {% endif %}
-
-<script type="text/javascript">
-  $(document).ready(function() {
-    $('#accounts').DataTable({
-      "ordering": false,
-    });
-  });
-</script>
 
 {% endblock %}
