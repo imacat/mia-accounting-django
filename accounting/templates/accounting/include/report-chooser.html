@@ -57,7 +57,7 @@ First written: 2020/7/9
   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
     <span class="d-none d-md-inline">
       <i class="{{ current_report_icon }}"></i>
-      {{ current_report_title }}
+      {{ current_report_title|force_escape }}
     </span>
     <span class="d-md-none">{{ _("Book")|force_escape }}</span>
   </button>
