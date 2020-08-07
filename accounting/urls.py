@@ -28,6 +28,7 @@ from mia_core.digest_auth import login_required
 from . import converters, views
 
 register_converter(converters.PeriodConverter, "period")
+register_converter(converters.AccountConverter, "account")
 register_converter(converters.CashAccountConverter, "cash-account")
 register_converter(converters.LedgerAccountConverter, "ledger-account")
 register_converter(converters.TransactionTypeConverter, "txn-type")
@@ -91,7 +92,7 @@ urlpatterns = [
          views.txn_sort, name="transactions.sort"),
     # TODO: To be done
     path("accounts",
-         mia_core_views.todo, name="accounts"),
+         views.AccountListView.as_view(), name="accounts"),
     # TODO: To be done
     path("accounts/create",
          mia_core_views.todo, name="accounts.create"),
@@ -101,15 +102,15 @@ urlpatterns = [
     path("accounts/options",
          views.account_options, name="accounts.options"),
     # TODO: To be done
-    path("accounts/<str:account_code>",
+    path("accounts/<account:account>",
          mia_core_views.todo, name="accounts.show"),
     # TODO: To be done
-    path("accounts/<str:account_code>/edit",
+    path("accounts/<account:account>/edit",
          mia_core_views.todo, name="accounts.edit"),
     # TODO: To be done
-    path("accounts/<str:account_code>/update",
+    path("accounts/<account:account>/update",
          mia_core_views.todo, name="accounts.update"),
     # TODO: To be done
-    path("accounts/<str:account_code>/delete",
+    path("accounts/<account:account>/delete",
          mia_core_views.todo, name="accounts.delete"),
 ]

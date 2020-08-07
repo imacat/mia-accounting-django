@@ -108,6 +108,36 @@ class DateConverter:
         return value.strftime("%Y-%m-%d")
 
 
+class AccountConverter:
+    """The path converter for the account."""
+    regex = "[1-9]{1,5}"
+
+    def to_python(self, value):
+        """Returns the account by the account code.
+
+        Args:
+            value (str): The account code.
+
+        Returns:
+            Account: The account.
+        """
+        try:
+            return Account.objects.get(code=value)
+        except Account.DoesNotExist:
+            raise ValueError
+
+    def to_url(self, value):
+        """Returns the code of an account.
+
+        Args:
+            value (Account): The account.
+
+        Returns:
+            str: The account code.
+        """
+        return value.code
+
+
 class CashAccountConverter:
     """The path converter for the cash account."""
     regex = "0|(11|12|21|22)[1-9]{1,3}"
