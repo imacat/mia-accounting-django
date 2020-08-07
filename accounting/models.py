@@ -64,6 +64,7 @@ class Account(DirtyFieldsMixin, models.Model):
         self.is_for_debit = None
         self.is_for_credit = None
         self.is_in_use = None
+        self._is_parent_and_in_use = None
 
     def __str__(self):
         """Returns the string representation of this account."""
@@ -86,6 +87,23 @@ class Account(DirtyFieldsMixin, models.Model):
             "code": self.code,
             "title": self.title,
         }
+
+    @property
+    def is_parent_and_in_use(self):
+        """Whether this is a parent account and is in use.
+
+        Returns:
+            bool: True if this is a parent account and is in use, or false
+                otherwise
+        """
+        if self._is_parent_and_in_use is None:
+            self._is_parent_and_in_use = self.child_set.count() > 0\
+                                         and self.record_set.count() > 0
+        return self._is_parent_and_in_use
+
+    @is_parent_and_in_use.setter
+    def is_parent_and_in_use(self, value):
+        self._is_parent_and_in_use = value
 
 
 class Transaction(DirtyFieldsMixin, models.Model):
