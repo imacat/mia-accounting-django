@@ -20,6 +20,7 @@ Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2020/7/9
 {% endcomment %}
 {% load i18n %}
+{% load accounting %}
 
 <!-- the accounting record search dialog -->
 <form action="{% url "accounting:search" %}" method="GET">
@@ -61,36 +62,37 @@ First written: 2020/7/9
     </span>
     <span class="d-md-none">{{ _("Book")|force_escape }}</span>
   </button>
+  {% report_url cash_account=cash_account ledger_account=ledger_account period=period as report_url %}
   <div class="dropdown-menu account-picker">
-    <a class="dropdown-item {% if request.resolver_match.url_name == "cash" %} active {% endif %}" href="{{ reports.cash }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "cash" %} active {% endif %}" href="{{ report_url.cash }}">
       <i class="fas fa-money-bill-wave"></i>
       {{ _("Cash Account")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "cash-summary" %} active {% endif %}" href="{{ reports.cash_summary }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "cash-summary" %} active {% endif %}" href="{{ report_url.cash_summary }}">
       <i class="fas fa-money-bill-wave"></i>
       {{ _("Cash Summary")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "ledger" %} active {% endif %}" href="{{ reports.ledger }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "ledger" %} active {% endif %}" href="{{ report_url.ledger }}">
       <i class="fas fa-file-invoice-dollar"></i>
       {{ _("Ledger")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "ledger-summary" %} active {% endif %}" href="{{ reports.ledger_summary }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "ledger-summary" %} active {% endif %}" href="{{ report_url.ledger_summary }}">
       <i class="fas fa-file-invoice-dollar"></i>
       {{ _("Ledger Summary")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "journal" %} active {% endif %}" href="{{ reports.journal }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "journal" %} active {% endif %}" href="{{ report_url.journal }}">
       <i class="fas fa-book"></i>
       {{ _("Journal")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "trial-balance" %} active {% endif %}" href="{{ reports.trial_balance }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "trial-balance" %} active {% endif %}" href="{{ report_url.trial_balance }}">
       <i class="fas fa-balance-scale-right"></i>
       {{ _("Trial Balance")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "income-statement" %} active {% endif %}" href="{{ reports.income_statement }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "income-statement" %} active {% endif %}" href="{{ report_url.income_statement }}">
       <i class="fas fa-file-invoice"></i>
       {{ _("Income Statement")|force_escape }}
     </a>
-    <a class="dropdown-item {% if request.resolver_match.url_name == "balance-sheet" %} active {% endif %}" href="{{ reports.balance_sheet }}">
+    <a class="dropdown-item {% if request.resolver_match.url_name == "balance-sheet" %} active {% endif %}" href="{{ report_url.balance_sheet }}">
       <i class="fas fa-balance-scale"></i>
       {{ _("Balance Sheet")|force_escape }}
     </a>

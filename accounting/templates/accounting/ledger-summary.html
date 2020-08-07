@@ -52,7 +52,7 @@ First written: 2020/7/16
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-file-invoice-dollar" current_report_title=_("Ledger Summary") %}
+  {% with current_report_icon="fas fa-file-invoice-dollar" current_report_title=_("Ledger Summary") ledger_account=account %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <div class="btn-group">

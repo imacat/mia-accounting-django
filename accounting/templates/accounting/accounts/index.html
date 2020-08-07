@@ -37,7 +37,6 @@ First written: 2020/7/1
     <i class="fas fa-plus"></i>
     {{ _("New")|force_escape }}
   </a>
-  {% report_url as reports %}
   {% with current_report_icon="fas fa-list-ol" current_report_title=_("Accounts") %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}

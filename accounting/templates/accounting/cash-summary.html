@@ -52,7 +52,7 @@ First written: 2020/7/15
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-money-bill-wave" current_report_title=_("Cash Summary") %}
+  {% with current_report_icon="fas fa-money-bill-wave" current_report_title=_("Cash Summary") cash_account=account %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <div class="btn-group">

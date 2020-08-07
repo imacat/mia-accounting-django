@@ -163,7 +163,6 @@ def cash(request, account, period):
         "pagination": pagination,
         "account": account,
         "period": period,
-        "reports": ReportUrl(cash=account, period=period),
         "shortcut_accounts": [x for x in accounts
                               if x.code in shortcut_accounts],
         "all_accounts": [x for x in accounts
@@ -263,7 +262,6 @@ def cash_summary(request, account):
         "item_list": pagination.items,
         "pagination": pagination,
         "account": account,
-        "reports": ReportUrl(cash=account),
         "shortcut_accounts": [x for x in accounts if
                               x.code in shortcut_accounts],
         "all_accounts": [x for x in accounts if
@@ -347,7 +345,6 @@ def ledger(request, account, period):
         "pagination": pagination,
         "account": account,
         "period": period,
-        "reports": ReportUrl(ledger=account, period=period),
         "accounts": get_ledger_accounts(),
     })
 
@@ -412,7 +409,6 @@ def ledger_summary(request, account):
         "item_list": pagination.items,
         "pagination": pagination,
         "account": account,
-        "reports": ReportUrl(ledger=account),
         "accounts": get_ledger_accounts(),
     })
 
@@ -496,7 +492,6 @@ def journal(request, period):
     return render(request, "accounting/journal.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "reports": ReportUrl(period=period),
         "period": period,
     })
 
@@ -601,7 +596,6 @@ def trial_balance(request, period):
     return render(request, "accounting/trial-balance.html", {
         "item_list": accounts,
         "total_item": total_account,
-        "reports": ReportUrl(period=period),
         "period": period,
     })
 
@@ -678,7 +672,6 @@ def income_statement(request, period):
     sections[-1].has_next = False
     return render(request, "accounting/income-statement.html", {
         "item_list": sections,
-        "reports": ReportUrl(period=period),
         "period": period,
     })
 
@@ -780,7 +773,6 @@ def balance_sheet(request, period):
         "assets": by_code["1"],
         "liabilities": by_code["2"],
         "owners_equity": by_code["3"],
-        "reports": ReportUrl(period=period),
         "period": period,
     })
 
@@ -813,7 +805,6 @@ def search(request):
     return render(request, "accounting/search.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "reports": ReportUrl(),
     })
 
 

@@ -47,15 +47,18 @@ def accounting_amount(value):
 
 
 @register.simple_tag
-def report_url(cash=None, ledger=None, period=None):
+def report_url(cash_account, ledger_account, period):
     """Returns accounting report URL helper.
 
     Args:
-        cash (Account): The current cash account.
-        ledger (Account): The current ledger account.
+        cash_account (Account): The current cash account.
+        ledger_account (Account): The current ledger account.
         period (Period): The period.
 
     Returns:
         ReportUrl: The accounting report URL helper.
     """
-    return ReportUrl(cash=cash, ledger=ledger, period=period)
+    return ReportUrl(
+        cash=cash_account or None,
+        ledger=ledger_account or None,
+        period=period or None)
