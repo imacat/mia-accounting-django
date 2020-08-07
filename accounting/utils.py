@@ -75,12 +75,11 @@ class ReportUrl:
     """The URL of the accounting reports.
 
     Args:
-        **kwargs: the keyword arguments:
-            period (Period): The currently-specified period.
-            cash (Account): The currently-specified account of the
-                cash account or cash summary.
-            ledger (Account): The currently-specified account of the
-                ledger or leger summary.
+        cash (Account): The currently-specified account of the
+            cash account or cash summary.
+        ledger (Account): The currently-specified account of the
+            ledger or leger summary.
+        period (Period): The currently-specified period.
 
     Attributes:
         cash (str): The URL of the cash account.
@@ -93,21 +92,14 @@ class ReportUrl:
         balance_sheet (str): The URL of the balance sheet.
     """
 
-    def __init__(self, **kwargs):
-        if "period" in kwargs:
-            self._period = kwargs["period"]
-        else:
-            self._period = Period()
-        if "cash" in kwargs:
-            self._cash = kwargs["cash"]
-        else:
-            self._cash = Account.objects.get(
-                code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
-        if "ledger" in kwargs:
-            self._ledger = kwargs["ledger"]
-        else:
-            self._ledger = Account.objects.get(
-                code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
+    def __init__(self, cash=None, ledger=None, period=None):
+        self._period = Period() if period is None else period
+        self._cash = Account.objects.get(
+                code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])\
+            if cash is None else cash
+        self._ledger = Account.objects.get(
+                code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])\
+            if ledger is None else ledger
 
     def cash(self):
         return reverse(
