@@ -84,7 +84,7 @@ First written: 2020/7/19
           </tr>
         </thead>
         <tbody>
-          {% for section in item_list %}
+          {% for section in section_list %}
             <tr class="section-title">
               <td><div>{{ section.title|title_case }}</div></td>
               <td class="amount"></td>
@@ -99,13 +99,13 @@ First written: 2020/7/19
                   <td class="amount"></td>
                   <td class="actions"></td>
                 </tr>
-                {% for item in group.details %}
+                {% for account in group.details %}
                   <tr>
-                    <td><div class="account">{{ item.title|title_case }}</div></td>
-                    <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
+                    <td><div class="account">{{ account.title|title_case }}</div></td>
+                    <td class="amount {% if account.amount < 0 %} text-danger {% endif %}">{{ account.amount|accounting_amount }}</td>
                     <td class="amount"></td>
                     <td class="actions">
-                      <a href="{% url "accounting:ledger" item request.resolver_match.kwargs.period %}" class="btn btn-info" role="button">
+                      <a href="{% url "accounting:ledger" account request.resolver_match.kwargs.period %}" class="btn btn-info" role="button">
                         <i class="fas fa-eye"></i>
                         <span class="d-none d-lg-inline">{{ _("View")|force_escape }}</span>
                       </a>
@@ -154,7 +154,7 @@ First written: 2020/7/19
   <div class="row">
     <div class="col-sm-12">
       <ul class="list-group income-statement-list">
-        {% for section in item_list %}
+        {% for section in section_list %}
           <li class="list-group-item d-flex justify-content-between align-items-center section-title">
             {{ section.title|title_case }}
           </li>
@@ -163,13 +163,13 @@ First written: 2020/7/19
               <li class="list-group-item d-flex justify-content-between align-items-center group-title">
                 {{ group.title|title_case }}
               </li>
-              {% for item in group.details %}
+              {% for account in group.details %}
                 <li class="list-group-item d-flex justify-content-between align-items-center account">
-                  <a class="list-group-item-action" href="{% url "accounting:ledger" item request.resolver_match.kwargs.period %}">
-                    {{ item.title|title_case }}
+                  <a class="list-group-item-action" href="{% url "accounting:ledger" account request.resolver_match.kwargs.period %}">
+                    {{ account.title|title_case }}
                     <div class="float-right">
-                      <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
-                        {{ item.amount|accounting_amount }}
+                      <span class="badge {% if account.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
+                        {{ account.amount|accounting_amount }}
                       </span>
                     </div>
                   </a>

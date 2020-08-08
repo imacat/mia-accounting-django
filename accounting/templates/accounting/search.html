@@ -66,7 +66,7 @@ First written: 2020/7/21
   </form>
 </div>
 
-{% if item_list %}
+{% if record_list %}
   {% include "mia_core/include/pagination.html" %}
 
   {# The table for large screens #}
@@ -83,24 +83,24 @@ First written: 2020/7/21
       </tr>
     </thead>
     <tbody>
-      {% for item in item_list %}
-        <tr class="{% if not item.is_balanced or item.has_order_hole %} table-danger {% endif %}">
-          <td>{{ item.transaction.date|smart_date }}</td>
-          <td>{{ item.account.title|title_case }}</td>
-          <td><div class="{% if item.is_credit %} journal-credit {% else %} journal-debit {% endif %}">{{ item.summary|default:"" }}{% if not item.is_balanced %}
+      {% for record in record_list %}
+        <tr class="{% if not record.is_balanced or record.has_order_hole %} table-danger {% endif %}">
+          <td>{{ record.transaction.date|smart_date }}</td>
+          <td>{{ record.account.title|title_case }}</td>
+          <td><div class="{% if record.is_credit %} journal-credit {% else %} journal-debit {% endif %}">{{ record.summary|default:"" }}{% if not record.is_balanced %}
             <span class="badge badge-danger badge-pill">
               {{ _("Unbalanced")|force_escape }}
             </span>
-          {% endif %}{% if item.has_order_hole %}
+          {% endif %}{% if record.has_order_hole %}
             <span class="badge badge-danger badge-pill">
               {{ _("Need Reorder")|force_escape }}
             </span>
           {% endif %}</div></td>
-          <td class="amount">{{ item.debit_amount|accounting_amount }}</td>
-          <td class="amount">{{ item.credit_amount|accounting_amount }}</td>
-          <td>{{ item.transaction.notes|default:"" }}</td>
+          <td class="amount">{{ record.debit_amount|accounting_amount }}</td>
+          <td class="amount">{{ record.credit_amount|accounting_amount }}</td>
+          <td>{{ record.transaction.notes|default:"" }}</td>
           <td class="actions">
-            <a href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}" class="btn btn-info" role="button">
+            <a href="{% url_with_return "accounting:transactions.show" record.transaction.type record.transaction %}" class="btn btn-info" role="button">
               <i class="fas fa-eye"></i>
               {{ _("View")|force_escape }}
             </a>
@@ -112,41 +112,41 @@ First written: 2020/7/21
 
   {# The list for small screens #}
   <ul class="list-group d-md-none">
-    {% for item in item_list %}
-      <li class="list-group-item {% if not item.is_balanced or item.has_order_hole %} list-group-item-danger {% endif %}">
-        <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" item.transaction.type item.transaction %}">
-          <div class="{% if item.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
+    {% for record in record_list %}
+      <li class="list-group-item {% if not record.is_balanced or record.has_order_hole %} list-group-item-danger {% endif %}">
+        <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" record.transaction.type record.transaction %}">
+          <div class="{% if record.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
             <div class="date-account-line">
-              {{ item.transaction.date|smart_date }} {{ item.account.title|title_case }}
+              {{ record.transaction.date|smart_date }} {{ record.account.title|title_case }}
             </div>
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                {{ item.summary|default:"" }}
-                {% if not item.is_balanced %}
+                {{ record.summary|default:"" }}
+                {% if not record.is_balanced %}
                   <span class="badge badge-danger badge-pill">
                     {{ _("Unbalanced")|force_escape }}
                   </span>
                 {% endif %}
-                {% if item.has_order_hole %}
+                {% if record.has_order_hole %}
                   <span class="badge badge-danger badge-pill">
                     {{ _("Need Reorder")|force_escape }}
                   </span>
                 {% endif %}
               </div>
               <div>
-                {% if item.debit_amount is not None %}
+                {% if record.debit_amount is not None %}
                   <span class="badge badge-success badge-pill">
-                    {{ item.debit_amount|intcomma:False }}
+                    {{ record.debit_amount|intcomma:False }}
                   </span>
                 {% endif %}
-                {% if item.credit_amount is not None %}
+                {% if record.credit_amount is not None %}
                   <span class="badge badge-warning badge-pill">
-                    {{ item.credit_amount|intcomma:False }}
+                    {{ record.credit_amount|intcomma:False }}
                   </span>
                 {% endif %}
               </div>
             </div>
-            <div>{{ item.transaction.note|default:"" }}</div>
+            <div>{{ record.transaction.note|default:"" }}</div>
           </div>
         </a>
       </li>

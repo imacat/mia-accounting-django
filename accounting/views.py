@@ -160,7 +160,7 @@ def cash(request, account, period):
     accounts = get_cash_accounts()
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash.html", {
-        "item_list": records,
+        "record_list": records,
         "pagination": pagination,
         "shortcut_accounts": [x for x in accounts
                               if x.code in shortcut_accounts],
@@ -258,7 +258,7 @@ def cash_summary(request, account):
         return HttpResponseRedirect(e.url)
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash-summary.html", {
-        "item_list": pagination.items,
+        "month_list": pagination.items,
         "pagination": pagination,
         "shortcut_accounts": [x for x in accounts if
                               x.code in shortcut_accounts],
@@ -339,7 +339,7 @@ def ledger(request, account, period):
     find_payable_records(account, records)
     find_existing_equipments(account, records)
     return render(request, "accounting/ledger.html", {
-        "item_list": records,
+        "record_list": records,
         "pagination": pagination,
         "accounts": get_ledger_accounts(),
     })
@@ -402,7 +402,7 @@ def ledger_summary(request, account):
     except PaginationException as e:
         return HttpResponseRedirect(e.url)
     return render(request, "accounting/ledger-summary.html", {
-        "item_list": pagination.items,
+        "month_list": pagination.items,
         "pagination": pagination,
         "accounts": get_ledger_accounts(),
     })
@@ -485,7 +485,7 @@ def journal(request, period):
     except PaginationException as e:
         return HttpResponseRedirect(e.url)
     return render(request, "accounting/journal.html", {
-        "item_list": pagination.items,
+        "record_list": pagination.items,
         "pagination": pagination,
     })
 
@@ -588,7 +588,7 @@ def trial_balance(request, period):
     total_account.credit_amount = sum([x.credit_amount for x in accounts
                                        if x.credit_amount is not None])
     return render(request, "accounting/trial-balance.html", {
-        "item_list": accounts,
+        "account_list": accounts,
         "total_item": total_account,
     })
 
@@ -664,7 +664,7 @@ def income_statement(request, period):
         section.has_next = True
     sections[-1].has_next = False
     return render(request, "accounting/income-statement.html", {
-        "item_list": sections,
+        "section_list": sections,
     })
 
 
@@ -794,7 +794,7 @@ def search(request):
     except PaginationException as e:
         return HttpResponseRedirect(e.url)
     return render(request, "accounting/search.html", {
-        "item_list": pagination.items,
+        "record_list": pagination.items,
         "pagination": pagination,
     })
 
