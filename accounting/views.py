@@ -22,6 +22,7 @@ import json
 import re
 
 from django.conf import settings
+from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
@@ -37,7 +38,7 @@ from django.views.generic import RedirectView, ListView
 
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
-from mia_core.status import success_redirect, error_redirect
+from mia_core.status import error_redirect
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk, PaginationException
 from .models import Record, Transaction, Account
@@ -900,10 +901,11 @@ def txn_store(request, txn_type, txn=None):
     old_date = txn.date
     fill_txn_from_post(txn_type, txn, post)
     if not txn.is_dirty():
+        messages.success(request, gettext_noop(
+            "This transaction was not modified."))
         url = reverse("accounting:transactions.show", args=(txn_type, txn))
         url = str(UrlBuilder(url).query(r=request.GET.get("r")))
-        message = gettext_noop("This transaction was not modified.")
-        return success_redirect(request, url, message)
+        return HttpResponseRedirect(url)
 
     # Prepares the data
     user = request.user
@@ -946,10 +948,11 @@ def txn_store(request, txn_type, txn=None):
             record.save()
         for x in txn_to_sort:
             x.save()
+    messages.success(request, gettext_noop(
+        "This transaction was saved successfully."))
     url = reverse("accounting:transactions.show", args=(txn_type, txn))
     url = str(UrlBuilder(url).query(r=request.GET.get("r")))
-    message = gettext_noop("This transaction was saved successfully.")
-    return success_redirect(request, url, message)
+    return HttpResponseRedirect(url)
 
 
 @require_POST
@@ -979,9 +982,10 @@ def txn_delete(request, txn):
         txn.delete()
         for x in txn_to_sort:
             x.save()
+    messages.success(request, gettext_noop(
+        "This transaction was deleted successfully."))
     url = request.GET.get("r") or reverse("accounting:home")
-    message = gettext_noop("This transaction was deleted successfully.")
-    return success_redirect(request, url, message)
+    return HttpResponseRedirect(url)
 
 
 @login_required
@@ -1029,17 +1033,18 @@ def txn_sort(request, date):
         modified = [x for x in transactions if x.is_dirty()]
 
         if len(modified) == 0:
+            messages.success(request, gettext_noop(
+                "The transaction orders were not modified."))
             url = request.GET.get("r") or reverse("accounting:home")
-            message = gettext_noop("The transaction orders were not modified.")
-            return success_redirect(request, url, message)
+            return HttpResponseRedirect(url)
 
         with transaction.atomic():
             for txn in modified:
                 txn.save()
+        messages.success(request, gettext_noop(
+            "The transaction orders were saved successfully."))
         url = request.GET.get("r") or reverse("accounting:home")
-        message = gettext_noop(
-            "The transaction orders were saved successfully.")
-        return success_redirect(request, url, message)
+        return HttpResponseRedirect(url)
 
 
 @method_decorator(require_GET, name="dispatch")
