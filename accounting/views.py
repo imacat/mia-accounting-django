@@ -41,7 +41,7 @@ from mia_core.status import success_redirect, error_redirect
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk, PaginationException
 from .models import Record, Transaction, Account
-from .utils import ReportUrl, get_cash_accounts, get_ledger_accounts, \
+from .utils import get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
     sort_post_txn_records, make_txn_form_from_status, \
     make_txn_form_from_model, make_txn_form_from_post, MonthlySummary, \
