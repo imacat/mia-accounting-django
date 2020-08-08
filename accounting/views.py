@@ -799,22 +799,18 @@ def search(request):
     })
 
 
-@require_GET
-@login_required
-def txn_detail(request, txn_type, txn):
-    """The view of the details of an accounting transaction.
+@method_decorator(require_GET, name="dispatch")
+@method_decorator(login_required, name="dispatch")
+class TransactionView(DetailView):
+    """The view of the details of an accounting transaction."""
+    context_object_name = "txn"
 
-    Args:
-        request (HttpRequest): The request.
-        txn_type (str): The transaction type.
-        txn (Transaction): The transaction.
+    def get_object(self, queryset=None):
+        return self.request.resolver_match.kwargs["txn"]
 
-    Returns:
-        HttpResponse: The response.
-    """
-    return render(request, F"accounting/transactions/{txn_type}/detail.html", {
-        "txn": txn,
-    })
+    def get_template_names(self):
+        return ["accounting/transactions/%s/detail.html"
+                % (self.request.resolver_match.kwargs["txn_type"],)]
 
 
 @require_GET
