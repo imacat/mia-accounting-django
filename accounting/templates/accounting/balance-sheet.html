@@ -27,7 +27,7 @@ First written: 2020/7/20
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with prep_period=period.prep_desc %}Balance Sheet {{ prep_period }}{% endblocktrans %}
+  {% blocktrans asvar title with prep_period=request.resolver_match.kwargs.period.prep_desc %}Balance Sheet {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -53,17 +53,19 @@ First written: 2020/7/20
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-balance-scale" current_report_title=_("Balance Sheet") period=period %}
+  {% with current_report_icon="fas fa-balance-scale" current_report_title=_("Balance Sheet") period=request.resolver_match.kwargs.period %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
     <i class="far fa-calendar-alt"></i>
-    <span class="d-none d-md-inline">{{ period.description }}</span>
+    <span class="d-none d-md-inline">{{ request.resolver_match.kwargs.period.description }}</span>
     <span class="d-md-none">{{ _("Period")|force_escape }}</span>
   </button>
 </div>
 
-{% include "mia_core/include/period-chooser.html" %}
+{% with period=request.resolver_match.kwargs.period %}
+  {% include "mia_core/include/period-chooser.html" %}
+{% endwith %}
 
 {# The table for large screens #}
 <div class="d-none d-lg-block report-block report-block-lg">

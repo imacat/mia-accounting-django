@@ -27,7 +27,7 @@ First written: 2020/7/16
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with account=account.title prep_period=period.prep_desc %}Ledger for {{ account }} {{ prep_period }}{% endblocktrans %}
+  {% blocktrans asvar title with account=request.resolver_match.kwargs.account.title prep_period=request.resolver_match.kwargs.period.prep_desc %}Ledger for {{ account }} {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -53,30 +53,32 @@ First written: 2020/7/16
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-file-invoice-dollar" current_report_title=_("Ledger") ledger_account=account period=period %}
+  {% with current_report_icon="fas fa-file-invoice-dollar" current_report_title=_("Ledger") ledger_account=request.resolver_match.kwargs.account period=request.resolver_match.kwargs.period %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ account.title|title_case }}</span>
+      <span class="d-none d-md-inline">{{ request.resolver_match.kwargs.account.title|title_case }}</span>
       <span class="d-md-none">{{ _("Account")|force_escape }}</span>
     </button>
     <div class="dropdown-menu account-picker">
-      {% for x in accounts %}
-        <a class="dropdown-item {% if x.code == account.code %} active {% endif %}" href="{% url "accounting:ledger" x period %}">
-          {{ x.code }} {{ x.title|title_case }}
+      {% for account in accounts %}
+        <a class="dropdown-item {% if account.code == request.resolver_match.kwargs.account.code %} active {% endif %}" href="{% url "accounting:ledger" account request.resolver_match.kwargs.period %}">
+          {{ account.code }} {{ account.title|title_case }}
         </a>
       {% endfor %}
     </div>
   </div>
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
     <i class="far fa-calendar-alt"></i>
-    <span class="d-none d-md-inline">{{ period.description }}</span>
+    <span class="d-none d-md-inline">{{ request.resolver_match.kwargs.period.description }}</span>
     <span class="d-md-none">{{ _("Period")|force_escape }}</span>
   </button>
 </div>
 
-{% include "mia_core/include/period-chooser.html" %}
+{% with period=request.resolver_match.kwargs.period %}
+  {% include "mia_core/include/period-chooser.html" %}
+{% endwith %}
 
 {% if item_list %}
   {% include "mia_core/include/pagination.html" %}

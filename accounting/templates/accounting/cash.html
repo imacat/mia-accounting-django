@@ -27,7 +27,7 @@ First written: 2020/7/1
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with account=account.title prep_period=period.prep_desc %}Cash Account for {{ account }} {{ prep_period }}{% endblocktrans %}
+  {% blocktrans asvar title with account=request.resolver_match.kwargs.account.title prep_period=request.resolver_match.kwargs.period.prep_desc %}Cash Account for {{ account }} {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -53,37 +53,39 @@ First written: 2020/7/1
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-money-bill-wave" current_report_title=_("Cash Account") cash_account=account period=period %}
+  {% with current_report_icon="fas fa-money-bill-wave" current_report_title=_("Cash Account") cash_account=request.resolver_match.kwargs.account period=request.resolver_match.kwargs.period %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-      <span class="d-none d-md-inline">{{ account.title|title_case }}</span>
+      <span class="d-none d-md-inline">{{ request.resolver_match.kwargs.account.title|title_case }}</span>
       <span class="d-md-none">{{ _("Account")|force_escape }}</span>
     </button>
     <div class="dropdown-menu account-picker">
       <div class="dropdown-header">{{ _("Shortcuts")|force_escape }}</div>
-      {% for x in shortcut_accounts %}
-        <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:cash" x period %}">
-          {{ x.title|title_case }}
+      {% for account in shortcut_accounts %}
+        <a class="dropdown-item {% if account.code == request.resolver_match.kwargs.account.code %} active {% endif %}>" href="{% url "accounting:cash" account request.resolver_match.kwargs.period %}">
+          {{ account.title|title_case }}
         </a>
       {% endfor %}
       <div class="dropdown-header">{{ _("All")|force_escape }}</div>
-      {% for x in all_accounts %}
-        <a class="dropdown-item {% if x.code == account.code %} active {% endif %}>" href="{% url "accounting:cash" x period %}">
-          {{ x.code }} {{ x.title|title_case }}
+      {% for account in all_accounts %}
+        <a class="dropdown-item {% if account.code == request.resolver_match.kwargs.account.code %} active {% endif %}>" href="{% url "accounting:cash" account request.resolver_match.kwargs.period %}">
+          {{ account.code }} {{ account.title|title_case }}
         </a>
       {% endfor %}
     </div>
   </div>
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
     <i class="far fa-calendar-alt"></i>
-    <span class="d-none d-md-inline">{{ period.description }}</span>
+    <span class="d-none d-md-inline">{{ request.resolver_match.kwargs.period.description }}</span>
     <span class="d-md-none">{{ _("Period")|force_escape }}</span>
   </button>
 </div>
 
-{% include "mia_core/include/period-chooser.html" %}
+{% with period=request.resolver_match.kwargs.period %}
+  {% include "mia_core/include/period-chooser.html" %}
+{% endwith %}
 
 {% if item_list %}
   {% include "mia_core/include/pagination.html" %}

@@ -27,7 +27,7 @@ First written: 2020/7/19
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with prep_period=period.prep_desc %}Income Statement {{ prep_period }}{% endblocktrans %}
+  {% blocktrans asvar title with prep_period=request.resolver_match.kwargs.period.prep_desc %}Income Statement {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -53,17 +53,19 @@ First written: 2020/7/19
       </a>
     </div>
   </div>
-  {% with current_report_icon="fas fa-file-invoice" current_report_title=_("Income Statement") period=period %}
+  {% with current_report_icon="fas fa-file-invoice" current_report_title=_("Income Statement") period=request.resolver_match.kwargs.period %}
     {% include "accounting/include/report-chooser.html" %}
   {% endwith %}
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#period-modal">
     <i class="far fa-calendar-alt"></i>
-    <span class="d-none d-md-inline">{{ period.description }}</span>
+    <span class="d-none d-md-inline">{{ request.resolver_match.kwargs.period.description }}</span>
     <span class="d-md-none">{{ _("Period")|force_escape }}</span>
   </button>
 </div>
 
-{% include "mia_core/include/period-chooser.html" %}
+{% with period=request.resolver_match.kwargs.period %}
+  {% include "mia_core/include/period-chooser.html" %}
+{% endwith %}
 
 {# The table for large screens #}
 <div class="d-none d-sm-block report-block report-block-lg">
@@ -103,7 +105,7 @@ First written: 2020/7/19
                     <td class="amount {% if item.amount < 0 %} text-danger {% endif %}">{{ item.amount|accounting_amount }}</td>
                     <td class="amount"></td>
                     <td class="actions">
-                      <a href="{% url "accounting:ledger" item period %}" class="btn btn-info" role="button">
+                      <a href="{% url "accounting:ledger" item request.resolver_match.kwargs.period %}" class="btn btn-info" role="button">
                         <i class="fas fa-eye"></i>
                         <span class="d-none d-lg-inline">{{ _("View")|force_escape }}</span>
                       </a>
@@ -163,7 +165,7 @@ First written: 2020/7/19
               </li>
               {% for item in group.details %}
                 <li class="list-group-item d-flex justify-content-between align-items-center account">
-                  <a class="list-group-item-action" href="{% url "accounting:ledger" item period %}">
+                  <a class="list-group-item-action" href="{% url "accounting:ledger" item request.resolver_match.kwargs.period %}">
                     {{ item.title|title_case }}
                     <div class="float-right">
                       <span class="badge {% if item.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">

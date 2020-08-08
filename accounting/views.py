@@ -162,8 +162,6 @@ def cash(request, account, period):
     return render(request, "accounting/cash.html", {
         "item_list": records,
         "pagination": pagination,
-        "account": account,
-        "period": period,
         "shortcut_accounts": [x for x in accounts
                               if x.code in shortcut_accounts],
         "all_accounts": [x for x in accounts
@@ -262,7 +260,6 @@ def cash_summary(request, account):
     return render(request, "accounting/cash-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "account": account,
         "shortcut_accounts": [x for x in accounts if
                               x.code in shortcut_accounts],
         "all_accounts": [x for x in accounts if
@@ -344,8 +341,6 @@ def ledger(request, account, period):
     return render(request, "accounting/ledger.html", {
         "item_list": records,
         "pagination": pagination,
-        "account": account,
-        "period": period,
         "accounts": get_ledger_accounts(),
     })
 
@@ -409,7 +404,6 @@ def ledger_summary(request, account):
     return render(request, "accounting/ledger-summary.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "account": account,
         "accounts": get_ledger_accounts(),
     })
 
@@ -493,7 +487,6 @@ def journal(request, period):
     return render(request, "accounting/journal.html", {
         "item_list": pagination.items,
         "pagination": pagination,
-        "period": period,
     })
 
 
@@ -597,7 +590,6 @@ def trial_balance(request, period):
     return render(request, "accounting/trial-balance.html", {
         "item_list": accounts,
         "total_item": total_account,
-        "period": period,
     })
 
 
@@ -673,7 +665,6 @@ def income_statement(request, period):
     sections[-1].has_next = False
     return render(request, "accounting/income-statement.html", {
         "item_list": sections,
-        "period": period,
     })
 
 
@@ -774,7 +765,6 @@ def balance_sheet(request, period):
         "assets": by_code["1"],
         "liabilities": by_code["2"],
         "owners_equity": by_code["3"],
-        "period": period,
     })
 
 
