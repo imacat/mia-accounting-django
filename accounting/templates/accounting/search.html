@@ -29,7 +29,6 @@ First written: 2020/7/21
 {% block settings %}
   {% blocktrans asvar title with query=request.GET.q %}Search Result for “{{ query }}”{% endblocktrans %}
   {% setvar "title" title %}
-  {% setvar "use_period_chooser" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
 
