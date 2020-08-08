@@ -38,6 +38,13 @@ First written: 2020/7/23
 
 {% include "accounting/include/summary-helper.html" %}
 
+{% for message in item.non_field_errors %}
+  <div class="alert alert-danger alert-dismissible fade show">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>{{ _("Error:")|force_escape }}</strong> {{ message }}
+  </div>
+{% endfor %}
+
 <div class="btn-group btn-actions">
   <a class="btn btn-primary" role="button" href="{% if item.transaction %}{% url_keep_return "accounting:transactions.show" "expense" item.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
