@@ -813,7 +813,7 @@ def txn_show(request, txn_type, txn):
         HttpResponse: The response.
     """
     return render(request, F"accounting/transactions/{txn_type}/view.html", {
-        "item": txn,
+        "txn": txn,
     })
 
 
@@ -854,7 +854,7 @@ def txn_edit(request, txn_type, txn=None):
             "accounting/include/form-record-non-transfer.html",
             new_record_context))
     return render(request, F"accounting/transactions/{txn_type}/form.html", {
-        "item": form,
+        "txn": form,
         "summary_categories": get_summary_categories,
         "should_validate": should_validate,
         "new_record_template": new_record_template,
@@ -997,7 +997,7 @@ def txn_sort(request, date):
         raise Http404
     if request.method != "POST":
         return render(request, "accounting/transactions/sort.html", {
-            "item_list": transactions,
+            "txn_list": transactions,
             "date": date,
         })
     else:

@@ -32,7 +32,7 @@ First written: 2020/7/23
 
 {% block content %}
 
-{% if item.has_order_hole %}
+{% if txn.has_order_hole %}
   <div class="alert alert-danger alert-dismissible fade show">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     <strong>{{ _("Error:") }}</strong> {{ _("The transactions on this day are not well-ordered.  Please reorder them.")|force_escape }}
@@ -40,7 +40,7 @@ First written: 2020/7/23
 {% endif %}
 
 <!-- the delete confirmation dialog -->
-<form action="{% url_keep_return "accounting:transactions.delete" item %}" method="post">
+<form action="{% url_keep_return "accounting:transactions.delete" txn %}" method="post">
   {% csrf_token %}
   <!-- The Modal -->
   <div class="modal" id="del-modal">
@@ -71,22 +71,22 @@ First written: 2020/7/23
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
-  <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" "expense" item %}">
+  <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" "expense" txn %}">
     <i class="fas fa-edit"></i>
     {{ _("Edit")|force_escape }}
   </a>
-  {% if not item.has_many_same_day %}
+  {% if not txn.has_many_same_day %}
     <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{{ _("There is no other transaction at the same day.")|force_escape }}">
       <i class="fas fa-sort"></i>
       {{ _("Sort")|force_escape }}
     </button>
   {% else %}
-    <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url_with_return "accounting:transactions.sort" item.date %}">
+    <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url_with_return "accounting:transactions.sort" txn.date %}">
       <i class="fas fa-sort"></i>
       {{ _("Sort")|force_escape }}
     </a>
   {% endif %}
-  <a class="btn btn-primary d-none d-sm-inline" href="{% url_keep_return "accounting:transactions.show" "transfer" item %}">
+  <a class="btn btn-primary d-none d-sm-inline" href="{% url_keep_return "accounting:transactions.show" "transfer" txn %}">
     <i class="fas fa-exchange-alt"></i>
     {{ _("To Transfer")|force_escape }}
   </a>
@@ -95,18 +95,18 @@ First written: 2020/7/23
       <i class="fas fa-bars"></i>
     </button>
     <div class="dropdown-menu">
-      {% if not item.has_many_same_day %}
+      {% if not txn.has_many_same_day %}
         <span class="dropdown-item disabled" title="{{ _("There is no other transaction at the same day.")|force_escape }}">
           <i class="fas fa-sort"></i>
           {{ _("Sort")|force_escape }}
         </span>
       {% else %}
-        <a class="dropdown-item" href="{% url_with_return "accounting:transactions.sort" item.date %}">
+        <a class="dropdown-item" href="{% url_with_return "accounting:transactions.sort" txn.date %}">
           <i class="fas fa-sort"></i>
           {{ _("Sort")|force_escape }}
         </a>
       {% endif %}
-      <a class="dropdown-item" href="{% url_keep_return "accounting:transactions.show" "transfer" item %}">
+      <a class="dropdown-item" href="{% url_keep_return "accounting:transactions.show" "transfer" txn %}">
         <i class="fas fa-exchange-alt"></i>
         {{ _("To Transfer")|force_escape }}
       </a>
@@ -120,7 +120,7 @@ First written: 2020/7/23
 
 <div class="row">
   <div class="col-sm-2">{{ _("Date:")|force_escape }}</div>
-  <div class="col-sm-10">{{ item.date|smart_date }}</div>
+  <div class="col-sm-10">{{ txn.date|smart_date }}</div>
 </div>
 
 <table class="table table-striped table-hover d-none d-sm-table">
@@ -132,7 +132,7 @@ First written: 2020/7/23
     </tr>
   </thead>
   <tbody>
-    {% for x in item.debit_records %}
+    {% for x in txn.debit_records %}
       <tr>
         <td>{{ x.account.title|title_case }}</td>
         <td>{{ x.summary|default:"" }}</td>
@@ -143,13 +143,13 @@ First written: 2020/7/23
   <tfoot>
     <tr>
       <td colspan="2">{{ _("Total")|force_escape }}</td>
-      <td class="amount">{{ item.debit_total|accounting_amount }}</td>
+      <td class="amount">{{ txn.debit_total|accounting_amount }}</td>
     </tr>
   </tfoot>
 </table>
 
 <ul class="list-group d-sm-none">
-  {% for x in item.debit_records %}
+  {% for x in txn.debit_records %}
     <li class="list-group-item">
       <div class="d-flex justify-content-between align-items-center account-line">
         {{ x.account.title|title_case }}
@@ -161,36 +161,36 @@ First written: 2020/7/23
   <li class="list-group-item">
     <div class="d-flex justify-content-between align-items-center account-line">
       {{ _("Total")|force_escape }}
-      <span class="badge badge-info">{{ item.debit_total|accounting_amount }}</span>
+      <span class="badge badge-info">{{ txn.debit_total|accounting_amount }}</span>
     </div>
   </li>
 </ul>
 
-{% if item.notes %}
+{% if txn.notes %}
   <div class="row">
     <div class="col-sm-2">{{ _("Notes:")|force_escape }}</div>
-    <div class="col-sm-10">{{ item.notes }}</div>
+    <div class="col-sm-10">{{ txn.notes }}</div>
   </div>
 {% endif %}
 
 <div class="row form-group">
   <div class="col-sm-2">{{ _("Created at:")|force_escape }}</div>
-  <div class="col-sm-10">{{ item.created_at }}</div>
+  <div class="col-sm-10">{{ txn.created_at }}</div>
 </div>
 
 <div class="row form-group">
   <div class="col-sm-2">{{ _("Created by:")|force_escape }}</div>
-  <div class="col-sm-10">{{ item.created_by.name }}</div>
+  <div class="col-sm-10">{{ txn.created_by.name }}</div>
 </div>
 
 <div class="row form-group">
   <div class="col-sm-2">{{ _("Updated at:")|force_escape }}</div>
-  <div class="col-sm-10">{{ item.updated_at }}</div>
+  <div class="col-sm-10">{{ txn.updated_at }}</div>
 </div>
 
 <div class="row form-group">
   <div class="col-sm-2">{{ _("Updated by:")|force_escape }}</div>
-  <div class="col-sm-10">{{ item.updated_by.name }}</div>
+  <div class="col-sm-10">{{ txn.updated_by.name }}</div>
 </div>
 
 {% endblock %}

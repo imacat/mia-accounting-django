@@ -54,7 +54,7 @@ First written: 2020/8/6
   </div>
 </div>
 
-{% if item_list|length > 1 %}
+{% if txn_list|length > 1 %}
   <form action="{% url_keep_return "accounting:transactions.sort" date %}" method="post">
     {% csrf_token %}
     <table class="table general-journal-table">
@@ -68,63 +68,63 @@ First written: 2020/8/6
         </tr>
       </thead>
       <tbody id="transactions">
-        {% for item in item_list %}
-          <tr id="transaction-{{ item.pk }}" class="transaction {% if not item.is_balanced %} table-danger {% endif %}">
+        {% for txn in txn_list %}
+          <tr id="transaction-{{ txn.pk }}" class="transaction {% if not txn.is_balanced %} table-danger {% endif %}">
             <td class="actions">
               <div class="btn-group">
                 <button class="btn btn-outline-secondary" type="button">
                   <i class="fas fa-sort"></i>
                 </button>
-                <a class="btn btn-primary" role="button" href="{% url_with_return "accounting:transactions.show" item.type item %}">
+                <a class="btn btn-primary" role="button" href="{% url_with_return "accounting:transactions.show" txn.type txn %}">
                   <i class="fas fa-eye"></i>
                 </a>
               </div>
             </td>
             <td>
-              {% if item.is_cash_expense %}
+              {% if txn.is_cash_expense %}
                 {{ _("Cash Expense")|force_escape }}
-              {% elif item.is_cash_income %}
+              {% elif txn.is_cash_income %}
                 {{ _("Cash Income")|force_escape }}
               {% else %}
                 {{ _("Transfer")|force_escape }}
               {% endif %}
             </td>
             <td>
-              <input id="transaction-{{ item.pk }}-ord" type="hidden" name="transaction-{{ item.pk }}-ord" value="{{ forloop.counter }}" />
-              {% if item.is_cash_expense %}
+              <input id="transaction-{{ txn.pk }}-ord" type="hidden" name="transaction-{{ txn.pk }}-ord" value="{{ forloop.counter }}" />
+              {% if txn.is_cash_expense %}
                 <ul class="txn-content-expense">
-                  {% for summary in item.debit_sumaries %}
+                  {% for summary in txn.debit_sumaries %}
                     <li>{{ summary }}</li>
                   {% endfor %}
                 </ul>
-              {% elif item.is_cash_income %}
+              {% elif txn.is_cash_income %}
                 <ul class="txn-content-income">
-                  {% for summary in item.credit_summaries %}
+                  {% for summary in txn.credit_summaries %}
                     <li>{{ summary }}</li>
                   {% endfor %}
                 </ul>
               {% else %}
                 <ul class="txn-content-expense">
-                  {% for summary in item.debit_sumaries %}
+                  {% for summary in txn.debit_sumaries %}
                     <li>{{ summary }}</li>
                   {% endfor %}
                 </ul>
                 <ul class="txn-content-income">
-                  {% for summary in item.credit_summaries %}
+                  {% for summary in txn.credit_summaries %}
                     <li>{{ summary }}</li>
                   {% endfor %}
                 </ul>
               {% endif %}
-              {% if not item.is_balanced %}
+              {% if not txn.is_balanced %}
                 <span class="badge badge-danger badge-pill">
                   {{ _("Unbalanced")|force_escape }}
                 </span>
               {% endif %}
             </td>
             <td class="amount">
-              {{ item.amount|accounting_amount }}
+              {{ txn.amount|accounting_amount }}
             </td>
-            <td>{{ item.notes|default:"" }}</td>
+            <td>{{ txn.notes|default:"" }}</td>
           </tr>
         {% endfor %}
       </tbody>
