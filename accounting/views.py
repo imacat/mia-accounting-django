@@ -1042,6 +1042,7 @@ def txn_sort(request, date):
 class AccountListView(ListView):
     """The view to list the accounts."""
     queryset = Account.objects.order_by("code")
+    context_object_name = "account_list"
 
 
 @require_GET
