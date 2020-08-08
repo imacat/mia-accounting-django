@@ -152,26 +152,6 @@ def add_js(context, url):
     return ""
 
 
-@register.simple_tag(takes_context=True, name="retrieve_status")
-def retrieve_status_tag(context):
-    """Returns the success message from the previously-stored status.  The
-    success message is saved as "success", and the error messages are saved as
-    "errors" in the template variables.
-
-    Args:
-        context (RequestContext): The request context.
-
-    Returns:
-        str: An empty string.
-    """
-    status = retrieve_status(context.request)
-    if status is None:
-        return ""
-    if "success" in status:
-        context.dicts[0]["success"] = status["success"]
-    return ""
-
-
 @register.filter
 def smart_date(value):
     """Formats the date for human friendliness.
