@@ -809,7 +809,7 @@ class TransactionView(DetailView):
         return self.request.resolver_match.kwargs["txn"]
 
     def get_template_names(self):
-        return ["accounting/transactions/%s/detail.html"
+        return ["accounting/transaction_detail-%s.html"
                 % (self.request.resolver_match.kwargs["txn_type"],)]
 
 
@@ -849,7 +849,7 @@ def txn_edit(request, txn_type, txn=None):
         new_record_template = json.dumps(render_to_string(
             "accounting/include/form-record-non-transfer.html",
             new_record_context))
-    return render(request, F"accounting/transactions/{txn_type}/form.html", {
+    return render(request, F"accounting/transaction_form-{txn_type}.html", {
         "txn": form,
         "summary_categories": get_summary_categories,
         "should_validate": should_validate,
@@ -992,7 +992,7 @@ def txn_sort(request, date):
     if len(transactions) < 2:
         raise Http404
     if request.method != "POST":
-        return render(request, "accounting/transactions/sort.html", {
+        return render(request, "accounting/transaction-sort.html", {
             "txn_list": transactions,
             "date": date,
         })
