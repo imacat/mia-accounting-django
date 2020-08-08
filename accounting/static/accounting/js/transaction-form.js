@@ -338,6 +338,12 @@ function resetRecordButtons() {
 function validateForm() {
     let isValidated = true;
     isValidated = isValidated && validateDate();
+    $(".debit-record").each(function () {
+        isValidated = isValidated && validateRecord(this);
+    });
+    $(".credit-account").each(function () {
+        isValidated = isValidated && validateRecord(this);
+    });
     $(".record-account").each(function () {
         isValidated = isValidated && validateAccount(this);
     });
@@ -372,6 +378,18 @@ function validateDate() {
     date.classList.remove("is-invalid");
     errorMessage.text("");
     return true;
+}
+
+/**
+ * Validates the record.
+ *
+ * @param {HTMLLIElement} record the record
+ * @returns {boolean} true if the validation succeed, or false
+ *                    otherwise
+ * @private
+ */
+function validateRecord(record) {
+    return !record.classList.contains("list-group-item-danger");
 }
 
 /**
