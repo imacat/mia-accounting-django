@@ -21,7 +21,6 @@
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models
-from django.db.models import Sum, Case, When, F, Q
 from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
