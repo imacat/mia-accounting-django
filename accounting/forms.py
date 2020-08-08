@@ -37,7 +37,7 @@ class RecordForm(forms.Form):
     id = forms.IntegerField(
         required=False,
         error_messages={
-            "invalid": _("This record is not valid."),
+            "invalid": _("This accounting record is not valid."),
         },
         validators=[validate_record_id])
     account = forms.CharField(
@@ -157,11 +157,11 @@ class RecordForm(forms.Form):
         if record.is_credit != self.is_credit:
             if self.is_credit:
                 raise forms.ValidationError(
-                    _("This record is not a credit record."),
+                    _("This accounting record is not a credit record."),
                     code="not_credit")
             else:
                 raise forms.ValidationError(
-                    _("This record is not a debit record."),
+                    _("This accounting record is not a debit record."),
                     code="not_debit")
 
 
@@ -224,7 +224,7 @@ class TransactionForm(forms.Form):
             return
         if self.txn_type == "transfer":
             raise forms.ValidationError(
-                _("Please fill in debit records."),
+                _("Please fill in debit accounting records."),
                 code="has_debit_records")
         raise forms.ValidationError(
             _("Please fill in accounting records."),
@@ -242,7 +242,7 @@ class TransactionForm(forms.Form):
             return
         if self.txn_type == "transfer":
             raise forms.ValidationError(
-                _("Please fill in credit records."),
+                _("Please fill in credit accounting records."),
                 code="has_debit_records")
         raise forms.ValidationError(
             _("Please fill in accounting records."),
@@ -260,7 +260,7 @@ class TransactionForm(forms.Form):
         if self.debit_total() == self.credit_total():
             return
         raise forms.ValidationError(
-            _("The total amount of debit and credit records are inconsistent."),
+            _("The total of the debit and credit amounts are inconsistent."),
             code="balance")
 
     def is_valid(self):

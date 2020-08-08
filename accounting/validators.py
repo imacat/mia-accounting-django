@@ -37,7 +37,7 @@ def validate_record_id(value):
     try:
         Record.objects.get(pk=value)
     except Record.DoesNotExist:
-        raise ValidationError(_("This record does not exists."),
+        raise ValidationError(_("This accounting record does not exists."),
                               code="not_exist")
 
 
