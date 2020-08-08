@@ -281,6 +281,7 @@ function deleteRecord(button) {
     resetRecordOrders(type);
     resetRecordButtons();
     updateTotalAmount(button);
+    validateBalance();
 }
 
 /**
