@@ -798,7 +798,7 @@ def search(request):
             get_multi_lingual_search("account__title", query)
             | Q(account__code__icontains=query)
             | Q(summary__icontains=query)
-            | Q(transaction__note__icontains=query))
+            | Q(transaction__notes__icontains=query))
     try:
         pagination = Pagination(request, records, True)
     except PaginationException as e:
