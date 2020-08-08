@@ -67,7 +67,7 @@ First written: 2020/8/7
             {% endif %}
           </td>
           <td class="actions">
-            <a href="{% url "accounting:accounts.show" account %}" class="btn btn-info" role="button">
+            <a href="{% url "accounting:accounts.detail" account %}" class="btn btn-info" role="button">
               <i class="fas fa-eye"></i>
               <span class="d-none d-sm-inline">{{ _("View")|force_escape }}</span>
             </a>
