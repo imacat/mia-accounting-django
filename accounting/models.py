@@ -63,7 +63,7 @@ class Account(DirtyFieldsMixin, models.Model):
         self.amount = None
         self.is_for_debit = None
         self.is_for_credit = None
-        self.is_in_use = None
+        self._is_in_use = None
         self._is_parent_and_in_use = None
 
     def __str__(self):
@@ -104,6 +104,22 @@ class Account(DirtyFieldsMixin, models.Model):
     @is_parent_and_in_use.setter
     def is_parent_and_in_use(self, value):
         self._is_parent_and_in_use = value
+
+    @property
+    def is_in_use(self):
+        """Whether this account is in use.
+
+        Returns:
+            bool: True if this account is in use, or false otherwise.
+        """
+        if self._is_in_use is None:
+            self._is_in_use = self.child_set.count() > 0\
+                              or self.record_set.count() > 0
+        return self._is_in_use
+
+    @is_in_use.setter
+    def is_in_use(self, value):
+        self._is_in_use = value
 
 
 class Transaction(DirtyFieldsMixin, models.Model):

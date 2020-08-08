@@ -101,9 +101,8 @@ urlpatterns = [
          mia_core_views.todo, name="accounts.store"),
     path("accounts/options",
          views.account_options, name="accounts.options"),
-    # TODO: To be done
     path("accounts/<account:account>",
-         mia_core_views.todo, name="accounts.show"),
+         views.AccountView.as_view(), name="accounts.show"),
     # TODO: To be done
     path("accounts/<account:account>/edit",
          mia_core_views.todo, name="accounts.edit"),

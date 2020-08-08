@@ -34,7 +34,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import RedirectView, ListView
+from django.views.generic import RedirectView, ListView, DetailView
 
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
@@ -1043,6 +1043,14 @@ class AccountListView(ListView):
     """The view to list the accounts."""
     queryset = Account.objects.order_by("code")
     context_object_name = "account_list"
+
+
+@method_decorator(require_GET, name="dispatch")
+@method_decorator(login_required, name="dispatch")
+class AccountView(DetailView):
+    """The view of an account."""
+    def get_object(self, queryset=None):
+        return self.request.resolver_match.kwargs["account"]
 
 
 @require_GET

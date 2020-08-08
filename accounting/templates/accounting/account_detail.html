@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% comment %}
+The Mia Accounting Application
+account_detail.html: The template for the account detail
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/8/8
+{% endcomment %}
+{% load static %}
+{% load i18n %}
+{% load mia_core %}
+{% load accounting %}
+
+{% block settings %}
+  {% setvar "title" account %}
+{% endblock %}
+
+{% block content %}
+
+{% if account.is_parent_and_in_use %}
+  <div class="alert alert-danger alert-dismissible fade show">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>{{ _("Error:")|force_escape }}</strong> {{ _("The account is a parent account but is also used in the accounting records.")|force_escape }}
+  </div>
+{% endif %}
+
+<!-- the delete confirmation dialog -->
+<form action="{% url_keep_return "accounting:accounts.delete" account %}" method="post">
+  {% csrf_token %}
+  <!-- The Modal -->
+  <div class="modal" id="del-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">{{ _("Account Deletion Confirmation")|force_escape }}</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">{{ _("Do you really want to delete this account?")|force_escape }}</div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button class="btn btn-danger" type="submit" name="del-confirm">{{ _("Confirm")|force_escape }}</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _("Cancel")|force_escape }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="btn-group btn-actions">
+  <a class="btn btn-primary" role="button" href="{% if "r" in request.GET %}{{ request.GET.r }}{% else %}{% url "accounting:accounts" %}{% endif %}">
+    <i class="fas fa-chevron-circle-left"></i>
+    {{ _("Back")|force_escape }}
+  </a>
+  <a class="btn btn-primary" role="button" href="{% url "accounting:accounts.edit" account %}">
+    <i class="fas fa-user-cog"></i>
+    {{ _("Setting")|force_escape }}
+  </a>
+  {% if not account.is_in_use %}
+    <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{{ _("This account is not used in the accounting records.")|force_escape }}">
+      <i class="fas fa-file-invoice-dollar"></i>
+      {{ _("Ledger")|force_escape }}
+    </button>
+  {% else %}
+    <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url "accounting:ledger" account "-" %}">
+      <i class="fas fa-file-invoice-dollar"></i>
+      {{ _("Ledger")|force_escape }}
+    </a>
+  {% endif %}
+  <div class="btn-group d-sm-none">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="dropdown-menu">
+      {% if not account.is_in_use %}
+        <span class="dropdown-item disabled" title="{{ _("This account is not used in the accounting records.")|force_escape }}">
+          <i class="fas fa-file-invoice-dollar"></i>
+          {{ _("Ledger")|force_escape }}
+        </span>
+      {% else %}
+        <a class="dropdown-item" href="{% url "accounting:ledger" account "-" %}">
+          <i class="fas fa-file-invoice-dollar"></i>
+          {{ _("Ledger")|force_escape }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  {% if account.is_in_use %}
+    <button class="btn btn-secondary" type="button" disabled="disabled" title="{{ _("This account is in use.")|force_escape }}">
+      <i class="fas fa-trash"></i>
+      {{ _("Delete")|force_escape }}
+    </button>
+  {% else %}
+    <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#del-modal">
+      <i class="fas fa-trash"></i>
+      {{ _("Delete")|force_escape }}
+    </button>
+  {% endif %}
+</div>
+
+<div class="row form-group">
+  <div class="col-sm-2">{{ _("Parent Account:")|force_escape }}</div>
+  <div class="col-sm-10">
+    {% if account.parent %}
+      {{ account.parent }}
+    {% else %}
+      {{ _("Topmost")|force_escape }}
+    {% endif %}
+  </div>
+</div>
+
+<div class="row form-group">
+<div class="col-sm-2">{{ _("Code:")|force_escape }}</div>
+  <div class="col-sm-10">{{ account.code }}</div>
+</div>
+
+<div class="row form-group">
+  <div class="col-sm-2">{{ _("Title:")|force_escape }}</div>
+  <div class="col-sm-10">{{ account.title }}</div>
+</div>
+
+<div class="row form-group">
+  <div class="col-sm-2">{{ _("Child Accounts:")|force_escape }}</div>
+  <div class="col-sm-10">
+    {% for child in account.child_set.all %}
+      <a class="btn btn-primary" type="role" href="{% url_with_return "accounting:accounts.show" child %}">
+        {{ child }}
+      </a>
+    {% empty %}
+      {{ _("This subject is an end-point subject.")|force_escape }}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="row form-group">
+<div class="col-sm-2">{{ _("Created at:")|force_escape }}</div>
+  <div class="col-sm-10">{{ account.created_at }}</div>
+</div>
+
+<div class="row form-group">
+  <div class="col-sm-2">{{ _("Created by:")|force_escape }}</div>
+  <div class="col-sm-10">{{ account.created_by }}</div>
+</div>
+
+<div class="row form-group">
+  <div class="col-sm-2">{{ _("Updated at:")|force_escape }}</div>
+  <div class="col-sm-10">{{ account.updated_at }}</div>
+</div>
+
+<div class="row form-group">
+  <div class="col-sm-2">{{ _("Updated by:")|force_escape }}</div>
+  <div class="col-sm-10">{{ account.updated_by }}</div>
+</div>
+
+{% endblock %}
