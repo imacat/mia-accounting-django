@@ -25,23 +25,6 @@ from django.http import HttpResponseRedirect
 from .utils import UrlBuilder
 
 
-def success_redirect(request, url, success):
-    """Redirects to a specific URL on error, with the status ID appended
-    as the query parameter "s".  The status will be loaded with the
-    retrieve_status template tag.
-
-    Args:
-        request (HttpRequest): The request.
-        url (str): The destination URL.
-        success (str): The success text message.
-
-    Returns:
-        HttpResponseRedirect: The redirect response.
-    """
-    status_id = _store(request, {"success": success})
-    return HttpResponseRedirect(str(UrlBuilder(url).query(s=status_id)))
-
-
 def error_redirect(request, url, form):
     """Redirects to a specific URL on error, with the status ID appended
     as the query parameter "s".  The status will be loaded with the
