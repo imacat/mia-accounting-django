@@ -200,7 +200,53 @@ class TransactionForm(forms.Form):
         Raises:
             ValidationError: When the validation fails.
         """
-        self._validate_balance()
+        errors = []
+        validators = [self._validate_has_debit_records,
+                      self._validate_has_credit_records,
+                      self._validate_balance]
+        for validator in validators:
+            try:
+                validator()
+            except forms.ValidationError as e:
+                errors.append(e)
+        if errors:
+            raise forms.ValidationError(errors)
+
+    def _validate_has_debit_records(self):
+        """Validates whether there is any debit record.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if self.txn_type == "income":
+            return
+        if len(self.debit_records) > 0:
+            return
+        if self.txn_type == "transfer":
+            raise forms.ValidationError(
+                _("Please fill in debit records."),
+                code="has_debit_records")
+        raise forms.ValidationError(
+            _("Please fill in accounting records."),
+            code="has_debit_records")
+
+    def _validate_has_credit_records(self):
+        """Validates whether there is any credit record.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if self.txn_type == "expense":
+            return
+        if len(self.credit_records) > 0:
+            return
+        if self.txn_type == "transfer":
+            raise forms.ValidationError(
+                _("Please fill in credit records."),
+                code="has_debit_records")
+        raise forms.ValidationError(
+            _("Please fill in accounting records."),
+            code="has_debit_records")
 
     def _validate_balance(self):
         """Validates whether the total amount of debit and credit records are
