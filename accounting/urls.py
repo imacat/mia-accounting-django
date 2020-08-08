@@ -90,7 +90,6 @@ urlpatterns = [
          views.txn_delete, name="transactions.delete"),
     path("transactions/sort/<date:date>",
          views.txn_sort, name="transactions.sort"),
-    # TODO: To be done
     path("accounts",
          views.AccountListView.as_view(), name="accounts"),
     # TODO: To be done
