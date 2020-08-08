@@ -81,7 +81,7 @@ urlpatterns = [
     path("transactions/<txn-type:txn_type>/store",
          views.txn_store, name="transactions.store"),
     path("transactions/<txn-type:txn_type>/<txn:txn>",
-         views.txn_show, name="transactions.show"),
+         views.txn_detail, name="transactions.detail"),
     path("transactions/<txn-type:txn_type>/<txn:txn>/edit",
          views.txn_edit, name="transactions.edit"),
     path("transactions/<txn-type:txn_type>/<txn:txn>/update",

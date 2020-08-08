@@ -46,7 +46,7 @@ First written: 2020/7/23
 {% endfor %}
 
 <div class="btn-group btn-actions">
-  <a class="btn btn-primary" role="button" href="{% if txn.transaction %}{% url_keep_return "accounting:transactions.show" "income" txn.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
+  <a class="btn btn-primary" role="button" href="{% if txn.transaction %}{% url_keep_return "accounting:transactions.detail" "income" txn.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>

@@ -156,13 +156,13 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """Returns the URL to view this transaction."""
         if self.is_cash_expense:
             return reverse(
-                "accounting:transactions.show", args=("expense", self))
+                "accounting:transactions.detail", args=("expense", self))
         elif self.is_cash_income:
             return reverse(
-                "accounting:transactions.show", args=("income", self))
+                "accounting:transactions.detail", args=("income", self))
         else:
             return reverse(
-                "accounting:transactions.show", args=("transfer", self))
+                "accounting:transactions.detail", args=("transfer", self))
 
     def is_dirty(self, **kwargs):
         """Returns whether the data of this transaction is changed and need

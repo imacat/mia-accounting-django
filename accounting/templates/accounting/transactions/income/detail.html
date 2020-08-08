@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% comment %}
 The Mia Accounting Application
-view.html: The template for a cash-expense transaction
+view.html: The template for a cash-income transaction
 
  Copyright (c) 2020 imacat.
 
@@ -26,7 +26,7 @@ First written: 2020/7/23
 {% load accounting %}
 
 {% block settings %}
-  {% setvar "title" _("Cash Expense Transaction") %}
+  {% setvar "title" _("Cash Income Transaction") %}
   {% static "accounting/css/transactions.css" as file %}{% add_css file %}
 {% endblock %}
 
@@ -49,12 +49,12 @@ First written: 2020/7/23
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">{{ _("Cash Expense Transaction Deletion Confirmation")|force_escape }}</h4>
+          <h4 class="modal-title">{{ _("Cash Income Transaction Deletion Confirmation")|force_escape }}</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
         <!-- Modal body -->
-        <div class="modal-body">{{ _("Do you really want to delete this cash expense transaction?")|force_escape }}</div>
+        <div class="modal-body">{{ _("Do you really want to delete this cash income transaction?")|force_escape }}</div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
@@ -71,7 +71,7 @@ First written: 2020/7/23
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
-  <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" "expense" txn %}">
+  <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" "income" txn %}">
     <i class="fas fa-edit"></i>
     {{ _("Edit")|force_escape }}
   </a>
@@ -86,7 +86,7 @@ First written: 2020/7/23
       {{ _("Sort")|force_escape }}
     </a>
   {% endif %}
-  <a class="btn btn-primary d-none d-sm-inline" href="{% url_keep_return "accounting:transactions.show" "transfer" txn %}">
+  <a class="btn btn-primary d-none d-sm-inline" href="{% url_keep_return "accounting:transactions.detail" "transfer" txn %}">
     <i class="fas fa-exchange-alt"></i>
     {{ _("To Transfer")|force_escape }}
   </a>
@@ -106,7 +106,7 @@ First written: 2020/7/23
           {{ _("Sort")|force_escape }}
         </a>
       {% endif %}
-      <a class="dropdown-item" href="{% url_keep_return "accounting:transactions.show" "transfer" txn %}">
+      <a class="dropdown-item" href="{% url_keep_return "accounting:transactions.detail" "transfer" txn %}">
         <i class="fas fa-exchange-alt"></i>
         {{ _("To Transfer")|force_escape }}
       </a>
@@ -132,7 +132,7 @@ First written: 2020/7/23
     </tr>
   </thead>
   <tbody>
-    {% for x in txn.debit_records %}
+    {% for x in txn.credit_records %}
       <tr>
         <td>{{ x.account.title|title_case }}</td>
         <td>{{ x.summary|default:"" }}</td>
@@ -143,13 +143,13 @@ First written: 2020/7/23
   <tfoot>
     <tr>
       <td colspan="2">{{ _("Total")|force_escape }}</td>
-      <td class="amount">{{ txn.debit_total|accounting_amount }}</td>
+      <td class="amount">{{ txn.credit_total|accounting_amount }}</td>
     </tr>
   </tfoot>
 </table>
 
 <ul class="list-group d-sm-none">
-  {% for x in txn.debit_records %}
+  {% for x in txn.credit_records %}
     <li class="list-group-item">
       <div class="d-flex justify-content-between align-items-center account-line">
         {{ x.account.title|title_case }}
@@ -161,7 +161,7 @@ First written: 2020/7/23
   <li class="list-group-item">
     <div class="d-flex justify-content-between align-items-center account-line">
       {{ _("Total")|force_escape }}
-      <span class="badge badge-info">{{ txn.debit_total|accounting_amount }}</span>
+      <span class="badge badge-info">{{ txn.credit_total|accounting_amount }}</span>
     </div>
   </li>
 </ul>
@@ -194,3 +194,5 @@ First written: 2020/7/23
 </div>
 
 {% endblock %}
+
+

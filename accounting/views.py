@@ -801,8 +801,8 @@ def search(request):
 
 @require_GET
 @login_required
-def txn_show(request, txn_type, txn):
-    """The view of an accounting transaction.
+def txn_detail(request, txn_type, txn):
+    """The view of the details of an accounting transaction.
 
     Args:
         request (HttpRequest): The request.
@@ -812,7 +812,7 @@ def txn_show(request, txn_type, txn):
     Returns:
         HttpResponse: The response.
     """
-    return render(request, F"accounting/transactions/{txn_type}/view.html", {
+    return render(request, F"accounting/transactions/{txn_type}/detail.html", {
         "txn": txn,
     })
 
@@ -893,7 +893,7 @@ def txn_store(request, txn_type, txn=None):
     if not txn.is_dirty():
         messages.success(request, gettext_noop(
             "This transaction was not modified."))
-        url = reverse("accounting:transactions.show", args=(txn_type, txn))
+        url = reverse("accounting:transactions.detail", args=(txn_type, txn))
         url = str(UrlBuilder(url).query(r=request.GET.get("r")))
         return HttpResponseRedirect(url)
 
@@ -940,7 +940,7 @@ def txn_store(request, txn_type, txn=None):
             x.save()
     messages.success(request, gettext_noop(
         "This transaction was saved successfully."))
-    url = reverse("accounting:transactions.show", args=(txn_type, txn))
+    url = reverse("accounting:transactions.detail", args=(txn_type, txn))
     url = str(UrlBuilder(url).query(r=request.GET.get("r")))
     return HttpResponseRedirect(url)
 

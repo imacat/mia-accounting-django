@@ -102,7 +102,7 @@ First written: 2020/7/17
           <td>{{ record.transaction.note|default:"" }}</td>
           <td class="actions">
             {% if record.pk is not None %}
-              <a href="{% url_with_return "accounting:transactions.show" record.transaction.type record.transaction %}" class="btn btn-info" role="button">
+              <a href="{% url_with_return "accounting:transactions.detail" record.transaction.type record.transaction %}" class="btn btn-info" role="button">
                 <i class="fas fa-eye"></i>
                 {{ _("View")|force_escape }}
               </a>
@@ -118,7 +118,7 @@ First written: 2020/7/17
     {% for record in record_list %}
       <li class="list-group-item {% if not record.is_balanced or record.has_order_hole %} list-group-item-danger {% endif %}">
         {% if record.pk is not None %}
-          <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.show" record.transaction.type record.transaction %}">
+          <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.detail" record.transaction.type record.transaction %}">
             <div class="{% if record.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
               <div class="date-account-line">
                 {{ record.transaction.date|smart_date }} {{ record.account.title|title_case }}
