@@ -85,6 +85,8 @@ class RecordForm(forms.Form):
             ValidationError: When the validation fails.
         """
         errors = []
+        if "id" in self.errors:
+            errors = errors + self.errors["id"].as_data()
         validators = [self._validate_transaction,
                       self._validate_account_type,
                       self._validate_is_credit]
@@ -106,20 +108,16 @@ class RecordForm(forms.Form):
             return
         if self.transaction is None:
             if "id" in self.data:
-                error = forms.ValidationError(
+                raise forms.ValidationError(
                     _("This record is not for this transaction."),
                     code="not_belong")
-                self.add_error("id", error)
-                raise error
         else:
             if "id" in self.data:
                 record = Record.objects.get(pk=self.data["id"])
                 if record.transaction.pk != self.transaction.pk:
-                    error = forms.ValidationError(
+                    raise forms.ValidationError(
                         _("This record is not for this transaction."),
                         code="not_belong")
-                    self.add_error("id", error)
-                    raise error
 
     def _validate_account_type(self):
         """Validates whether the account is a correct debit or credit account.
@@ -158,15 +156,13 @@ class RecordForm(forms.Form):
         record = Record.objects.get(pk=self.data["id"])
         if record.is_credit != self.is_credit:
             if self.is_credit:
-                error = forms.ValidationError(
+                raise forms.ValidationError(
                     _("This record is not a credit record."),
                     code="not_credit")
             else:
-                error = forms.ValidationError(
+                raise forms.ValidationError(
                     _("This record is not a debit record."),
                     code="not_debit")
-            self.add_error("id", error)
-            raise error
 
 
 class TransactionForm(forms.Form):
