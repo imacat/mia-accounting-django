@@ -138,12 +138,42 @@ def user_store(request, user=None):
     user.name = form["name"].value()
     user.is_disabled = form["is_disabled"].value()
     if not user.is_dirty():
-        message = gettext_noop("This user account was not modified.")
+        message = gettext_noop("This user account was not changed.")
     else:
         user.save(current_user=request.user)
         message = gettext_noop("This user account was saved successfully.")
     messages.success(request, message)
     return redirect("mia_core:users.detail", user)
+
+
+@require_POST
+@login_required
+def user_delete(request, user):
+    """The view to delete an user.
+
+    Args:
+        request (HttpRequest): The request.
+        user (User): The user.
+
+    Returns:
+        HttpResponseRedirect: The response.
+    """
+    message = None
+    if user.pk == request.user.pk:
+        message = gettext_noop("You cannot delete your own account.")
+    elif user.is_in_use():
+        message = gettext_noop(
+            "You cannot delete this account because it is in use.")
+    elif user.is_deleted:
+        message = gettext_noop("This account is already deleted.")
+    if message is not None:
+        messages.error(request, message)
+        return redirect("mia_core:users.detail", user)
+    user.delete()
+    message = gettext_noop("This user account was deleted successfully.")
+    messages.success(request, message)
+    return redirect("mia_core:users")
+
 
 
 def api_users_exists(request, login_id):

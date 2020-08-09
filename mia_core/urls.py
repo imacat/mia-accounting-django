@@ -32,8 +32,7 @@ urlpatterns = [
     path("users/<user:user>", views.UserView.as_view(), name="users.detail"),
     path("users/<user:user>/edit", views.user_form, name="users.edit"),
     path("users/<user:user>/update", views.user_store, name="users.update"),
-    # TODO: To be done.
-    path("users/<user:user>/delete", views.todo, name="users.delete"),
+    path("users/<user:user>/delete", views.user_delete, name="users.delete"),
     path("api/users/<str:login_id>/exists", views.api_users_exists,
          name="api.users.exists"),
     # TODO: To be done.
