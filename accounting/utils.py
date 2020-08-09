@@ -31,12 +31,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from mia_core.period import Period
+from mia_core.status import get_previous_post
+from mia_core.templatetags.mia_core import smart_month
+from mia_core.utils import new_pk
 from .forms import TransactionForm, RecordForm
 from .models import Account, Transaction, Record
-from mia_core.templatetags.mia_core import smart_month
-from mia_core.period import Period
-from mia_core.status import retrieve_status
-from mia_core.utils import new_pk
 
 
 class MonthlySummary:
@@ -624,13 +624,10 @@ def make_txn_form_from_status(request, txn_type, txn):
         TransactionForm: The transaction form, or None if there is no
             previously-stored status.
     """
-    status = retrieve_status(request)
-    if status is None:
+    form = get_previous_post(request)
+    if form is None:
         return None
-    if "form" not in status:
-        return
-    return make_txn_form_from_post(
-        status["form"], txn_type, txn)
+    return make_txn_form_from_post(form, txn_type, txn)
 
 
 def _find_max_record_no(txn_type, post):
