@@ -47,7 +47,7 @@ First written: 2020/8/9
   <input id="exists-url" type="hidden" value="{% url "mia_core:api.users.exists" "ID" %}" />
   <input id="user-login-id-original" type="hidden" value="{{ form.user.login_id }}" />
   <div class="row form-group">
-    <label class="col-sm-2 col-form-label" for="user-login-id">{{ _("Log in ID:")|force_escape }}</label>
+    <label class="col-sm-2 col-form-label" for="user-login-id">{{ _("Log in ID.:")|force_escape }}</label>
     <div class="col-sm-10">
       <input id="user-login-id" class="form-control {% if form.login_id.errors %} is-invalid {% endif %}" type="text" name="login_id" value="{{ form.login_id.value|default:"" }}" maxlength="32" required="required" />
       <div id="user-login-id-error" class="invalid-feedback">{{ form.login_id.errors.0 }}</div>
