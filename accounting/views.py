@@ -1095,6 +1095,29 @@ def account_store(request, account=None):
                                         args=(account,)))
 
 
+@require_POST
+@login_required
+def account_delete(request, account):
+    """The view to delete an accounting.
+
+    Args:
+        request (HttpRequest): The request.
+        account (Account): The account.
+
+    Returns:
+        HttpResponseRedirect: The response.
+    """
+    if account.is_in_use:
+        message = gettext_noop("This account is in use.")
+        messages.error(request, message)
+        return HttpResponseRedirect(reverse("accounting:accounts.detail",
+                                            args=(account,)))
+    account.delete()
+    message = gettext_noop("This account was deleted successfully.")
+    messages.success(request, message)
+    return HttpResponseRedirect(reverse("accounting:accounts"))
+
+
 @require_GET
 @login_required
 def api_account_list(request):

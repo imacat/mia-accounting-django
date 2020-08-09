@@ -106,7 +106,6 @@ urlpatterns = [
          views.account_form, name="accounts.edit"),
     path("accounts/<account:account>/update",
          views.account_store, name="accounts.update"),
-    # TODO: To be done
     path("accounts/<account:account>/delete",
-         mia_core_views.todo, name="accounts.delete"),
+         views.account_delete, name="accounts.delete"),
 ]
