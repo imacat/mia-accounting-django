@@ -71,8 +71,10 @@ class Account(DirtyFieldsMixin, models.Model):
             else Account.objects.get(code=self.code[:-1])
         if self.pk is None:
             self.pk = new_pk(Account)
+        if getattr(self, "created_by", None) is None:
             self.created_by = current_user
-        self.updated_by = current_user
+        if getattr(self, "updated_by", None) is None:
+            self.updated_by = current_user
         with transaction.atomic():
             super(Account, self).save(
                 force_insert=force_insert, force_update=force_update,
