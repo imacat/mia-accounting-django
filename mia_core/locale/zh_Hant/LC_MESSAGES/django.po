@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 22:03+0800\n"
-"PO-Revision-Date: 2020-08-09 22:05+0800\n"
+"POT-Creation-Date: 2020-08-09 22:51+0800\n"
+"PO-Revision-Date: 2020-08-09 22:52+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -181,7 +181,7 @@ msgstr "回上頁"
 msgid "Settings"
 msgstr "設定"
 
-#: mia_core/templates/mia_core/user_detail.html:76
+#: mia_core/templates/mia_core/user_detail.html:76 mia_core/views.py:163
 msgid "You cannot delete your own account."
 msgstr "不能刪除自己的帳號。"
 
@@ -192,11 +192,11 @@ msgstr "不能刪除自己的帳號。"
 msgid "Delete"
 msgstr "刪除"
 
-#: mia_core/templates/mia_core/user_detail.html:81
+#: mia_core/templates/mia_core/user_detail.html:81 mia_core/views.py:166
 msgid "You cannot delete this account because it is in use."
 msgstr "帳號使用中，不可刪除。"
 
-#: mia_core/templates/mia_core/user_detail.html:86
+#: mia_core/templates/mia_core/user_detail.html:86 mia_core/views.py:168
 msgid "This account is already deleted."
 msgstr "帳號已刪除。"
 
@@ -333,3 +333,15 @@ msgstr "…"
 msgctxt "Pagination|"
 msgid "Next"
 msgstr "下一頁"
+
+#: mia_core/views.py:141
+msgid "This user account was not changed."
+msgstr "帳號未異動。"
+
+#: mia_core/views.py:144
+msgid "This user account was saved successfully."
+msgstr "帳號已儲存。"
+
+#: mia_core/views.py:173
+msgid "This user account was deleted successfully."
+msgstr "帳號已刪除。"
