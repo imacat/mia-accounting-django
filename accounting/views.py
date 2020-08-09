@@ -1058,7 +1058,7 @@ def account_form(request, account=None):
 @require_POST
 @login_required
 def account_store(request, account=None):
-    """The view to edit an accounting transaction.
+    """The view to store an account.
 
     Args:
         request (HttpRequest): The request.
@@ -1093,7 +1093,7 @@ def account_store(request, account=None):
 @require_POST
 @login_required
 def account_delete(request, account):
-    """The view to delete an accounting.
+    """The view to delete an account.
 
     Args:
         request (HttpRequest): The request.
@@ -1129,7 +1129,7 @@ def api_account_list(request):
 @require_GET
 @login_required
 def api_account_options(request):
-    """The view to return the account options.
+    """The API view to return the account options.
 
     Args:
         request (HttpRequest): The request.
