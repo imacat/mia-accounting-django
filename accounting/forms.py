@@ -24,7 +24,6 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext as _
 
-from mia_core.status import retrieve_status
 from .models import Account, Record
 from .validators import validate_record_account_code, validate_record_id, \
     validate_account_code

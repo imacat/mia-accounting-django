@@ -28,7 +28,6 @@ from django.utils import timezone
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext
 
-from mia_core.status import retrieve_status
 from mia_core.utils import UrlBuilder
 
 register = template.Library()
