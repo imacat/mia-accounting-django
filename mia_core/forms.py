@@ -47,7 +47,7 @@ class UserForm(forms.Form):
             "required": _("Please fill in the name."),
             "max_length": _("This name is too long (max 32 characters)."),
         })
-    is_disabled = forms.BooleanField()
+    is_disabled = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(UserForm, self).__init__(*args, **kwargs)
