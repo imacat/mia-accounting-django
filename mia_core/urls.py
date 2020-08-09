@@ -26,7 +26,6 @@ register_converter(converters.UserConverter, "user")
 
 app_name = "mia_core"
 urlpatterns = [
-    # TODO: To be done.
     path("users", views.UserListView.as_view(), name="users"),
     # TODO: To be done.
     path("users/create", views.todo, name="users.create"),
