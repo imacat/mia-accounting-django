@@ -18,10 +18,14 @@
 """The data models of the Mia core application.
 
 """
-from dirtyfields import DirtyFieldsMixin
-from django.db import models, connection, OperationalError
+import hashlib
 
-from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
+from dirtyfields import DirtyFieldsMixin
+from django.conf import settings
+from django.db import models, connection, OperationalError, transaction
+
+from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
+    new_pk
 
 
 class Country(DirtyFieldsMixin, models.Model):
@@ -113,9 +117,32 @@ class User(DirtyFieldsMixin, models.Model):
         return "%s (%s)" % (
             self.name.__str__(), self.login_id.__str__())
 
+    def save(self, current_user=None, force_insert=False, force_update=False,
+             using=None, update_fields=None):
+        if self.pk is None:
+            self.pk = new_pk(User)
+            if current_user is not None:
+                self.created_by = current_user
+        if current_user is not None:
+            self.updated_by = current_user
+        with transaction.atomic():
+            super(User, self).save(
+                force_insert=force_insert, force_update=force_update,
+                using=using, update_fields=update_fields)
+
     class Meta:
         db_table = "users"
         app_label = "mia_core"
+
+    def set_digest_password(self, login_id, password):
+        self.password = self.md5(
+            F"{login_id}:{settings.DIGEST_REALM}:{password}")
+
+    @staticmethod
+    def md5(value):
+        m = hashlib.md5()
+        m.update(value.encode("utf-8"))
+        return m.hexdigest()
 
     def is_in_use(self):
         """Returns whether this user is in use.

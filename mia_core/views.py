@@ -23,7 +23,9 @@ from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_noop
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import DeleteView as CoreDeleteView, ListView, \
     DetailView
@@ -32,6 +34,7 @@ from . import stored_post
 from .digest_auth import login_required
 from .forms import UserForm
 from .models import User
+from .utils import strip_post
 
 
 class DeleteView(SuccessMessageMixin, CoreDeleteView):
@@ -103,6 +106,44 @@ def user_form(request, user=None):
     return render(request, "mia_core/user_form.html", {
         "form": form,
     })
+
+
+def user_store(request, user=None):
+    """The view to store a user.
+
+    Args:
+        request (HttpRequest): The request.
+        user (Account): The user.
+
+    Returns:
+        HttpResponseRedirect: The response.
+    """
+    post = request.POST.dict()
+    strip_post(post)
+    form = UserForm(post)
+    form.user = user
+    form.current_user = request.user
+    if not form.is_valid():
+        if user is None:
+            url = reverse("mia_core:users.create")
+        else:
+            url = reverse("mia_core:users.edit", args=(user,))
+        return stored_post.error_redirect(request, url, post)
+    if user is None:
+        user = User()
+    user.login_id = form["login_id"].value()
+    if form["password"].value() is not None:
+        user.set_digest_password(
+            form["login_id"].value(), form["password"].value())
+    user.name = form["name"].value()
+    user.is_disabled = form["is_disabled"].value()
+    if not user.is_dirty():
+        message = gettext_noop("This user account was not modified.")
+    else:
+        user.save(current_user=request.user)
+        message = gettext_noop("This user account was saved successfully.")
+    messages.success(request, message)
+    return redirect("mia_core:users.detail", user)
 
 
 def api_users_exists(request, login_id):

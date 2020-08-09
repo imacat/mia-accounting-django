@@ -28,12 +28,10 @@ app_name = "mia_core"
 urlpatterns = [
     path("users", views.UserListView.as_view(), name="users"),
     path("users/create", views.user_form, name="users.create"),
-    # TODO: To be done.
-    path("users/store", views.todo, name="users.store"),
+    path("users/store", views.user_store, name="users.store"),
     path("users/<user:user>", views.UserView.as_view(), name="users.detail"),
     path("users/<user:user>/edit", views.user_form, name="users.edit"),
-    # TODO: To be done.
-    path("users/<user:user>/update", views.todo, name="users.update"),
+    path("users/<user:user>/update", views.user_store, name="users.update"),
     # TODO: To be done.
     path("users/<user:user>/delete", views.todo, name="users.delete"),
     # TODO: To be done.
