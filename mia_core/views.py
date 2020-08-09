@@ -23,6 +23,7 @@ from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import DeleteView as CoreDeleteView
 
@@ -50,7 +51,7 @@ def logout(request):
     if "next" in request.POST:
         request.session["logout"] = True
         return redirect(request.POST["next"])
-    return redirect("/")
+    return redirect(reverse("home"))
 
 
 # TODO: To be removed.
