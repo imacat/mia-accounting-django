@@ -22,8 +22,8 @@ from django.contrib import messages
 from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from django.views.decorators.http import require_POST, require_GET
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
 from django.views.generic import DeleteView as CoreDeleteView
 
 
@@ -34,19 +34,6 @@ class DeleteView(SuccessMessageMixin, CoreDeleteView):
         response = super(DeleteView, self).delete(request, *args, **kwargs)
         messages.success(request, self.get_success_message({}))
         return response
-
-
-@require_GET
-def home(request):
-    """The view of the home page.
-
-    Args:
-        request (HttpRequest): The request.
-
-    Returns:
-        HttpResponse: The response.
-    """
-    return render(request, "index.html")
 
 
 @require_POST
