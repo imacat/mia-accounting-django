@@ -51,7 +51,7 @@ def logout(request):
     if "next" in request.POST:
         request.session["logout"] = True
         return redirect(request.POST["next"])
-    return redirect(reverse("home"))
+    return redirect("home")
 
 
 # TODO: To be removed.
