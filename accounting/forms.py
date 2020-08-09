@@ -27,8 +27,7 @@ from django.db.models.functions import Length
 from django.utils.translation import gettext as _
 
 from .models import Account, Record
-from .validators import validate_record_account_code, validate_record_id, \
-    validate_account_code
+from .validators import validate_record_account_code, validate_record_id
 
 
 class RecordForm(forms.Form):
