@@ -26,7 +26,6 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
-from django.forms import model_to_dict
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -35,7 +34,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import RedirectView, ListView, DetailView
+from django.views.generic import RedirectView, ListView, DetailView, DeleteView
 
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
@@ -943,37 +942,25 @@ def txn_store(request, txn_type, txn=None):
     return HttpResponseRedirect(url)
 
 
-@require_POST
-@login_required
-def txn_delete(request, txn):
-    """The view to delete an accounting transaction.
+@method_decorator(require_POST, name="dispatch")
+@method_decorator(login_required, name="dispatch")
+class TransactionDeleteView(DeleteView):
+    """The view to delete an accounting transaction."""
 
-    Args:
-        request (HttpRequest): The request.
-        txn (Transaction): The transaction.
+    def get_object(self, queryset=None):
+        txn = self.request.resolver_match.kwargs["txn"]
+        txn.request = self.request
+        return txn
 
-    Returns:
-        HttpResponse: The response.
-    """
-    txn_same_day = list(
-        Transaction.objects
-        .filter(Q(date=txn.date), ~Q(pk=txn.pk))
-        .order_by("ord"))
-    txn_to_sort = []
-    for i in range(len(txn_same_day)):
-        txn_same_day[i].ord = i + 1
-        if txn_same_day[i].is_dirty():
-            txn_to_sort.append(txn_same_day[i])
-    with transaction.atomic():
-        for record in txn.records:
-            record.delete()
-        txn.delete()
-        for x in txn_to_sort:
-            x.save()
-    messages.success(request, gettext_noop(
-        "This transaction was deleted successfully."))
-    url = request.GET.get("r") or reverse("accounting:home")
-    return HttpResponseRedirect(url)
+    def delete(self, request, *args, **kwargs):
+        response = super(TransactionDeleteView, self)\
+            .delete(request, *args, **kwargs)
+        messages.success(request, gettext_noop(
+            "This transaction was deleted successfully."))
+        return response
+
+    def get_success_url(self):
+        return self.request.GET.get("r") or reverse("accounting:home")
 
 
 @login_required

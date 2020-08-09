@@ -20,7 +20,8 @@
 """
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Q
 from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
@@ -179,6 +180,24 @@ class Transaction(DirtyFieldsMixin, models.Model):
         if len([x for x in self.record_set.all() if x.pk not in kept]) > 0:
             return True
         return False
+
+    def delete(self, using=None, keep_parents=False):
+        txn_same_day = list(
+            Transaction.objects
+            .filter(Q(date=self.date), ~Q(pk=self.pk))
+            .order_by("ord"))
+        txn_to_sort = []
+        for i in range(len(txn_same_day)):
+            txn_same_day[i].ord = i + 1
+            if txn_same_day[i].is_dirty():
+                txn_to_sort.append(txn_same_day[i])
+        with transaction.atomic():
+            for record in self.record_set.all():
+                record.delete()
+            super(Transaction, self).delete(
+                using=using, keep_parents=keep_parents)
+            for txn in txn_to_sort:
+                txn.save()
 
     class Meta:
         db_table = "accounting_transactions"

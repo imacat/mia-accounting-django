@@ -87,7 +87,7 @@ urlpatterns = [
     path("transactions/<txn-type:txn_type>/<txn:txn>/update",
          views.txn_store, name="transactions.update"),
     path("transactions/<txn:txn>/delete",
-         views.txn_delete, name="transactions.delete"),
+         views.TransactionDeleteView.as_view(), name="transactions.delete"),
     path("transactions/sort/<date:date>",
          views.txn_sort, name="transactions.sort"),
     path("accounts",
