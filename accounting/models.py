@@ -24,7 +24,8 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 
-from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
+from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
+    new_pk
 
 
 class Account(DirtyFieldsMixin, models.Model):
@@ -69,6 +70,19 @@ class Account(DirtyFieldsMixin, models.Model):
     def __str__(self):
         """Returns the string representation of this account."""
         return self.code.__str__() + " " + self.title
+
+    def save(self, current_user=None, force_insert=False, force_update=False,
+             using=None, update_fields=None):
+        self.parent = None if len(self.code) == 1\
+            else Account.objects.get(code=self.code[:-1])
+        if self.pk is None:
+            self.pk = new_pk(Account)
+            self.created_by = current_user
+        self.updated_by = current_user
+        with transaction.atomic():
+            super(Account, self).save(
+                force_insert=force_insert, force_update=force_update,
+                using=using, update_fields=update_fields)
 
     class Meta:
         db_table = "accounting_accounts"

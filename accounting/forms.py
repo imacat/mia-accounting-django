@@ -22,6 +22,8 @@ import re
 
 from django import forms
 from django.core.validators import RegexValidator
+from django.db.models import Q, Max
+from django.db.models.functions import Length
 from django.utils.translation import gettext as _
 
 from .models import Account, Record
@@ -317,7 +319,6 @@ class AccountForm(forms.Form):
             RegexValidator(
                 regex="^[1-9]+$",
                 message=_("You can only use numbers 1-9 in the code.")),
-            validate_account_code,
         ])
     title = forms.CharField(
         max_length=128,
@@ -328,6 +329,7 @@ class AccountForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(AccountForm, self).__init__(*args, **kwargs)
+        self.account = None
 
     @property
     def parent(self):
@@ -335,3 +337,109 @@ class AccountForm(forms.Form):
         if code is None or len(code) < 2:
             return None
         return Account.objects.get(code=code[:-1])
+
+    def clean(self):
+        """Validates the form globally.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        errors = []
+        validators = [self._validate_code_not_under_myself,
+                      self._validate_code_unique,
+                      self._validate_code_parent_exists,
+                      self._validate_code_descendant_code_size]
+        for validator in validators:
+            try:
+                validator()
+            except forms.ValidationError as e:
+                errors.append(e)
+        if errors:
+            raise forms.ValidationError(errors)
+
+    def _validate_code_not_under_myself(self):
+        """Validates whether the code is under itself.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if self.account is None:
+            return
+        if "code" not in self.data:
+            return
+        if self.data["code"] == self.account.code:
+            return
+        if not self.data["code"].startswith(self.account.code):
+            return
+        error = forms.ValidationError(
+            _("You cannot set the code under itself."),
+            code="not_under_myself")
+        self.add_error("code", error)
+        raise error
+
+    def _validate_code_unique(self):
+        """Validates whether the code is unique.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if "code" not in self.data:
+            return
+        try:
+            if self.account is None:
+                Account.objects.get(code=self.data["code"])
+            else:
+                Account.objects.get(Q(code=self.data["code"]),
+                                    ~Q(pk=self.account.pk))
+        except Account.DoesNotExist:
+            return
+        error = forms.ValidationError(_("This code is already in use."),
+                                      code="code_unique")
+        self.add_error("code", error)
+        raise error
+
+    def _validate_code_parent_exists(self):
+        """Validates whether the parent account exists.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if "code" not in self.data:
+            return
+        if len(self.data["code"]) < 2:
+            return
+        try:
+            Account.objects.get(code=self.data["code"][:-1])
+        except Account.DoesNotExist:
+            error = forms.ValidationError(
+                _("The parent account of this code does not exist."),
+                code="code_unique")
+            self.add_error("code", error)
+            raise error
+        return
+
+    def _validate_code_descendant_code_size(self):
+        """Validates whether the codes of the descendants will be too long.
+
+        Raises:
+            ValidationError: When the validation fails.
+        """
+        if "code" not in self.data:
+            return
+        if self.account is None:
+            return
+        cur_max_len = Account.objects\
+            .filter(Q(code__startswith=self.account.code),
+                    ~Q(pk=self.account.pk))\
+            .aggregate(max_len=Max(Length("code")))["max_len"]
+        if cur_max_len is None:
+            return True
+        new_max_len = cur_max_len - len(self.account.code)\
+                      + len(self.data["code"])
+        if new_max_len <= 5:
+            return
+        error = forms.ValidationError(
+            _("The descendant account codes will be too long  (max. 5)."),
+            code="descendant_code_size")
+        self.add_error("code", error)
+        raise error

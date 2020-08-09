@@ -94,9 +94,8 @@ urlpatterns = [
          views.AccountListView.as_view(), name="accounts"),
     path("accounts/create",
          views.account_form, name="accounts.create"),
-    # TODO: To be done
     path("accounts/store",
-         mia_core_views.todo, name="accounts.store"),
+         views.account_store, name="accounts.store"),
     path("api/accounts",
          views.api_account_list, name="api.accounts"),
     path("api/accounts/options",
@@ -105,9 +104,8 @@ urlpatterns = [
          views.AccountView.as_view(), name="accounts.detail"),
     path("accounts/<account:account>/edit",
          views.account_form, name="accounts.edit"),
-    # TODO: To be done
     path("accounts/<account:account>/update",
-         mia_core_views.todo, name="accounts.update"),
+         views.account_store, name="accounts.update"),
     # TODO: To be done
     path("accounts/<account:account>/delete",
          mia_core_views.todo, name="accounts.delete"),

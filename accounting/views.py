@@ -1053,9 +1053,46 @@ def account_form(request, account=None):
         })
     else:
         form = AccountForm()
+    form.account = account
     return render(request, "accounting/account_form.html", {
         "form": form,
     })
+
+
+@require_POST
+@login_required
+def account_store(request, account=None):
+    """The view to edit an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        account (Account): The account.
+
+    Returns:
+        HttpResponseRedirect: The response.
+    """
+    post = request.POST.dict()
+    strip_post(post)
+    form = AccountForm(post)
+    form.account = account
+    if not form.is_valid():
+        if account is None:
+            url = reverse("accounting:accounts.create")
+        else:
+            url = reverse("accounting:accounts.edit", args=(account,))
+        return stored_post.error_redirect(request, url, post)
+    if account is None:
+        account = Account()
+    account.code = form["code"].value()
+    account.title = form["title"].value()
+    if not account.is_dirty():
+        message = gettext_noop("This account was not modified.")
+    else:
+        account.save(current_user=request.user)
+        message = gettext_noop("This account was saved successfully.")
+    messages.success(request, message)
+    return HttpResponseRedirect(reverse("accounting:accounts.detail",
+                                        args=(account,)))
 
 
 @require_GET
