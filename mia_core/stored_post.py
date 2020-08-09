@@ -21,6 +21,7 @@
 import random
 
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
 from .utils import UrlBuilder
 
@@ -41,7 +42,7 @@ def error_redirect(request, url, post):
         HttpResponseRedirect: The redirect response.
     """
     post_id = _store(request, post)
-    return HttpResponseRedirect(str(UrlBuilder(url).query(s=post_id)))
+    return redirect(str(UrlBuilder(url).query(s=post_id)))
 
 
 def get_previous_post(request):

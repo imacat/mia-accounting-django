@@ -27,7 +27,7 @@ from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
 from django.http import JsonResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
@@ -155,7 +155,7 @@ def cash(request, account, period):
     try:
         pagination = Pagination(request, records, True)
     except PaginationException as e:
-        return HttpResponseRedirect(e.url)
+        return redirect(e.url)
     records = pagination.items
     find_imbalanced(records)
     find_order_holes(records)
@@ -257,7 +257,7 @@ def cash_summary(request, account):
     try:
         pagination = Pagination(request, months, True)
     except PaginationException as e:
-        return HttpResponseRedirect(e.url)
+        return redirect(e.url)
     shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
     return render(request, "accounting/cash-summary.html", {
         "month_list": pagination.items,
@@ -334,7 +334,7 @@ def ledger(request, account, period):
     try:
         pagination = Pagination(request, records, True)
     except PaginationException as e:
-        return HttpResponseRedirect(e.url)
+        return redirect(e.url)
     records = pagination.items
     find_imbalanced(records)
     find_order_holes(records)
@@ -402,7 +402,7 @@ def ledger_summary(request, account):
     try:
         pagination = Pagination(request, months, True)
     except PaginationException as e:
-        return HttpResponseRedirect(e.url)
+        return redirect(e.url)
     return render(request, "accounting/ledger-summary.html", {
         "month_list": pagination.items,
         "pagination": pagination,
@@ -485,7 +485,7 @@ def journal(request, period):
     try:
         pagination = Pagination(request, records, True)
     except PaginationException as e:
-        return HttpResponseRedirect(e.url)
+        return redirect(e.url)
     return render(request, "accounting/journal.html", {
         "record_list": pagination.items,
         "pagination": pagination,
@@ -794,7 +794,7 @@ def search(request):
     try:
         pagination = Pagination(request, records, True)
     except PaginationException as e:
-        return HttpResponseRedirect(e.url)
+        return redirect(e.url)
     return render(request, "accounting/search.html", {
         "record_list": pagination.items,
         "pagination": pagination,
@@ -892,8 +892,7 @@ def txn_store(request, txn_type, txn=None):
         messages.success(request, gettext_noop(
             "This transaction was not modified."))
         url = reverse("accounting:transactions.detail", args=(txn_type, txn))
-        url = str(UrlBuilder(url).query(r=request.GET.get("r")))
-        return HttpResponseRedirect(url)
+        return redirect(str(UrlBuilder(url).query(r=request.GET.get("r"))))
 
     # Prepares the data
     user = request.user
@@ -939,8 +938,7 @@ def txn_store(request, txn_type, txn=None):
     messages.success(request, gettext_noop(
         "This transaction was saved successfully."))
     url = reverse("accounting:transactions.detail", args=(txn_type, txn))
-    url = str(UrlBuilder(url).query(r=request.GET.get("r")))
-    return HttpResponseRedirect(url)
+    return redirect(str(UrlBuilder(url).query(r=request.GET.get("r"))))
 
 
 @method_decorator(require_POST, name="dispatch")
@@ -1004,16 +1002,14 @@ def txn_sort(request, date):
         if len(modified) == 0:
             messages.success(request, gettext_noop(
                 "The transaction orders were not modified."))
-            url = request.GET.get("r") or reverse("accounting:home")
-            return HttpResponseRedirect(url)
+            return redirect(request.GET.get("r") or reverse("accounting:home"))
 
         with transaction.atomic():
             for txn in modified:
                 txn.save()
         messages.success(request, gettext_noop(
             "The transaction orders were saved successfully."))
-        url = request.GET.get("r") or reverse("accounting:home")
-        return HttpResponseRedirect(url)
+        return redirect(request.GET.get("r") or reverse("accounting:home"))
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -1091,8 +1087,7 @@ def account_store(request, account=None):
         account.save(current_user=request.user)
         message = gettext_noop("This account was saved successfully.")
     messages.success(request, message)
-    return HttpResponseRedirect(reverse("accounting:accounts.detail",
-                                        args=(account,)))
+    return redirect("accounting:accounts.detail", account)
 
 
 @require_POST
@@ -1110,12 +1105,11 @@ def account_delete(request, account):
     if account.is_in_use:
         message = gettext_noop("This account is in use.")
         messages.error(request, message)
-        return HttpResponseRedirect(reverse("accounting:accounts.detail",
-                                            args=(account,)))
+        return redirect("accounting:accounts.detail", account)
     account.delete()
     message = gettext_noop("This account was deleted successfully.")
     messages.success(request, message)
-    return HttpResponseRedirect(reverse("accounting:accounts"))
+    return redirect("accounting:accounts")
 
 
 @require_GET
