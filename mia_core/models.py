@@ -18,11 +18,13 @@
 """The data models of the Mia core application.
 
 """
+import datetime
 import hashlib
 
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models, connection, OperationalError, transaction
+from django.db.models.functions import Now
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
     new_pk
@@ -77,7 +79,7 @@ class User(DirtyFieldsMixin, models.Model):
     is_deleted = models.BooleanField(
         default=False, db_column="deleted")
     language = models.CharField(max_length=6, null=True, db_column="lang")
-    visits = models.PositiveSmallIntegerField(null=True)
+    visits = models.PositiveSmallIntegerField(default=0)
     visited_at = models.DateTimeField(null=True, db_column="visited")
     visited_ip = models.GenericIPAddressField(null=True, db_column="ip")
     visited_host = models.CharField(
@@ -91,7 +93,7 @@ class User(DirtyFieldsMixin, models.Model):
         "self", on_delete=models.PROTECT,
         db_column="createdby", related_name="created_users")
     updated_at = models.DateTimeField(
-        auto_now=True, db_column="updated")
+        auto_now_add=True, db_column="updated")
     updated_by = models.ForeignKey(
         "self", on_delete=models.PROTECT,
         db_column="updatedby", related_name="updated_users")
@@ -129,6 +131,7 @@ class User(DirtyFieldsMixin, models.Model):
             super(User, self).save(
                 force_insert=force_insert, force_update=force_update,
                 using=using, update_fields=update_fields)
+            User.objects.filter(pk=self.pk).update(updated_at=Now())
 
     class Meta:
         db_table = "users"
