@@ -49,20 +49,6 @@ def setvar(context, key, value):
     return ""
 
 
-@register.simple_tag
-def str_format(format_str, *args):
-    """Sets a variable in the template.
-
-    Args:
-        format_str (str): The format.
-        args (*str): The arguments.
-
-    Returns:
-        str: The formatted text string.
-    """
-    return format_str.format(*args)
-
-
 @register.simple_tag(takes_context=True)
 def url_period(context, period_spec):
     """Returns the current URL with a new period.
