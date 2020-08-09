@@ -80,16 +80,6 @@ class ReportUrl:
         ledger (Account): The currently-specified account of the
             ledger or leger summary.
         period (Period): The currently-specified period.
-
-    Attributes:
-        cash (str): The URL of the cash account.
-        cash_summary (str): The URL of the cash summary.
-        ledger (str): The URL of the ledger.
-        ledger_summary (str): The URL of the ledger summary.
-        journal (str): The URL of the journal.
-        trial_balance (str): The URL of the trial balance.
-        income_statement (str): The URL of the income statement.
-        balance_sheet (str): The URL of the balance sheet.
     """
 
     def __init__(self, cash=None, ledger=None, period=None):
