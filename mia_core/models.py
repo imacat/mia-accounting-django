@@ -110,7 +110,7 @@ class User(DirtyFieldsMixin, models.Model):
 
     def __str__(self):
         """Returns the string representation of this user."""
-        return "%s(%s)" % (
+        return "%s (%s)" % (
             self.name.__str__(), self.login_id.__str__())
 
     class Meta:
