@@ -36,13 +36,13 @@ First written: 2020/8/9
 {% block content %}
 
 <div class="btn-group btn-actions">
-  <a class="btn btn-primary" role="button" href="{% if form.user %}{% url "mia_core:users.detail" form.user %}{% else %}{% url "mia_core:users" %}{% endif %}">
+  <a class="btn btn-primary" role="button" href="{% if request|is_in_section:"mia_core:my-account" %}{% url "mia_core:my-account" %}{% elif form.user %}{% url "mia_core:users.detail" form.user %}{% else %}{% url "mia_core:users" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
 </div>
 
-<form id="user-form" action="{% if form.user %}{% url "mia_core:users.update" form.user %}{% else %}{% url "mia_core:users.store" %}{% endif %}" method="POST">
+<form id="user-form" action="{% if request|is_in_section:"mia_core:my-account" %}{% url "mia_core:my-account.update" %}{% elif form.user %}{% url "mia_core:users.update" form.user %}{% else %}{% url "mia_core:users.store" %}{% endif %}" method="POST">
   {% csrf_token %}
   <input id="exists-url" type="hidden" value="{% url "mia_core:api.users.exists" "ID" %}" />
   <input id="user-login-id-original" type="hidden" value="{{ form.user.login_id }}" />
@@ -78,18 +78,20 @@ First written: 2020/8/9
     </div>
   </div>
 
-  <div class="row form-group form-check">
-    <div class="col-sm-12">
-      {% if form.user and form.user.pk == request.user.pk %}
-        {{ _("You cannot disable your own account.")|force_escape }}
-      {% else %}
-        <input id="user-is-disabled" class="form-check-input" type="checkbox" name="is_disabled" value="1" {% if form.is_disabled.value %} checked="checked" {% endif %} />
-        <label class="form-check-label" for="user-is-disabled">
-          {{ _("This account is disabled.")|force_escape }}
-        </label>
-      {% endif %}
+  {% if not request|is_in_section:"mia_core:my-account" %}
+    <div class="row form-group form-check">
+      <div class="col-sm-12">
+        {% if form.user and form.user.pk == request.user.pk %}
+          {{ _("You cannot disable your own account.")|force_escape }}
+        {% else %}
+          <input id="user-is-disabled" class="form-check-input" type="checkbox" name="is_disabled" value="1" {% if form.is_disabled.value %} checked="checked" {% endif %} />
+          <label class="form-check-label" for="user-is-disabled">
+            {{ _("This account is disabled.")|force_escape }}
+          </label>
+        {% endif %}
+      </div>
     </div>
-  </div>
+  {% endif %}
 
   <div class="row form-group">
     <div class="col-sm-12">

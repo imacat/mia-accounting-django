@@ -19,8 +19,11 @@
 
 """
 from django.urls import path, register_converter
+from django.views.decorators.http import require_GET
+from django.views.generic import TemplateView
 
 from . import views, converters
+from .digest_auth import login_required
 
 register_converter(converters.UserConverter, "user")
 
@@ -35,10 +38,9 @@ urlpatterns = [
     path("users/<user:user>/delete", views.user_delete, name="users.delete"),
     path("api/users/<str:login_id>/exists", views.api_users_exists,
          name="api.users.exists"),
-    # TODO: To be done.
-    path("my-account", views.todo, name="my-account"),
-    # TODO: To be done.
-    path("my-account/edit", views.todo, name="my-account.edit"),
-    # TODO: To be done.
-    path("my-account/update", views.todo, name="my-account.update"),
+    path("my-account", require_GET(login_required(TemplateView.as_view(
+        template_name="mia_core/user_detail.html"))), name="my-account"),
+    path("my-account/edit", views.my_account_form, name="my-account.edit"),
+    path("my-account/update", views.my_account_store,
+         name="my-account.update"),
 ]

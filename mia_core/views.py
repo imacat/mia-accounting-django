@@ -175,6 +175,64 @@ def user_delete(request, user):
     return redirect("mia_core:users")
 
 
+@require_GET
+@login_required
+def my_account_form(request):
+    """The view to edit my account.
+
+    Args:
+        request (HttpRequest): The request.
+        user (User): The account.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    previous_post = stored_post.get_previous_post(request)
+    if previous_post is not None:
+        form = UserForm(previous_post)
+    else:
+        form = UserForm({
+            "login_id": request.user.login_id,
+            "name": request.user.name,
+        })
+    form.user = request.user
+    form.current_user = request.user
+    return render(request, "mia_core/user_form.html", {
+        "form": form,
+    })
+
+
+def my_account_store(request):
+    """The view to store my account.
+
+    Args:
+        request (HttpRequest): The request.
+        user (Account): The user.
+
+    Returns:
+        HttpResponseRedirect: The response.
+    """
+    post = request.POST.dict()
+    strip_post(post)
+    form = UserForm(post)
+    form.user = request.user
+    form.current_user = request.user
+    if not form.is_valid():
+        url = reverse("mia_core:my-account.edit")
+        return stored_post.error_redirect(request, url, post)
+    request.user.login_id = form["login_id"].value()
+    if form["password"].value() is not None:
+        request.user.set_digest_password(
+            form["login_id"].value(), form["password"].value())
+    request.user.name = form["name"].value()
+    if not request.user.is_dirty():
+        message = gettext_noop("Your user account was not changed.")
+    else:
+        request.user.save(current_user=request.user)
+        message = gettext_noop("Your user account was saved successfully.")
+    messages.success(request, message)
+    return redirect("mia_core:my-account")
+
 
 def api_users_exists(request, login_id):
     """The view to check whether a user with a log in ID exists.
