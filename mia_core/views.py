@@ -23,9 +23,10 @@ from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.decorators.http import require_POST
-from django.views.generic import DeleteView as CoreDeleteView
+from django.views.generic import DeleteView as CoreDeleteView, ListView
+
+from mia_core.models import User
 
 
 class DeleteView(SuccessMessageMixin, CoreDeleteView):
@@ -52,6 +53,11 @@ def logout(request):
         request.session["logout"] = True
         return redirect(request.POST["next"])
     return redirect("home")
+
+
+class UserListView(ListView):
+    """The view to list the users."""
+    queryset = User.objects.order_by("login_id")
 
 
 # TODO: To be removed.

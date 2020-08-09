@@ -19,7 +19,7 @@
 
 """
 from dirtyfields import DirtyFieldsMixin
-from django.db import models
+from django.db import models, connection, OperationalError
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
@@ -116,3 +116,37 @@ class User(DirtyFieldsMixin, models.Model):
     class Meta:
         db_table = "users"
         app_label = "mia_core"
+
+    def is_in_use(self):
+        """Returns whether this user is in use.
+
+        Returns:
+            bool: True if this user is in use, or False otherwise.
+        """
+        for table in connection.introspection.table_names():
+            if self._is_in_use_with(F"SELECT * FROM {table}"
+                                    " WHERE createdby=%s OR updatedby=%s"):
+                return True
+            if self._is_in_use_with(
+                    F"SELECT * FROM {table}"
+                    " WHERE created_by_id=%s OR updated_by_id=%s"):
+                return True
+        return False
+
+    def _is_in_use_with(self, sql):
+        """Returns whether this user is in use with a specific SQL statement.
+
+        Args:
+            sql (str): The SQL query statement
+
+        Returns:
+            bool: True if this user is in use, or False otherwise.
+        """
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(sql, [self.pk, self.pk])
+            except OperationalError:
+                return False
+            if cursor.fetchone() is None:
+                return False
+            return True

@@ -18,26 +18,28 @@
 """The route settings of the Mia core application.
 
 """
-from django.urls import path
+from django.urls import path, register_converter
 
-from . import views
+from . import views, converters
+
+register_converter(converters.UserConverter, "user")
 
 app_name = "mia_core"
 urlpatterns = [
     # TODO: To be done.
-    path("users", views.todo, name="users"),
+    path("users", views.UserListView.as_view(), name="users"),
     # TODO: To be done.
     path("users/create", views.todo, name="users.create"),
     # TODO: To be done.
     path("users/store", views.todo, name="users.store"),
     # TODO: To be done.
-    path("users/<str:login_id>", views.todo, name="users.detail"),
+    path("users/<user:user>", views.todo, name="users.detail"),
     # TODO: To be done.
-    path("users/<str:login_id>/edit", views.todo, name="users.edit"),
+    path("users/<user:user>/edit", views.todo, name="users.edit"),
     # TODO: To be done.
-    path("users/<str:login_id>/update", views.todo, name="users.update"),
+    path("users/<user:user>/update", views.todo, name="users.update"),
     # TODO: To be done.
-    path("users/<str:login_id>/delete", views.todo, name="users.delete"),
+    path("users/<user:user>/delete", views.todo, name="users.delete"),
     # TODO: To be done.
     path("api/users/<str:login_id>/exists", views.todo,
          name="api.users.exists"),
