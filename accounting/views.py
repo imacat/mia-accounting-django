@@ -817,7 +817,7 @@ class TransactionView(DetailView):
 
 @require_GET
 @login_required
-def txn_edit(request, txn_type, txn=None):
+def txn_form(request, txn_type, txn=None):
     """The view to edit an accounting transaction.
 
     Args:
