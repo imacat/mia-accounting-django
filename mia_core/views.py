@@ -117,7 +117,6 @@ def api_users_exists(request, login_id):
     return JsonResponse(True, safe=False)
 
 
-
 # TODO: To be removed.
 def todo(request, **kwargs):
     """A dummy placeholder view for the URL settings that are not
