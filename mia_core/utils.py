@@ -43,16 +43,16 @@ def new_pk(cls):
             return pk
 
 
-def strip_form(form):
-    """Strips the values of a form.  Empty strings are converted to None.
+def strip_post(post):
+    """Strips the values of the POSTed data.  Empty strings are removed.
 
     Args:
-        form (dict[str]): The form.
+        post (dict[str]): The POSTed data.
     """
-    for key in list(form.keys()):
-        form[key] = form[key].strip()
-        if form[key] == "":
-            del form[key]
+    for key in list(post.keys()):
+        post[key] = post[key].strip()
+        if post[key] == "":
+            del post[key]
 
 
 class Language:

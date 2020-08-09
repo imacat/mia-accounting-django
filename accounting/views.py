@@ -40,7 +40,7 @@ from mia_core import stored_post
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
-    strip_form, new_pk, PaginationException
+    strip_post, new_pk, PaginationException
 from mia_core.views import DeleteView
 from .forms import AccountForm
 from .models import Record, Transaction, Account
@@ -873,7 +873,7 @@ def txn_store(request, txn_type, txn=None):
         HttpResponse: The response.
     """
     post = request.POST.dict()
-    strip_form(post)
+    strip_post(post)
     sort_post_txn_records(post)
     form = make_txn_form_from_post(post, txn_type, txn)
     if not form.is_valid():
