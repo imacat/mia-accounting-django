@@ -23,6 +23,7 @@ from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import DeleteView as CoreDeleteView, ListView, \
     DetailView
@@ -59,11 +60,15 @@ def logout(request):
     return redirect("home")
 
 
+@method_decorator(require_GET, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class UserListView(ListView):
     """The view to list the users."""
     queryset = User.objects.order_by("login_id")
 
 
+@method_decorator(require_GET, name="dispatch")
+@method_decorator(login_required, name="dispatch")
 class UserView(DetailView):
     """The view of a user."""
     def get_object(self, queryset=None):
