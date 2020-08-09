@@ -31,8 +31,7 @@ urlpatterns = [
     path("users/create", views.todo, name="users.create"),
     # TODO: To be done.
     path("users/store", views.todo, name="users.store"),
-    # TODO: To be done.
-    path("users/<user:user>", views.todo, name="users.detail"),
+    path("users/<user:user>", views.UserView.as_view(), name="users.detail"),
     # TODO: To be done.
     path("users/<user:user>/edit", views.todo, name="users.edit"),
     # TODO: To be done.

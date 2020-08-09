@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 20:20+0800\n"
-"PO-Revision-Date: 2020-08-09 20:21+0800\n"
+"POT-Creation-Date: 2020-08-09 20:41+0800\n"
+"PO-Revision-Date: 2020-08-09 20:45+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -100,6 +100,7 @@ msgstr "日期："
 
 #: mia_core/templates/mia_core/include/period-chooser.html:107
 #: mia_core/templates/mia_core/include/period-chooser.html:125
+#: mia_core/templates/mia_core/user_detail.html:58
 msgid "Confirm"
 msgstr "確定"
 
@@ -115,40 +116,143 @@ msgstr "從："
 msgid "To:"
 msgstr "到："
 
-#: mia_core/templates/mia_core/user_list.html:28
+#: mia_core/templates/mia_core/user_detail.html:35
+msgid "The account is not in use."
+msgstr "帳號未使用。"
+
+#: mia_core/templates/mia_core/user_detail.html:49
+msgid "User Deletion Confirmation"
+msgstr "帳號刪除確認"
+
+#: mia_core/templates/mia_core/user_detail.html:54
+msgid "Do you really want to delete this user?"
+msgstr "您真的要刪掉這個帳號嗎？"
+
+#: mia_core/templates/mia_core/user_detail.html:59
+msgid "Cancel"
+msgstr "取消"
+
+#: mia_core/templates/mia_core/user_detail.html:69
+msgid "Back"
+msgstr "回上頁"
+
+#: mia_core/templates/mia_core/user_detail.html:73
+msgid "Setting"
+msgstr "設定"
+
+#: mia_core/templates/mia_core/user_detail.html:76
+msgid "You cannot delete your own account."
+msgstr "不能刪除自己的帳號。"
+
+#: mia_core/templates/mia_core/user_detail.html:78
+#: mia_core/templates/mia_core/user_detail.html:83
+#: mia_core/templates/mia_core/user_detail.html:88
+#: mia_core/templates/mia_core/user_detail.html:93
+msgid "Delete"
+msgstr "刪除"
+
+#: mia_core/templates/mia_core/user_detail.html:81
+msgid "You cannot delete this account because it is in use."
+msgstr "帳號使用中，不可刪除。"
+
+#: mia_core/templates/mia_core/user_detail.html:86
+msgid "This account is already deleted."
+msgstr "帳號已刪除。"
+
+#: mia_core/templates/mia_core/user_detail.html:99
+msgid "Login ID.:"
+msgstr "帳號"
+
+#: mia_core/templates/mia_core/user_detail.html:104
+msgid "Name:"
+msgstr "姓名"
+
+#: mia_core/templates/mia_core/user_detail.html:110
+msgid "This account is disabled."
+msgstr "帳號停用。"
+
+#: mia_core/templates/mia_core/user_detail.html:116
+msgid "This account is deleted."
+msgstr "帳號已刪。"
+
+#: mia_core/templates/mia_core/user_detail.html:122
+msgid "This user has not logged in yet."
+msgstr "使用者還沒登入過。"
+
+#: mia_core/templates/mia_core/user_detail.html:126
+msgid "# of visits:"
+msgstr "登入次數："
+
+#: mia_core/templates/mia_core/user_detail.html:131
+msgid "Last visit at:"
+msgstr "上次登入時間："
+
+#: mia_core/templates/mia_core/user_detail.html:136
+msgid "IP:"
+msgstr "IP:"
+
+#: mia_core/templates/mia_core/user_detail.html:141
+msgid "Host:"
+msgstr "主機名稱："
+
+#: mia_core/templates/mia_core/user_detail.html:146
+msgid "Country:"
+msgstr "國家："
+
+#: mia_core/templates/mia_core/user_detail.html:147
+msgid "(Not Available)"
+msgstr "（不可考）"
+
+#: mia_core/templates/mia_core/user_detail.html:152
+msgid "Created at:"
+msgstr "建檔時間："
+
+#: mia_core/templates/mia_core/user_detail.html:157
+msgid "Created by:"
+msgstr "建檔人："
+
+#: mia_core/templates/mia_core/user_detail.html:162
+msgid "Updated at:"
+msgstr "更新時間："
+
+#: mia_core/templates/mia_core/user_detail.html:167
+msgid "Updated by:"
+msgstr "更新人："
+
+#: mia_core/templates/mia_core/user_list.html:27
 msgid "Account Management"
 msgstr "帳號管理"
 
-#: mia_core/templates/mia_core/user_list.html:36
+#: mia_core/templates/mia_core/user_list.html:35
 msgid "New"
 msgstr "新增"
 
-#: mia_core/templates/mia_core/user_list.html:44
+#: mia_core/templates/mia_core/user_list.html:43
 msgid "Login ID"
 msgstr "帳號"
 
-#: mia_core/templates/mia_core/user_list.html:45
+#: mia_core/templates/mia_core/user_list.html:44
 msgid "Name"
 msgstr "姓名"
 
-#: mia_core/templates/mia_core/user_list.html:46
-#: mia_core/templates/mia_core/user_list.html:68
+#: mia_core/templates/mia_core/user_list.html:45
+#: mia_core/templates/mia_core/user_list.html:67
 msgid "View"
 msgstr "查閱"
 
-#: mia_core/templates/mia_core/user_list.html:56
+#: mia_core/templates/mia_core/user_list.html:55
 msgid "Disabled"
 msgstr "停用"
 
-#: mia_core/templates/mia_core/user_list.html:59
+#: mia_core/templates/mia_core/user_list.html:58
 msgid "Deleted"
 msgstr "已刪"
 
-#: mia_core/templates/mia_core/user_list.html:62
+#: mia_core/templates/mia_core/user_list.html:61
 msgid "Not In Use"
 msgstr "未使用"
 
-#: mia_core/templates/mia_core/user_list.html:76
+#: mia_core/templates/mia_core/user_list.html:75
 msgid "There is currently no data."
 msgstr "目前沒有資料。"
 
