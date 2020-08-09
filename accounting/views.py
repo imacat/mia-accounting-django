@@ -845,11 +845,11 @@ def txn_form(request, txn_type, txn=None):
                           "order": ""}
     if txn_type == "transfer":
         new_record_template = json.dumps(render_to_string(
-            "accounting/include/form-record-transfer.html",
+            "accounting/include/record_form-transfer.html",
             new_record_context))
     else:
         new_record_template = json.dumps(render_to_string(
-            "accounting/include/form-record-non-transfer.html",
+            "accounting/include/record_form-non-transfer.html",
             new_record_context))
     return render(request, F"accounting/transaction_form-{txn_type}.html", {
         "form": form,

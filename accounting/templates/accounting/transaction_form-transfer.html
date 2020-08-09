@@ -74,7 +74,7 @@ First written: 2020/7/23
       <ul id="debit-records" class="list-group">
         {% for record in form.debit_records %}
           {% with record_type="debit" no=forloop.counter order=forloop.counter %}
-            {% include "accounting/include/form-record-transfer.html" %}
+            {% include "accounting/include/record_form-transfer.html" %}
           {% endwith %}
         {% endfor %}
       </ul>
@@ -100,7 +100,7 @@ First written: 2020/7/23
       <ul id="credit-records" class="list-group">
         {% for record in form.credit_records %}
           {% with record_type="credit" no=forloop.counter order=forloop.counter %}
-            {% include "accounting/include/form-record-transfer.html" %}
+            {% include "accounting/include/record_form-transfer.html" %}
           {% endwith %}
         {% endfor %}
       </ul>

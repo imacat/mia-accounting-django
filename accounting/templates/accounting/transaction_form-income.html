@@ -72,7 +72,7 @@ First written: 2020/7/23
       <ul id="credit-records" class="list-group">
         {% for record in form.credit_records %}
           {% with record_type="credit" no=forloop.counter order=forloop.counter %}
-            {% include "accounting/include/form-record-non-transfer.html" %}
+            {% include "accounting/include/record_form-non-transfer.html" %}
           {% endwith %}
         {% endfor %}
       </ul>
