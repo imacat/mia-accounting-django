@@ -66,6 +66,7 @@ def logout(request):
     return redirect("/")
 
 
+# TODO: To be removed.
 def todo(request, **kwargs):
     """A dummy placeholder view for the URL settings that are not
     implemented yet.
