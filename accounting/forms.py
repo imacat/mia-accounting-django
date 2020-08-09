@@ -85,7 +85,7 @@ class RecordForm(forms.Form):
         """Validates the form globally.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         errors = []
         if "id" in self.errors:
@@ -105,7 +105,7 @@ class RecordForm(forms.Form):
         """Validates whether the transaction matches the transaction form.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if "id" in self.errors:
             return
@@ -126,7 +126,7 @@ class RecordForm(forms.Form):
         """Validates whether the account is a correct debit or credit account.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if "account" in self.errors:
             return
@@ -150,7 +150,7 @@ class RecordForm(forms.Form):
         as corresponding debit and credit records.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if "id" in self.errors:
             return
@@ -201,7 +201,7 @@ class TransactionForm(forms.Form):
         """Validates the form globally.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         errors = []
         validators = [self._validate_has_debit_records,
@@ -219,7 +219,7 @@ class TransactionForm(forms.Form):
         """Validates whether there is any debit record.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if self.txn_type == "income":
             return
@@ -237,7 +237,7 @@ class TransactionForm(forms.Form):
         """Validates whether there is any credit record.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if self.txn_type == "expense":
             return
@@ -256,7 +256,7 @@ class TransactionForm(forms.Form):
         consistent.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if self.txn_type != "transfer":
             return
@@ -341,7 +341,7 @@ class AccountForm(forms.Form):
         """Validates the form globally.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         errors = []
         validators = [self._validate_code_not_under_myself,
@@ -360,7 +360,7 @@ class AccountForm(forms.Form):
         """Validates whether the code is under itself.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if self.account is None:
             return
@@ -380,7 +380,7 @@ class AccountForm(forms.Form):
         """Validates whether the code is unique.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if "code" not in self.data:
             return
@@ -401,7 +401,7 @@ class AccountForm(forms.Form):
         """Validates whether the parent account exists.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if "code" not in self.data:
             return
@@ -421,7 +421,7 @@ class AccountForm(forms.Form):
         """Validates whether the codes of the descendants will be too long.
 
         Raises:
-            ValidationError: When the validation fails.
+            forms.ValidationError: When the validation fails.
         """
         if "code" not in self.data:
             return
