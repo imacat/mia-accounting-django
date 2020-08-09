@@ -39,7 +39,7 @@ First written: 2020/7/1
   <div class="btn-group">
     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
       <i class="fas fa-edit"></i>
-      {{ _("New")|force_escape }}
+      {% trans "New" context "Accounting" as text %}{{ text|force_escape }}
     </button>
     <div class="dropdown-menu">
       <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
