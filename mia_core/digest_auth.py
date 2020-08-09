@@ -19,11 +19,16 @@
 application.
 
 """
+import ipaddress
+import socket
 from functools import wraps
 
-from django.http import HttpResponse
+from django.db.models import F
+from django.db.models.functions import Now
+from django.http import HttpResponse, HttpRequest
+from geoip import geolite2
 
-from mia_core.models import User
+from .models import User, Country
 
 
 class AccountBackend:
@@ -68,9 +73,89 @@ def login_required(function=None):
                 return HttpResponse(status=401)
             if "logout" in request.session:
                 del request.session["logout"]
+                if "visit_logged" in request.session:
+                    del request.session["visit_logged"]
                 return HttpResponse(status=401)
+            _log_visit(request)
+            print(request.META["REMOTE_ADDR"])
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     if function:
         return decorator(function)
     return decorator
+
+
+def _log_visit(request):
+    """Logs the visit information for the logged-in user.
+
+    Args:
+        request (HttpRequest): The request.
+    """
+    if "visit_logged" in request.session:
+        return
+    user = request.user
+    ip = request.META["REMOTE_ADDR"]
+    User.objects.filter(pk=user.pk).update(
+        visits=F("visits") + 1,
+        visited_at=Now(),
+        visited_ip=ip,
+        visited_host=_get_host(ip),
+        visited_country=_get_country(ip),
+    )
+    request.session["visit_logged"] = True
+
+
+def _get_host(ip):
+    """Look-up the host name by its IP.
+
+    Args:
+        ip (str): The IP
+
+    Returns:
+        str: The host name, or None if the look-up fails.
+    """
+    try:
+        return socket.gethostbyaddr(ip)[0]
+    except Exception:
+        return None
+
+
+def _get_country(ip):
+    """Look-up the country by its IP.
+
+    Args:
+        ip (str): The IP
+
+    Returns:
+        Country: The country.
+    """
+    code = _get_country_code(ip)
+    try:
+        return Country.objects.get(code=code)
+    except Country.DoesNotExist:
+        pass
+    return None
+
+
+def _get_country_code(ip):
+    """Look-up the country code by its IP.
+
+    Args:
+        ip (str): The IP
+
+    Returns:
+        str: The country code, or None if the look-up fails.
+    """
+    try:
+        return geolite2.lookup(ip).country
+    except ValueError:
+        pass
+    except AttributeError:
+        pass
+    try:
+        ipaddr = ipaddress.ip_address(ip)
+        if ipaddr.is_private:
+            return "AA"
+    except ValueError:
+        pass
+    return None
