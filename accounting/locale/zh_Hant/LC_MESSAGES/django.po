@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 20:48+0800\n"
-"PO-Revision-Date: 2020-08-09 20:48+0800\n"
+"POT-Creation-Date: 2020-08-09 22:03+0800\n"
+"PO-Revision-Date: 2020-08-09 22:05+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -21,111 +21,111 @@ msgstr ""
 msgid "current assets and liabilities"
 msgstr "流動資產與負債"
 
-#: accounting/forms.py:44
+#: accounting/forms.py:43
 msgid "This accounting record is not valid."
 msgstr "這筆會計分錄無效。"
 
-#: accounting/forms.py:49
+#: accounting/forms.py:48
 msgid "Please select the account."
 msgstr "請選擇會計科目。"
 
-#: accounting/forms.py:56
+#: accounting/forms.py:55
 msgid "This summary is too long (max. 128 characters)."
 msgstr "摘要太長了（最長128個字）。"
 
-#: accounting/forms.py:61
+#: accounting/forms.py:60
 msgid "Please fill in the amount."
 msgstr "請填寫金額。"
 
-#: accounting/forms.py:62 accounting/forms.py:315
+#: accounting/forms.py:61 accounting/forms.py:314
 msgid "Please fill in a number."
 msgstr "請填寫數字。"
 
-#: accounting/forms.py:63
+#: accounting/forms.py:62
 msgid "The amount must be at least 1."
 msgstr "金額要大於零。"
 
-#: accounting/forms.py:116 accounting/forms.py:123
+#: accounting/forms.py:115 accounting/forms.py:122
 msgid "This record is not for this transaction."
 msgstr "這不是這張傳票的會計分錄。"
 
-#: accounting/forms.py:137
+#: accounting/forms.py:136
 msgid "This account is not for credit records."
 msgstr "這不是貸方的會計科目。"
 
-#: accounting/forms.py:144
+#: accounting/forms.py:143
 msgid "This account is not for debit records."
 msgstr "這不是借方的會計科目。"
 
-#: accounting/forms.py:164
+#: accounting/forms.py:163
 msgid "This accounting record is not a credit record."
 msgstr "這不是貸方的會計分錄。"
 
-#: accounting/forms.py:168
+#: accounting/forms.py:167
 msgid "This accounting record is not a debit record."
 msgstr "這不是借方的會計分錄。"
 
-#: accounting/forms.py:184
+#: accounting/forms.py:183
 msgid "Please fill in the date."
 msgstr "請填寫日期。"
 
-#: accounting/forms.py:185
+#: accounting/forms.py:184
 msgid "This date is not valid."
 msgstr "請依正確日期格式填寫日期。"
 
-#: accounting/forms.py:191
+#: accounting/forms.py:190
 msgid "These notes are too long (max. 128 characters)."
 msgstr "註記太長了（最長128個字）。"
 
-#: accounting/forms.py:231
+#: accounting/forms.py:230
 msgid "Please fill in debit accounting records."
 msgstr "請填寫借方會計分錄。"
 
-#: accounting/forms.py:234 accounting/forms.py:252
+#: accounting/forms.py:233 accounting/forms.py:251
 msgid "Please fill in accounting records."
 msgstr "請填寫會計分錄。"
 
-#: accounting/forms.py:249
+#: accounting/forms.py:248
 msgid "Please fill in credit accounting records."
 msgstr "請填寫貸方會計分錄。"
 
-#: accounting/forms.py:267
+#: accounting/forms.py:266
 msgid "The total of the debit and credit amounts are inconsistent."
 msgstr "借方和貸方合計不符。"
 
-#: accounting/forms.py:314
+#: accounting/forms.py:313
 msgid "Please fill in the code."
-msgstr "請填上代碼。"
+msgstr "請填寫代碼。"
 
-#: accounting/forms.py:316 accounting/forms.py:317
+#: accounting/forms.py:315 accounting/forms.py:316
 msgid "This code is too long  (max. 5)."
 msgstr "代碼太長了（最長5位數字）。"
 
-#: accounting/forms.py:321
+#: accounting/forms.py:320
 msgid "You can only use numbers 1-9 in the code."
 msgstr "代碼限填數字1-9。"
 
-#: accounting/forms.py:326
+#: accounting/forms.py:325
 msgid "Please fill in the title."
-msgstr "請填上標題。"
+msgstr "請填寫標題。"
 
-#: accounting/forms.py:327
+#: accounting/forms.py:326
 msgid "This title is too long  (max. 128)."
 msgstr "標題太長了（最長128個字）。"
 
-#: accounting/forms.py:375
+#: accounting/forms.py:374
 msgid "You cannot set the code under itself."
 msgstr "代碼不可設在自己之下。"
 
-#: accounting/forms.py:396
+#: accounting/forms.py:395
 msgid "This code is already in use."
 msgstr "代碼和其他會計科目重複。"
 
-#: accounting/forms.py:415 accounting/validators.py:81
+#: accounting/forms.py:414
 msgid "The parent account of this code does not exist."
 msgstr "找不到上層會計科目。"
 
-#: accounting/forms.py:442
+#: accounting/forms.py:441
 msgid "The descendant account codes will be too long  (max. 5)."
 msgstr "子科目的代碼會太長（最長5位數字）。"
 

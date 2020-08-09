@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 12:12+0800\n"
-"PO-Revision-Date: 2020-08-09 12:16+0800\n"
+"POT-Creation-Date: 2020-08-09 21:54+0800\n"
+"PO-Revision-Date: 2020-08-09 22:05+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -27,7 +27,7 @@ msgstr "（不可考）"
 
 #: accounting/static/accounting/js/account-form.js:118
 msgid "Please fill in the code."
-msgstr "請填上代碼。"
+msgstr "請填寫代碼。"
 
 #: accounting/static/accounting/js/account-form.js:123
 msgid "You can only use numbers 1-9 in the code."
@@ -51,7 +51,7 @@ msgstr "子科目的代碼會太長（最長5位數字）。"
 
 #: accounting/static/accounting/js/account-form.js:183
 msgid "Please fill in the title."
-msgstr "請填上標題。"
+msgstr "請填寫標題。"
 
 #: accounting/static/accounting/js/transaction-form.js:376
 msgid "Please fill in the date."
