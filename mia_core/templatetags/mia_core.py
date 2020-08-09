@@ -22,6 +22,7 @@ from datetime import date
 
 import titlecase
 from django import template
+from django.http import HttpRequest
 from django.template import defaultfilters
 from django.urls import reverse
 from django.utils import timezone
@@ -191,3 +192,20 @@ def title_case(value):
     if isinstance(value, SafeString):
         value = value + ""
     return titlecase.titlecase(value)
+
+
+@register.filter
+def is_in_section(request, section_name):
+    """Returns whether the request is currently in a section.
+
+    Args:
+        request (HttpRequest): The request.
+        section_name (str): The view name of this section.
+
+    Returns:
+        bool: True if the request is currently in this section, or False
+            otherwise
+    """
+    view_name = request.resolver_match.view_name
+    return view_name == section_name\
+           or view_name.startswith(section_name + ".")
