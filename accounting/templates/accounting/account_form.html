@@ -26,7 +26,11 @@ First written: 2020/8/8
 {% load accounting %}
 
 {% block settings %}
-  {% setvar "title" account %}
+  {% if form.account %}
+    {% setvar "title" form.account %}
+  {% else %}
+    {% setvar "title" _("Add a New Account") %}
+  {% endif %}
   {% static "accounting/js/account-form.js" as file %}{% add_js file %}
 {% endblock %}
 
