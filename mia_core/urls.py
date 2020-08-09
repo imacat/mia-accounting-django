@@ -27,19 +27,17 @@ register_converter(converters.UserConverter, "user")
 app_name = "mia_core"
 urlpatterns = [
     path("users", views.UserListView.as_view(), name="users"),
-    # TODO: To be done.
-    path("users/create", views.todo, name="users.create"),
+    path("users/create", views.user_form, name="users.create"),
     # TODO: To be done.
     path("users/store", views.todo, name="users.store"),
     path("users/<user:user>", views.UserView.as_view(), name="users.detail"),
-    # TODO: To be done.
-    path("users/<user:user>/edit", views.todo, name="users.edit"),
+    path("users/<user:user>/edit", views.user_form, name="users.edit"),
     # TODO: To be done.
     path("users/<user:user>/update", views.todo, name="users.update"),
     # TODO: To be done.
     path("users/<user:user>/delete", views.todo, name="users.delete"),
     # TODO: To be done.
-    path("api/users/<str:login_id>/exists", views.todo,
+    path("api/users/<str:login_id>/exists", views.api_users_exists,
          name="api.users.exists"),
     # TODO: To be done.
     path("my-account", views.todo, name="my-account"),

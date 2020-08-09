@@ -21,13 +21,16 @@
 from django.contrib import messages
 from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.views.decorators.http import require_POST
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import DeleteView as CoreDeleteView, ListView, \
     DetailView
 
-from mia_core.models import User
+from . import stored_post
+from .digest_auth import login_required
+from .forms import UserForm
+from .models import User
 
 
 class DeleteView(SuccessMessageMixin, CoreDeleteView):
@@ -65,6 +68,54 @@ class UserView(DetailView):
     """The view of a user."""
     def get_object(self, queryset=None):
         return self.request.resolver_match.kwargs["user"]
+
+
+@require_GET
+@login_required
+def user_form(request, user=None):
+    """The view to edit an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        user (User): The account.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    previous_post = stored_post.get_previous_post(request)
+    if previous_post is not None:
+        form = UserForm(previous_post)
+    elif user is not None:
+        form = UserForm({
+            "login_id": user.login_id,
+            "name": user.name,
+            "is_disabled": user.is_disabled,
+        })
+    else:
+        form = UserForm()
+    form.user = user
+    form.current_user = request.user
+    return render(request, "mia_core/user_form.html", {
+        "form": form,
+    })
+
+
+def api_users_exists(request, login_id):
+    """The view to check whether a user with a log in ID exists.
+
+    Args:
+        request (HttpRequest): The request.
+        login_id (str): The log in ID.
+
+    Returns:
+        JsonResponse: The response.
+    """
+    try:
+        User.objects.get(login_id=login_id)
+    except User.DoesNotExist:
+        return JsonResponse(False, safe=False)
+    return JsonResponse(True, safe=False)
+
 
 
 # TODO: To be removed.
