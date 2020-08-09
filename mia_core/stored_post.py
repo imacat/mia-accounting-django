@@ -15,7 +15,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-"""The session-based status management of the Mia core application.
+"""The session-based POST data storage management of the Mia core application.
 
 """
 import random
@@ -24,85 +24,83 @@ from django.http import HttpResponseRedirect
 
 from .utils import UrlBuilder
 
+STORAGE_KEY = "stored_post"
 
-def error_redirect(request, url, form):
-    """Redirects to a specific URL on error, with the status ID appended
-    as the query parameter "s".  The status will be loaded with the
-    retrieve_status template tag.
+
+def error_redirect(request, url, post):
+    """Redirects to a specific URL on error, with the POST data ID appended
+    as the query parameter "s".  The POST data can be loaded with the
+    get_previous_post() utility.
 
     Args:
         request (HttpRequest): The request.
         url (str): The destination URL.
-        form (dict[str]): The received POSTed form.
+        post (dict[str]): The POST data.
 
     Returns:
         HttpResponseRedirect: The redirect response.
     """
-    status_id = _store(request, {"form": form})
-    return HttpResponseRedirect(str(UrlBuilder(url).query(s=status_id)))
+    post_id = _store(request, post)
+    return HttpResponseRedirect(str(UrlBuilder(url).query(s=post_id)))
 
 
 def get_previous_post(request):
-    """Retrieves the previously-stored status.
+    """Retrieves the previously-stored POST data.
 
     Args:
         request (HttpRequest): The request.
 
     Returns:
-        dict: The previously-stored status.
+        dict: The previously-stored POST data.
     """
     if "s" not in request.GET:
         return None
-    status = _retrieve(request, request.GET["s"])
-    if "form" not in status:
-        return None
-    return status["form"]
+    return _retrieve(request, request.GET["s"])
 
 
-def _store(request, status):
-    """Stores the status into the session, and returns the status ID that can
-    be used to retrieve the status later with retrieve().
+def _store(request, post):
+    """Stores the POST data into the session, and returns the POST data ID that
+    can be used to retrieve it later with _retrieve().
 
     Args:
         request (HttpRequest): The request.
-        status (dict): The dict of the status.
+        post (dict): The POST data.
 
     Returns:
-        str: The status ID
+        str: The POST data ID
     """
-    if "stored_status" not in request.session:
-        request.session["stored_status"] = {}
-    id = _new_status_id(request.session["stored_status"])
-    request.session["stored_status"][id] = status
+    if STORAGE_KEY not in request.session:
+        request.session[STORAGE_KEY] = {}
+    id = _new_post_id(request.session[STORAGE_KEY])
+    request.session[STORAGE_KEY][id] = post
     return id
 
 
 def _retrieve(request, id):
-    """Stores the status into the session, and returns the status ID that can
-    be used to retrieve the status later with retrieve().
+    """Retrieves the POST data from the storage.
 
     Args:
         request (HttpRequest): The request.
-        id (str): The status ID.
+        id (str): The POST data ID.
 
     Returns:
-        dict: The status, or None if the status does not exist.
+        dict: The POST data, or None if the corresponding data does not exist.
     """
-    if "stored_status" not in request.session:
+    if STORAGE_KEY not in request.session:
         return None
-    if id not in request.session["stored_status"]:
+    if id not in request.session[STORAGE_KEY]:
         return None
-    return request.session["stored_status"][id]
+    return request.session[STORAGE_KEY][id]
 
 
-def _new_status_id(status_store):
-    """Generates and returns a new status ID that does not exist yet.
+def _new_post_id(post_store):
+    """Generates and returns a new POST ID that does not exist yet.
 
     Args:
-        status_store (dict): The status storage.
+        post_store (dict): The POST storage.
 
     Returns:
-        str: The newly-generated status ID.
+        str: The newly-generated POST ID.
     """
     while True:
         id = ""
@@ -116,5 +114,5 @@ def _new_status_id(status_store):
                 id = id + chr(ord("0") + (n - 52))
             else:
                 id = id + "-_."[n - 62]
-        if id not in status_store:
+        if id not in post_store:
             return id

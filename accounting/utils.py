@@ -32,7 +32,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from mia_core.period import Period
-from mia_core.status import get_previous_post
+from mia_core.stored_post import get_previous_post
 from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import new_pk
 from .forms import TransactionForm, RecordForm

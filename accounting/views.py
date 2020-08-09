@@ -38,7 +38,7 @@ from django.views.generic import RedirectView, ListView, DetailView, DeleteView
 
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
-from mia_core.status import error_redirect, get_previous_post
+from mia_core.stored_post import error_redirect, get_previous_post
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk, PaginationException
 from .forms import AccountForm
