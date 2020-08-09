@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 12:14+0800\n"
-"PO-Revision-Date: 2020-08-09 12:16+0800\n"
+"POT-Creation-Date: 2020-08-09 17:02+0800\n"
+"PO-Revision-Date: 2020-08-09 17:02+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -17,91 +17,91 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounting/converters.py:157 accounting/utils.py:253
+#: accounting/converters.py:157 accounting/utils.py:243
 msgid "current assets and liabilities"
 msgstr "流動資產與負債"
 
-#: accounting/forms.py:43
+#: accounting/forms.py:44
 msgid "This accounting record is not valid."
 msgstr "這筆會計分錄無效。"
 
-#: accounting/forms.py:48
+#: accounting/forms.py:49
 msgid "Please select the account."
 msgstr "請選擇會計科目。"
 
-#: accounting/forms.py:55
+#: accounting/forms.py:56
 msgid "This summary is too long (max. 128 characters)."
 msgstr "摘要太長了（最長128個字）。"
 
-#: accounting/forms.py:60
+#: accounting/forms.py:61
 msgid "Please fill in the amount."
 msgstr "請填寫金額。"
 
-#: accounting/forms.py:61 accounting/forms.py:314
+#: accounting/forms.py:62 accounting/forms.py:315
 msgid "Please fill in a number."
 msgstr "請填寫數字。"
 
-#: accounting/forms.py:62
+#: accounting/forms.py:63
 msgid "The amount must be at least 1."
 msgstr "金額要大於零。"
 
-#: accounting/forms.py:115 accounting/forms.py:122
+#: accounting/forms.py:116 accounting/forms.py:123
 msgid "This record is not for this transaction."
 msgstr "這不是這張傳票的會計分錄。"
 
-#: accounting/forms.py:136
+#: accounting/forms.py:137
 msgid "This account is not for credit records."
 msgstr "這不是貸方的會計科目。"
 
-#: accounting/forms.py:143
+#: accounting/forms.py:144
 msgid "This account is not for debit records."
 msgstr "這不是借方的會計科目。"
 
-#: accounting/forms.py:163
+#: accounting/forms.py:164
 msgid "This accounting record is not a credit record."
 msgstr "這不是貸方的會計分錄。"
 
-#: accounting/forms.py:167
+#: accounting/forms.py:168
 msgid "This accounting record is not a debit record."
 msgstr "這不是借方的會計分錄。"
 
-#: accounting/forms.py:183
+#: accounting/forms.py:184
 msgid "Please fill in the date."
 msgstr "請填寫日期。"
 
-#: accounting/forms.py:184
+#: accounting/forms.py:185
 msgid "This date is not valid."
 msgstr "請依正確日期格式填寫日期。"
 
-#: accounting/forms.py:190
+#: accounting/forms.py:191
 msgid "These notes are too long (max. 128 characters)."
 msgstr "註記太長了（最長128個字）。"
 
-#: accounting/forms.py:230
+#: accounting/forms.py:231
 msgid "Please fill in debit accounting records."
 msgstr "請填寫借方會計分錄。"
 
-#: accounting/forms.py:233 accounting/forms.py:251
+#: accounting/forms.py:234 accounting/forms.py:252
 msgid "Please fill in accounting records."
 msgstr "請填寫會計分錄。"
 
-#: accounting/forms.py:248
+#: accounting/forms.py:249
 msgid "Please fill in credit accounting records."
 msgstr "請填寫貸方會計分錄。"
 
-#: accounting/forms.py:266
+#: accounting/forms.py:267
 msgid "The total of the debit and credit amounts are inconsistent."
 msgstr "借方和貸方合計不符。"
 
-#: accounting/forms.py:313
+#: accounting/forms.py:314
 msgid "Please fill in the code."
 msgstr "請填上代碼。"
 
-#: accounting/forms.py:315 accounting/forms.py:316
+#: accounting/forms.py:316 accounting/forms.py:317
 msgid "This code is too long  (max. 5)."
 msgstr "代碼太長了（最長5位數字）。"
 
-#: accounting/forms.py:320
+#: accounting/forms.py:321
 msgid "You can only use numbers 1-9 in the code."
 msgstr "代碼限填數字1-9。"
 
@@ -112,6 +112,22 @@ msgstr "請填上標題。"
 #: accounting/forms.py:327
 msgid "This title is too long  (max. 128)."
 msgstr "標題太長了（最長128個字）。"
+
+#: accounting/forms.py:375
+msgid "You cannot set the code under itself."
+msgstr "代碼不可設在自己之下。"
+
+#: accounting/forms.py:396
+msgid "This code is already in use."
+msgstr "代碼和其他會計科目重複。"
+
+#: accounting/forms.py:415 accounting/validators.py:81
+msgid "The parent account of this code does not exist."
+msgstr "找不到上層會計科目。"
+
+#: accounting/forms.py:442
+msgid "The descendant account codes will be too long  (max. 5)."
+msgstr "子科目的代碼會太長（最長5位數字）。"
 
 #: accounting/templates/accounting/account_detail.html:37
 #: accounting/templates/accounting/transaction_detail-expense.html:38
@@ -266,17 +282,8 @@ msgid "Accounts"
 msgstr "會計科目"
 
 #: accounting/templates/accounting/account_list.html:40
-#: accounting/templates/accounting/balance-sheet.html:42
-#: accounting/templates/accounting/cash-summary.html:41
-#: accounting/templates/accounting/cash.html:42
-#: accounting/templates/accounting/income-statement.html:42
-#: accounting/templates/accounting/journal.html:42
-#: accounting/templates/accounting/ledger-summary.html:41
-#: accounting/templates/accounting/ledger.html:42
-#: accounting/templates/accounting/search.html:41
-#: accounting/templates/accounting/trial-balance.html:42
 msgid "New"
-msgstr "記帳"
+msgstr "新增"
 
 #: accounting/templates/accounting/account_list.html:52
 msgid "Code"
@@ -328,6 +335,19 @@ msgstr "目前沒有資料。"
 #, python-format
 msgid "Balance Sheet %(prep_period)s"
 msgstr "%(prep_period)s的資產負債表"
+
+#: accounting/templates/accounting/balance-sheet.html:42
+#: accounting/templates/accounting/cash-summary.html:41
+#: accounting/templates/accounting/cash.html:42
+#: accounting/templates/accounting/income-statement.html:42
+#: accounting/templates/accounting/journal.html:42
+#: accounting/templates/accounting/ledger-summary.html:41
+#: accounting/templates/accounting/ledger.html:42
+#: accounting/templates/accounting/search.html:41
+#: accounting/templates/accounting/trial-balance.html:42
+msgctxt "Accounting"
+msgid "New"
+msgstr "記帳"
 
 #: accounting/templates/accounting/balance-sheet.html:46
 #: accounting/templates/accounting/cash-summary.html:45
@@ -825,10 +845,6 @@ msgstr "沒有這個會計科目。"
 msgid "You cannot select a parent account."
 msgstr "請勿選擇上層會計科目。"
 
-#: accounting/validators.py:81
-msgid "The parent account of this code does not exist."
-msgstr "找不到上層會計科目。"
-
 #: accounting/views.py:320
 msgid "Brought Forward"
 msgstr "上期結轉"
@@ -857,30 +873,38 @@ msgstr "會計傳票未異動。"
 msgid "This transaction was saved successfully."
 msgstr "會計傳票已存檔。"
 
-#: accounting/views.py:974
+#: accounting/views.py:951
 msgid "This transaction was deleted successfully."
 msgstr "會計傳票已刪除。"
 
-#: accounting/views.py:1007
+#: accounting/views.py:988
 msgid "Invalid arguments."
 msgstr "參數無效。"
 
-#: accounting/views.py:1009
+#: accounting/views.py:990
 msgid "Invalid order."
 msgstr "次序格式錯誤。"
 
-#: accounting/views.py:1025
+#: accounting/views.py:1006
 msgid "The transaction orders were not modified."
 msgstr "會計傳票次序未異動。"
 
-#: accounting/views.py:1033
+#: accounting/views.py:1014
 msgid "The transaction orders were saved successfully."
 msgstr "會計傳票次序已儲存。"
 
-#: accounting/views.py:1117
+#: accounting/views.py:1089
+msgid "This account was not modified."
+msgstr "會計科目未異動。"
+
+#: accounting/views.py:1092
+msgid "This account was saved successfully."
+msgstr "會計科目已存檔。"
+
+#: accounting/views.py:1135
 msgid "---Accounts In Use---"
 msgstr "-----使用中科目-----"
 
-#: accounting/views.py:1122
+#: accounting/views.py:1140
 msgid "---Accounts Not In Use---"
 msgstr "-----未使用科目-----"
