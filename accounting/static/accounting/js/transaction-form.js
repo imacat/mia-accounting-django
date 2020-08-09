@@ -245,7 +245,7 @@ function insertNewRecord(type, newNo) {
         })
         .on("click", function () {
             if (typeof startSummaryHelper === "function") {
-                startSummaryHelper(this);
+                startSummaryHelper($(this));
             }
         });
     $("#" + type + "-" + newNo + "-amount")
