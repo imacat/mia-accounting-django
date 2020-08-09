@@ -34,13 +34,14 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import RedirectView, ListView, DetailView, DeleteView
+from django.views.generic import RedirectView, ListView, DetailView
 
 from mia_core import stored_post
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk, PaginationException
+from mia_core.views import DeleteView
 from .forms import AccountForm
 from .models import Record, Transaction, Account
 from .utils import get_cash_accounts, get_ledger_accounts, \
@@ -946,18 +947,11 @@ def txn_store(request, txn_type, txn=None):
 @method_decorator(login_required, name="dispatch")
 class TransactionDeleteView(DeleteView):
     """The view to delete an accounting transaction."""
+    success_message = gettext_noop(
+            "This transaction was deleted successfully.")
 
     def get_object(self, queryset=None):
-        txn = self.request.resolver_match.kwargs["txn"]
-        txn.request = self.request
-        return txn
-
-    def delete(self, request, *args, **kwargs):
-        response = super(TransactionDeleteView, self)\
-            .delete(request, *args, **kwargs)
-        messages.success(request, gettext_noop(
-            "This transaction was deleted successfully."))
-        return response
+        return self.request.resolver_match.kwargs["txn"]
 
     def get_success_url(self):
         return self.request.GET.get("r") or reverse("accounting:home")

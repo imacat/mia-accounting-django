@@ -18,11 +18,22 @@
 """The views of the Mia core application.
 
 """
-
+from django.contrib import messages
 from django.contrib.auth import logout as logout_user
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST, require_GET
+from django.views.generic import DeleteView as CoreDeleteView
+
+
+class DeleteView(SuccessMessageMixin, CoreDeleteView):
+    """The delete form view, with SuccessMessageMixin."""
+
+    def delete(self, request, *args, **kwargs):
+        response = super(DeleteView, self).delete(request, *args, **kwargs)
+        messages.success(request, self.get_success_message({}))
+        return response
 
 
 @require_GET
