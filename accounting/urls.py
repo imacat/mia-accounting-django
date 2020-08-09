@@ -23,7 +23,6 @@ from django.urls import path, register_converter
 from django.views.decorators.http import require_GET
 from django.views.generic import RedirectView
 
-from mia_core import views as mia_core_views
 from mia_core.digest_auth import login_required
 from . import converters, views
 
