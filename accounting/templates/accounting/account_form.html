@@ -41,7 +41,7 @@ First written: 2020/8/8
 
 <form id="account-form" action="{% if request.resolver_match.kwargs.account %}{% url "accounting:accounts.update" request.resolver_match.kwargs.account %}{% else %}{% url "accounting:accounts.store" %}{% endif %}" method="post">
   {% csrf_token %}
-  <input id="all-account-url" type="hidden" value="{% url "accounting:api.accounts.all" %}" />
+  <input id="all-account-url" type="hidden" value="{% url "accounting:api.accounts" %}" />
   <input id="account-code-original" type="hidden" value="{% if request.resolver_match.kwargs.account %}{{ request.resolver_match.kwargs.account.code }}{% endif %}" />
   <div class="row form-group">
     <label class="col-sm-2" for="account-parent">{{ _("Parent Account:")|force_escape }}</label>

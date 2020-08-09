@@ -52,7 +52,7 @@ First written: 2020/7/23
   </a>
 </div>
 
-<input id="account-option-url" type="hidden" value="{% url "accounting:accounts.options" %}" />
+<input id="account-option-url" type="hidden" value="{% url "accounting:api.accounts.options" %}" />
 <input id="summary-categories" type="hidden" value="{{ summary_categories }}" />
 <input id="new-record-template" type="hidden" value="{{ new_record_template }}" />
 <form id="txn-form" action="{% if form.transaction %}{% url_keep_return "accounting:transactions.update" "income" form.transaction %}{% else %}{% url_keep_return "accounting:transactions.store" "income" %}{% endif %}" method="post">

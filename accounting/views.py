@@ -1060,7 +1060,7 @@ def account_form(request, account=None):
 
 @require_GET
 @login_required
-def api_account_all(request):
+def api_account_list(request):
     """The API view to return all the accounts.
 
     Args:
@@ -1074,7 +1074,7 @@ def api_account_all(request):
 
 @require_GET
 @login_required
-def account_options(request):
+def api_account_options(request):
     """The view to return the account options.
 
     Args:
