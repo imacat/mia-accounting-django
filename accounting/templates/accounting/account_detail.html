@@ -72,7 +72,7 @@ First written: 2020/8/8
   </a>
   <a class="btn btn-primary" role="button" href="{% url "accounting:accounts.edit" account %}">
     <i class="fas fa-user-cog"></i>
-    {{ _("Setting")|force_escape }}
+    {{ _("Settings")|force_escape }}
   </a>
   {% if not account.is_in_use %}
     <button type="button" class="btn btn-secondary d-none d-sm-inline" disabled="disabled" title="{{ _("This account is not used in the accounting records.")|force_escape }}">

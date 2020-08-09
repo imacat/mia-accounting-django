@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 19:13+0800\n"
-"PO-Revision-Date: 2020-08-09 19:13+0800\n"
+"POT-Creation-Date: 2020-08-09 20:48+0800\n"
+"PO-Revision-Date: 2020-08-09 20:48+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -181,7 +181,7 @@ msgid "Back"
 msgstr "回上頁"
 
 #: accounting/templates/accounting/account_detail.html:75
-msgid "Setting"
+msgid "Settings"
 msgstr "設定"
 
 #: accounting/templates/accounting/account_detail.html:78

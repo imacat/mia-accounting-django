@@ -70,7 +70,7 @@ First written: 2020/8/9
   </a>
   <a class="btn btn-primary" role="button" href="{% url "mia_core:users.edit" user %}">
     <i class="fas fa-user-cog"></i>
-    {{ _("Setting")|force_escape }}
+    {{ _("Settings")|force_escape }}
   </a>
   {% if user.login_id == request.user.login_id %}
     <button class="btn btn-secondary" type="button" disabled="disabled" title="{{ _("You cannot delete your own account.")|force_escape }}">
