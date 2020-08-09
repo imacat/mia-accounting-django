@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 17:24+0800\n"
-"PO-Revision-Date: 2020-08-09 17:24+0800\n"
+"POT-Creation-Date: 2020-08-09 19:13+0800\n"
+"PO-Revision-Date: 2020-08-09 19:13+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -169,7 +169,7 @@ msgid "Cancel"
 msgstr "取消"
 
 #: accounting/templates/accounting/account_detail.html:71
-#: accounting/templates/accounting/account_form.html:38
+#: accounting/templates/accounting/account_form.html:42
 #: accounting/templates/accounting/transaction-sort.html:43
 #: accounting/templates/accounting/transaction_detail-expense.html:72
 #: accounting/templates/accounting/transaction_detail-income.html:72
@@ -199,7 +199,7 @@ msgid "Ledger"
 msgstr "分類帳"
 
 #: accounting/templates/accounting/account_detail.html:107
-#: accounting/views.py:1111
+#: accounting/views.py:1106
 msgid "This account is in use."
 msgstr "會計科目使用中。"
 
@@ -212,22 +212,22 @@ msgid "Delete"
 msgstr "刪除"
 
 #: accounting/templates/accounting/account_detail.html:120
-#: accounting/templates/accounting/account_form.html:47
+#: accounting/templates/accounting/account_form.html:51
 msgid "Parent Account:"
 msgstr "上層科目："
 
 #: accounting/templates/accounting/account_detail.html:125
-#: accounting/templates/accounting/account_form.html:52
+#: accounting/templates/accounting/account_form.html:56
 msgid "Topmost"
 msgstr "最上層"
 
 #: accounting/templates/accounting/account_detail.html:131
-#: accounting/templates/accounting/account_form.html:58
+#: accounting/templates/accounting/account_form.html:62
 msgid "Code:"
 msgstr "代碼："
 
 #: accounting/templates/accounting/account_detail.html:136
-#: accounting/templates/accounting/account_form.html:66
+#: accounting/templates/accounting/account_form.html:70
 msgid "Title:"
 msgstr "標題："
 
@@ -267,7 +267,11 @@ msgstr "更新時間："
 msgid "Updated by:"
 msgstr "更新人："
 
-#: accounting/templates/accounting/account_form.html:77
+#: accounting/templates/accounting/account_form.html:32
+msgid "Add a New Account"
+msgstr "建新會計科目"
+
+#: accounting/templates/accounting/account_form.html:81
 #: accounting/templates/accounting/transaction-sort.html:137
 #: accounting/templates/accounting/transaction_form-expense.html:109
 #: accounting/templates/accounting/transaction_form-income.html:109
@@ -870,46 +874,46 @@ msgstr "稅後淨利"
 msgid "This transaction was not modified."
 msgstr "會計傳票未異動。"
 
-#: accounting/views.py:940
+#: accounting/views.py:939
 msgid "This transaction was saved successfully."
 msgstr "會計傳票已存檔。"
 
-#: accounting/views.py:951
+#: accounting/views.py:949
 msgid "This transaction was deleted successfully."
 msgstr "會計傳票已刪除。"
 
-#: accounting/views.py:988
+#: accounting/views.py:986
 msgid "Invalid arguments."
 msgstr "參數無效。"
 
-#: accounting/views.py:990
+#: accounting/views.py:988
 msgid "Invalid order."
 msgstr "次序格式錯誤。"
 
-#: accounting/views.py:1006
+#: accounting/views.py:1004
 msgid "The transaction orders were not modified."
 msgstr "會計傳票次序未異動。"
 
-#: accounting/views.py:1014
+#: accounting/views.py:1011
 msgid "The transaction orders were saved successfully."
 msgstr "會計傳票次序已儲存。"
 
-#: accounting/views.py:1089
+#: accounting/views.py:1085
 msgid "This account was not modified."
 msgstr "會計科目未異動。"
 
-#: accounting/views.py:1092
+#: accounting/views.py:1088
 msgid "This account was saved successfully."
 msgstr "會計科目已存檔。"
 
-#: accounting/views.py:1115
+#: accounting/views.py:1110
 msgid "This account was deleted successfully."
 msgstr "會計科目已刪除。"
 
-#: accounting/views.py:1157
+#: accounting/views.py:1152
 msgid "---Accounts In Use---"
 msgstr "-----使用中科目-----"
 
-#: accounting/views.py:1162
+#: accounting/views.py:1157
 msgid "---Accounts Not In Use---"
 msgstr "-----未使用科目-----"
