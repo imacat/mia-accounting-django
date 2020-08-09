@@ -852,7 +852,7 @@ def txn_form(request, txn_type, txn=None):
             "accounting/include/form-record-non-transfer.html",
             new_record_context))
     return render(request, F"accounting/transaction_form-{txn_type}.html", {
-        "txn": form,
+        "form": form,
         "summary_categories": get_summary_categories,
         "should_validate": should_validate,
         "new_record_template": new_record_template,

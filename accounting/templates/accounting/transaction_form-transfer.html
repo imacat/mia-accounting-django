@@ -38,7 +38,7 @@ First written: 2020/7/23
 
 {% include "accounting/include/summary-helper.html" %}
 
-{% for message in txn.non_field_errors %}
+{% for message in form.non_field_errors %}
   <div class="alert alert-danger alert-dismissible fade show">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     <strong>{{ _("Error:")|force_escape }}</strong> {{ message }}
@@ -46,7 +46,7 @@ First written: 2020/7/23
 {% endfor %}
 
 <div class="btn-group btn-actions">
-  <a class="btn btn-primary" role="button" href="{% if txn.transaction %}{% url_keep_return "accounting:transactions.detail" "transfer" txn.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
+  <a class="btn btn-primary" role="button" href="{% if form.transaction %}{% url_keep_return "accounting:transactions.detail" "transfer" form.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
@@ -55,15 +55,15 @@ First written: 2020/7/23
 <input id="account-option-url" type="hidden" value="{% url "accounting:accounts.options" %}" />
 <input id="summary-categories" type="hidden" value="{{ summary_categories }}" />
 <input id="new-record-template" type="hidden" value="{{ new_record_template }}" />
-<form id="txn-form" action="{% if txn.transaction %}{% url_keep_return "accounting:transactions.update" "transfer" txn.transaction %}{% else %}{% url_keep_return "accounting:transactions.store" "transfer" %}{% endif %}" method="post">
+<form id="txn-form" action="{% if form.transaction %}{% url_keep_return "accounting:transactions.update" "transfer" form.transaction %}{% else %}{% url_keep_return "accounting:transactions.store" "transfer" %}{% endif %}" method="post">
   {% csrf_token %}
   <div class="row form-group">
     <div class="col-sm-2">
       <label for="txn-date">{{ _("Date:")|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <input id="txn-date" class="form-control {% if should_validate and txn.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ txn.date.value }}" required="required" />
-      <div id="txn-date-error" class="invalid-feedback">{% if should_validate %}{{ txn.date.errors.0|default:"" }}{% endif %}</div>
+      <input id="txn-date" class="form-control {% if should_validate and form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ form.date.value }}" required="required" />
+      <div id="txn-date-error" class="invalid-feedback">{% if should_validate %}{{ form.date.errors.0|default:"" }}{% endif %}</div>
     </div>
   </div>
 
@@ -72,7 +72,7 @@ First written: 2020/7/23
       <h2>{{ _("Debit")|force_escape }}</h2>
 
       <ul id="debit-records" class="list-group">
-        {% for record in txn.debit_records %}
+        {% for record in form.debit_records %}
           {% with record_type="debit" no=forloop.counter order=forloop.counter %}
             {% include "accounting/include/form-record-transfer.html" %}
           {% endwith %}
@@ -85,11 +85,11 @@ First written: 2020/7/23
           </button>
         </li>
         <li class="list-group-item">
-          <div id="debit-total-row" class="d-flex justify-content-between align-items-center form-control {% if should_validate and txn.balance_error %} is-invalid {% endif %} balance-row">
+          <div id="debit-total-row" class="d-flex justify-content-between align-items-center form-control {% if should_validate and form.balance_error %} is-invalid {% endif %} balance-row">
             {{ _("Total")|force_escape }}
-            <span id="debit-total" class="amount">{{ txn.debit_total }}</span>
+            <span id="debit-total" class="amount">{{ form.debit_total }}</span>
           </div>
-          <div id="debit-total-error" class="invalid-feedback balance-error">{% if should_validate %}{{ txn.balance_error|default:"" }}{% endif %}</div>
+          <div id="debit-total-error" class="invalid-feedback balance-error">{% if should_validate %}{{ form.balance_error|default:"" }}{% endif %}</div>
         </li>
       </ul>
     </div>
@@ -98,7 +98,7 @@ First written: 2020/7/23
       <h2>{{ _("Credit")|force_escape }}</h2>
 
       <ul id="credit-records" class="list-group">
-        {% for record in txn.credit_records %}
+        {% for record in form.credit_records %}
           {% with record_type="credit" no=forloop.counter order=forloop.counter %}
             {% include "accounting/include/form-record-transfer.html" %}
           {% endwith %}
@@ -111,11 +111,11 @@ First written: 2020/7/23
           </button>
         </li>
         <li class="list-group-item">
-          <div id="credit-total-row" class="d-flex justify-content-between align-items-center form-control {% if should_validate and txn.balance_error %} is-invalid {% endif %} balance-row">
+          <div id="credit-total-row" class="d-flex justify-content-between align-items-center form-control {% if should_validate and form.balance_error %} is-invalid {% endif %} balance-row">
             {{ _("Total")|force_escape }}
-            <span id="credit-total" class="amount">{{ txn.credit_total }}</span>
+            <span id="credit-total" class="amount">{{ form.credit_total }}</span>
           </div>
-          <div id="credit-total-error" class="invalid-feedback balance-error">{% if should_validate %}{{ txn.balance_error|default:"" }}{% endif %}</div>
+          <div id="credit-total-error" class="invalid-feedback balance-error">{% if should_validate %}{{ form.balance_error|default:"" }}{% endif %}</div>
         </li>
       </ul>
     </div>
@@ -126,8 +126,8 @@ First written: 2020/7/23
       <label for="txn-note">{{ _("Notes:")|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <textarea id="txn-note" class="form-control {% if should_validate and txn.notes.errors %} is-invalid {% endif %}" name="notes">{{ txn.notes.value|default:"" }}</textarea>
-      <div id="txn-note-error" class="invalid-feedback">{% if should_validate %}{{ txn.notes.errors.0|default:"" }}{% endif %}</div>
+      <textarea id="txn-note" class="form-control {% if should_validate and form.notes.errors %} is-invalid {% endif %}" name="notes">{{ form.notes.value|default:"" }}</textarea>
+      <div id="txn-note-error" class="invalid-feedback">{% if should_validate %}{{ form.notes.errors.0|default:"" }}{% endif %}</div>
     </div>
   </div>
 
