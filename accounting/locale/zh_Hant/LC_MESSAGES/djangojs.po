@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mia 1.0\n"
-"Report-Msgid-Bugs-To: imacat <imacat@mail.imacat.idv.tw>\n"
-"POT-Creation-Date: 2020-08-06 01:42+0800\n"
-"PO-Revision-Date: 2020-08-06 01:46+0800\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-09 12:12+0800\n"
+"PO-Revision-Date: 2020-08-09 12:16+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -17,26 +17,62 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounting/static/accounting/js/transaction-form.js:369
+#: accounting/static/accounting/js/account-form.js:75
+msgid "Topmost"
+msgstr "最上層"
+
+#: accounting/static/accounting/js/account-form.js:83
+msgid "(Unknown)"
+msgstr "（不可考）"
+
+#: accounting/static/accounting/js/account-form.js:118
+msgid "Please fill in the code."
+msgstr "請填上代碼。"
+
+#: accounting/static/accounting/js/account-form.js:123
+msgid "You can only use numbers 1-9 in the code."
+msgstr "代碼限填數字1-9。"
+
+#: accounting/static/accounting/js/account-form.js:130
+msgid "You cannot set the code under itself."
+msgstr "代碼不可設在自己之下。"
+
+#: accounting/static/accounting/js/account-form.js:135
+msgid "This code is already in use."
+msgstr "代碼和其他會計科目重複。"
+
+#: accounting/static/accounting/js/account-form.js:142
+msgid "The parent account of this code does not exist."
+msgstr "找不到上層會計科目。"
+
+#: accounting/static/accounting/js/account-form.js:160
+msgid "The descendant account codes will be too long  (max. 5)."
+msgstr "子科目的代碼會太長（最長5位數字）。"
+
+#: accounting/static/accounting/js/account-form.js:183
+msgid "Please fill in the title."
+msgstr "請填上標題。"
+
+#: accounting/static/accounting/js/transaction-form.js:376
 msgid "Please fill in the date."
 msgstr "請填寫日期。"
 
-#: accounting/static/accounting/js/transaction-form.js:389
+#: accounting/static/accounting/js/transaction-form.js:408
 msgid "Please select the account."
 msgstr "請選擇會計科目。"
 
-#: accounting/static/accounting/js/transaction-form.js:410
+#: accounting/static/accounting/js/transaction-form.js:429
 msgid "This summary is too long (max. 128 characters)."
 msgstr "摘要太長了（最長128個字）。"
 
-#: accounting/static/accounting/js/transaction-form.js:431
+#: accounting/static/accounting/js/transaction-form.js:450
 msgid "Please fill in the amount."
 msgstr "請填寫金額。"
 
-#: accounting/static/accounting/js/transaction-form.js:463
+#: accounting/static/accounting/js/transaction-form.js:482
 msgid "The total amount of debit and credit records are inconsistent."
 msgstr "借方和貸方合計不符。"
 
-#: accounting/static/accounting/js/transaction-form.js:484
+#: accounting/static/accounting/js/transaction-form.js:503
 msgid "These notes are too long (max. 128 characters)."
 msgstr "註記太長了（最長128個字）。"

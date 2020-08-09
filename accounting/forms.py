@@ -317,7 +317,7 @@ class AccountForm(forms.Form):
         }, validators=[
             RegexValidator(
                 regex="^[1-9]+$",
-                message=_("You can only use numbers 1-9 in the code")),
+                message=_("You can only use numbers 1-9 in the code.")),
             validate_account_code,
         ])
     title = forms.CharField(

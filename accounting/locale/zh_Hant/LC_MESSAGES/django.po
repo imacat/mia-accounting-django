@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-js 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-08 16:25+0800\n"
-"PO-Revision-Date: 2020-08-08 16:25+0800\n"
+"POT-Creation-Date: 2020-08-09 12:14+0800\n"
+"PO-Revision-Date: 2020-08-09 12:16+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -21,85 +21,105 @@ msgstr ""
 msgid "current assets and liabilities"
 msgstr "流動資產與負債"
 
-#: accounting/forms.py:40
+#: accounting/forms.py:43
 msgid "This accounting record is not valid."
 msgstr "這筆會計分錄無效。"
 
-#: accounting/forms.py:45
+#: accounting/forms.py:48
 msgid "Please select the account."
 msgstr "請選擇會計科目。"
 
-#: accounting/forms.py:52
+#: accounting/forms.py:55
 msgid "This summary is too long (max. 128 characters)."
 msgstr "摘要太長了（最長128個字）。"
 
-#: accounting/forms.py:57
+#: accounting/forms.py:60
 msgid "Please fill in the amount."
 msgstr "請填寫金額。"
 
-#: accounting/forms.py:58
+#: accounting/forms.py:61 accounting/forms.py:314
 msgid "Please fill in a number."
 msgstr "請填寫數字。"
 
-#: accounting/forms.py:59
+#: accounting/forms.py:62
 msgid "The amount must be at least 1."
 msgstr "金額要大於零。"
 
-#: accounting/forms.py:112 accounting/forms.py:119
+#: accounting/forms.py:115 accounting/forms.py:122
 msgid "This record is not for this transaction."
 msgstr "這不是這張傳票的會計分錄。"
 
-#: accounting/forms.py:133
+#: accounting/forms.py:136
 msgid "This account is not for credit records."
 msgstr "這不是貸方的會計科目。"
 
-#: accounting/forms.py:140
+#: accounting/forms.py:143
 msgid "This account is not for debit records."
 msgstr "這不是借方的會計科目。"
 
-#: accounting/forms.py:160
+#: accounting/forms.py:163
 msgid "This accounting record is not a credit record."
 msgstr "這不是貸方的會計分錄。"
 
-#: accounting/forms.py:164
+#: accounting/forms.py:167
 msgid "This accounting record is not a debit record."
 msgstr "這不是借方的會計分錄。"
 
-#: accounting/forms.py:180
+#: accounting/forms.py:183
 msgid "Please fill in the date."
 msgstr "請填寫日期。"
 
-#: accounting/forms.py:181
+#: accounting/forms.py:184
 msgid "This date is not valid."
 msgstr "請依正確日期格式填寫日期。"
 
-#: accounting/forms.py:187
+#: accounting/forms.py:190
 msgid "These notes are too long (max. 128 characters)."
 msgstr "註記太長了（最長128個字）。"
 
-#: accounting/forms.py:227
+#: accounting/forms.py:230
 msgid "Please fill in debit accounting records."
 msgstr "請填寫借方會計分錄。"
 
-#: accounting/forms.py:230 accounting/forms.py:248
+#: accounting/forms.py:233 accounting/forms.py:251
 msgid "Please fill in accounting records."
 msgstr "請填寫會計分錄。"
 
-#: accounting/forms.py:245
+#: accounting/forms.py:248
 msgid "Please fill in credit accounting records."
 msgstr "請填寫貸方會計分錄。"
 
-#: accounting/forms.py:263
+#: accounting/forms.py:266
 msgid "The total of the debit and credit amounts are inconsistent."
 msgstr "借方和貸方合計不符。"
 
+#: accounting/forms.py:313
+msgid "Please fill in the code."
+msgstr "請填上代碼。"
+
+#: accounting/forms.py:315 accounting/forms.py:316
+msgid "This code is too long  (max. 5)."
+msgstr "代碼太長了（最長5位數字）。"
+
+#: accounting/forms.py:320
+msgid "You can only use numbers 1-9 in the code."
+msgstr "代碼限填數字1-9。"
+
+#: accounting/forms.py:326
+msgid "Please fill in the title."
+msgstr "請填上標題。"
+
+#: accounting/forms.py:327
+msgid "This title is too long  (max. 128)."
+msgstr "標題太長了（最長128個字）。"
+
 #: accounting/templates/accounting/account_detail.html:37
-#: accounting/templates/accounting/transactions/expense/detail.html:38
-#: accounting/templates/accounting/transactions/expense/form.html:44
-#: accounting/templates/accounting/transactions/income/detail.html:38
-#: accounting/templates/accounting/transactions/income/form.html:44
-#: accounting/templates/accounting/transactions/transfer/detail.html:38
-#: accounting/templates/accounting/transactions/transfer/form.html:44
+#: accounting/templates/accounting/transaction_detail-expense.html:38
+#: accounting/templates/accounting/transaction_detail-income.html:38
+#: accounting/templates/accounting/transaction_detail-transfer.html:38
+#: accounting/templates/accounting/transaction_form-expense.html:44
+#: accounting/templates/accounting/transaction_form-income.html:44
+#: accounting/templates/accounting/transaction_form-transfer.html:44
 msgid "Error:"
 msgstr "錯誤："
 
@@ -118,28 +138,29 @@ msgstr "您真的要刪掉這個會計科目嗎？"
 
 #: accounting/templates/accounting/account_detail.html:60
 #: accounting/templates/accounting/include/summary-helper.html:158
-#: accounting/templates/accounting/transactions/expense/detail.html:61
-#: accounting/templates/accounting/transactions/income/detail.html:61
-#: accounting/templates/accounting/transactions/transfer/detail.html:61
+#: accounting/templates/accounting/transaction_detail-expense.html:61
+#: accounting/templates/accounting/transaction_detail-income.html:61
+#: accounting/templates/accounting/transaction_detail-transfer.html:61
 msgid "Confirm"
 msgstr "確定"
 
 #: accounting/templates/accounting/account_detail.html:61
 #: accounting/templates/accounting/include/summary-helper.html:159
-#: accounting/templates/accounting/transactions/expense/detail.html:62
-#: accounting/templates/accounting/transactions/income/detail.html:62
-#: accounting/templates/accounting/transactions/transfer/detail.html:62
+#: accounting/templates/accounting/transaction_detail-expense.html:62
+#: accounting/templates/accounting/transaction_detail-income.html:62
+#: accounting/templates/accounting/transaction_detail-transfer.html:62
 msgid "Cancel"
 msgstr "取消"
 
 #: accounting/templates/accounting/account_detail.html:71
-#: accounting/templates/accounting/transactions/expense/detail.html:72
-#: accounting/templates/accounting/transactions/expense/form.html:51
-#: accounting/templates/accounting/transactions/income/detail.html:72
-#: accounting/templates/accounting/transactions/income/form.html:51
-#: accounting/templates/accounting/transactions/sort.html:43
-#: accounting/templates/accounting/transactions/transfer/detail.html:72
-#: accounting/templates/accounting/transactions/transfer/form.html:51
+#: accounting/templates/accounting/account_form.html:38
+#: accounting/templates/accounting/transaction-sort.html:43
+#: accounting/templates/accounting/transaction_detail-expense.html:72
+#: accounting/templates/accounting/transaction_detail-income.html:72
+#: accounting/templates/accounting/transaction_detail-transfer.html:72
+#: accounting/templates/accounting/transaction_form-expense.html:51
+#: accounting/templates/accounting/transaction_form-income.html:51
+#: accounting/templates/accounting/transaction_form-transfer.html:51
 msgid "Back"
 msgstr "回上頁"
 
@@ -167,25 +188,29 @@ msgstr "會計科目使用中。"
 
 #: accounting/templates/accounting/account_detail.html:109
 #: accounting/templates/accounting/account_detail.html:114
-#: accounting/templates/accounting/transactions/expense/detail.html:117
-#: accounting/templates/accounting/transactions/income/detail.html:117
-#: accounting/templates/accounting/transactions/transfer/detail.html:109
+#: accounting/templates/accounting/transaction_detail-expense.html:117
+#: accounting/templates/accounting/transaction_detail-income.html:117
+#: accounting/templates/accounting/transaction_detail-transfer.html:109
 msgid "Delete"
 msgstr "刪除"
 
 #: accounting/templates/accounting/account_detail.html:120
+#: accounting/templates/accounting/account_form.html:47
 msgid "Parent Account:"
 msgstr "上層科目："
 
 #: accounting/templates/accounting/account_detail.html:125
+#: accounting/templates/accounting/account_form.html:52
 msgid "Topmost"
 msgstr "最上層"
 
 #: accounting/templates/accounting/account_detail.html:131
+#: accounting/templates/accounting/account_form.html:58
 msgid "Code:"
 msgstr "代碼："
 
 #: accounting/templates/accounting/account_detail.html:136
+#: accounting/templates/accounting/account_form.html:66
 msgid "Title:"
 msgstr "標題："
 
@@ -198,32 +223,40 @@ msgid "This account is an end-point account."
 msgstr "這個會計科目是最下層科目。"
 
 #: accounting/templates/accounting/account_detail.html:154
-#: accounting/templates/accounting/transactions/expense/detail.html:177
-#: accounting/templates/accounting/transactions/income/detail.html:177
-#: accounting/templates/accounting/transactions/transfer/detail.html:223
+#: accounting/templates/accounting/transaction_detail-expense.html:177
+#: accounting/templates/accounting/transaction_detail-income.html:177
+#: accounting/templates/accounting/transaction_detail-transfer.html:223
 msgid "Created at:"
 msgstr "建檔時間："
 
 #: accounting/templates/accounting/account_detail.html:159
-#: accounting/templates/accounting/transactions/expense/detail.html:182
-#: accounting/templates/accounting/transactions/income/detail.html:182
-#: accounting/templates/accounting/transactions/transfer/detail.html:228
+#: accounting/templates/accounting/transaction_detail-expense.html:182
+#: accounting/templates/accounting/transaction_detail-income.html:182
+#: accounting/templates/accounting/transaction_detail-transfer.html:228
 msgid "Created by:"
 msgstr "建檔人："
 
 #: accounting/templates/accounting/account_detail.html:164
-#: accounting/templates/accounting/transactions/expense/detail.html:187
-#: accounting/templates/accounting/transactions/income/detail.html:187
-#: accounting/templates/accounting/transactions/transfer/detail.html:233
+#: accounting/templates/accounting/transaction_detail-expense.html:187
+#: accounting/templates/accounting/transaction_detail-income.html:187
+#: accounting/templates/accounting/transaction_detail-transfer.html:233
 msgid "Updated at:"
 msgstr "更新時間："
 
 #: accounting/templates/accounting/account_detail.html:169
-#: accounting/templates/accounting/transactions/expense/detail.html:192
-#: accounting/templates/accounting/transactions/income/detail.html:192
-#: accounting/templates/accounting/transactions/transfer/detail.html:238
+#: accounting/templates/accounting/transaction_detail-expense.html:192
+#: accounting/templates/accounting/transaction_detail-income.html:192
+#: accounting/templates/accounting/transaction_detail-transfer.html:238
 msgid "Updated by:"
 msgstr "更新人："
+
+#: accounting/templates/accounting/account_form.html:77
+#: accounting/templates/accounting/transaction-sort.html:137
+#: accounting/templates/accounting/transaction_form-expense.html:109
+#: accounting/templates/accounting/transaction_form-income.html:109
+#: accounting/templates/accounting/transaction_form-transfer.html:138
+msgid "Save"
+msgstr "儲存"
 
 #: accounting/templates/accounting/account_list.html:29
 #: accounting/templates/accounting/account_list.html:42
@@ -304,7 +337,7 @@ msgstr "%(prep_period)s的資產負債表"
 #: accounting/templates/accounting/ledger-summary.html:45
 #: accounting/templates/accounting/ledger.html:46
 #: accounting/templates/accounting/search.html:45
-#: accounting/templates/accounting/transactions/sort.html:85
+#: accounting/templates/accounting/transaction-sort.html:85
 #: accounting/templates/accounting/trial-balance.html:46
 msgid "Cash Expense"
 msgstr "現金支出"
@@ -317,7 +350,7 @@ msgstr "現金支出"
 #: accounting/templates/accounting/ledger-summary.html:48
 #: accounting/templates/accounting/ledger.html:49
 #: accounting/templates/accounting/search.html:48
-#: accounting/templates/accounting/transactions/sort.html:87
+#: accounting/templates/accounting/transaction-sort.html:87
 #: accounting/templates/accounting/trial-balance.html:49
 msgid "Cash Income"
 msgstr "現金收入"
@@ -330,7 +363,7 @@ msgstr "現金收入"
 #: accounting/templates/accounting/ledger-summary.html:51
 #: accounting/templates/accounting/ledger.html:52
 #: accounting/templates/accounting/search.html:51
-#: accounting/templates/accounting/transactions/sort.html:89
+#: accounting/templates/accounting/transaction-sort.html:89
 #: accounting/templates/accounting/trial-balance.html:52
 msgid "Transfer"
 msgstr "轉帳"
@@ -361,22 +394,22 @@ msgstr "期間"
 #: accounting/templates/accounting/income-statement.html:124
 #: accounting/templates/accounting/income-statement.html:179
 #: accounting/templates/accounting/income-statement.html:189
-#: accounting/templates/accounting/transactions/expense/detail.html:145
-#: accounting/templates/accounting/transactions/expense/detail.html:163
-#: accounting/templates/accounting/transactions/expense/form.html:87
-#: accounting/templates/accounting/transactions/income/detail.html:145
-#: accounting/templates/accounting/transactions/income/detail.html:163
-#: accounting/templates/accounting/transactions/income/form.html:87
-#: accounting/templates/accounting/transactions/transfer/detail.html:141
-#: accounting/templates/accounting/transactions/transfer/detail.html:159
-#: accounting/templates/accounting/transactions/transfer/detail.html:188
-#: accounting/templates/accounting/transactions/transfer/detail.html:207
-#: accounting/templates/accounting/transactions/transfer/form.html:89
-#: accounting/templates/accounting/transactions/transfer/form.html:115
+#: accounting/templates/accounting/transaction_detail-expense.html:145
+#: accounting/templates/accounting/transaction_detail-expense.html:163
+#: accounting/templates/accounting/transaction_detail-income.html:145
+#: accounting/templates/accounting/transaction_detail-income.html:163
+#: accounting/templates/accounting/transaction_detail-transfer.html:141
+#: accounting/templates/accounting/transaction_detail-transfer.html:159
+#: accounting/templates/accounting/transaction_detail-transfer.html:188
+#: accounting/templates/accounting/transaction_detail-transfer.html:207
+#: accounting/templates/accounting/transaction_form-expense.html:87
+#: accounting/templates/accounting/transaction_form-income.html:87
+#: accounting/templates/accounting/transaction_form-transfer.html:89
+#: accounting/templates/accounting/transaction_form-transfer.html:115
 #: accounting/templates/accounting/trial-balance.html:107
 #: accounting/templates/accounting/trial-balance.html:147
-#: accounting/views.py:137 accounting/views.py:249 accounting/views.py:394
-#: accounting/views.py:585
+#: accounting/views.py:139 accounting/views.py:251 accounting/views.py:396
+#: accounting/views.py:587
 msgid "Total"
 msgstr "合計"
 
@@ -398,10 +431,10 @@ msgstr "現金帳摘要"
 #: accounting/templates/accounting/ledger.html:62
 #: accounting/templates/accounting/ledger.html:91
 #: accounting/templates/accounting/search.html:77
-#: accounting/templates/accounting/transactions/expense/detail.html:129
-#: accounting/templates/accounting/transactions/income/detail.html:129
-#: accounting/templates/accounting/transactions/transfer/detail.html:125
-#: accounting/templates/accounting/transactions/transfer/detail.html:172
+#: accounting/templates/accounting/transaction_detail-expense.html:129
+#: accounting/templates/accounting/transaction_detail-income.html:129
+#: accounting/templates/accounting/transaction_detail-transfer.html:125
+#: accounting/templates/accounting/transaction_detail-transfer.html:172
 #: accounting/templates/accounting/trial-balance.html:84
 msgid "Account"
 msgstr "科目"
@@ -465,10 +498,10 @@ msgstr "日期"
 #: accounting/templates/accounting/journal.html:79
 #: accounting/templates/accounting/ledger.html:92
 #: accounting/templates/accounting/search.html:78
-#: accounting/templates/accounting/transactions/expense/detail.html:130
-#: accounting/templates/accounting/transactions/income/detail.html:130
-#: accounting/templates/accounting/transactions/transfer/detail.html:126
-#: accounting/templates/accounting/transactions/transfer/detail.html:173
+#: accounting/templates/accounting/transaction_detail-expense.html:130
+#: accounting/templates/accounting/transaction_detail-income.html:130
+#: accounting/templates/accounting/transaction_detail-transfer.html:126
+#: accounting/templates/accounting/transaction_detail-transfer.html:173
 msgid "Summary"
 msgstr "摘要"
 
@@ -481,7 +514,7 @@ msgstr "摘要"
 #: accounting/templates/accounting/ledger.html:151
 #: accounting/templates/accounting/search.html:92
 #: accounting/templates/accounting/search.html:127
-#: accounting/templates/accounting/transactions/sort.html:120
+#: accounting/templates/accounting/transaction-sort.html:120
 msgid "Unbalanced"
 msgstr "借貸不平衡"
 
@@ -593,7 +626,7 @@ msgid "Income Statement %(prep_period)s"
 msgstr "%(prep_period)s的損益表"
 
 #: accounting/templates/accounting/income-statement.html:82
-#: accounting/templates/accounting/transactions/sort.html:66
+#: accounting/templates/accounting/transaction-sort.html:66
 msgid "Amount"
 msgstr "金額"
 
@@ -606,8 +639,8 @@ msgstr "%(prep_period)s的日記簿"
 #: accounting/templates/accounting/ledger-summary.html:81
 #: accounting/templates/accounting/ledger.html:93
 #: accounting/templates/accounting/search.html:79
-#: accounting/templates/accounting/transactions/transfer/detail.html:120
-#: accounting/templates/accounting/transactions/transfer/form.html:72
+#: accounting/templates/accounting/transaction_detail-transfer.html:120
+#: accounting/templates/accounting/transaction_form-transfer.html:72
 #: accounting/templates/accounting/trial-balance.html:85
 msgid "Debit"
 msgstr "借方"
@@ -616,15 +649,15 @@ msgstr "借方"
 #: accounting/templates/accounting/ledger-summary.html:82
 #: accounting/templates/accounting/ledger.html:94
 #: accounting/templates/accounting/search.html:80
-#: accounting/templates/accounting/transactions/transfer/detail.html:167
-#: accounting/templates/accounting/transactions/transfer/form.html:98
+#: accounting/templates/accounting/transaction_detail-transfer.html:167
+#: accounting/templates/accounting/transaction_form-transfer.html:98
 #: accounting/templates/accounting/trial-balance.html:86
 msgid "Credit"
 msgstr "貸方"
 
 #: accounting/templates/accounting/journal.html:82
 #: accounting/templates/accounting/search.html:81
-#: accounting/templates/accounting/transactions/sort.html:67
+#: accounting/templates/accounting/transaction-sort.html:67
 msgid "Notes"
 msgstr "註記"
 
@@ -653,132 +686,125 @@ msgstr "尚存"
 msgid "Search Result for “%(query)s”"
 msgstr "「%(query)s」搜尋結果"
 
-#: accounting/templates/accounting/transactions/expense/detail.html:29
-#: accounting/templates/accounting/transactions/expense/form.html:28
-msgid "Cash Expense Transaction"
-msgstr "現金支出傳票"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:38
-#: accounting/templates/accounting/transactions/income/detail.html:38
-#: accounting/templates/accounting/transactions/transfer/detail.html:38
-msgid ""
-"The transactions on this day are not well-ordered.  Please reorder them."
-msgstr "這一天的傳票次序不齊，請重新排序。"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:52
-msgid "Cash Expense Transaction Deletion Confirmation"
-msgstr "現金支出傳票刪除確認"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:57
-msgid "Do you really want to delete this cash expense transaction?"
-msgstr "您真的要刪掉這張現金支出傳票嗎？"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:76
-#: accounting/templates/accounting/transactions/income/detail.html:76
-#: accounting/templates/accounting/transactions/transfer/detail.html:76
-msgid "Edit"
-msgstr "編輯"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:79
-#: accounting/templates/accounting/transactions/expense/detail.html:99
-#: accounting/templates/accounting/transactions/income/detail.html:79
-#: accounting/templates/accounting/transactions/income/detail.html:99
-#: accounting/templates/accounting/transactions/transfer/detail.html:79
-#: accounting/templates/accounting/transactions/transfer/detail.html:95
-msgid "There is no other transaction at the same day."
-msgstr "當天沒有其他會計傳票。"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:81
-#: accounting/templates/accounting/transactions/expense/detail.html:86
-#: accounting/templates/accounting/transactions/expense/detail.html:101
-#: accounting/templates/accounting/transactions/expense/detail.html:106
-#: accounting/templates/accounting/transactions/income/detail.html:81
-#: accounting/templates/accounting/transactions/income/detail.html:86
-#: accounting/templates/accounting/transactions/income/detail.html:101
-#: accounting/templates/accounting/transactions/income/detail.html:106
-#: accounting/templates/accounting/transactions/transfer/detail.html:81
-#: accounting/templates/accounting/transactions/transfer/detail.html:86
-#: accounting/templates/accounting/transactions/transfer/detail.html:97
-#: accounting/templates/accounting/transactions/transfer/detail.html:102
-msgid "Sort"
-msgstr "排序"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:91
-#: accounting/templates/accounting/transactions/expense/detail.html:111
-#: accounting/templates/accounting/transactions/income/detail.html:91
-#: accounting/templates/accounting/transactions/income/detail.html:111
-msgid "To Transfer"
-msgstr "改轉帳"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:122
-#: accounting/templates/accounting/transactions/expense/form.html:62
-#: accounting/templates/accounting/transactions/income/detail.html:122
-#: accounting/templates/accounting/transactions/income/form.html:62
-#: accounting/templates/accounting/transactions/sort.html:49
-#: accounting/templates/accounting/transactions/transfer/detail.html:114
-#: accounting/templates/accounting/transactions/transfer/form.html:62
-msgid "Date:"
-msgstr "日期："
-
-#: accounting/templates/accounting/transactions/expense/detail.html:131
-#: accounting/templates/accounting/transactions/income/detail.html:131
-#: accounting/templates/accounting/transactions/transfer/detail.html:127
-#: accounting/templates/accounting/transactions/transfer/detail.html:174
-msgid "$"
-msgstr "$"
-
-#: accounting/templates/accounting/transactions/expense/detail.html:171
-#: accounting/templates/accounting/transactions/expense/form.html:97
-#: accounting/templates/accounting/transactions/income/detail.html:171
-#: accounting/templates/accounting/transactions/income/form.html:97
-#: accounting/templates/accounting/transactions/transfer/detail.html:217
-#: accounting/templates/accounting/transactions/transfer/form.html:126
-msgid "Notes:"
-msgstr "註記："
-
-#: accounting/templates/accounting/transactions/expense/form.html:109
-#: accounting/templates/accounting/transactions/income/form.html:109
-#: accounting/templates/accounting/transactions/sort.html:137
-#: accounting/templates/accounting/transactions/transfer/form.html:138
-msgid "Save"
-msgstr "儲存"
-
-#: accounting/templates/accounting/transactions/income/detail.html:29
-#: accounting/templates/accounting/transactions/income/form.html:28
-msgid "Cash Income Transaction"
-msgstr "現金收入傳票"
-
-#: accounting/templates/accounting/transactions/income/detail.html:52
-msgid "Cash Income Transaction Deletion Confirmation"
-msgstr "現金收入傳票刪除確認"
-
-#: accounting/templates/accounting/transactions/income/detail.html:57
-msgid "Do you really want to delete this cash income transaction?"
-msgstr "您真的要刪掉這張現金收入傳票嗎？"
-
-#: accounting/templates/accounting/transactions/sort.html:30
+#: accounting/templates/accounting/transaction-sort.html:30
 #, python-format
 msgid "Reorder the Transactions in %(date)s"
 msgstr "%(date)s的傳票排序"
 
-#: accounting/templates/accounting/transactions/sort.html:64
+#: accounting/templates/accounting/transaction-sort.html:49
+#: accounting/templates/accounting/transaction_detail-expense.html:122
+#: accounting/templates/accounting/transaction_detail-income.html:122
+#: accounting/templates/accounting/transaction_detail-transfer.html:114
+#: accounting/templates/accounting/transaction_form-expense.html:62
+#: accounting/templates/accounting/transaction_form-income.html:62
+#: accounting/templates/accounting/transaction_form-transfer.html:62
+msgid "Date:"
+msgstr "日期："
+
+#: accounting/templates/accounting/transaction-sort.html:64
 msgid "Type"
 msgstr "類型"
 
-#: accounting/templates/accounting/transactions/sort.html:65
+#: accounting/templates/accounting/transaction-sort.html:65
 msgid "Content"
 msgstr "內容"
 
-#: accounting/templates/accounting/transactions/transfer/detail.html:29
-#: accounting/templates/accounting/transactions/transfer/form.html:28
+#: accounting/templates/accounting/transaction_detail-expense.html:29
+#: accounting/templates/accounting/transaction_form-expense.html:28
+msgid "Cash Expense Transaction"
+msgstr "現金支出傳票"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:38
+#: accounting/templates/accounting/transaction_detail-income.html:38
+#: accounting/templates/accounting/transaction_detail-transfer.html:38
+msgid ""
+"The transactions on this day are not well-ordered.  Please reorder them."
+msgstr "這一天的傳票次序不齊，請重新排序。"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:52
+msgid "Cash Expense Transaction Deletion Confirmation"
+msgstr "現金支出傳票刪除確認"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:57
+msgid "Do you really want to delete this cash expense transaction?"
+msgstr "您真的要刪掉這張現金支出傳票嗎？"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:76
+#: accounting/templates/accounting/transaction_detail-income.html:76
+#: accounting/templates/accounting/transaction_detail-transfer.html:76
+msgid "Edit"
+msgstr "編輯"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:79
+#: accounting/templates/accounting/transaction_detail-expense.html:99
+#: accounting/templates/accounting/transaction_detail-income.html:79
+#: accounting/templates/accounting/transaction_detail-income.html:99
+#: accounting/templates/accounting/transaction_detail-transfer.html:79
+#: accounting/templates/accounting/transaction_detail-transfer.html:95
+msgid "There is no other transaction at the same day."
+msgstr "當天沒有其他會計傳票。"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:81
+#: accounting/templates/accounting/transaction_detail-expense.html:86
+#: accounting/templates/accounting/transaction_detail-expense.html:101
+#: accounting/templates/accounting/transaction_detail-expense.html:106
+#: accounting/templates/accounting/transaction_detail-income.html:81
+#: accounting/templates/accounting/transaction_detail-income.html:86
+#: accounting/templates/accounting/transaction_detail-income.html:101
+#: accounting/templates/accounting/transaction_detail-income.html:106
+#: accounting/templates/accounting/transaction_detail-transfer.html:81
+#: accounting/templates/accounting/transaction_detail-transfer.html:86
+#: accounting/templates/accounting/transaction_detail-transfer.html:97
+#: accounting/templates/accounting/transaction_detail-transfer.html:102
+msgid "Sort"
+msgstr "排序"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:91
+#: accounting/templates/accounting/transaction_detail-expense.html:111
+#: accounting/templates/accounting/transaction_detail-income.html:91
+#: accounting/templates/accounting/transaction_detail-income.html:111
+msgid "To Transfer"
+msgstr "改轉帳"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:131
+#: accounting/templates/accounting/transaction_detail-income.html:131
+#: accounting/templates/accounting/transaction_detail-transfer.html:127
+#: accounting/templates/accounting/transaction_detail-transfer.html:174
+msgid "$"
+msgstr "$"
+
+#: accounting/templates/accounting/transaction_detail-expense.html:171
+#: accounting/templates/accounting/transaction_detail-income.html:171
+#: accounting/templates/accounting/transaction_detail-transfer.html:217
+#: accounting/templates/accounting/transaction_form-expense.html:97
+#: accounting/templates/accounting/transaction_form-income.html:97
+#: accounting/templates/accounting/transaction_form-transfer.html:126
+msgid "Notes:"
+msgstr "註記："
+
+#: accounting/templates/accounting/transaction_detail-income.html:29
+#: accounting/templates/accounting/transaction_form-income.html:28
+msgid "Cash Income Transaction"
+msgstr "現金收入傳票"
+
+#: accounting/templates/accounting/transaction_detail-income.html:52
+msgid "Cash Income Transaction Deletion Confirmation"
+msgstr "現金收入傳票刪除確認"
+
+#: accounting/templates/accounting/transaction_detail-income.html:57
+msgid "Do you really want to delete this cash income transaction?"
+msgstr "您真的要刪掉這張現金收入傳票嗎？"
+
+#: accounting/templates/accounting/transaction_detail-transfer.html:29
+#: accounting/templates/accounting/transaction_form-transfer.html:28
 msgid "Transfer Transaction"
 msgstr "轉帳傳票"
 
-#: accounting/templates/accounting/transactions/transfer/detail.html:52
+#: accounting/templates/accounting/transaction_detail-transfer.html:52
 msgid "Transfer Transaction Deletion Confirmation"
 msgstr "轉帳傳票刪除確認"
 
-#: accounting/templates/accounting/transactions/transfer/detail.html:57
+#: accounting/templates/accounting/transaction_detail-transfer.html:57
 msgid "Do you really want to delete this transfer transaction?"
 msgstr "您真的要刪掉這張轉帳傳票嗎？"
 
@@ -799,58 +825,62 @@ msgstr "沒有這個會計科目。"
 msgid "You cannot select a parent account."
 msgstr "請勿選擇上層會計科目。"
 
-#: accounting/views.py:318
+#: accounting/validators.py:81
+msgid "The parent account of this code does not exist."
+msgstr "找不到上層會計科目。"
+
+#: accounting/views.py:320
 msgid "Brought Forward"
 msgstr "上期結轉"
 
-#: accounting/views.py:641
+#: accounting/views.py:643
 msgid "Gross Income"
 msgstr "營業毛利"
 
-#: accounting/views.py:642
+#: accounting/views.py:644
 msgid "Operating Income"
 msgstr "營業淨利"
 
-#: accounting/views.py:643
+#: accounting/views.py:645
 msgid "Before Tax Income"
 msgstr "稅前淨利"
 
-#: accounting/views.py:644
+#: accounting/views.py:646
 msgid "After Tax Income"
 msgstr "稅後淨利"
 
-#: accounting/views.py:891
+#: accounting/views.py:893
 msgid "This transaction was not modified."
 msgstr "會計傳票未異動。"
 
-#: accounting/views.py:938
+#: accounting/views.py:940
 msgid "This transaction was saved successfully."
 msgstr "會計傳票已存檔。"
 
-#: accounting/views.py:972
+#: accounting/views.py:974
 msgid "This transaction was deleted successfully."
 msgstr "會計傳票已刪除。"
 
-#: accounting/views.py:1005
+#: accounting/views.py:1007
 msgid "Invalid arguments."
 msgstr "參數無效。"
 
-#: accounting/views.py:1007
+#: accounting/views.py:1009
 msgid "Invalid order."
 msgstr "次序格式錯誤。"
 
-#: accounting/views.py:1023
+#: accounting/views.py:1025
 msgid "The transaction orders were not modified."
 msgstr "會計傳票次序未異動。"
 
-#: accounting/views.py:1031
+#: accounting/views.py:1033
 msgid "The transaction orders were saved successfully."
 msgstr "會計傳票次序已儲存。"
 
-#: accounting/views.py:1074
+#: accounting/views.py:1117
 msgid "---Accounts In Use---"
 msgstr "-----使用中科目-----"
 
-#: accounting/views.py:1079
+#: accounting/views.py:1122
 msgid "---Accounts Not In Use---"
 msgstr "-----未使用科目-----"

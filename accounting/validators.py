@@ -78,6 +78,6 @@ def validate_account_code(value):
             Account.objects.get(code=value[:-1])
         except Account.DoesNotExist:
             raise ValidationError(
-                _("The parent account of this code does not exist"),
+                _("The parent account of this code does not exist."),
                 code="parent_not_exist")
 

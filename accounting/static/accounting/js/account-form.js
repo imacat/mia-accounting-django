@@ -118,9 +118,9 @@ function validateCode() {
         errorMessage.text(gettext("Please fill in the code."));
         return false;
     }
-    if (!code.value.match(/^[1-9][0-9]*$/)) {
+    if (!code.value.match(/^[1-9]+$/)) {
         code.classList.add("is-invalid");
-        errorMessage.text(gettext("You can only use a number as the code"));
+        errorMessage.text(gettext("You can only use numbers 1-9 in the code."));
         return false;
     }
     const originalCode = $("#account-code-original").val();
