@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% comment %}
+The Mia Accounting Application
+account_detail.html: The template for the account detail
+
+ Copyright (c) 2020 imacat.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+Author: imacat@mail.imacat.idv.tw (imacat)
+First written: 2020/8/8
+{% endcomment %}
+{% load static %}
+{% load i18n %}
+{% load mia_core %}
+{% load accounting %}
+
+{% block settings %}
+  {% setvar "title" account %}
+  {% static "accounting/js/account-form.js" as file %}{% add_js file %}
+{% endblock %}
+
+{% block content %}
+
+<div class="btn-group btn-actions">
+  <a class="btn btn-primary" role="button" href="{% if account %}{% url "accounting:accounts.detail" request.resolver_match.kwargs.account %}{% else %}{% url "accounting:accounts" %}{% endif %}">
+    <i class="fas fa-chevron-circle-left"></i>
+    {{ _("Back")|force_escape }}
+  </a>
+</div>
+
+<form id="account-form" action="{% if request.resolver_match.kwargs.account %}{% url "accounting:accounts.update" request.resolver_match.kwargs.account %}{% else %}{% url "accounting:accounts.store" %}{% endif %}" method="post">
+  {% csrf_token %}
+  <input id="all-account-url" type="hidden" value="{% url "accounting:api.accounts.all" %}" />
+  <input id="account-code-original" type="hidden" value="{% if request.resolver_match.kwargs.account %}{{ request.resolver_match.kwargs.account.code }}{% endif %}" />
+  <div class="row form-group">
+    <label class="col-sm-2" for="account-parent">{{ _("Parent Account:")|force_escape }}</label>
+    <div id="account-parent" class="col-sm-10">
+      {% if form.parent %}
+        {{ form.parent }}
+      {% else %}
+        {{ _("Topmost")|force_escape }}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label class="col-sm-2 col-form-label" for="account-code">{{ _("Code:")|force_escape }}</label>
+    <div class="col-sm-10">
+      <input id="account-code" class="form-control {% if form.code.errors %} is-invalid {% endif %}" type="text" name="code" value="{{ form.code.value|default:"" }}" maxlength="5" required="required" />
+      <div id="account-code-error" class="invalid-feedback">{% if form.code.errors %}{{ form.code.errors.0 }}{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label class="col-sm-2 col-form-label" for="account-title">{{ _("Title:")|force_escape }}</label>
+    <div class="col-sm-10">
+      <input id="account-title" class="form-control {% if form.title.errors %} is-invalid {% endif %}" type="text" name="title" value="{{ form.title.value|default:"" }}" required="required" />
+      <div id="account-title-error" class="invalid-feedback">{% if form.title.errors %}{{ form.title.errors.0 }}{% endif %}</div>
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <div class="col-sm-12">
+      <button class="btn btn-primary" type="submit">
+        <i class="fas fa-save"></i>
+        {{ _("Save")|force_escape }}
+      </button>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

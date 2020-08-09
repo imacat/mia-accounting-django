@@ -21,10 +21,13 @@
 import re
 
 from django import forms
+from django.core.validators import RegexValidator
 from django.utils.translation import gettext as _
 
+from mia_core.status import retrieve_status
 from .models import Account, Record
-from .validators import validate_record_account_code, validate_record_id
+from .validators import validate_record_account_code, validate_record_id, \
+    validate_account_code
 
 
 class RecordForm(forms.Form):
@@ -301,3 +304,35 @@ class TransactionForm(forms.Form):
         """
         return sum([int(x.data["amount"]) for x in self.credit_records
                     if "amount" not in x.errors])
+
+
+class AccountForm(forms.Form):
+    """An account form."""
+    code = forms.CharField(
+        error_messages={
+            "required": _("Please fill in the code."),
+            "invalid": _("Please fill in a number."),
+            "max_length": _("This code is too long  (max. 5)."),
+            "min_value": _("This code is too long  (max. 5)."),
+        }, validators=[
+            RegexValidator(
+                regex="^[1-9]+$",
+                message=_("You can only use numbers 1-9 in the code")),
+            validate_account_code,
+        ])
+    title = forms.CharField(
+        max_length=128,
+        error_messages={
+            "required": _("Please fill in the title."),
+            "max_length": _("This title is too long  (max. 128)."),
+        })
+
+    def __init__(self, *args, **kwargs):
+        super(AccountForm, self).__init__(*args, **kwargs)
+
+    @property
+    def parent(self):
+        code = self["code"].value()
+        if code is None or len(code) < 2:
+            return None
+        return Account.objects.get(code=code[:-1])

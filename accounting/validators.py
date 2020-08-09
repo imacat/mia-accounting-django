@@ -62,3 +62,22 @@ def validate_record_account_code(value):
     if child is not None:
         raise ValidationError(_("You cannot select a parent account."),
                               code="parent_account")
+
+
+def validate_account_code(value):
+    """Validates an account code.
+
+    Args:
+        value (str): The account code.
+
+    Raises:
+        ValidationError: When the validation fails.
+    """
+    if len(value) > 1:
+        try:
+            Account.objects.get(code=value[:-1])
+        except Account.DoesNotExist:
+            raise ValidationError(
+                _("The parent account of this code does not exist"),
+                code="parent_not_exist")
+

@@ -92,19 +92,19 @@ urlpatterns = [
          views.txn_sort, name="transactions.sort"),
     path("accounts",
          views.AccountListView.as_view(), name="accounts"),
-    # TODO: To be done
     path("accounts/create",
-         mia_core_views.todo, name="accounts.create"),
+         views.account_form, name="accounts.create"),
     # TODO: To be done
     path("accounts/store",
          mia_core_views.todo, name="accounts.store"),
+    path("api/accounts/all",
+         views.api_account_all, name="api.accounts.all"),
     path("accounts/options",
          views.account_options, name="accounts.options"),
     path("accounts/<account:account>",
          views.AccountView.as_view(), name="accounts.detail"),
-    # TODO: To be done
     path("accounts/<account:account>/edit",
-         mia_core_views.todo, name="accounts.edit"),
+         views.account_form, name="accounts.edit"),
     # TODO: To be done
     path("accounts/<account:account>/update",
          mia_core_views.todo, name="accounts.update"),

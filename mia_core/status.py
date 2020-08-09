@@ -42,6 +42,23 @@ def error_redirect(request, url, form):
     return HttpResponseRedirect(str(UrlBuilder(url).query(s=status_id)))
 
 
+def get_previous_post(request):
+    """Retrieves the previously-stored status.
+
+    Args:
+        request (HttpRequest): The request.
+
+    Returns:
+        dict: The previously-stored status.
+    """
+    if "s" not in request.GET:
+        return None
+    status = _retrieve(request, request.GET["s"])
+    if "form" not in status:
+        return None
+    return status["form"]
+
+
 def retrieve_status(request):
     """Retrieves the previously-stored status.
 

@@ -26,6 +26,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
 from django.db.models.functions import TruncMonth, Coalesce, Now
+from django.forms import model_to_dict
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -38,9 +39,10 @@ from django.views.generic import RedirectView, ListView, DetailView
 
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
-from mia_core.status import error_redirect
+from mia_core.status import error_redirect, get_previous_post
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk, PaginationException
+from .forms import AccountForm
 from .models import Record, Transaction, Account
 from .utils import get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
@@ -1046,6 +1048,47 @@ class AccountView(DetailView):
     """The view of an account."""
     def get_object(self, queryset=None):
         return self.request.resolver_match.kwargs["account"]
+
+
+@require_GET
+@login_required
+def account_form(request, account=None):
+    """The view to edit an accounting transaction.
+
+    Args:
+        request (HttpRequest): The request.
+        account (Account): The account.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    previous_post = get_previous_post(request)
+    if previous_post is not None:
+        form = AccountForm(previous_post)
+    elif account is not None:
+        form = AccountForm({
+            "code": account.code,
+            "title": account.title,
+        })
+    else:
+        form = AccountForm()
+    return render(request, "accounting/account_form.html", {
+        "form": form,
+    })
+
+
+@require_GET
+@login_required
+def api_account_all(request):
+    """The API view to return all the accounts.
+
+    Args:
+        request (HttpRequest): The request.
+
+    Returns:
+        JsonResponse: The response.
+    """
+    return JsonResponse({x.code: x.title for x in Account.objects.all()})
 
 
 @require_GET
