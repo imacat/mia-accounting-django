@@ -32,25 +32,19 @@ class Account(DirtyFieldsMixin, models.Model):
     """An account."""
     id = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
-        "self", on_delete=models.PROTECT, null=True, blank=True,
+        "self", on_delete=models.PROTECT, null=True,
         related_name="child_set")
     code = models.CharField(max_length=5, unique=True)
-    title_zh_hant = models.CharField(
-        max_length=32, db_column="title_zhtw")
-    title_en = models.CharField(max_length=128, null=True, blank=True)
-    title_zh_hans = models.CharField(
-        max_length=32, null=True, blank=True, db_column="title_zhcn")
-    created_at = models.DateTimeField(
-        auto_now_add=True, db_column="created")
+    title_zh_hant = models.CharField(max_length=32)
+    title_en = models.CharField(max_length=128, null=True)
+    title_zh_hans = models.CharField(max_length=32, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        db_column="createdby",
         related_name="created_accounting_accounts")
-    updated_at = models.DateTimeField(
-        auto_now_add=True, db_column="updated")
+    updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        db_column="updatedby",
         related_name="updated_accounting_accounts")
     CASH = "1111"
     ACCUMULATED_BALANCE = "3351"
@@ -142,17 +136,13 @@ class Transaction(DirtyFieldsMixin, models.Model):
     date = models.DateField()
     ord = models.PositiveSmallIntegerField(default=1)
     notes = models.CharField(max_length=128, null=True, blank=True)
-    created_at = models.DateTimeField(
-        auto_now_add=True, db_column="created")
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        db_column="createdby",
         related_name="created_accounting_transactions")
-    updated_at = models.DateTimeField(
-        auto_now_add=True, db_column="updated")
+    updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        db_column="updatedby",
         related_name="updated_accounting_transactions")
 
     def __init__(self, *args, **kwargs):
@@ -369,17 +359,13 @@ class Record(DirtyFieldsMixin, models.Model):
         Account, on_delete=models.PROTECT)
     summary = models.CharField(max_length=128, blank=True, null=True)
     amount = models.PositiveIntegerField()
-    created_at = models.DateTimeField(
-        auto_now_add=True, db_column="created")
+    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        db_column="createdby",
         related_name="created_accounting_records")
-    updated_at = models.DateTimeField(
-        auto_now_add=True, db_column="updated")
+    updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        db_column="updatedby",
         related_name="updated_accounting_records")
 
     def __init__(self, *args, **kwargs):

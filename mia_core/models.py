@@ -41,7 +41,7 @@ class Country(DirtyFieldsMixin, models.Model):
         "User", on_delete=models.PROTECT,
         db_column="createdby", related_name="created_countries")
     updated_at = models.DateTimeField(
-        auto_now_add=True, db_column="updated")
+        auto_now=True, db_column="updated")
     updated_by = models.ForeignKey(
         "User", on_delete=models.PROTECT,
         db_column="updatedby", related_name="updated_countries")
@@ -87,7 +87,7 @@ class User(DirtyFieldsMixin, models.Model):
         "self", on_delete=models.PROTECT,
         db_column="createdby", related_name="created_users")
     updated_at = models.DateTimeField(
-        auto_now_add=True, db_column="updated")
+        auto_now=True, db_column="updated")
     updated_by = models.ForeignKey(
         "self", on_delete=models.PROTECT,
         db_column="updatedby", related_name="updated_users")
