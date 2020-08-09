@@ -71,26 +71,26 @@ def _store(request, post):
     """
     if STORAGE_KEY not in request.session:
         request.session[STORAGE_KEY] = {}
-    id = _new_post_id(request.session[STORAGE_KEY])
-    request.session[STORAGE_KEY][id] = post
-    return id
+    post_id = _new_post_id(request.session[STORAGE_KEY])
+    request.session[STORAGE_KEY][post_id] = post
+    return post_id
 
 
-def _retrieve(request, id):
+def _retrieve(request, post_id):
     """Retrieves the POST data from the storage.
 
     Args:
         request (HttpRequest): The request.
-        id (str): The POST data ID.
+        post_id (str): The POST data ID.
 
     Returns:
         dict: The POST data, or None if the corresponding data does not exist.
     """
     if STORAGE_KEY not in request.session:
         return None
-    if id not in request.session[STORAGE_KEY]:
+    if post_id not in request.session[STORAGE_KEY]:
         return None
-    return request.session[STORAGE_KEY][id]
+    return request.session[STORAGE_KEY][post_id]
 
 
 def _new_post_id(post_store):
@@ -103,16 +103,16 @@ def _new_post_id(post_store):
         str: The newly-generated POST ID.
     """
     while True:
-        id = ""
-        while len(id) < 16:
+        post_id = ""
+        while len(post_id) < 16:
             n = random.randint(1, 64)
             if n < 26:
-                id = id + chr(ord("a") + n)
+                post_id = post_id + chr(ord("a") + n)
             elif n < 52:
-                id = id + chr(ord("a") + (n - 26))
+                post_id = post_id + chr(ord("a") + (n - 26))
             elif n < 62:
-                id = id + chr(ord("0") + (n - 52))
+                post_id = post_id + chr(ord("0") + (n - 52))
             else:
-                id = id + "-_."[n - 62]
-        if id not in post_store:
-            return id
+                post_id = post_id + "-_."[n - 62]
+        if post_id not in post_store:
+            return post_id
