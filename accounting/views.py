@@ -36,9 +36,9 @@ from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import RedirectView, ListView, DetailView, DeleteView
 
+from mia_core import stored_post
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
-from mia_core.stored_post import error_redirect, get_previous_post
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_form, new_pk, PaginationException
 from .forms import AccountForm
@@ -881,7 +881,7 @@ def txn_store(request, txn_type, txn=None):
         else:
             url = reverse("accounting:transactions.edit", args=(txn_type, txn))
         url = str(UrlBuilder(url).query(r=request.GET.get("r")))
-        return error_redirect(request, url, post)
+        return stored_post.error_redirect(request, url, post)
 
     if txn is None:
         txn = Transaction()
@@ -996,7 +996,7 @@ def txn_sort(request, date):
                 errors[key] = gettext_noop("Invalid order.")
 
         if len(errors) > 0:
-            return error_redirect(
+            return stored_post.error_redirect(
                 request, reverse("accounting:transactions.sort"), post)
 
         keys = [F"transaction-{x.pk}-ord" for x in transactions]
@@ -1049,7 +1049,7 @@ def account_form(request, account=None):
     Returns:
         HttpResponse: The response.
     """
-    previous_post = get_previous_post(request)
+    previous_post = stored_post.get_previous_post(request)
     if previous_post is not None:
         form = AccountForm(previous_post)
     elif account is not None:

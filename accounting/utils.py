@@ -31,8 +31,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from mia_core import stored_post
 from mia_core.period import Period
-from mia_core.stored_post import get_previous_post
 from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import new_pk
 from .forms import TransactionForm, RecordForm
@@ -624,7 +624,7 @@ def make_txn_form_from_status(request, txn_type, txn):
         TransactionForm: The transaction form, or None if there is no
             previously-stored status.
     """
-    form = get_previous_post(request)
+    form = stored_post.get_previous_post(request)
     if form is None:
         return None
     return make_txn_form_from_post(form, txn_type, txn)
