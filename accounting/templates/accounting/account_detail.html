@@ -39,7 +39,7 @@ First written: 2020/8/8
 {% endif %}
 
 <!-- the delete confirmation dialog -->
-<form action="{% url_keep_return "accounting:accounts.delete" account %}" method="post">
+<form action="{% url "accounting:accounts.delete" account as url %}{% url_keep_return url %}" method="post">
   {% csrf_token %}
   <!-- The Modal -->
   <div class="modal" id="del-modal">
@@ -141,7 +141,7 @@ First written: 2020/8/8
   <div class="col-sm-2">{{ _("Child Accounts:")|force_escape }}</div>
   <div class="col-sm-10">
     {% for child in account.child_set.all %}
-      <a class="btn btn-primary" type="role" href="{% url_with_return "accounting:accounts.detail" child %}">
+      <a class="btn btn-primary" type="role" href="{% url "accounting:accounts.detail" child as url %}{% url_with_return url %}">
         {{ child }}
       </a>
     {% empty %}

@@ -40,7 +40,7 @@ First written: 2020/7/23
 {% endif %}
 
 <!-- the delete confirmation dialog -->
-<form action="{% url_keep_return "accounting:transactions.delete" txn %}" method="post">
+<form action="{% url "accounting:transactions.delete" txn as url %}{% url_keep_return url %}" method="post">
   {% csrf_token %}
   <!-- The Modal -->
   <div class="modal" id="del-modal">
@@ -71,7 +71,7 @@ First written: 2020/7/23
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
-  <a class="btn btn-primary" role="button" href="{% url_keep_return "accounting:transactions.edit" "transfer" txn %}">
+  <a class="btn btn-primary" role="button" href="{% url "accounting:transactions.edit" "transfer" txn as url %}{% url_keep_return url %}">
     <i class="fas fa-edit"></i>
     {{ _("Edit")|force_escape }}
   </a>
@@ -81,7 +81,7 @@ First written: 2020/7/23
       {{ _("Sort")|force_escape }}
     </button>
   {% else %}
-    <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url_with_return "accounting:transactions.sort" txn.date %}">
+    <a class="btn btn-primary d-none d-sm-inline" role="button" href="{% url "accounting:transactions.sort" txn.date as url %}{% url_with_return url %}">
       <i class="fas fa-sort"></i>
       {{ _("Sort")|force_escape }}
     </a>
@@ -97,7 +97,7 @@ First written: 2020/7/23
           {{ _("Sort")|force_escape }}
         </span>
       {% else %}
-        <a class="dropdown-item" href="{% url_with_return "accounting:transactions.sort" txn.date %}">
+        <a class="dropdown-item" href="{% url "accounting:transactions.sort" txn.date as url %}{% url_with_return url %}">
           <i class="fas fa-sort"></i>
           {{ _("Sort")|force_escape }}
         </a>

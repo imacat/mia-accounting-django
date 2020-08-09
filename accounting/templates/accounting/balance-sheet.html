@@ -42,13 +42,13 @@ First written: 2020/7/20
       {% trans "New" context "Accounting" as text %}{{ text|force_escape }}
     </button>
     <div class="dropdown-menu">
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "expense" as url %}{% url_with_return url %}">
         {{ _("Cash Expense")|force_escape }}
       </a>
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "income" as url %}{% url_with_return url %}">
         {{ _("Cash Income")|force_escape }}
       </a>
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "transfer" as url %}{% url_with_return url %}">
         {{ _("Transfer")|force_escape }}
       </a>
     </div>

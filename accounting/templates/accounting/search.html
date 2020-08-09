@@ -41,13 +41,13 @@ First written: 2020/7/21
       {% trans "New" context "Accounting" as text %}{{ text|force_escape }}
     </button>
     <div class="dropdown-menu">
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "expense" as url %}{% url_with_return url %}">
         {{ _("Cash Expense")|force_escape }}
       </a>
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "income" as url %}{% url_with_return url %}">
         {{ _("Cash Income")|force_escape }}
       </a>
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "transfer" as url %}{% url_with_return url %}">
         {{ _("Transfer")|force_escape }}
       </a>
     </div>
@@ -100,7 +100,7 @@ First written: 2020/7/21
           <td class="amount">{{ record.credit_amount|accounting_amount }}</td>
           <td>{{ record.transaction.notes|default:"" }}</td>
           <td class="actions">
-            <a href="{% url_with_return "accounting:transactions.detail" record.transaction.type record.transaction %}" class="btn btn-info" role="button">
+            <a href="{% url "accounting:transactions.detail" record.transaction.type record.transaction as url %}{% url_with_return url %}" class="btn btn-info" role="button">
               <i class="fas fa-eye"></i>
               {{ _("View")|force_escape }}
             </a>
@@ -114,7 +114,7 @@ First written: 2020/7/21
   <ul class="list-group d-md-none">
     {% for record in record_list %}
       <li class="list-group-item {% if not record.is_balanced or record.has_order_hole %} list-group-item-danger {% endif %}">
-        <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.detail" record.transaction.type record.transaction %}">
+        <a class="list-group-item-action" href="{% url "accounting:transactions.detail" record.transaction.type record.transaction as url %}{% url_with_return url %}">
           <div class="{% if record.is_credit %} journal-credit {% else %} journal-debit {% endif %}">
             <div class="date-account-line">
               {{ record.transaction.date|smart_date }} {{ record.account.title|title_case }}

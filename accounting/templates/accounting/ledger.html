@@ -42,13 +42,13 @@ First written: 2020/7/16
       {% trans "New" context "Accounting" as text %}{{ text|force_escape }}
     </button>
     <div class="dropdown-menu">
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "expense" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "expense" as url %}{% url_with_return url %}">
         {{ _("Cash Expense")|force_escape }}
       </a>
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "income" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "income" as url %}{% url_with_return url %}">
         {{ _("Cash Income")|force_escape }}
       </a>
-      <a class="dropdown-item" href="{% url_with_return "accounting:transactions.create" "transfer" %}">
+      <a class="dropdown-item" href="{% url "accounting:transactions.create" "transfer" as url %}{% url_with_return url %}">
         {{ _("Transfer")|force_escape }}
       </a>
     </div>
@@ -123,7 +123,7 @@ First written: 2020/7/16
           <td class="amount {% if record.balance < 0 %} text-danger {% endif %}">{{ record.balance|accounting_amount }}</td>
           <td class="actions">
             {% if record.pk is not None %}
-              <a href="{% url_with_return "accounting:transactions.detail" record.transaction.type record.transaction %}" class="btn btn-info" role="button">
+              <a href="{% url "accounting:transactions.detail" record.transaction.type record.transaction as url %}{% url_with_return url %}" class="btn btn-info" role="button">
                 <i class="fas fa-eye"></i>
                 <span class="d-none d-lg-inline">{{ _("View")|force_escape }}</span>
               </a>
@@ -139,7 +139,7 @@ First written: 2020/7/16
     {% for record in record_list %}
       <li class="list-group-item {% if not record.is_balanced or record.has_order_hole or record.is_payable %} list-group-item-danger {% endif %}{% if record.is_existing_equipment %} list-group-item-info {% endif %}">
         {% if record.pk is not None %}
-          <a class="list-group-item-action" href="{% url_with_return "accounting:transactions.detail" record.transaction.type record.transaction %}">
+          <a class="list-group-item-action" href="{% url "accounting:transactions.detail" record.transaction.type record.transaction as url %}{% url_with_return url %}">
             <div class="date-account-line">
               {{ record.transaction.date|smart_date }} {{ record.account.title|title_case }}
             </div>

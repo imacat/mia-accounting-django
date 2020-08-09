@@ -83,35 +83,33 @@ def url_period(context, period_spec):
 
 
 @register.simple_tag(takes_context=True)
-def url_with_return(context, view_name, *args):
-    """Returns the transaction URL.
+def url_with_return(context, url):
+    """Returns the URL with the current page added as the "r" query parameter,
+    so that returning to this page is possible.
 
     Args:
         context (RequestContext): The request context.
-        view_name (str): The view name.
-        *args (tuple[any]): The URL arguments.
+        url (str): The URL.
 
     Returns:
-        str: The URL.
+        str: The URL with the current page added as the "r" query parameter.
     """
-    url = reverse(view_name, args=args)
     return str(UrlBuilder(url).query(
         r=str(UrlBuilder(context.request.get_full_path()).remove("s"))))
 
 
 @register.simple_tag(takes_context=True)
-def url_keep_return(context, view_name, *args):
-    """Returns the transaction URL.
+def url_keep_return(context, url):
+    """Returns the URL with the current "r" query parameter set, so that the
+    next processor can still return to the same page.
 
     Args:
         context (RequestContext): The request context.
-        view_name (str): The view name.
-        *args (tuple[any]): The URL arguments.
+        url (str): The URL.
 
     Returns:
-        str: The URL.
+        str: The URL with the current "r" query parameter set.
     """
-    url = reverse(view_name, args=args)
     return str(UrlBuilder(url).query(r=context.request.GET.get("r")))
 
 

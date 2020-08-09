@@ -46,7 +46,7 @@ First written: 2020/7/23
 {% endfor %}
 
 <div class="btn-group btn-actions">
-  <a class="btn btn-primary" role="button" href="{% if form.transaction %}{% url_keep_return "accounting:transactions.detail" "income" form.transaction %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
+  <a class="btn btn-primary" role="button" href="{% if form.transaction %}{% url "accounting:transactions.detail" "income" form.transaction as url %}{% url_keep_return url %}{% elif request.GET.r %}{{ request.GET.r }}{% else %}{% url "accounting:home" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
@@ -55,7 +55,7 @@ First written: 2020/7/23
 <input id="account-option-url" type="hidden" value="{% url "accounting:api.accounts.options" %}" />
 <input id="summary-categories" type="hidden" value="{{ summary_categories }}" />
 <input id="new-record-template" type="hidden" value="{{ new_record_template }}" />
-<form id="txn-form" action="{% if form.transaction %}{% url_keep_return "accounting:transactions.update" "income" form.transaction %}{% else %}{% url_keep_return "accounting:transactions.store" "income" %}{% endif %}" method="post">
+<form id="txn-form" action="{% if form.transaction %}{% url "accounting:transactions.update" "income" form.transaction as url %}{% url_keep_return url %}{% else %}{% url "accounting:transactions.store" "income" as url %}{% url_keep_return url %}{% endif %}" method="post">
   {% csrf_token %}
   <div class="row form-group">
     <div class="col-sm-2">
