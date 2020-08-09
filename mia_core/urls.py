@@ -34,7 +34,6 @@ urlpatterns = [
     path("users/<user:user>/update", views.user_store, name="users.update"),
     # TODO: To be done.
     path("users/<user:user>/delete", views.todo, name="users.delete"),
-    # TODO: To be done.
     path("api/users/<str:login_id>/exists", views.api_users_exists,
          name="api.users.exists"),
     # TODO: To be done.
