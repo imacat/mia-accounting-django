@@ -77,7 +77,6 @@ def login_required(function=None):
                     del request.session["visit_logged"]
                 return HttpResponse(status=401)
             _log_visit(request)
-            print(request.META["REMOTE_ADDR"])
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     if function:
