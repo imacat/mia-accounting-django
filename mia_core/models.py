@@ -32,8 +32,8 @@ from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
 
 class Country(DirtyFieldsMixin, models.Model):
     """A country."""
-    sn = models.PositiveIntegerField(primary_key=True)
-    code = models.CharField(max_length=2, unique=True)
+    id = models.PositiveIntegerField(primary_key=True, db_column="sn")
+    code = models.CharField(max_length=2, unique=True, db_column="id")
     name_en = models.CharField(max_length=64)
     name_zh_hant = models.CharField(
         max_length=32, null=True, db_column="name_zhtw")
@@ -65,12 +65,12 @@ class Country(DirtyFieldsMixin, models.Model):
         set_multi_lingual_attr(self, "name", value)
 
     class Meta:
-        db_table = "countries"
+        db_table = "country"
 
 
 class User(DirtyFieldsMixin, models.Model):
     """A user."""
-    sn = models.PositiveIntegerField(primary_key=True)
+    id = models.PositiveIntegerField(primary_key=True, db_column="sn")
     login_id = models.CharField(max_length=32, unique=True, db_column="id")
     password = models.CharField(max_length=32, db_column="passwd")
     name = models.CharField(max_length=32)
@@ -97,7 +97,7 @@ class User(DirtyFieldsMixin, models.Model):
     updated_by = models.ForeignKey(
         "self", on_delete=models.PROTECT,
         db_column="updatedby", related_name="updated_users")
-    REQUIRED_FIELDS = ["sn", "name"]
+    REQUIRED_FIELDS = ["id", "name"]
     USERNAME_FIELD = "login_id"
 
     @property
