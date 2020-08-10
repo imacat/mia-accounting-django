@@ -83,7 +83,7 @@ First written: 2020/7/10
           <ul class="nav nav-pills">
             {% for year in period.years_to_choose %}
               <li class="nav-item">
-                <a class="nav-link {% if period.spec == year|stringformat:"i" %} active {% endif %}" href="{% url_period year|stringformat:"i" %}">{{ year }}</a>
+                <a class="nav-link {% if period.spec == year %} active {% endif %}" href="{% url_period year %}">{{ year }}</a>
               </li>
             {% endfor %}
           </ul>
