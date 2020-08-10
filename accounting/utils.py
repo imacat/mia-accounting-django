@@ -260,7 +260,7 @@ def get_ledger_accounts():
         FROM accounting_accounts AS s
          INNER JOIN accounting_records AS r ON r.account_id = s.id
         GROUP BY s.code) AS u
-      ON u.code LIKE s.code || '%'
+      ON u.code LIKE s.code || '%%'
     GROUP BY s.code)
   ORDER BY s.code"""))
 
