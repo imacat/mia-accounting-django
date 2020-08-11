@@ -59,8 +59,11 @@ class CashDefaultView(RedirectView):
     pattern_name = "accounting:cash"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = Account.objects.get(
-            code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
+        code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
+        kwargs["account"] = Account(
+                code="0",
+                title=_("current assets and liabilities"),
+            ) if code == "0" else Account.objects.get(code=code)
         kwargs["period"] = Period.default_spec()
         return super().get_redirect_url(*args, **kwargs)
 
