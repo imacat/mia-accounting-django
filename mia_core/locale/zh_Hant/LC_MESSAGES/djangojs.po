@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-core-js 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 21:54+0800\n"
-"PO-Revision-Date: 2020-08-11 10:14+0800\n"
+"POT-Creation-Date: 2020-08-11 21:42+0800\n"
+"PO-Revision-Date: 2020-08-11 21:44+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -17,30 +17,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: mia_core/static/mia_core/js/user-form.js:129
+#: mia_core/static/mia_core/js/user-form.js:154
 msgid "Please fill in the log in ID."
 msgstr "請填寫登入帳號。"
 
-#: mia_core/static/mia_core/js/user-form.js:134
+#: mia_core/static/mia_core/js/user-form.js:159
 msgid "You cannot use slash (/) in the log in ID."
 msgstr "登入帳號不可以包含斜線 (/) 。"
 
-#: mia_core/static/mia_core/js/user-form.js:154
+#: mia_core/static/mia_core/js/user-form.js:179
 msgid "This log in ID is already in use."
 msgstr "登入帳號和其他人重複。"
 
-#: mia_core/static/mia_core/js/user-form.js:177
+#: mia_core/static/mia_core/js/user-form.js:204
+msgid "Please fill in the password to change the log in ID."
+msgstr "變更登入帳號時，請填寫密碼。"
+
+#: mia_core/static/mia_core/js/user-form.js:206
 msgid "Please fill in the password."
 msgstr "請填寫密碼。"
 
-#: mia_core/static/mia_core/js/user-form.js:201
+#: mia_core/static/mia_core/js/user-form.js:231
 msgid "Please enter the password again to verify it."
 msgstr "請再次確認密碼。"
 
-#: mia_core/static/mia_core/js/user-form.js:207
+#: mia_core/static/mia_core/js/user-form.js:237
 msgid "The two passwords do not match."
 msgstr "兩次密碼不符，請重新輸入。"
 
-#: mia_core/static/mia_core/js/user-form.js:228
+#: mia_core/static/mia_core/js/user-form.js:258
 msgid "Please fill in the name."
 msgstr "請填寫姓名。"

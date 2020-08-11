@@ -23,22 +23,47 @@
 
 // Initializes the page JavaScript.
 $(function () {
-    $("#user-login-id").on("blur", function () {
+    $("#user-login-id")
+        .on("blur", function () {
         validateLoginId();
-    });
-    $("#user-password").on("blur", function () {
+        updatePasswordRequirement();
+    })
+    $("#user-password")
+        .on("blur", function () {
         validatePassword();
     });
-    $("#user-password2").on("blur", function () {
+    $("#user-password2")
+        .on("blur", function () {
         validatePassword2();
     });
-    $("#user-name").on("blur", function () {
+    $("#user-name")
+        .on("blur", function () {
         validateName();
     });
-    $("#user-form").on("submit", function () {
+    $("#user-form")
+        .on("submit", function () {
         return validateForm();
     });
 });
+
+/**
+ * Updates the password required when the log in ID is changed.
+ *
+ * The HTTP digest authentication requires both the log in ID and the
+ * password to compose and store the hash.  When the log in ID is
+ * changed, we will also need the password in order to update the
+ * hash.
+ *
+ * @private
+ */
+function updatePasswordRequirement() {
+    const originalId = $("#user-login-id-original").val();
+    if (originalId === "") {
+        return;
+    }
+    $("#user-password")[0].required = ($("#user-login-id").val() !== originalId);
+    validatePassword();
+}
 
 
 /*******************
@@ -174,7 +199,12 @@ async function validatePassword() {
     if (password.required) {
         if (password.value === "") {
             password.classList.add("is-invalid");
-            errorMessage.text(gettext("Please fill in the password."));
+            const originalId = $("#user-login-id-original").val();
+            if (originalId === "" || $("#user-login-id").val() !== originalId) {
+                errorMessage.text(gettext("Please fill in the password to change the log in ID."));
+            } else {
+                errorMessage.text(gettext("Please fill in the password."));
+            }
             return false;
         }
     }

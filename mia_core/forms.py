@@ -62,7 +62,8 @@ class UserForm(forms.Form):
         """
         errors = []
         validators = [self._validate_login_id_unique,
-                      self._validate_password_required,
+                      self._validate_password_new_required,
+                      self._validate_password_login_id_changed_required,
                       self._validate_password2_required,
                       self._validate_passwords_equal,
                       self._validate_is_disabled_not_oneself]
@@ -92,7 +93,7 @@ class UserForm(forms.Form):
         self.add_error("login_id", error)
         raise error
 
-    def _validate_password_required(self):
+    def _validate_password_new_required(self):
         """Validates whether the password is entered for newly-created users.
 
         Raises:
@@ -104,6 +105,27 @@ class UserForm(forms.Form):
             return
         error = forms.ValidationError(_("Please fill in the password."),
                                       code="password_required")
+        self.add_error("password", error)
+        raise error
+
+    def _validate_password_login_id_changed_required(self):
+        """Validates whether the password is entered for users whose login ID
+        changed.
+
+        Raises:
+            forms.ValidationError: When the validation fails.
+        """
+        if self.user is None:
+            return
+        if "login_id" not in self.data:
+            return
+        if self.data["login_id"] == self.user.login_id:
+            return
+        if "password" in self.data:
+            return
+        error = forms.ValidationError(
+            _("Please fill in the password to change the log in ID."),
+            code="password_required")
         self.add_error("password", error)
         raise error
 
