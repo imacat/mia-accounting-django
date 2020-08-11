@@ -1144,7 +1144,8 @@ def api_account_options(request):
         .annotate(is_in_use=Case(
             When(record_count__gt=0, then=True),
             default=False,
-            output_field=BooleanField()))
+            output_field=BooleanField()))\
+        .order_by("code")
     for x in accounts:
         x.is_for_debit = re.match("^([1235689]|7[5678])", x.code) is not None
         x.is_for_credit = re.match("^([123489]|7[1234])", x.code) is not None
