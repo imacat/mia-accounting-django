@@ -529,7 +529,7 @@ def trial_balance(request, period):
             amount=Sum(Case(
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
-        .filter(amount__isnull=False)
+        .filter(Q(amount__isnull=False), ~Q(amount=0))
         .annotate(
             debit_amount=Case(
                 When(amount__gt=0, then=F("amount")),
@@ -550,7 +550,7 @@ def trial_balance(request, period):
             amount=Sum(Case(
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
-        .filter(amount__isnull=False)
+        .filter(Q(amount__isnull=False), ~Q(amount=0))
         .annotate(
             debit_amount=Case(
                 When(amount__gt=0, then=F("amount")),
@@ -632,7 +632,7 @@ def income_statement(request, period):
             amount=Sum(Case(
                 When(record__is_credit=True, then=1),
                 default=-1) * F("record__amount")))
-        .filter(amount__isnull=False)
+        .filter(Q(amount__isnull=False), ~Q(amount=0))
         .order_by("code"))
     groups = list(Account.objects.filter(
         code__in=[x.code[:2] for x in accounts]))
@@ -707,7 +707,7 @@ def balance_sheet(request, period):
             amount=Sum(Case(
                 When(record__is_credit=True, then=-1),
                 default=1) * F("record__amount")))
-        .filter(amount__isnull=False)
+        .filter(Q(amount__isnull=False), ~Q(amount=0))
         .order_by("code"))
     for account in accounts:
         account.url = reverse("accounting:ledger", args=(account, period))
