@@ -247,14 +247,3 @@ def api_users_exists(request, login_id):
     except User.DoesNotExist:
         return JsonResponse(False, safe=False)
     return JsonResponse(True, safe=False)
-
-
-# TODO: To be removed.
-def todo(request, **kwargs):
-    """A dummy placeholder view for the URL settings that are not
-    implemented yet.
-
-    Returns:
-        HttpResponse: A dummy response.
-    """
-    return HttpResponse("TODO: To be done.")
