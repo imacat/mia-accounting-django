@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: mia 1.0\n"
+"Project-Id-Version: mia-core 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-08-10 02:42+0800\n"
-"PO-Revision-Date: 2020-08-10 02:44+0800\n"
+"PO-Revision-Date: 2020-08-11 10:14+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
