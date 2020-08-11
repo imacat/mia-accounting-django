@@ -63,6 +63,18 @@ def logout(request):
     return redirect("home")
 
 
+def http500_view(request):
+    """The view of the HTTP 500 Internal Server Error page.
+
+    Args:
+        request (HttpRequest): The request.
+
+    Returns:
+        HttpResponse: The response.
+    """
+    return render(request, "500.html")
+
+
 @method_decorator(require_GET, name="dispatch")
 @method_decorator(login_required, name="dispatch")
 class UserListView(ListView):
