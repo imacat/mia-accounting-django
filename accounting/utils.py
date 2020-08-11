@@ -38,6 +38,12 @@ from mia_core.utils import new_pk
 from .forms import TransactionForm, RecordForm
 from .models import Account, Transaction, Record
 
+DEFAULT_CASH_ACCOUNT = "1111"
+CASH_SHORTCUT_ACCOUNTS = ["0", "1111"]
+DEFAULT_LEDGER_ACCOUNT = "1111"
+PAYABLE_ACCOUNTS = ["2141", "21413"]
+EQUIPMENT_ACCOUNTS = ["1441"],
+
 
 class MonthlySummary:
     """A summary record.
@@ -84,11 +90,8 @@ class ReportUrl:
 
     def __init__(self, cash=None, ledger=None, period=None):
         self._period = Period() if period is None else period
-        self._cash = Account.objects.get(
-                code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])\
-            if cash is None else cash
-        self._ledger = Account.objects.get(
-                code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])\
+        self._cash = get_default_cash_account() if cash is None else cash
+        self._ledger = get_default_ledger_account()\
             if ledger is None else ledger
 
     def cash(self):
@@ -245,6 +248,52 @@ def get_cash_accounts():
     return accounts
 
 
+def get_default_cash_account():
+    """Returns the default cash account.
+
+    Returns:
+        Account: The default cash account.
+    """
+    try:
+        code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
+    except AttributeError:
+        code = DEFAULT_CASH_ACCOUNT
+    except TypeError:
+        code = DEFAULT_CASH_ACCOUNT
+    except KeyError:
+        code = DEFAULT_CASH_ACCOUNT
+    if code == "0":
+        return Account(code="0", title=_("current assets and liabilities"))
+    try:
+        return Account.objects.get(code=code)
+    except Account.DoesNotExist:
+        pass
+    try:
+        return Account.objects.get(code=DEFAULT_CASH_ACCOUNT)
+    except Account.DoesNotExist:
+        pass
+    return Account(code="0", title=_("current assets and liabilities"))
+
+
+def get_cash_shortcut_accounts():
+    """Returns the codes of the shortcut cash accounts.
+
+    Returns:
+        list[str]: The codes of the shortcut cash accounts.
+    """
+    try:
+        accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
+    except AttributeError:
+        return CASH_SHORTCUT_ACCOUNTS
+    except TypeError:
+        return CASH_SHORTCUT_ACCOUNTS
+    except KeyError:
+        return CASH_SHORTCUT_ACCOUNTS
+    if not isinstance(accounts, list):
+        return CASH_SHORTCUT_ACCOUNTS
+    return accounts
+
+
 def get_ledger_accounts():
     """Returns the accounts for the ledger.
 
@@ -263,6 +312,31 @@ def get_ledger_accounts():
       ON u.code LIKE s.code || '%%'
     GROUP BY s.code)
   ORDER BY s.code"""))
+
+
+def get_default_ledger_account():
+    """Returns the default ledger account.
+
+    Returns:
+        Account: The default ledger account.
+    """
+    try:
+        code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
+    except AttributeError:
+        code = DEFAULT_CASH_ACCOUNT
+    except TypeError:
+        code = DEFAULT_CASH_ACCOUNT
+    except KeyError:
+        code = DEFAULT_CASH_ACCOUNT
+    try:
+        return Account.objects.get(code=code)
+    except Account.DoesNotExist:
+        pass
+    try:
+        return Account.objects.get(code=DEFAULT_LEDGER_ACCOUNT)
+    except Account.DoesNotExist:
+        pass
+    return None
 
 
 def find_imbalanced(records):
@@ -312,15 +386,21 @@ def find_payable_records(account, records):
         account (Account): The current ledger account.
         records (list[Record]): The accounting records.
     """
-    if "PAYABLE_ACCOUNTS" not in settings.ACCOUNTING:
+    try:
+        payable_accounts = settings.ACCOUNTING["PAYABLE_ACCOUNTS"]
+    except AttributeError:
         return
-    if not isinstance(settings.ACCOUNTING["PAYABLE_ACCOUNTS"], list):
+    except TypeError:
         return
-    if account.code not in settings.ACCOUNTING["PAYABLE_ACCOUNTS"]:
+    except KeyError:
+        return
+    if not isinstance(payable_accounts, list):
+        return
+    if account.code not in payable_accounts:
         return
     rows = Record.objects\
         .filter(
-            account__code__in=settings.ACCOUNTING["PAYABLE_ACCOUNTS"],
+            account__code__in=payable_accounts,
             summary__isnull=False)\
         .values("account__code", "summary")\
         .annotate(
@@ -341,15 +421,21 @@ def find_existing_equipments(account, records):
         account (Account): The current ledger account.
         records (list[Record]): The accounting records.
     """
-    if "EQUIPMENT_ACCOUNTS" not in settings.ACCOUNTING:
+    try:
+        equipment_accounts = settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"]
+    except AttributeError:
         return
-    if not isinstance(settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"], list):
+    except TypeError:
         return
-    if account.code not in settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"]:
+    except KeyError:
+        return
+    if not isinstance(equipment_accounts, list):
+        return
+    if account.code not in equipment_accounts:
         return
     rows = Record.objects\
         .filter(
-            account__code__in=settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"],
+            account__code__in=equipment_accounts,
             summary__isnull=False)\
         .values("account__code", "summary")\
         .annotate(

@@ -49,7 +49,9 @@ from .utils import get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
     sort_post_txn_records, make_txn_form_from_status, \
     make_txn_form_from_model, make_txn_form_from_post, MonthlySummary, \
-    get_summary_categories, find_payable_records, find_existing_equipments
+    get_summary_categories, find_payable_records, find_existing_equipments, \
+    get_default_cash_account, get_default_ledger_account, \
+    get_cash_shortcut_accounts
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -60,11 +62,7 @@ class CashDefaultView(RedirectView):
     pattern_name = "accounting:cash"
 
     def get_redirect_url(self, *args, **kwargs):
-        code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
-        kwargs["account"] = Account(
-                code="0",
-                title=_("current assets and liabilities"),
-            ) if code == "0" else Account.objects.get(code=code)
+        kwargs["account"] = get_default_cash_account()
         kwargs["period"] = Period.default_spec()
         return super().get_redirect_url(*args, **kwargs)
 
@@ -164,7 +162,7 @@ def cash(request, account, period):
     find_imbalanced(records)
     find_order_holes(records)
     accounts = get_cash_accounts()
-    shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
+    shortcut_accounts = get_cash_shortcut_accounts()
     return render(request, "accounting/cash.html", {
         "record_list": records,
         "pagination": pagination,
@@ -183,8 +181,7 @@ class CashSummaryDefaultView(RedirectView):
     pattern_name = "accounting:cash-summary"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = Account.objects.get(
-            code=settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"])
+        kwargs["account"] = get_default_cash_account()
         return super().get_redirect_url(*args, **kwargs)
 
 
@@ -262,7 +259,7 @@ def cash_summary(request, account):
         pagination = Pagination(request, months, True)
     except PaginationException as e:
         return redirect(e.url)
-    shortcut_accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
+    shortcut_accounts = get_cash_shortcut_accounts()
     return render(request, "accounting/cash-summary.html", {
         "month_list": pagination.items,
         "pagination": pagination,
@@ -281,8 +278,7 @@ class LedgerDefaultView(RedirectView):
     pattern_name = "accounting:ledger"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = Account.objects.get(
-            code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
+        kwargs["account"] = get_default_ledger_account()
         kwargs["period"] = Period.default_spec()
         return super().get_redirect_url(*args, **kwargs)
 
@@ -359,8 +355,7 @@ class LedgerSummaryDefaultView(RedirectView):
     pattern_name = "accounting:ledger-summary"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = Account.objects.get(
-            code=settings.ACCOUNTING["DEFAULT_LEDGER_ACCOUNT"])
+        kwargs["account"] = get_default_ledger_account()
         return super().get_redirect_url(*args, **kwargs)
 
 
