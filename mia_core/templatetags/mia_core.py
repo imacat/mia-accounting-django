@@ -206,7 +206,7 @@ def is_in_section(request, section_name):
         bool: True if the request is currently in this section, or False
             otherwise
     """
-    if request.resolver_match is None:
+    if request is None:
         return False
     view_name = request.resolver_match.view_name
     return view_name == section_name\
