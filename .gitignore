@@ -10,3 +10,5 @@ venv
 mirror
 excludes
 zh_Hans
+django_digest
+test_app
