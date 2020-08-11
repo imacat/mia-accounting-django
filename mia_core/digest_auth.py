@@ -23,6 +23,7 @@ import ipaddress
 import socket
 from functools import wraps
 
+from django.conf import settings
 from django.db.models import F
 from django.db.models.functions import Now
 from django.http import HttpResponse, HttpRequest
@@ -76,7 +77,8 @@ def login_required(function=None):
                 if "visit_logged" in request.session:
                     del request.session["visit_logged"]
                 return HttpResponse(status=401)
-            _log_visit(request)
+            if not settings.DEBUG:
+                _log_visit(request)
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     if function:
