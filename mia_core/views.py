@@ -182,7 +182,6 @@ def my_account_form(request):
 
     Args:
         request (HttpRequest): The request.
-        user (User): The account.
 
     Returns:
         HttpResponse: The response.
@@ -207,7 +206,6 @@ def my_account_store(request):
 
     Args:
         request (HttpRequest): The request.
-        user (Account): The user.
 
     Returns:
         HttpResponseRedirect: The response.
