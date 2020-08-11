@@ -24,7 +24,8 @@ import re
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField
+from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField, \
+    ExpressionWrapper
 from django.db.models.functions import TruncMonth, Coalesce, Now
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect
@@ -1019,7 +1020,13 @@ def txn_sort(request, date):
 @method_decorator(login_required, name="dispatch")
 class AccountListView(ListView):
     """The view to list the accounts."""
-    queryset = Account.objects.order_by("code")
+    queryset = Account.objects\
+        .annotate(child_count=Count("child_set"),
+                  record_count=Count("record"))\
+        .annotate(is_parent_and_in_use=ExpressionWrapper(
+            Q(child_count__gt=0) & Q(record_count__gt=0),
+            output_field=BooleanField()))\
+        .order_by("code")
 
 
 @method_decorator(require_GET, name="dispatch")
