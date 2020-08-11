@@ -21,7 +21,6 @@
 import json
 import re
 
-from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField, \
