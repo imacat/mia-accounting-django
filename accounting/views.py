@@ -79,7 +79,6 @@ def cash(request, account, period):
     Returns:
         HttpResponse: The response.
     """
-    a = 3 / 0
     # The accounting records
     if account.code == "0":
         records = list(
