@@ -162,7 +162,7 @@ def cash(request, account, period):
     find_order_holes(records)
     accounts = get_cash_accounts()
     shortcut_accounts = get_cash_shortcut_accounts()
-    return render(request, "accounting/cash.html", {
+    return render(request, "accounting/report-cash.html", {
         "record_list": records,
         "pagination": pagination,
         "shortcut_accounts": [x for x in accounts
@@ -259,7 +259,7 @@ def cash_summary(request, account):
     except PaginationException as e:
         return redirect(e.url)
     shortcut_accounts = get_cash_shortcut_accounts()
-    return render(request, "accounting/cash-summary.html", {
+    return render(request, "accounting/report-cash-summary.html", {
         "month_list": pagination.items,
         "pagination": pagination,
         "shortcut_accounts": [x for x in accounts if
@@ -339,7 +339,7 @@ def ledger(request, account, period):
     find_order_holes(records)
     find_payable_records(account, records)
     find_existing_equipments(account, records)
-    return render(request, "accounting/ledger.html", {
+    return render(request, "accounting/report-ledger.html", {
         "record_list": records,
         "pagination": pagination,
         "accounts": get_ledger_accounts(),
@@ -401,7 +401,7 @@ def ledger_summary(request, account):
         pagination = Pagination(request, months, True)
     except PaginationException as e:
         return redirect(e.url)
-    return render(request, "accounting/ledger-summary.html", {
+    return render(request, "accounting/report-ledger-summary.html", {
         "month_list": pagination.items,
         "pagination": pagination,
         "accounts": get_ledger_accounts(),
@@ -484,7 +484,7 @@ def journal(request, period):
         pagination = Pagination(request, records, True)
     except PaginationException as e:
         return redirect(e.url)
-    return render(request, "accounting/journal.html", {
+    return render(request, "accounting/report-journal.html", {
         "record_list": pagination.items,
         "pagination": pagination,
     })
@@ -587,7 +587,7 @@ def trial_balance(request, period):
                                       if x.debit_amount is not None])
     total_account.credit_amount = sum([x.credit_amount for x in accounts
                                        if x.credit_amount is not None])
-    return render(request, "accounting/trial-balance.html", {
+    return render(request, "accounting/report-trial-balance.html", {
         "account_list": accounts,
         "total_item": total_account,
     })
@@ -663,7 +663,7 @@ def income_statement(request, period):
             section.cumulative_total = None
         section.has_next = True
     sections[-1].has_next = False
-    return render(request, "accounting/income-statement.html", {
+    return render(request, "accounting/report-income-statement.html", {
         "section_list": sections,
     })
 
@@ -761,7 +761,7 @@ def balance_sheet(request, period):
                                 for x in group.details])
         section.amount = sum([x.amount for x in section.groups])
     by_code = {x.code: x for x in sections}
-    return render(request, "accounting/balance-sheet.html", {
+    return render(request, "accounting/report-balance-sheet.html", {
         "assets": by_code["1"],
         "liabilities": by_code["2"],
         "owners_equity": by_code["3"],
