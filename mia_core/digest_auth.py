@@ -93,7 +93,7 @@ def _log_visit(request):
     if "visit_logged" in request.session:
         return
     user = request.user
-    ip = request.META["REMOTE_ADDR"]
+    ip = _get_remote_ip(request)
     User.objects.filter(pk=user.pk).update(
         visits=F("visits") + 1,
         visited_at=Now(),
@@ -102,6 +102,13 @@ def _log_visit(request):
         visited_country=_get_country(ip),
     )
     request.session["visit_logged"] = True
+
+
+def _get_remote_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0]
+    return request.META.get('REMOTE_ADDR')
 
 
 def _get_host(ip):
