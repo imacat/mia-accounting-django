@@ -64,7 +64,7 @@ def url_period(context, period_spec):
     view_name = "%s:%s" % (
         context.request.resolver_match.app_name,
         context.request.resolver_match.url_name)
-    kwargs = context.request.resolver_match.kwargs
+    kwargs = context.request.resolver_match.kwargs.copy()
     kwargs["period"] = period_spec
     return reverse(view_name, kwargs=kwargs)
 
