@@ -827,8 +827,6 @@ def txn_form(request, txn_type, txn=None):
         form = utils.make_txn_form_from_model(txn_type, txn)
     else:
         form = TransactionForm()
-        form.debit_records.append(RecordForm())
-        form.credit_records.append(RecordForm())
     form.transaction = txn
     form.txn_type = txn_type
     new_record_context = {"record": RecordForm(),

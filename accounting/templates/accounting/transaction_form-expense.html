@@ -76,6 +76,10 @@ First written: 2020/7/23
           {% with record_type="debit" no=forloop.counter order=forloop.counter %}
             {% include "accounting/include/record_form-non-transfer.html" %}
           {% endwith %}
+        {% empty %}
+          {% with record_type="debit" no=1 order=1 %}
+            {% include "accounting/include/record_form-non-transfer.html" %}
+          {% endwith %}
         {% endfor %}
       </ul>
       <ul class="list-group">
