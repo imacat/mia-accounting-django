@@ -245,15 +245,14 @@ class Transaction(DirtyFieldsMixin, models.Model):
             .order_by("ord"))
         txn_to_sort = []
         for i in range(len(txn_same_day)):
-            txn_same_day[i].ord = i + 1
-            if txn_same_day[i].is_dirty():
-                txn_to_sort.append(txn_same_day[i])
+            if txn_same_day[i].ord != i + 1:
+                txn_to_sort.append([txn_same_day[i], i + 1])
         with transaction.atomic():
             for record in self.record_set.all():
                 record.delete()
             super().delete(using=using, keep_parents=keep_parents)
-            for txn in txn_to_sort:
-                txn.save()
+            for x in txn_to_sort:
+                Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
 
     class Meta:
         db_table = "accounting_transactions"
