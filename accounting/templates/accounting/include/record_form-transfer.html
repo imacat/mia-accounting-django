@@ -30,6 +30,7 @@ First written: 2020/8/5
             <input type="hidden" name="{{ record_type }}-{{ no }}-id" value="{{ record.id.value }}" />
           {% endif %}
           <input id="{{ record_type }}-{{ no }}-ord" class="{{ record_type }}-ord" type="hidden" name="{{ record_type }}-{{ no }}-ord" value="{{ order }}" />
+          <label for="{{ record_type }}-{{ no }}-account" class="record-label">{{ _("Account:")|force_escape }}</label>
           <select id="{{ record_type }}-{{ no }}-account" class="form-control record-account {{ record_type }}-account {% if record.account.errors %} is-invalid {% endif %}" name="{{ record_type }}-{{ no }}-account" data-type="{{ record_type }}">
             {% if record.account is not None %}
               <option value="{{ record.account.value|default:"" }}" selected="selected">{{ record.account.value|default:"" }} {{ record.account_title|default:"" }}</option>
@@ -43,10 +44,12 @@ First written: 2020/8/5
       </div>
       <div class="row">
         <div class="col-lg-8">
+          <label for="{{ record_type }}-{{ no }}-summary" class="record-label">{{ _("Summary:")|force_escape }}</label>
           <input id="{{ record_type }}-{{ no }}-summary" class="form-control record-summary {% if record.summary.errors %} is-invalid {% endif %}" type="text" name="{{ record_type }}-{{ no }}-summary" value="{{ record.summary.value|default:"" }}" maxlength="128" data-toggle="modal" data-target="#summary-modal" data-type="{{ record_type }}" data-no="{{ no }}" />
           <div id="{{ record_type }}-{{ no }}-summary-error" class="invalid-feedback">{{ record.summary.errors.0|default:"" }}</div>
         </div>
         <div class="col-lg-4">
+          <label for="{{ record_type }}-{{ no }}-amount" class="record-label">{{ _("Amount:")|force_escape }}</label>
           <input id="{{ record_type }}-{{ no }}-amount" class="form-control record-amount {{ record_type }}-to-sum {% if record.amount.errors %} is-invalid {% endif %}" type="number" min="1" name="{{ record_type }}-{{ no }}-amount" value="{{ record.amount.value|default:"" }}" required="required" data-type="{{ record_type }}" />
           <div id="{{ record_type }}-{{ no }}-amount-error" class="invalid-feedback">{{ record.amount.errors.0|default:"" }}</div>
         </div>

@@ -34,3 +34,7 @@
 .balance-row {
     border-color: transparent;
 }
+.record-label {
+    margin-top: 0.25rem;
+    margin-bottom: 0.1rem;
+}
