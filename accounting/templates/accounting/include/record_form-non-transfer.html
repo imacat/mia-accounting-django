@@ -24,22 +24,10 @@ First written: 2020/8/5
   <div id="{{ record_type }}-{{ no }}-error">{% if record.non_field_errors %}{{ record.non_field_errors.0 }}{% endif %}</div>
   <div class="d-flex justify-content-between">
     <div class="row">
-      <div class="col-lg-6">
-        {% if record.id.value %}
-          <input type="hidden" name="{{ record_type }}-{{ no }}-id" value="{{ record.id.value }}" />
-        {% endif %}
-        <input id="{{ record_type }}-{{ no }}-ord" class="{{ record_type }}-ord" type="hidden" name="{{ record_type }}-{{ no }}-ord" value="{{ order }}" />
-        <label for="{{ record_type }}-{{ no }}-account" class="record-label">{{ _("Account:")|force_escape }}</label>
-        <select id="{{ record_type }}-{{ no }}-account" class="form-control record-account {{ record_type }}-account {% if record.account.errors %} is-invalid {% endif %}" name="{{ record_type }}-{{ no }}-account" data-type="{{ record_type }}">
-          {% if record.account is not None %}
-            <option value="{{ record.account.value|default:"" }}" selected="selected">{{ record.account.value|default:"" }} {{ record.account_title|default:"" }}</option>
-          {% else %}
-            <option value=""></option>
-          {% endif %}
-          <option value="">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</option>
-        </select>
-        <div id="{{ record_type }}-{{ no }}-account-error" class="invalid-feedback">{{ record.account.errors.0|default:"" }}</div>
-      </div>
+      {% if record.id.value %}
+        <input type="hidden" name="{{ record_type }}-{{ no }}-id" value="{{ record.id.value }}" />
+      {% endif %}
+      <input id="{{ record_type }}-{{ no }}-ord" class="{{ record_type }}-ord" type="hidden" name="{{ record_type }}-{{ no }}-ord" value="{{ order }}" />
       <div class="col-lg-6">
         <div class="row">
           <div class="col-sm-8">
@@ -53,6 +41,18 @@ First written: 2020/8/5
             <div id="{{ record_type }}-{{ no }}-amount-error" class="invalid-feedback">{{ record.amount.errors.0|default:"" }}</div>
           </div>
         </div>
+      </div>
+      <div class="col-lg-6">
+        <label for="{{ record_type }}-{{ no }}-account" class="record-label">{{ _("Account:")|force_escape }}</label>
+        <select id="{{ record_type }}-{{ no }}-account" class="form-control record-account {{ record_type }}-account {% if record.account.errors %} is-invalid {% endif %}" name="{{ record_type }}-{{ no }}-account" data-type="{{ record_type }}">
+          {% if record.account is not None %}
+            <option value="{{ record.account.value|default:"" }}" selected="selected">{{ record.account.value|default:"" }} {{ record.account_title|default:"" }}</option>
+          {% else %}
+            <option value=""></option>
+          {% endif %}
+          <option value="">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</option>
+        </select>
+        <div id="{{ record_type }}-{{ no }}-account-error" class="invalid-feedback">{{ record.account.errors.0|default:"" }}</div>
       </div>
     </div>
     <div>
