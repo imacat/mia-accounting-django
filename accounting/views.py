@@ -43,7 +43,7 @@ from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_post, new_pk, PaginationException
 from mia_core.views import DeleteView
 from . import utils
-from .forms import AccountForm, TransactionForm, RecordForm
+from .forms import AccountForm, TransactionForm
 from .models import Record, Transaction, Account
 
 
