@@ -93,7 +93,7 @@ First written: 2020/8/6
               <input id="transaction-{{ txn.pk }}-ord" type="hidden" name="transaction-{{ txn.pk }}-ord" value="{{ forloop.counter }}" />
               {% if txn.is_cash_expense %}
                 <ul class="txn-content-expense">
-                  {% for summary in txn.debit_sumaries %}
+                  {% for summary in txn.debit_summaries %}
                     <li>{{ summary }}</li>
                   {% endfor %}
                 </ul>
@@ -105,7 +105,7 @@ First written: 2020/8/6
                 </ul>
               {% else %}
                 <ul class="txn-content-expense">
-                  {% for summary in txn.debit_sumaries %}
+                  {% for summary in txn.debit_summaries %}
                     <li>{{ summary }}</li>
                   {% endfor %}
                 </ul>
