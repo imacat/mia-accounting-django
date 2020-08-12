@@ -18,6 +18,9 @@
 """The data models of the accounting application.
 
 """
+import datetime
+from typing import Dict, List, Optional
+
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models, transaction
@@ -83,51 +86,44 @@ class Account(DirtyFieldsMixin, models.Model):
         db_table = "accounting_accounts"
 
     @property
-    def title(self):
+    def title(self) -> str:
+        """The title in the current language."""
         return get_multi_lingual_attr(self, "title")
 
     @title.setter
-    def title(self, value):
+    def title(self, value: str) -> None:
         set_multi_lingual_attr(self, "title", value)
 
     @property
-    def option_data(self):
+    def option_data(self) -> Dict[str, str]:
+        """The data as an option."""
         return {
             "code": self.code,
             "title": self.title,
         }
 
     @property
-    def is_parent_and_in_use(self):
-        """Whether this is a parent account and is in use.
-
-        Returns:
-            bool: True if this is a parent account and is in use, or false
-                otherwise
-        """
+    def is_parent_and_in_use(self) -> bool:
+        """Whether this is a parent account and is in use."""
         if self._is_parent_and_in_use is None:
             self._is_parent_and_in_use = self.child_set.count() > 0\
                                          and self.record_set.count() > 0
         return self._is_parent_and_in_use
 
     @is_parent_and_in_use.setter
-    def is_parent_and_in_use(self, value):
+    def is_parent_and_in_use(self, value: bool) -> None:
         self._is_parent_and_in_use = value
 
     @property
-    def is_in_use(self):
-        """Whether this account is in use.
-
-        Returns:
-            bool: True if this account is in use, or false otherwise.
-        """
+    def is_in_use(self) -> bool:
+        """Whether this account is in use."""
         if self._is_in_use is None:
             self._is_in_use = self.child_set.count() > 0\
                               or self.record_set.count() > 0
         return self._is_in_use
 
     @is_in_use.setter
-    def is_in_use(self, value):
+    def is_in_use(self, value: bool) -> None:
         self._is_in_use = value
 
 
@@ -157,7 +153,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         transaction."""
         return self.date.__str__() + " #" + self.ord.__str__()
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         """Returns the URL to view this transaction."""
         if self.is_cash_expense:
             return reverse(
@@ -169,13 +165,13 @@ class Transaction(DirtyFieldsMixin, models.Model):
             return reverse(
                 "accounting:transactions.detail", args=("transfer", self))
 
-    def is_dirty(self, check_relationship=False, check_m2m=None):
+    def is_dirty(self, check_relationship=False, check_m2m=None) -> bool:
         """Returns whether the data of this transaction is changed and need
         to be saved into the database.
 
         Returns:
-            bool: True if the data of this transaction is changed and need
-                to be saved into the database, or False otherwise.
+            True if the data of this transaction is changed and need to be
+            saved into the database, or False otherwise.
         """
         if super().is_dirty(check_relationship=check_relationship,
                             check_m2m=check_m2m):
@@ -189,8 +185,9 @@ class Transaction(DirtyFieldsMixin, models.Model):
             return True
         return False
 
-    def save(self, current_user=None, old_date=None, force_insert=False,
-             force_update=False, using=None, update_fields=None):
+    def save(self, current_user=None, old_date: datetime.date = None,
+             force_insert=False, force_update=False, using=None,
+             update_fields=None):
         # When the date is changed, the orders of the transactions in the same
         # day need to be reordered
         txn_to_sort = []
@@ -262,7 +259,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """The records of the transaction.
 
         Returns:
-            list[Record]: The records.
+            List[Record]: The records.
         """
         if self._records is None:
             self._records = list(self.record_set.all())
@@ -278,22 +275,18 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """The debit records of this transaction.
 
         Returns:
-            list[Record]: The records.
+            List[Record]: The records.
         """
         return [x for x in self.records if not x.is_credit]
 
-    def debit_total(self):
+    def debit_total(self) -> int:
         """The total amount of the debit records."""
         return sum([x.amount for x in self.debit_records
                     if isinstance(x.amount, int)])
 
     @property
-    def debit_summaries(self):
-        """The summaries of the debit records.
-
-        Returns:
-            list[str]: The summaries of the debit records.
-        """
+    def debit_summaries(self) -> List[str]:
+        """The summaries of the debit records."""
         return [x.account.title if x.summary is None else x.summary
                 for x in self.debit_records]
 
@@ -302,36 +295,28 @@ class Transaction(DirtyFieldsMixin, models.Model):
         """The credit records of this transaction.
 
         Returns:
-            list[Record]: The records.
+            List[Record]: The records.
         """
         return [x for x in self.records if x.is_credit]
 
-    def credit_total(self):
+    def credit_total(self) -> int:
         """The total amount of the credit records."""
         return sum([x.amount for x in self.credit_records
                     if isinstance(x.amount, int)])
 
     @property
-    def credit_summaries(self):
-        """The summaries of the credit records.
-
-        Returns:
-            list[str]: The summaries of the credit records.
-        """
+    def credit_summaries(self) -> List[str]:
+        """The summaries of the credit records."""
         return [x.account.title if x.summary is None else x.summary
                 for x in self.credit_records]
 
     @property
-    def amount(self):
-        """The amount of this transaction.
-
-        Returns:
-            int: The amount of this transaction.
-        """
+    def amount(self) -> int:
+        """The amount of this transaction."""
         return self.debit_total()
 
     @property
-    def is_balanced(self):
+    def is_balanced(self) -> bool:
         """Whether the sum of the amounts of the debit records is the
         same as the sum of the amounts of the credit records. """
         if self._is_balanced is None:
@@ -341,16 +326,16 @@ class Transaction(DirtyFieldsMixin, models.Model):
         return self._is_balanced
 
     @is_balanced.setter
-    def is_balanced(self, value):
+    def is_balanced(self, value: bool) -> None:
         self._is_balanced = value
 
-    def has_many_same_day(self):
+    def has_many_same_day(self) -> bool:
         """whether there are more than one transactions at this day,
         so that the user can sort their orders. """
         return Transaction.objects.filter(date=self.date).count() > 1
 
     @property
-    def has_order_hole(self):
+    def has_order_hole(self) -> bool:
         """Whether the order of the transactions on this day is not
         1, 2, 3, 4, 5..., and should be reordered. """
         if self._has_order_hole is None:
@@ -369,11 +354,11 @@ class Transaction(DirtyFieldsMixin, models.Model):
         return self._has_order_hole
 
     @has_order_hole.setter
-    def has_order_hole(self, value):
+    def has_order_hole(self, value: bool) -> None:
         self._has_order_hole = value
 
     @property
-    def is_cash_income(self):
+    def is_cash_income(self) -> bool:
         """Whether this transaction is a cash income transaction."""
         debit_records = self.debit_records
         return (len(debit_records) == 1
@@ -381,7 +366,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
                 and debit_records[0].summary is None)
 
     @property
-    def is_cash_expense(self):
+    def is_cash_expense(self) -> bool:
         """Whether this transaction is a cash expense transaction."""
         credit_records = self.credit_records
         return (len(credit_records) == 1
@@ -389,7 +374,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
                 and credit_records[0].summary is None)
 
     @property
-    def type(self):
+    def type(self) -> str:
         """The transaction type."""
         if self.is_cash_expense:
             return "expense"
@@ -444,40 +429,40 @@ class Record(DirtyFieldsMixin, models.Model):
         db_table = "accounting_records"
 
     @property
-    def debit_amount(self):
+    def debit_amount(self) -> Optional[int]:
         """The debit amount of this accounting record."""
         if self._debit_amount is None:
             self._debit_amount = self.amount if not self.is_credit else None
         return self._debit_amount
 
     @debit_amount.setter
-    def debit_amount(self, value):
+    def debit_amount(self, value: Optional[int]) -> None:
         self._debit_amount = value
 
     @property
-    def credit_amount(self):
+    def credit_amount(self) -> Optional[int]:
         """The credit amount of this accounting record."""
         if self._credit_amount is None:
             self._credit_amount = self.amount if self.is_credit else None
         return self._credit_amount
 
     @credit_amount.setter
-    def credit_amount(self, value):
+    def credit_amount(self, value: Optional[int]):
         self._credit_amount = value
 
     @property
-    def is_balanced(self):
+    def is_balanced(self) -> bool:
         """Whether the transaction of this record is balanced. """
         if self._is_balanced is None:
             self._is_balanced = self.transaction.is_balanced
         return self._is_balanced
 
     @is_balanced.setter
-    def is_balanced(self, value):
+    def is_balanced(self, value: bool) -> None:
         self._is_balanced = value
 
     @property
-    def has_order_hole(self):
+    def has_order_hole(self) -> bool:
         """Whether the order of the transactions on this day is not
         1, 2, 3, 4, 5..., and should be reordered. """
         if self._has_order_hole is None:
@@ -485,5 +470,5 @@ class Record(DirtyFieldsMixin, models.Model):
         return self._has_order_hole
 
     @has_order_hole.setter
-    def has_order_hole(self, value):
+    def has_order_hole(self, value: bool) -> None:
         self._has_order_hole = value

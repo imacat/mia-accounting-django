@@ -21,6 +21,7 @@
 import datetime
 import json
 import re
+from typing import Union, Tuple, List, Optional, Iterable, Mapping, Dict
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -37,6 +38,9 @@ from mia_core.utils import new_pk
 from .forms import TransactionForm, RecordForm
 from .models import Account, Transaction, Record
 
+AccountData = Tuple[Union[str, int], str, str, str]
+RecordData = Tuple[Union[str, int], Optional[str], int]
+
 DEFAULT_CASH_ACCOUNT = "1111"
 CASH_SHORTCUT_ACCOUNTS = ["0", "1111"]
 DEFAULT_LEDGER_ACCOUNT = "1111"
@@ -48,12 +52,12 @@ class MonthlySummary:
     """A summary record.
 
     Args:
-        month (datetime.date): The month.
-        label (str): The text label.
-        credit (int): The credit amount.
-        debit (int): The debit amount.
-        balance (int): The balance.
-        cumulative_balance (int): The cumulative balance.
+        month: The month.
+        label: The text label.
+        credit: The credit amount.
+        debit: The debit amount.
+        balance: The balance.
+        cumulative_balance: The cumulative balance.
 
     Attributes:
         month (datetime.date): The month.
@@ -64,8 +68,9 @@ class MonthlySummary:
         cumulative_balance (int): The cumulative balance.
     """
 
-    def __init__(self, month=None, label=None, credit=None, debit=None,
-                 balance=None, cumulative_balance=None):
+    def __init__(self, month: datetime.date = None, label: str = None,
+                 credit: int = None, debit: int = None, balance: int = None,
+                 cumulative_balance: int = None):
         self.month = month
         self.label = label
         self.credit = credit
@@ -80,43 +85,42 @@ class ReportUrl:
     """The URL of the accounting reports.
 
     Args:
-        cash (Account): The currently-specified account of the
+        cash: The currently-specified account of the
             cash account or cash summary.
-        ledger (Account): The currently-specified account of the
+        ledger: The currently-specified account of the
             ledger or leger summary.
-        period (Period): The currently-specified period.
+        period: The currently-specified period.
     """
 
-    def __init__(self, cash=None, ledger=None, period=None):
+    def __init__(self, cash: Account = None, ledger: Account = None,
+                 period: Period = None):
         self._period = Period() if period is None else period
         self._cash = get_default_cash_account() if cash is None else cash
         self._ledger = get_default_ledger_account()\
             if ledger is None else ledger
 
-    def cash(self):
-        return reverse(
-            "accounting:cash", args=(self._cash, self._period))
+    def cash(self) -> str:
+        return reverse("accounting:cash", args=(self._cash, self._period))
 
-    def cash_summary(self):
+    def cash_summary(self) -> str:
         return reverse("accounting:cash-summary", args=(self._cash,))
 
-    def ledger(self):
-        return reverse(
-            "accounting:ledger", args=(self._ledger, self._period))
+    def ledger(self) -> str:
+        return reverse("accounting:ledger", args=(self._ledger, self._period))
 
-    def ledger_summary(self):
+    def ledger_summary(self) -> str:
         return reverse("accounting:ledger-summary", args=(self._ledger,))
 
-    def journal(self):
+    def journal(self) -> str:
         return reverse("accounting:journal", args=(self._period,))
 
-    def trial_balance(self):
+    def trial_balance(self) -> str:
         return reverse("accounting:trial-balance", args=(self._period,))
 
-    def income_statement(self):
+    def income_statement(self) -> str:
         return reverse("accounting:income-statement", args=(self._period,))
 
-    def balance_sheet(self):
+    def balance_sheet(self) -> str:
         return reverse("accounting:balance-sheet", args=(self._period,))
 
 
@@ -124,7 +128,7 @@ class Populator:
     """The helper to populate the accounting data.
 
     Args:
-        user (User): The user in action.
+        user: The user in action.
 
     Attributes:
         user (User): The user in action.
@@ -133,7 +137,7 @@ class Populator:
     def __init__(self, user):
         self.user = user
 
-    def add_accounts(self, accounts):
+    def add_accounts(self, accounts: List[AccountData]) -> None:
         """Adds accounts.
 
         Args:
@@ -152,16 +156,16 @@ class Populator:
                     title_zh_hans=data[3],
                     created_by=self.user, updated_by=self.user).save()
 
-    def add_transfer_transaction(self, date, debit, credit):
+    def add_transfer_transaction(self, date: Union[datetime.date, int],
+                                 debit: List[RecordData],
+                                 credit: List[RecordData]) -> None:
         """Adds a transfer transaction.
 
         Args:
-            date (datetime.date|int): The date, or the number of days from
+            date: The date, or the number of days from
                 today.
-            debit (tuple[tuple[any]]): Tuples of (account, summary, amount)
-                of the debit records.
-            credit (tuple[tuple[any]]): Tuples of (account, summary, amount)
-                of the credit records.
+            debit: Tuples of (account, summary, amount) of the debit records.
+            credit: Tuples of (account, summary, amount) of the credit records.
         """
         if isinstance(date, int):
             date = timezone.localdate() + timezone.timedelta(days=date)
@@ -196,38 +200,36 @@ class Populator:
                                           updated_by=self.user)
             order = order + 1
 
-    def add_income_transaction(self, date, credit):
+    def add_income_transaction(self, date: Union[datetime.date, int],
+                               credit: List[RecordData]) -> None:
         """Adds a cash income transaction.
 
         Args:
-            date (datetime.date|int): The date, or the number of days from
-                today.
-            credit (tuple[tuple[any]]): Tuples of (account, summary, amount) of
-                the credit records.
+            date: The date, or the number of days from today.
+            credit: Tuples of (account, summary, amount) of the credit records.
         """
         amount = sum([x[2] for x in credit])
         self.add_transfer_transaction(
-            date, ((Account.CASH, None, amount),), credit)
+            date, [(Account.CASH, None, amount)], credit)
 
-    def add_expense_transaction(self, date, debit):
+    def add_expense_transaction(self, date: Union[datetime.date, int],
+                                debit: List[RecordData]) -> None:
         """Adds a cash income transaction.
 
         Args:
-            date (datetime.date|int): The date, or the number of days from
-                today.
-            debit (tuple[tuple[any]]): Tuples of (account, summary, amount) of
-                the debit records.
+            date: The date, or the number of days from today.
+            debit: Tuples of (account, summary, amount) of the debit records.
         """
         amount = sum([x[2] for x in debit])
         self.add_transfer_transaction(
-            date, debit, ((Account.CASH, None, amount),))
+            date, debit, [(Account.CASH, None, amount)])
 
 
-def get_cash_accounts():
+def get_cash_accounts() -> List[Account]:
     """Returns the cash accounts.
 
     Returns:
-        list[Account]: The cash accounts.
+        The cash accounts.
     """
     accounts = list(
         Account.objects
@@ -247,11 +249,11 @@ def get_cash_accounts():
     return accounts
 
 
-def get_default_cash_account():
+def get_default_cash_account() -> Account:
     """Returns the default cash account.
 
     Returns:
-        Account: The default cash account.
+        The default cash account.
     """
     try:
         code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
@@ -274,11 +276,11 @@ def get_default_cash_account():
     return Account(code="0", title=_("current assets and liabilities"))
 
 
-def get_cash_shortcut_accounts():
+def get_cash_shortcut_accounts() -> List[str]:
     """Returns the codes of the shortcut cash accounts.
 
     Returns:
-        list[str]: The codes of the shortcut cash accounts.
+        The codes of the shortcut cash accounts.
     """
     try:
         accounts = settings.ACCOUNTING["CASH_SHORTCUT_ACCOUNTS"]
@@ -293,11 +295,11 @@ def get_cash_shortcut_accounts():
     return accounts
 
 
-def get_ledger_accounts():
+def get_ledger_accounts() -> List[Account]:
     """Returns the accounts for the ledger.
 
     Returns:
-        list[Account]: The accounts for the ledger.
+        The accounts for the ledger.
     """
     """
     For SQL one-liner:
@@ -315,18 +317,19 @@ SELECT s.*
     """
     codes = {}
     for code in [x.code for x in Account.objects
-            .annotate(Count("record")).filter(record__count__gt=0)]:
+                 .annotate(Count("record"))
+                 .filter(record__count__gt=0)]:
         while len(code) > 0:
             codes[code] = True
             code = code[:-1]
     return Account.objects.filter(code__in=codes).order_by("code")
 
 
-def get_default_ledger_account():
+def get_default_ledger_account() -> Optional[Account]:
     """Returns the default ledger account.
 
     Returns:
-        Account: The default ledger account.
+        The default ledger account.
     """
     try:
         code = settings.ACCOUNTING["DEFAULT_CASH_ACCOUNT"]
@@ -347,12 +350,12 @@ def get_default_ledger_account():
     return None
 
 
-def find_imbalanced(records):
+def find_imbalanced(records: Iterable[Record]) -> None:
     """"Finds the records with imbalanced transactions, and sets their
     is_balanced attribute.
 
     Args:
-        records (list[Record]): The accounting records.
+        records: The accounting records.
     """
     imbalanced = [x.pk for x in Transaction.objects
                   .annotate(
@@ -364,13 +367,13 @@ def find_imbalanced(records):
         record.is_balanced = record.transaction.pk not in imbalanced
 
 
-def find_order_holes(records):
+def find_order_holes(records: Iterable[Record]) -> None:
     """"Finds whether the order of the transactions on this day is not
         1, 2, 3, 4, 5..., and should be reordered, and sets their
         has_order_holes attributes.
 
     Args:
-        records (list[Record]): The accounting records.
+        records: The accounting records.
     """
     holes = [x["date"] for x in Transaction.objects
              .values("date")
@@ -387,12 +390,12 @@ def find_order_holes(records):
                                 and record.transaction.date in holes
 
 
-def find_payable_records(account, records):
+def find_payable_records(account: Account, records: Iterable[Record]) -> None:
     """Finds and sets the whether the payable record is paid.
 
     Args:
-        account (Account): The current ledger account.
-        records (list[Record]): The accounting records.
+        account: The current ledger account.
+        records: The accounting records.
     """
     try:
         payable_accounts = settings.ACCOUNTING["PAYABLE_ACCOUNTS"]
@@ -418,16 +421,17 @@ def find_payable_records(account, records):
     keys = ["%s-%s" % (x["account__code"], x["summary"]) for x in rows]
     for x in [x for x in records
               if x.pk is not None
-                 and F"{x.account.code}-{x.summary}" in keys]:
+              and F"{x.account.code}-{x.summary}" in keys]:
         x.is_payable = True
 
 
-def find_existing_equipments(account, records):
+def find_existing_equipments(account: Account,
+                             records: Iterable[Record]) -> None:
     """Finds and sets the equipments that still exist.
 
     Args:
-        account (Account): The current ledger account.
-        records (list[Record]): The accounting records.
+        account: The current ledger account.
+        records: The accounting records.
     """
     try:
         equipment_accounts = settings.ACCOUNTING["EQUIPMENT_ACCOUNTS"]
@@ -453,17 +457,17 @@ def find_existing_equipments(account, records):
     keys = ["%s-%s" % (x["account__code"], x["summary"]) for x in rows]
     for x in [x for x in records
               if x.pk is not None
-                 and F"{x.account.code}-{x.summary}" in keys]:
+              and F"{x.account.code}-{x.summary}" in keys]:
         x.is_existing_equipment = True
 
 
-def get_summary_categories():
+def get_summary_categories() -> str:
     """Finds and returns the summary categories and their corresponding account
-    hints.
+    hints as JSON.
 
     Returns:
-        dict[str,str]: The summary categories and their account hints, by
-            their record types and category types.
+        The summary categories and their account hints, by their record types
+        and category types.
     """
     rows = Record.objects\
         .filter(Q(summary__contains="—"),
@@ -507,14 +511,15 @@ def get_summary_categories():
     return json.dumps(categories)
 
 
-def fill_txn_from_post(txn_type, txn, post):
+def fill_txn_from_post(txn_type: str, txn: Transaction,
+                       post: Mapping[str, str]) -> None:
     """Fills the transaction from the POSTed data.  The POSTed data must be
     validated and clean at this moment.
 
     Args:
-        txn_type (str): The transaction type.
-        txn (Transaction): The transaction.
-        post (dict): The POSTed data.
+        txn_type: The transaction type.
+        txn: The transaction.
+        post: The POSTed data.
     """
     m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", post["date"])
     txn.date = datetime.date(
@@ -565,12 +570,12 @@ def fill_txn_from_post(txn_type, txn, post):
     txn.records = records
 
 
-def sort_post_txn_records(post):
+def sort_post_txn_records(post: Dict[str, str]) -> None:
     """Sorts the records in the form by their specified order, so that the
     form can be used to populate the data to return to the user.
 
     Args:
-        post (dict): The POSTed form.
+        post: The POSTed form.
     """
     # Collects the available record numbers
     record_no = {
@@ -618,15 +623,16 @@ def sort_post_txn_records(post):
         post[key] = new_post[key]
 
 
-def make_txn_form_from_model(txn_type, txn):
+def make_txn_form_from_model(txn_type: str,
+                             txn: Transaction) -> TransactionForm:
     """Converts a transaction data model to a transaction form.
 
     Args:
-        txn_type (str): The transaction type.
-        txn (Transaction): The transaction data model.
+        txn_type: The transaction type.
+        txn: The transaction data model.
 
     Returns:
-        TransactionForm: The transaction form.
+        The transaction form.
     """
     form = TransactionForm(
         {x: str(getattr(txn, x)) for x in ["date", "notes"]
@@ -658,7 +664,8 @@ def make_txn_form_from_model(txn_type, txn):
     return form
 
 
-def _find_max_record_no(txn_type, post):
+def _find_max_record_no(txn_type: str,
+                        post: Mapping[str, str]) -> Dict[str, int]:
     """Finds the max debit and record numbers from the POSTed form.
 
     Args:

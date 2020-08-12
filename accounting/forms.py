@@ -19,6 +19,7 @@
 
 """
 import re
+from typing import Optional
 
 from django import forms
 from django.core.validators import RegexValidator
@@ -67,12 +68,12 @@ class RecordForm(forms.Form):
         self.txn_form = None
         self.is_credit = None
 
-    def account_title(self):
+    def account_title(self) -> Optional[str]:
         """Returns the title of the specified account, if any.
 
         Returns:
-            str: The title of the specified account, or None if the specified
-                account is not available.
+            The title of the specified account, or None if the specified
+            account is not available.
         """
         try:
             return Account.objects.get(code=self["account"].value()).title
@@ -101,7 +102,7 @@ class RecordForm(forms.Form):
         if errors:
             raise forms.ValidationError(errors)
 
-    def _validate_transaction(self):
+    def _validate_transaction(self) -> None:
         """Validates whether the transaction matches the transaction form.
 
         Raises:
@@ -122,7 +123,7 @@ class RecordForm(forms.Form):
                         _("This record is not for this transaction."),
                         code="not_belong")
 
-    def _validate_account_type(self):
+    def _validate_account_type(self) -> None:
         """Validates whether the account is a correct debit or credit account.
 
         Raises:
@@ -145,7 +146,7 @@ class RecordForm(forms.Form):
                 self.add_error("account", error)
                 raise error
 
-    def _validate_is_credit(self):
+    def _validate_is_credit(self) -> None:
         """Validates whether debit and credit records are submitted correctly
         as corresponding debit and credit records.
 
@@ -250,7 +251,7 @@ class TransactionForm(forms.Form):
         if errors:
             raise forms.ValidationError(errors)
 
-    def _validate_has_debit_records(self):
+    def _validate_has_debit_records(self) -> None:
         """Validates whether there is any debit record.
 
         Raises:
@@ -268,7 +269,7 @@ class TransactionForm(forms.Form):
             _("Please fill in accounting records."),
             code="has_debit_records")
 
-    def _validate_has_credit_records(self):
+    def _validate_has_credit_records(self) -> None:
         """Validates whether there is any credit record.
 
         Raises:
@@ -286,7 +287,7 @@ class TransactionForm(forms.Form):
             _("Please fill in accounting records."),
             code="has_debit_records")
 
-    def _validate_balance(self):
+    def _validate_balance(self) -> None:
         """Validates whether the total amount of debit and credit records are
         consistent.
 
@@ -301,20 +302,20 @@ class TransactionForm(forms.Form):
             _("The total of the debit and credit amounts are inconsistent."),
             code="balance")
 
-    def is_valid(self):
-        if not super(TransactionForm, self).is_valid():
+    def is_valid(self) -> bool:
+        if not super().is_valid():
             return False
         for x in self.debit_records + self.credit_records:
             if not x.is_valid():
                 return False
         return True
 
-    def balance_error(self):
+    def balance_error(self) -> Optional[str]:
         """Returns the error message when the transaction is imbalanced.
 
         Returns:
-            str: The error message when the transaction is imbalanced, or
-                None otherwise.
+            The error message when the transaction is imbalanced, or None
+            otherwise.
         """
         errors = [x for x in self.non_field_errors().data
                   if x.code == "balance"]
@@ -322,20 +323,20 @@ class TransactionForm(forms.Form):
             return errors[0].message
         return None
 
-    def debit_total(self):
+    def debit_total(self) -> int:
         """Returns the total amount of the debit records.
 
         Returns:
-            int: The total amount of the credit records.
+            The total amount of the credit records.
         """
         return sum([int(x.data["amount"]) for x in self.debit_records
                     if "amount" in x.data and "amount" not in x.errors])
 
-    def credit_total(self):
+    def credit_total(self) -> int:
         """Returns the total amount of the credit records.
 
         Returns:
-            int: The total amount of the credit records.
+            The total amount of the credit records.
         """
         return sum([int(x.data["amount"]) for x in self.credit_records
                     if "amount" in x.data and "amount" not in x.errors])
@@ -366,7 +367,8 @@ class AccountForm(forms.Form):
         self.account = None
 
     @property
-    def parent(self):
+    def parent(self) -> Optional[Account]:
+        """The parent account, or None if this is the topmost account."""
         code = self["code"].value()
         if code is None or len(code) < 2:
             return None
@@ -391,7 +393,7 @@ class AccountForm(forms.Form):
         if errors:
             raise forms.ValidationError(errors)
 
-    def _validate_code_not_under_myself(self):
+    def _validate_code_not_under_myself(self) -> None:
         """Validates whether the code is under itself.
 
         Raises:
@@ -411,7 +413,7 @@ class AccountForm(forms.Form):
         self.add_error("code", error)
         raise error
 
-    def _validate_code_unique(self):
+    def _validate_code_unique(self) -> None:
         """Validates whether the code is unique.
 
         Raises:
@@ -432,7 +434,7 @@ class AccountForm(forms.Form):
         self.add_error("code", error)
         raise error
 
-    def _validate_code_parent_exists(self):
+    def _validate_code_parent_exists(self) -> None:
         """Validates whether the parent account exists.
 
         Raises:
@@ -452,7 +454,7 @@ class AccountForm(forms.Form):
             raise error
         return
 
-    def _validate_code_descendant_code_size(self):
+    def _validate_code_descendant_code_size(self) -> None:
         """Validates whether the codes of the descendants will be too long.
 
         Raises:
@@ -467,9 +469,9 @@ class AccountForm(forms.Form):
                     ~Q(pk=self.account.pk))\
             .aggregate(max_len=Max(Length("code")))["max_len"]
         if cur_max_len is None:
-            return True
+            return
         new_max_len = cur_max_len - len(self.account.code)\
-                      + len(self.data["code"])
+            + len(self.data["code"])
         if new_max_len <= 5:
             return
         error = forms.ValidationError(

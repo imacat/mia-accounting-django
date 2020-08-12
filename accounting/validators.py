@@ -25,11 +25,11 @@ from django.utils.translation import gettext as _
 from .models import Account, Record
 
 
-def validate_record_id(value):
+def validate_record_id(value: str) -> None:
     """Validates the record ID.
 
     Args:
-        value (str): The record ID.
+        value: The record ID.
 
     Raises:
         ValidationError: When the validation fails.
@@ -41,11 +41,11 @@ def validate_record_id(value):
                               code="not_exist")
 
 
-def validate_record_account_code(value):
+def validate_record_account_code(value: str) -> None:
     """Validates an account code.
 
     Args:
-        value (str): The account code.
+        value: The account code.
 
     Raises:
         ValidationError: When the validation fails.

@@ -142,14 +142,17 @@ class CashAccountConverter:
     """The path converter for the cash account."""
     regex = "0|(11|12|21|22)[1-9]{1,3}"
 
-    def to_python(self, value):
+    def to_python(self, value: str) -> Account:
         """Returns the cash account by the account code.
 
         Args:
-            value (str): The account code.
+            value: The account code.
 
         Returns:
-            Account: The account.
+            The account.
+
+        Raises:
+            ValueError: When the value is invalid
         """
         if value == "0":
             return Account(
@@ -164,14 +167,14 @@ class CashAccountConverter:
             raise ValueError
         return account
 
-    def to_url(self, value):
+    def to_url(self, value: Account) -> str:
         """Returns the code of an account.
 
         Args:
-            value (Account): The account.
+            value: The account.
 
         Returns:
-            str: The account code.
+            The account code.
         """
         return value.code
 
@@ -180,14 +183,17 @@ class LedgerAccountConverter:
     """The path converter for the ledger account."""
     regex = "[1-9]{1,5}"
 
-    def to_python(self, value):
+    def to_python(self, value: str) -> Account:
         """Returns the ledger account by the account code.
 
         Args:
-            value (str): The account code.
+            value: The account code.
 
         Returns:
-            Account: The account.
+            The account.
+
+        Raises:
+            ValueError: When the value is invalid
         """
         try:
             account = Account.objects.get(code=value)
@@ -197,14 +203,14 @@ class LedgerAccountConverter:
             raise ValueError
         return account
 
-    def to_url(self, value):
+    def to_url(self, value: Account) -> str:
         """Returns the code of an account.
 
         Args:
-            value (Account): The account.
+            value: The account.
 
         Returns:
-            str: The account code.
+            The account code.
         """
         return value.code
 
@@ -213,27 +219,30 @@ class TransactionConverter:
     """The path converter for the accounting transactions."""
     regex = "[1-9][0-9]{8}"
 
-    def to_python(self, value):
+    def to_python(self, value: str) -> Transaction:
         """Returns the transaction by the transaction ID.
 
         Args:
-            value (str): The transaction ID.
+            value: The transaction ID.
 
         Returns:
-            Transaction: The account.
+            The account.
+
+        Raises:
+            ValueError: When the value is invalid
         """
         try:
             return Transaction.objects.get(pk=value)
         except Transaction.DoesNotExist:
             raise ValueError
 
-    def to_url(self, value):
+    def to_url(self, value: Transaction) -> str:
         """Returns the ID of an account.
 
         Args:
-            value (Transaction): The transaction.
+            value: The transaction.
 
         Returns:
-            str: The transaction ID.
+            The transaction ID.
         """
         return value.pk

@@ -18,6 +18,7 @@
 """The view controllers of the accounting application.
 
 """
+import datetime
 import json
 import re
 
@@ -26,7 +27,8 @@ from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
     ExpressionWrapper
 from django.db.models.functions import TruncMonth, Coalesce
-from django.http import JsonResponse, HttpResponseRedirect, Http404
+from django.http import JsonResponse, HttpResponseRedirect, Http404, \
+    HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -62,16 +64,17 @@ class CashDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def cash(request, account, period):
+def cash(request: HttpRequest, account: Account,
+         period: Period) -> HttpResponse:
     """The cash account.
 
     Args:
-        request (HttpRequest) The request.
-        account (Account): The account.
-        period (Period): The period.
+        request: The request.
+        account: The account.
+        period: The period.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounting records
     if account.code == "0":
@@ -180,15 +183,15 @@ class CashSummaryDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def cash_summary(request, account):
+def cash_summary(request: HttpRequest, account: Account) -> HttpResponse:
     """The cash account summary.
 
     Args:
-        request (HttpRequest) The request.
-        account (Account): The account.
+        request: The request.
+        account: The account.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The account
     accounts = utils.get_cash_accounts()
@@ -278,16 +281,17 @@ class LedgerDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def ledger(request, account, period):
+def ledger(request: HttpRequest, account: Account,
+           period: Period) -> HttpResponse:
     """The ledger.
 
     Args:
-        request (HttpRequest) The request.
-        account (Account): The account.
-        period (Period): The period.
+        request: The request.
+        account: The account.
+        period: The period.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounting records
     records = list(
@@ -354,15 +358,15 @@ class LedgerSummaryDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def ledger_summary(request, account):
+def ledger_summary(request: HttpRequest, account: Account) -> HttpResponse:
     """The ledger summary report.
 
     Args:
-        request (HttpRequest) The request.
-        account (Account): The account.
+        request: The request.
+        account: The account.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The month summaries
     months = [utils.MonthlySummary(**x) for x in Record.objects
@@ -416,15 +420,15 @@ class JournalDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def journal(request, period):
+def journal(request: HttpRequest, period: Period) -> HttpResponse:
     """The journal.
 
     Args:
-        request (HttpRequest) The request.
-        period (Period): The period.
+        request: The request.
+        period: The period.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounting records
     records = Record.objects \
@@ -498,15 +502,15 @@ class TrialBalanceDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def trial_balance(request, period):
+def trial_balance(request: HttpRequest, period: Period) -> HttpResponse:
     """The trial balance.
 
     Args:
-        request (HttpRequest) The request.
-        period (Period): The period.
+        request: The request.
+        period: The period.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounts
     nominal = list(
@@ -601,15 +605,15 @@ class IncomeStatementDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def income_statement(request, period):
+def income_statement(request: HttpRequest, period: Period) -> HttpResponse:
     """The income statement.
 
     Args:
-        request (HttpRequest) The request.
-        period (Period): The period.
+        request: The request.
+        period: The period.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounts
     accounts = list(
@@ -676,15 +680,15 @@ class BalanceSheetDefaultView(RedirectView):
 
 @require_GET
 @login_required
-def balance_sheet(request, period):
+def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
     """The balance sheet.
 
     Args:
-        request (HttpRequest) The request.
-        period (Period): The period.
+        request: The request.
+        period: The period.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounts
     accounts = list(
@@ -764,14 +768,14 @@ def balance_sheet(request, period):
 
 @require_GET
 @login_required
-def search(request):
+def search(request: HttpRequest) -> HttpResponse:
     """The search.
 
     Args:
-        request (HttpRequest) The request.
+        request: The request.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     # The accounting records
     query = request.GET.get("q")
@@ -809,16 +813,17 @@ class TransactionView(DetailView):
 
 @require_GET
 @login_required
-def txn_form(request, txn_type, txn=None):
+def txn_form(request: HttpRequest, txn_type: str,
+             txn: Transaction = None) -> HttpResponse:
     """The view to edit an accounting transaction.
 
     Args:
-        request (HttpRequest): The request.
-        txn_type (str): The transaction type.
-        txn (Transaction): The transaction.
+        request: The request.
+        txn_type: The transaction type.
+        txn: The transaction.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     previous_post = stored_post.get_previous_post(request)
     if previous_post is not None:
@@ -847,16 +852,17 @@ def txn_form(request, txn_type, txn=None):
 
 @require_POST
 @login_required
-def txn_store(request, txn_type, txn=None):
+def txn_store(request: HttpRequest, txn_type: str,
+              txn: Transaction = None) -> HttpResponseRedirect:
     """The view to store an accounting transaction.
 
     Args:
-        request (HttpRequest): The request.
-        txn_type (str): The transaction type.
-        txn (Transaction): The transaction.
+        request: The request.
+        txn_type: The transaction type.
+        txn: The transaction.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     post = request.POST.dict()
     strip_post(post)
@@ -900,15 +906,15 @@ class TransactionDeleteView(DeleteView):
 
 
 @login_required
-def txn_sort(request, date):
+def txn_sort(request: HttpRequest, date: datetime.date) -> HttpResponse:
     """The view for the form to sort the transactions in a same day.
 
     Args:
-        request (HttpRequest): The request.
-        date (datetime.date): The day.
+        request: The request.
+        date: The day.
 
     Returns:
-        HttpResponse: The response.
+        The response.
 
     Raises:
         Http404: When there are less than two transactions in this day.
@@ -977,15 +983,16 @@ class AccountView(DetailView):
 
 @require_GET
 @login_required
-def account_form(request, account=None):
+def account_form(request: HttpRequest,
+                 account: Account = None) -> HttpResponse:
     """The view to edit an accounting transaction.
 
     Args:
-        request (HttpRequest): The request.
-        account (Account): The account.
+        request: The request.
+        account: The account.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     previous_post = stored_post.get_previous_post(request)
     if previous_post is not None:
@@ -1005,15 +1012,16 @@ def account_form(request, account=None):
 
 @require_POST
 @login_required
-def account_store(request, account=None):
+def account_store(request: HttpRequest,
+                  account: Account = None) -> HttpResponseRedirect:
     """The view to store an account.
 
     Args:
-        request (HttpRequest): The request.
-        account (Account): The account.
+        request: The request.
+        account: The account.
 
     Returns:
-        HttpResponseRedirect: The response.
+        The response.
     """
     post = request.POST.dict()
     strip_post(post)
@@ -1040,7 +1048,8 @@ def account_store(request, account=None):
 
 @require_POST
 @login_required
-def account_delete(request, account):
+def account_delete(request: HttpRequest,
+                   account: Account) -> HttpResponseRedirect:
     """The view to delete an account.
 
     Args:
@@ -1062,28 +1071,28 @@ def account_delete(request, account):
 
 @require_GET
 @login_required
-def api_account_list(request):
+def api_account_list(request: HttpRequest) -> JsonResponse:
     """The API view to return all the accounts.
 
     Args:
-        request (HttpRequest): The request.
+        request: The request.
 
     Returns:
-        JsonResponse: The response.
+        The response.
     """
     return JsonResponse({x.code: x.title for x in Account.objects.all()})
 
 
 @require_GET
 @login_required
-def api_account_options(request):
+def api_account_options(request: HttpRequest) -> JsonResponse:
     """The API view to return the account options.
 
     Args:
-        request (HttpRequest): The request.
+        request: The request.
 
     Returns:
-        JsonResponse: The response.
+        The response.
     """
     accounts = Account.objects\
         .annotate(children_count=Count("child_set"))\

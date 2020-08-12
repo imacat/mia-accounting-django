@@ -19,6 +19,7 @@
 
 """
 import re
+from typing import Union, Optional
 
 from django import template
 
@@ -30,7 +31,7 @@ register = template.Library()
 
 
 @register.filter
-def accounting_amount(value):
+def accounting_amount(value: Union[str, int]) -> str:
     if value is None:
         return ""
     if value == 0:
@@ -47,13 +48,15 @@ def accounting_amount(value):
 
 
 @register.simple_tag
-def report_url(cash_account, ledger_account, period):
+def report_url(cash_account: Optional[Account],
+               ledger_account: Optional[Account],
+               period: Optional[Period]) -> ReportUrl:
     """Returns accounting report URL helper.
 
     Args:
-        cash_account (Account): The current cash account.
-        ledger_account (Account): The current ledger account.
-        period (Period): The period.
+        cash_account: The current cash account.
+        ledger_account: The current ledger account.
+        period: The period.
 
     Returns:
         ReportUrl: The accounting report URL helper.

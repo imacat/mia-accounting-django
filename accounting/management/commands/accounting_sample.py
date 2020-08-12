@@ -62,7 +62,7 @@ class Command(BaseCommand):
             user.save()
 
             p = Populator(user)
-            p.add_accounts((
+            p.add_accounts([
                 (1, "資產", "assets", "资产"),
                 (2, "負債", "liabilities", "负债"),
                 (3, "業主權益", "owners’ equity", "业主权益"),
@@ -124,7 +124,7 @@ class Command(BaseCommand):
                  "管理及总务费用"),
                 (6272, "伙食費", "meal (expenses)", "伙食费"),
                 (6273, "職工福利", "employee benefits/welfare", "职工福利"),
-            ))
+            ])
 
             income = random.randint(40000, 50000)
             pension = 882 if income <= 40100\
@@ -143,49 +143,49 @@ class Command(BaseCommand):
             month = (date.replace(day=1) - timezone.timedelta(days=1)).month
             p.add_transfer_transaction(
                 date,
-                ((1113, "薪資轉帳", savings),
+                [(1113, "薪資轉帳", savings),
                  (1314, F"勞保{month}月", pension),
                  (6262, F"健保{month}月", insurance),
-                 (1255, "代扣所得稅", tax)),
-                ((4611, F"{month}月份薪水", income),))
+                 (1255, "代扣所得稅", tax)],
+                [(4611, F"{month}月份薪水", income)])
 
             p.add_income_transaction(
                 -15,
-                ((1113, "ATM提款", 2000),))
+                [(1113, "ATM提款", 2000)])
             p.add_transfer_transaction(
                 -14,
-                ((6254, "高鐵—台北→左營", 1490),),
-                ((2141, "高鐵—台北→左營", 1490),))
+                [(6254, "高鐵—台北→左營", 1490)],
+                [(2141, "高鐵—台北→左營", 1490)])
             p.add_transfer_transaction(
                 -14,
-                ((6273, "電影—復仇者聯盟", 80),),
-                ((2141, "電影—復仇者聯盟", 80),))
+                [(6273, "電影—復仇者聯盟", 80)],
+                [(2141, "電影—復仇者聯盟", 80)])
             p.add_transfer_transaction(
                 -13,
-                ((6273, "電影—2001太空漫遊", 80),),
-                ((2141, "電影—2001太空漫遊", 80),))
+                [(6273, "電影—2001太空漫遊", 80)],
+                [(2141, "電影—2001太空漫遊", 80)])
             p.add_transfer_transaction(
                 -11,
-                ((2141, "電影—復仇者聯盟", 80),),
-                ((1113, "電影—復仇者聯盟", 80),))
+                [(2141, "電影—復仇者聯盟", 80)],
+                [(1113, "電影—復仇者聯盟", 80)])
 
             p.add_expense_transaction(
                 -13,
-                ((6273, "公車—262—民生社區→頂溪捷運站", 30),))
+                [(6273, "公車—262—民生社區→頂溪捷運站", 30)])
 
             p.add_expense_transaction(
                 -2,
-                ((6272, "午餐—排骨飯", random.randint(40, 200)),
-                 (6272, "飲料—紅茶", random.randint(40, 200))))
+                [(6272, "午餐—排骨飯", random.randint(40, 200)),
+                 (6272, "飲料—紅茶", random.randint(40, 200))])
             p.add_expense_transaction(
                 -1,
-                ((6272, "午餐—牛肉麵", random.randint(40, 200)),
-                 (6272, "飲料—紅茶", random.randint(40, 200))))
+                ([(6272, "午餐—牛肉麵", random.randint(40, 200)),
+                 (6272, "飲料—紅茶", random.randint(40, 200))]))
             p.add_expense_transaction(
                 -1,
-                ((6272, "午餐—排骨飯", random.randint(40, 200)),
-                 (6272, "飲料—冬瓜茶", random.randint(40, 200))))
+                [(6272, "午餐—排骨飯", random.randint(40, 200)),
+                 (6272, "飲料—冬瓜茶", random.randint(40, 200))])
             p.add_expense_transaction(
                 0,
-                ((6272, "午餐—雞腿飯", random.randint(40, 200)),
-                 (6272, "飲料—咖啡", random.randint(40, 200))))
+                [(6272, "午餐—雞腿飯", random.randint(40, 200)),
+                 (6272, "飲料—咖啡", random.randint(40, 200))])
