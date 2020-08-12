@@ -834,7 +834,7 @@ def txn_form(request, txn_type, txn=None):
             form.credit_records.append(RecordForm())
         else:
             form = make_txn_form_from_model(txn_type, txn)
-    new_record_context = {"record": Record(),
+    new_record_context = {"record": RecordForm(),
                           "record_type": "TTT",
                           "no": "NNN",
                           "order": ""}
