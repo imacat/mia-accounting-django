@@ -21,7 +21,7 @@
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
@@ -190,6 +190,55 @@ class Transaction(DirtyFieldsMixin, models.Model):
         if len([x for x in self.record_set.all() if x.pk not in kept]) > 0:
             return True
         return False
+
+    def save(self, current_user=None, old_date=None, force_insert=False,
+             force_update=False, using=None, update_fields=None):
+        # When the date is changed, the orders of the transactions in the same
+        # day need to be reordered
+        txn_to_sort = []
+        if self.date != old_date:
+            if old_date is not None:
+                txn_same_day = list(
+                    Transaction.objects
+                    .filter(Q(date=old_date), ~Q(pk=self.pk))
+                    .order_by("ord"))
+                for i in range(len(txn_same_day)):
+                    if txn_same_day[i].ord != i + 1:
+                        txn_to_sort.append([txn_same_day[i], i + 1])
+            max_ord = Transaction.objects\
+                .filter(date=self.date)\
+                .aggregate(max=Max("ord"))["max"]
+            self.ord = 1 if max_ord is None else max_ord + 1
+        # Collects the records to be deleted
+        to_keep = [x.pk for x in self.records if x.pk is not None]
+        to_delete = [x for x in self.record_set.all() if x.pk not in to_keep]
+        # Applies the created by and updated by
+        if self.pk is None:
+            self.pk = new_pk(Transaction)
+            if current_user is not None:
+                self.created_by = current_user
+        if current_user is not None:
+            self.updated_by = current_user
+        to_save = [x for x in self.records if x.is_dirty()]
+        for record in to_save:
+            if record.pk is None:
+                record.pk = new_pk(Record)
+                if current_user is not None:
+                    record.created_by = current_user
+            if current_user is not None:
+                record.updated_by = current_user
+        # Runs the update
+        with transaction.atomic():
+            super().save(force_insert=force_insert, force_update=force_update,
+                         using=using, update_fields=update_fields)
+            for record in to_delete:
+                record.delete()
+            for record in to_save:
+                record.save(force_insert=force_insert,
+                            force_update=force_update,
+                            using=using, update_fields=update_fields)
+            for x in txn_to_sort:
+                Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
 
     def delete(self, using=None, keep_parents=False):
         txn_same_day = list(

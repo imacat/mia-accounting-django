@@ -872,60 +872,16 @@ def txn_store(request, txn_type, txn=None):
             url = reverse("accounting:transactions.edit", args=(txn_type, txn))
         url = str(UrlBuilder(url).query(r=request.GET.get("r")))
         return stored_post.error_redirect(request, url, post)
-
     if txn is None:
         txn = Transaction()
     old_date = txn.date
     utils.fill_txn_from_post(txn_type, txn, post)
     if not txn.is_dirty(check_relationship=True):
-        messages.success(request, gettext_noop(
-            "This transaction was not modified."))
-        url = reverse("accounting:transactions.detail", args=(txn_type, txn))
-        return redirect(str(UrlBuilder(url).query(r=request.GET.get("r"))))
-
-    # Prepares the data
-    user = request.user
-    if txn.pk is None:
-        txn.pk = new_pk(Transaction)
-        txn.created_at = Now()
-        txn.created_by = user
-    txn.updated_at = Now()
-    txn.updated_by = user
-    txn_to_sort = []
-    if txn.date != old_date:
-        if old_date is not None:
-            txn_same_day = list(
-                Transaction.objects
-                .filter(Q(date=old_date), ~Q(pk=txn.pk))
-                .order_by("ord"))
-            for i in range(len(txn_same_day)):
-                txn_same_day[i].ord = i + 1
-                if txn_same_day[i].is_dirty():
-                    txn_to_sort.append(txn_same_day[i])
-        max_ord = Transaction.objects\
-            .filter(date=txn.date)\
-            .aggregate(max=Max("ord"))["max"]
-        txn.ord = 1 if max_ord is None else max_ord + 1
-    for record in txn.records:
-        if record.pk is None:
-            record.pk = new_pk(Record)
-            record.created_at = Now()
-            record.created_by = user
-        record.updated_at = Now()
-        record.updated_by = user
-    to_keep = [x.pk for x in txn.records if x.pk is not None]
-    to_delete = [x for x in txn.record_set.all() if x.pk not in to_keep]
-    # Runs the update
-    with transaction.atomic():
-        txn.save()
-        for record in to_delete:
-            record.delete()
-        for record in txn.records:
-            record.save()
-        for x in txn_to_sort:
-            x.save()
-    messages.success(request, gettext_noop(
-        "This transaction was saved successfully."))
+        message = gettext_noop("This transaction was not modified.")
+    else:
+        txn.save(current_user=request.user, old_date=old_date)
+        message = gettext_noop("This transaction was saved successfully.")
+    messages.success(request, message)
     url = reverse("accounting:transactions.detail", args=(txn_type, txn))
     return redirect(str(UrlBuilder(url).query(r=request.GET.get("r"))))
 
