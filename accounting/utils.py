@@ -31,7 +31,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from mia_core import stored_post
 from mia_core.period import Period
 from mia_core.templatetags.mia_core import smart_month
 from mia_core.utils import new_pk
