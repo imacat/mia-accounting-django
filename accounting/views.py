@@ -23,9 +23,9 @@ import re
 
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Sum, Case, When, F, Q, Max, Count, BooleanField, \
+from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
     ExpressionWrapper
-from django.db.models.functions import TruncMonth, Coalesce, Now
+from django.db.models.functions import TruncMonth, Coalesce
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -40,7 +40,7 @@ from mia_core import stored_post
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
-    strip_post, new_pk, PaginationException
+    strip_post, PaginationException
 from mia_core.views import DeleteView
 from . import utils
 from .forms import AccountForm, TransactionForm
