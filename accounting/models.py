@@ -76,9 +76,8 @@ class Account(DirtyFieldsMixin, models.Model):
         if current_user is not None:
             self.updated_by = current_user
         with transaction.atomic():
-            super(Account, self).save(
-                force_insert=force_insert, force_update=force_update,
-                using=using, update_fields=update_fields)
+            super().save(force_insert=force_insert, force_update=force_update,
+                         using=using, update_fields=update_fields)
 
     class Meta:
         db_table = "accounting_accounts"
@@ -178,9 +177,8 @@ class Transaction(DirtyFieldsMixin, models.Model):
             bool: True if the data of this transaction is changed and need
                 to be saved into the database, or False otherwise.
         """
-        if super(Transaction, self).is_dirty(
-                check_relationship=check_relationship,
-                check_m2m=check_m2m):
+        if super().is_dirty(check_relationship=check_relationship,
+                            check_m2m=check_m2m):
             return True
         if len([x for x in self.records
                 if x.is_dirty(check_relationship=check_relationship,
@@ -253,8 +251,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         with transaction.atomic():
             for record in self.record_set.all():
                 record.delete()
-            super(Transaction, self).delete(
-                using=using, keep_parents=keep_parents)
+            super().delete(using=using, keep_parents=keep_parents)
             for txn in txn_to_sort:
                 txn.save()
 
