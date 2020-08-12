@@ -300,8 +300,9 @@ def get_ledger_accounts():
     Returns:
         list[Account]: The accounts for the ledger.
     """
-    # TODO: Te be replaced with the Django model queries
-    return list(Account.objects.raw("""SELECT s.*
+    """
+    For SQL one-liner:
+SELECT s.*
   FROM accounting_accounts AS s
   WHERE s.code IN (SELECT s.code
     FROM accounting_accounts AS s
@@ -311,7 +312,15 @@ def get_ledger_accounts():
         GROUP BY s.code) AS u
       ON u.code LIKE s.code || '%%'
     GROUP BY s.code)
-  ORDER BY s.code"""))
+  ORDER BY s.code
+    """
+    codes = {}
+    for code in [x.code for x in Account.objects
+            .annotate(Count("record")).filter(record__count__gt=0)]:
+        while len(code) > 0:
+            codes[code] = True
+            code = code[:-1]
+    return Account.objects.filter(code__in=codes).order_by("code")
 
 
 def get_default_ledger_account():
