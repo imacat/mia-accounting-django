@@ -34,7 +34,7 @@ class RecordForm(forms.Form):
     """An accounting record form.
 
     Attributes:
-        transaction (Transaction|None): The current transaction or None.
+        txn_form (TransactionForm): The parent transaction form.
         is_credit (bool): Whether this is a credit record.
     """
     id = forms.IntegerField(
@@ -64,7 +64,7 @@ class RecordForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.transaction = None
+        self.txn_form = None
         self.is_credit = None
 
     def account_title(self):
@@ -109,7 +109,7 @@ class RecordForm(forms.Form):
         """
         if "id" in self.errors:
             return
-        if self.transaction is None:
+        if self.txn_form.transaction is None:
             if "id" in self.data:
                 raise forms.ValidationError(
                     _("This record is not for this transaction."),
@@ -117,7 +117,7 @@ class RecordForm(forms.Form):
         else:
             if "id" in self.data:
                 record = Record.objects.get(pk=self.data["id"])
-                if record.transaction.pk != self.transaction.pk:
+                if record.transaction.pk != self.txn_form.transaction.pk:
                     raise forms.ValidationError(
                         _("This record is not for this transaction."),
                         code="not_belong")
@@ -192,10 +192,45 @@ class TransactionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.txn_type = None
-        self.transaction = None
+        # Populates the belonging record forms
         self.debit_records = []
         self.credit_records = []
+        if len(args) > 0 and isinstance(args[0], dict):
+            by_rec_id = {}
+            for key in args[0].keys():
+                m = re.match(
+                    ("^((debit|credit)-([1-9][0-9]*))-"
+                     "(id|ord|account|summary|amount)$"),
+                    key)
+                if m is None:
+                    continue
+                rec_id = m.group(1)
+                column = m.group(4)
+                if rec_id not in by_rec_id:
+                    by_rec_id[rec_id] = {
+                        "is_credit": m.group(2) == "credit",
+                        "no": int(m.group(3)),
+                        "data": {},
+                    }
+                by_rec_id[rec_id]["data"][column] = args[0][key]
+            debit_data_list = [x for x in by_rec_id.values()
+                               if not x["is_credit"]]
+            debit_data_list.sort(key=lambda x: x["no"])
+            for x in debit_data_list:
+                record_form = RecordForm(x["data"])
+                record_form.txn_form = self
+                record_form.is_credit = False
+                self.debit_records.append(record_form)
+            credit_data_list = [x for x in by_rec_id.values()
+                                if x["is_credit"]]
+            credit_data_list.sort(key=lambda x: x["no"])
+            for x in credit_data_list:
+                record_form = RecordForm(x["data"])
+                record_form.txn_form = self
+                record_form.is_credit = True
+                self.credit_records.append(record_form)
+        self.txn_type = None
+        self.transaction = None
 
     def clean(self):
         """Validates the form globally.

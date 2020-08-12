@@ -641,69 +641,13 @@ def make_txn_form_from_model(txn_type, txn):
         except ObjectDoesNotExist:
             pass
         record_form = RecordForm(data)
-        record_form.transaction = form.transaction
+        record_form.txn_form = form
         record_form.is_credit = record.is_credit
         if record.is_credit:
             form.credit_records.append(record_form)
         else:
             form.debit_records.append(record_form)
     return form
-
-
-def make_txn_form_from_post(post, txn_type, txn):
-    """Converts the POSTed data to a transaction form.
-
-    Args:
-        post (dict[str]): The POSTed data.
-        txn_type (str): The transaction type.
-        txn (Transaction|None): The current transaction, or None
-            if there is no current transaction.
-
-    Returns:
-        TransactionForm: The transaction form.
-    """
-    form = TransactionForm(
-        {x: post[x] for x in ("date", "notes") if x in post})
-    form.transaction = txn
-    form.txn_type = txn_type
-    # The records
-    max_no = _find_max_record_no(txn_type, post)
-    for record_type in max_no.keys():
-        records = []
-        is_credit = (record_type == "credit")
-        for i in range(max_no[record_type]):
-            no = i + 1
-            record_form = RecordForm(
-                {x: post[F"{record_type}-{no}-{x}"]
-                 for x in ["id", "account", "summary", "amount"]
-                 if F"{record_type}-{no}-{x}" in post})
-            record_form.transaction = form.transaction
-            record_form.is_credit = is_credit
-            records.append(record_form)
-        if record_type == "debit":
-            form.debit_records = records
-        else:
-            form.credit_records = records
-    return form
-
-
-def make_txn_form_from_status(request, txn_type, txn):
-    """Converts the previously-stored status to a transaction form.
-
-    Args:
-        request (HttpRequest): The request.
-        txn_type (str): The transaction type.
-        txn (Transaction|None): The current transaction, or None
-            if there is no current transaction.
-
-    Returns:
-        TransactionForm: The transaction form, or None if there is no
-            previously-stored status.
-    """
-    form = stored_post.get_previous_post(request)
-    if form is None:
-        return None
-    return make_txn_form_from_post(form, txn_type, txn)
 
 
 def _find_max_record_no(txn_type, post):

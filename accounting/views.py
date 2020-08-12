@@ -820,14 +820,17 @@ def txn_form(request, txn_type, txn=None):
     Returns:
         HttpResponse: The response.
     """
-    form = utils.make_txn_form_from_status(request, txn_type, txn)
-    if form is None:
-        if txn is None:
-            form = TransactionForm()
-            form.debit_records.append(RecordForm())
-            form.credit_records.append(RecordForm())
-        else:
-            form = utils.make_txn_form_from_model(txn_type, txn)
+    previous_post = stored_post.get_previous_post(request)
+    if previous_post is not None:
+        form = TransactionForm(previous_post)
+    elif txn is not None:
+        form = utils.make_txn_form_from_model(txn_type, txn)
+    else:
+        form = TransactionForm()
+        form.debit_records.append(RecordForm())
+        form.credit_records.append(RecordForm())
+    form.transaction = txn
+    form.txn_type = txn_type
     new_record_context = {"record": RecordForm(),
                           "record_type": "TTT",
                           "no": "NNN",
@@ -863,7 +866,10 @@ def txn_store(request, txn_type, txn=None):
     post = request.POST.dict()
     strip_post(post)
     utils.sort_post_txn_records(post)
-    form = utils.make_txn_form_from_post(post, txn_type, txn)
+    form = TransactionForm(post)
+    form.transaction = txn
+    form.txn_type = txn_type
+    #form = utils.make_txn_form_from_post(post, txn_type, txn)
     if not form.is_valid():
         if txn is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
