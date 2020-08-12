@@ -62,8 +62,8 @@ First written: 2020/7/23
       <label for="txn-date">{{ _("Date:")|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <input id="txn-date" class="form-control {% if should_validate and form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{{ form.date.value }}" required="required" />
-      <div id="txn-date-error" class="invalid-feedback">{% if should_validate %}{{ form.date.errors.0|default:"" }}{% endif %}</div>
+      <input id="txn-date" class="form-control {% if form.date.errors %} is-invalid {% endif %}" type="date" name="date" value="{% if form.is_bound %}{{ form.date.value }}{% else %}{% now "Y-m-d" %}{% endif %}" required="required" />
+      <div id="txn-date-error" class="invalid-feedback">{{ form.date.errors.0|default:"" }}</div>
     </div>
   </div>
 
@@ -85,11 +85,11 @@ First written: 2020/7/23
           </button>
         </li>
         <li class="list-group-item">
-          <div id="debit-total-row" class="d-flex justify-content-between align-items-center form-control {% if should_validate and form.balance_error %} is-invalid {% endif %} balance-row">
+          <div id="debit-total-row" class="d-flex justify-content-between align-items-center form-control {% if form.balance_error %} is-invalid {% endif %} balance-row">
             {{ _("Total")|force_escape }}
             <span id="debit-total" class="amount">{{ form.debit_total }}</span>
           </div>
-          <div id="debit-total-error" class="invalid-feedback balance-error">{% if should_validate %}{{ form.balance_error|default:"" }}{% endif %}</div>
+          <div id="debit-total-error" class="invalid-feedback balance-error">{{ form.balance_error|default:"" }}</div>
         </li>
       </ul>
     </div>
@@ -111,11 +111,11 @@ First written: 2020/7/23
           </button>
         </li>
         <li class="list-group-item">
-          <div id="credit-total-row" class="d-flex justify-content-between align-items-center form-control {% if should_validate and form.balance_error %} is-invalid {% endif %} balance-row">
+          <div id="credit-total-row" class="d-flex justify-content-between align-items-center form-control {% if form.balance_error %} is-invalid {% endif %} balance-row">
             {{ _("Total")|force_escape }}
             <span id="credit-total" class="amount">{{ form.credit_total }}</span>
           </div>
-          <div id="credit-total-error" class="invalid-feedback balance-error">{% if should_validate %}{{ form.balance_error|default:"" }}{% endif %}</div>
+          <div id="credit-total-error" class="invalid-feedback balance-error">{{ form.balance_error|default:"" }}</div>
         </li>
       </ul>
     </div>
@@ -126,8 +126,8 @@ First written: 2020/7/23
       <label for="txn-note">{{ _("Notes:")|force_escape }}</label>
     </div>
     <div class="col-sm-10">
-      <textarea id="txn-note" class="form-control {% if should_validate and form.notes.errors %} is-invalid {% endif %}" name="notes">{{ form.notes.value|default:"" }}</textarea>
-      <div id="txn-note-error" class="invalid-feedback">{% if should_validate %}{{ form.notes.errors.0|default:"" }}{% endif %}</div>
+      <textarea id="txn-note" class="form-control {% if form.notes.errors %} is-invalid {% endif %}" name="notes">{{ form.notes.value|default:"" }}</textarea>
+      <div id="txn-note-error" class="invalid-feedback">{{ form.notes.errors.0|default:"" }}</div>
     </div>
   </div>
 

@@ -294,7 +294,7 @@ class TransactionForm(forms.Form):
             int: The total amount of the credit records.
         """
         return sum([int(x.data["amount"]) for x in self.debit_records
-                    if "amount" not in x.errors])
+                    if "amount" in x.data and "amount" not in x.errors])
 
     def credit_total(self):
         """Returns the total amount of the credit records.
@@ -303,7 +303,7 @@ class TransactionForm(forms.Form):
             int: The total amount of the credit records.
         """
         return sum([int(x.data["amount"]) for x in self.credit_records
-                    if "amount" not in x.errors])
+                    if "amount" in x.data and "amount" not in x.errors])
 
 
 class AccountForm(forms.Form):

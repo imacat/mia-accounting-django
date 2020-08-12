@@ -42,7 +42,7 @@ from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_post, new_pk, PaginationException
 from mia_core.views import DeleteView
-from .forms import AccountForm
+from .forms import AccountForm, TransactionForm, RecordForm
 from .models import Record, Transaction, Account
 from .utils import get_cash_accounts, get_ledger_accounts, \
     find_imbalanced, find_order_holes, fill_txn_from_post, \
@@ -827,16 +827,13 @@ def txn_form(request, txn_type, txn=None):
         HttpResponse: The response.
     """
     form = make_txn_form_from_status(request, txn_type, txn)
-    should_validate = True
     if form is None:
         if txn is None:
-            txn = Transaction(date=timezone.localdate())
-            should_validate = False
-        if len(txn.debit_records) == 0:
-            txn.records.append(Record(ord=1, is_credit=False))
-        if len(txn.credit_records) == 0:
-            txn.records.append(Record(ord=1, is_credit=True))
-        form = make_txn_form_from_model(txn_type, txn)
+            form = TransactionForm()
+            form.debit_records.append(RecordForm())
+            form.credit_records.append(RecordForm())
+        else:
+            form = make_txn_form_from_model(txn_type, txn)
     new_record_context = {"record": Record(),
                           "record_type": "TTT",
                           "no": "NNN",
@@ -852,7 +849,6 @@ def txn_form(request, txn_type, txn=None):
     return render(request, F"accounting/transaction_form-{txn_type}.html", {
         "form": form,
         "summary_categories": get_summary_categories,
-        "should_validate": should_validate,
         "new_record_template": new_record_template,
     })
 
