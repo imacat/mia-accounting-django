@@ -42,15 +42,9 @@ from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_post, new_pk, PaginationException
 from mia_core.views import DeleteView
+from . import utils
 from .forms import AccountForm, TransactionForm, RecordForm
 from .models import Record, Transaction, Account
-from .utils import get_cash_accounts, get_ledger_accounts, \
-    find_imbalanced, find_order_holes, fill_txn_from_post, \
-    sort_post_txn_records, make_txn_form_from_status, \
-    make_txn_form_from_model, make_txn_form_from_post, MonthlySummary, \
-    get_summary_categories, find_payable_records, find_existing_equipments, \
-    get_default_cash_account, get_default_ledger_account, \
-    get_cash_shortcut_accounts
 
 
 @method_decorator(require_GET, name="dispatch")
@@ -61,7 +55,7 @@ class CashDefaultView(RedirectView):
     pattern_name = "accounting:cash"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = get_default_cash_account()
+        kwargs["account"] = utils.get_default_cash_account()
         kwargs["period"] = Period.default_spec()
         return super().get_redirect_url(*args, **kwargs)
 
@@ -158,10 +152,10 @@ def cash(request, account, period):
     except PaginationException as e:
         return redirect(e.url)
     records = pagination.items
-    find_imbalanced(records)
-    find_order_holes(records)
-    accounts = get_cash_accounts()
-    shortcut_accounts = get_cash_shortcut_accounts()
+    utils.find_imbalanced(records)
+    utils.find_order_holes(records)
+    accounts = utils.get_cash_accounts()
+    shortcut_accounts = utils.get_cash_shortcut_accounts()
     return render(request, "accounting/report-cash.html", {
         "record_list": records,
         "pagination": pagination,
@@ -180,7 +174,7 @@ class CashSummaryDefaultView(RedirectView):
     pattern_name = "accounting:cash-summary"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = get_default_cash_account()
+        kwargs["account"] = utils.get_default_cash_account()
         return super().get_redirect_url(*args, **kwargs)
 
 
@@ -197,10 +191,10 @@ def cash_summary(request, account):
         HttpResponse: The response.
     """
     # The account
-    accounts = get_cash_accounts()
+    accounts = utils.get_cash_accounts()
     # The month summaries
     if account.code == "0":
-        months = [MonthlySummary(**x) for x in Record.objects
+        months = [utils.MonthlySummary(**x) for x in Record.objects
                   .filter(
                     Q(transaction__in=Transaction.objects.filter(
                         Q(record__account__code__startswith="11") |
@@ -225,7 +219,7 @@ def cash_summary(request, account):
                         When(is_credit=False, then=-F("amount")),
                         default=F("amount"))))]
     else:
-        months = [MonthlySummary(**x) for x in Record.objects
+        months = [utils.MonthlySummary(**x) for x in Record.objects
                   .filter(
                     Q(transaction__in=Transaction.objects.filter(
                         record__account__code__startswith=account.code)),
@@ -247,7 +241,7 @@ def cash_summary(request, account):
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
-    months.append(MonthlySummary(
+    months.append(utils.MonthlySummary(
         label=_("Total"),
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
@@ -258,7 +252,7 @@ def cash_summary(request, account):
         pagination = Pagination(request, months, True)
     except PaginationException as e:
         return redirect(e.url)
-    shortcut_accounts = get_cash_shortcut_accounts()
+    shortcut_accounts = utils.get_cash_shortcut_accounts()
     return render(request, "accounting/report-cash-summary.html", {
         "month_list": pagination.items,
         "pagination": pagination,
@@ -277,7 +271,7 @@ class LedgerDefaultView(RedirectView):
     pattern_name = "accounting:ledger"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = get_default_ledger_account()
+        kwargs["account"] = utils.get_default_ledger_account()
         kwargs["period"] = Period.default_spec()
         return super().get_redirect_url(*args, **kwargs)
 
@@ -335,14 +329,14 @@ def ledger(request, account, period):
     except PaginationException as e:
         return redirect(e.url)
     records = pagination.items
-    find_imbalanced(records)
-    find_order_holes(records)
-    find_payable_records(account, records)
-    find_existing_equipments(account, records)
+    utils.find_imbalanced(records)
+    utils.find_order_holes(records)
+    utils.find_payable_records(account, records)
+    utils.find_existing_equipments(account, records)
     return render(request, "accounting/report-ledger.html", {
         "record_list": records,
         "pagination": pagination,
-        "accounts": get_ledger_accounts(),
+        "accounts": utils.get_ledger_accounts(),
     })
 
 
@@ -354,7 +348,7 @@ class LedgerSummaryDefaultView(RedirectView):
     pattern_name = "accounting:ledger-summary"
 
     def get_redirect_url(self, *args, **kwargs):
-        kwargs["account"] = get_default_ledger_account()
+        kwargs["account"] = utils.get_default_ledger_account()
         return super().get_redirect_url(*args, **kwargs)
 
 
@@ -371,7 +365,7 @@ def ledger_summary(request, account):
         HttpResponse: The response.
     """
     # The month summaries
-    months = [MonthlySummary(**x) for x in Record.objects
+    months = [utils.MonthlySummary(**x) for x in Record.objects
               .filter(account__code__startswith=account.code)
               .annotate(month=TruncMonth("transaction__date"))
               .values("month")
@@ -390,7 +384,7 @@ def ledger_summary(request, account):
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
         month.cumulative_balance = cumulative_balance
-    months.append(MonthlySummary(
+    months.append(utils.MonthlySummary(
         label=_("Total"),
         credit=sum([x.credit for x in months]),
         debit=sum([x.debit for x in months]),
@@ -404,7 +398,7 @@ def ledger_summary(request, account):
     return render(request, "accounting/report-ledger-summary.html", {
         "month_list": pagination.items,
         "pagination": pagination,
-        "accounts": get_ledger_accounts(),
+        "accounts": utils.get_ledger_accounts(),
     })
 
 
@@ -826,14 +820,14 @@ def txn_form(request, txn_type, txn=None):
     Returns:
         HttpResponse: The response.
     """
-    form = make_txn_form_from_status(request, txn_type, txn)
+    form = utils.make_txn_form_from_status(request, txn_type, txn)
     if form is None:
         if txn is None:
             form = TransactionForm()
             form.debit_records.append(RecordForm())
             form.credit_records.append(RecordForm())
         else:
-            form = make_txn_form_from_model(txn_type, txn)
+            form = utils.make_txn_form_from_model(txn_type, txn)
     new_record_context = {"record": RecordForm(),
                           "record_type": "TTT",
                           "no": "NNN",
@@ -848,7 +842,7 @@ def txn_form(request, txn_type, txn=None):
             new_record_context))
     return render(request, F"accounting/transaction_form-{txn_type}.html", {
         "form": form,
-        "summary_categories": get_summary_categories,
+        "summary_categories": utils.get_summary_categories,
         "new_record_template": new_record_template,
     })
 
@@ -868,8 +862,8 @@ def txn_store(request, txn_type, txn=None):
     """
     post = request.POST.dict()
     strip_post(post)
-    sort_post_txn_records(post)
-    form = make_txn_form_from_post(post, txn_type, txn)
+    utils.sort_post_txn_records(post)
+    form = utils.make_txn_form_from_post(post, txn_type, txn)
     if not form.is_valid():
         if txn is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
@@ -881,7 +875,7 @@ def txn_store(request, txn_type, txn=None):
     if txn is None:
         txn = Transaction()
     old_date = txn.date
-    fill_txn_from_post(txn_type, txn, post)
+    utils.fill_txn_from_post(txn_type, txn, post)
     if not txn.is_dirty():
         messages.success(request, gettext_noop(
             "This transaction was not modified."))
