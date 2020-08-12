@@ -940,9 +940,8 @@ def txn_sort(request, date):
         keys.sort(key=lambda x: int(post[x]))
         for i in range(len(keys)):
             post[keys[i]] = i + 1
-        for txn in transactions:
-            txn.ord = post[F"transaction-{txn.pk}-ord"]
-        modified = [x for x in transactions if x.is_dirty()]
+        modified = [[x, post[F"transaction-{x.pk}-ord"]] for x in transactions
+                    if x.ord != post[F"transaction-{x.pk}-ord"]]
 
         if len(modified) == 0:
             messages.success(request, gettext_noop(
@@ -950,8 +949,8 @@ def txn_sort(request, date):
             return redirect(request.GET.get("r") or reverse("accounting:home"))
 
         with transaction.atomic():
-            for txn in modified:
-                txn.save()
+            for x in modified:
+                Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
         messages.success(request, gettext_noop(
             "The transaction orders were saved successfully."))
         return redirect(request.GET.get("r") or reverse("accounting:home"))
