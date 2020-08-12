@@ -170,7 +170,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
             return reverse(
                 "accounting:transactions.detail", args=("transfer", self))
 
-    def is_dirty(self, **kwargs):
+    def is_dirty(self, check_relationship=False, check_m2m=None):
         """Returns whether the data of this transaction is changed and need
         to be saved into the database.
 
@@ -178,9 +178,13 @@ class Transaction(DirtyFieldsMixin, models.Model):
             bool: True if the data of this transaction is changed and need
                 to be saved into the database, or False otherwise.
         """
-        if super(Transaction, self).is_dirty(**kwargs):
+        if super(Transaction, self).is_dirty(
+                check_relationship=check_relationship,
+                check_m2m=check_m2m):
             return True
-        if len([x for x in self.records if x.is_dirty(**kwargs)]) > 0:
+        if len([x for x in self.records
+                if x.is_dirty(check_relationship=check_relationship,
+                              check_m2m=check_m2m)]) > 0:
             return True
         kept = [x.pk for x in self.records]
         if len([x for x in self.record_set.all() if x.pk not in kept]) > 0:
