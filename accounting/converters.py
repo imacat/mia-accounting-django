@@ -237,7 +237,7 @@ class TransactionConverter:
             raise ValueError
 
     def to_url(self, value: Transaction) -> str:
-        """Returns the ID of an account.
+        """Returns the ID of a transaction.
 
         Args:
             value: The transaction.
