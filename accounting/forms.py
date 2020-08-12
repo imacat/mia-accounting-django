@@ -327,7 +327,7 @@ class AccountForm(forms.Form):
         })
 
     def __init__(self, *args, **kwargs):
-        super(AccountForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.account = None
 
     @property

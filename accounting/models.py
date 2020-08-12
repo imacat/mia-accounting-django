@@ -51,7 +51,7 @@ class Account(DirtyFieldsMixin, models.Model):
     NET_CHANGE = "3353"
 
     def __init__(self, *args, **kwargs):
-        super(Account, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.url = None
         self.debit_amount = None
         self.credit_amount = None
@@ -148,7 +148,7 @@ class Transaction(DirtyFieldsMixin, models.Model):
         related_name="updated_accounting_transactions")
 
     def __init__(self, *args, **kwargs):
-        super(Transaction, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._records = None
         self._is_balanced = None
         self._has_order_hole = None
@@ -375,7 +375,7 @@ class Record(DirtyFieldsMixin, models.Model):
         related_name="updated_accounting_records")
 
     def __init__(self, *args, **kwargs):
-        super(Record, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._debit_amount = None
         self._credit_amount = None
         self.balance = None

@@ -50,7 +50,7 @@ class UserForm(forms.Form):
     is_disabled = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
-        super(UserForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.user = None
         self.current_user = None
 
