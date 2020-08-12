@@ -956,7 +956,7 @@ def txn_sort(request, date):
         HttpResponse: The response.
 
     Raises:
-        Http404: When ther are less than two transactions in this day.
+        Http404: When there are less than two transactions in this day.
     """
     transactions = Transaction.objects.filter(date=date).order_by("ord")
     if len(transactions) < 2:
