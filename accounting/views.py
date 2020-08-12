@@ -865,7 +865,6 @@ def txn_store(request, txn_type, txn=None):
     form = TransactionForm(post)
     form.transaction = txn
     form.txn_type = txn_type
-    #form = utils.make_txn_form_from_post(post, txn_type, txn)
     if not form.is_valid():
         if txn is None:
             url = reverse("accounting:transactions.create", args=(txn_type,))
