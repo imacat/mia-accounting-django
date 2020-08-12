@@ -829,10 +829,8 @@ def txn_form(request, txn_type, txn=None):
         form = TransactionForm()
     form.transaction = txn
     form.txn_type = txn_type
-    new_record_context = {"record": RecordForm(),
-                          "record_type": "TTT",
-                          "no": "NNN",
-                          "order": ""}
+    new_record_context = {"record_type": "TTT",
+                          "no": "NNN"}
     if txn_type == "transfer":
         new_record_template = json.dumps(render_to_string(
             "accounting/include/record_form-transfer.html",
