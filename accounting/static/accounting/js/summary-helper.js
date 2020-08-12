@@ -35,6 +35,8 @@ $(function () {
     $("#summary-summary")
         .on("change", function () {
             this.value = this.value.trim();
+            // Replaced common substitution character "*" with "×"
+            this.value = this.value.replace(/\*(\d+)$/, "×$1");
             parseSummaryForHelper(this.value);
         });
     $(".summary-tab")
@@ -139,14 +141,17 @@ function loadSummaryCategoryData() {
  * @param {jQuery} summary the summary input element
  */
 function startSummaryHelper(summary) {
+    // Replaced common substitution character "*" with "×"
+    summary_content = summary.val();
+    summary_content = summary_content.replace(/\*(\d+)$/, "×$1");
     const type = summary.data("type");
     const no = summary.data("no");
     $("#summary-record").val(type + "-" + no);
-    $("#summary-summary").val(summary.val());
+    $("#summary-summary").val(summary_content);
     // Loads the know summary categories into the summary helper
     loadKnownSummaryCategories(type);
     // Parses the summary and sets up the summary helper
-    parseSummaryForHelper(summary.val());
+    parseSummaryForHelper(summary_content);
     // Focus on the summary input
     setTimeout(function () {
         $("#summary-summary").get(0).focus();
