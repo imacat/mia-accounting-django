@@ -876,7 +876,7 @@ def txn_store(request, txn_type, txn=None):
         txn = Transaction()
     old_date = txn.date
     utils.fill_txn_from_post(txn_type, txn, post)
-    if not txn.is_dirty():
+    if not txn.is_dirty(check_relationship=True):
         messages.success(request, gettext_noop(
             "This transaction was not modified."))
         url = reverse("accounting:transactions.detail", args=(txn_type, txn))
