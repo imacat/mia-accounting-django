@@ -29,6 +29,7 @@ register_converter(converters.UserConverter, "user")
 
 app_name = "mia_core"
 urlpatterns = [
+    path("logout", views.logout, name="logout"),
     path("users", views.UserListView.as_view(), name="users"),
     path("users/create", views.user_form, name="users.create"),
     path("users/store", views.user_store, name="users.store"),
