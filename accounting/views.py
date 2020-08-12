@@ -944,15 +944,14 @@ def txn_sort(request, date):
                     if x.ord != post[F"transaction-{x.pk}-ord"]]
 
         if len(modified) == 0:
-            messages.success(request, gettext_noop(
-                "The transaction orders were not modified."))
-            return redirect(request.GET.get("r") or reverse("accounting:home"))
-
-        with transaction.atomic():
-            for x in modified:
-                Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
-        messages.success(request, gettext_noop(
-            "The transaction orders were saved successfully."))
+            message = gettext_noop("The transaction orders were not modified.")
+        else:
+            with transaction.atomic():
+                for x in modified:
+                    Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
+            message = gettext_noop(
+                "The transaction orders were saved successfully.")
+        messages.success(request, message)
         return redirect(request.GET.get("r") or reverse("accounting:home"))
 
 
