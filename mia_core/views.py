@@ -274,7 +274,7 @@ class UserFormView(FormView):
         """Returns the URL on error."""
         user = self.get_object()
         return reverse("mia_core:users.create") if user is None\
-            else reverse("mia_core:users.edit", args=(user,))
+            else reverse("mia_core:users.update", args=(user,))
 
     def get_object(self) -> Optional[Model]:
         """Returns the current object, or None on a create form."""
