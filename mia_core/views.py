@@ -66,39 +66,48 @@ class FormView(View):
         Returns:
             The response.
         """
-        obj = self.get_current_object()
         if self.request.method != "POST":
-            previous_post = stored_post.get_previous_post(self.request)
-            if previous_post is not None:
-                form = self.make_form_from_post(previous_post)
-            elif obj is not None:
-                form = self.make_form_from_model(obj)
-            else:
-                form = self._form()
-            return render(self.request, self.get_template_name(), {
-                self.context_object_name: form
-            })
+            return self.do_get()
         else:
-            post = self.request.POST.dict()
-            utils.strip_post(post)
-            form = self.make_form_from_post(post)
-            if not form.is_valid():
-                url = str(utils.UrlBuilder(self.get_error_url())
-                          .query(r=self.request.GET.get("r")))
-                return stored_post.error_redirect(request, url, post)
-            if obj is None:
-                obj = self._model()
-                self._set_current_object(obj)
-            self.fill_model_from_form(obj, form)
-            if isinstance(obj, DirtyFieldsMixin)\
-                    and not obj.is_dirty(check_relationship=True):
-                message = self.get_not_modified_message()
-            else:
-                obj.save()
-                message = self.get_success_message()
-            messages.success(request, message)
-            return redirect(str(UrlBuilder(self.get_success_url())
-                                .query(r=self.request.GET.get("r"))))
+            return self.do_post()
+
+    def do_get(self) -> HttpResponse:
+        """Handles the GET requests."""
+        obj = self.get_current_object()
+        previous_post = stored_post.get_previous_post(self.request)
+        if previous_post is not None:
+            form = self.make_form_from_post(previous_post)
+        elif obj is not None:
+            form = self.make_form_from_model(obj)
+        else:
+            form = self._form()
+        return render(self.request, self.get_template_name(), {
+            self.context_object_name: form
+        })
+
+    def do_post(self) -> HttpResponseRedirect:
+        """Handles the POST requests."""
+        obj = self.get_current_object()
+        post = self.request.POST.dict()
+        utils.strip_post(post)
+        form = self.make_form_from_post(post)
+        if not form.is_valid():
+            url = str(utils.UrlBuilder(self.get_error_url())
+                      .query(r=self.request.GET.get("r")))
+            return stored_post.error_redirect(self.request, url, post)
+        if obj is None:
+            obj = self._model()
+            self._set_current_object(obj)
+        self.fill_model_from_form(obj, form)
+        if isinstance(obj, DirtyFieldsMixin)\
+                and not obj.is_dirty(check_relationship=True):
+            message = self.get_not_modified_message()
+        else:
+            obj.save()
+            message = self.get_success_message()
+        messages.success(self.request, message)
+        return redirect(str(UrlBuilder(self.get_success_url())
+                            .query(r=self.request.GET.get("r"))))
 
     @property
     def _form(self):
