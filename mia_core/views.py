@@ -60,12 +60,8 @@ class FormView(View):
         self._object = None
         self._is_object_requested = False
 
-    def dispatch(self, request: HttpRequest, *args, **kwargs):
-        """The view to store an accounting transaction.
-
-        Returns:
-            The response.
-        """
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """The view to store an accounting transaction."""
         if self.request.method != "POST":
             return self.do_get()
         else:
