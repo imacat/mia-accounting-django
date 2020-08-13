@@ -146,7 +146,8 @@ class FormView(View):
 
     def make_form_from_model(self, obj: Model) -> forms.Form:
         """Creates and returns the form from a data model."""
-        return self._form(obj)
+        return self._form({x: getattr(obj, x, None)
+                           for x in self._form.base_fields})
 
     def fill_model_from_form(self, obj: Model, form: forms.Form) -> None:
         """Fills in the data model from the form."""
