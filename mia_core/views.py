@@ -151,8 +151,8 @@ class FormView(View):
 
     def fill_model_from_form(self, obj: Model, form: forms.Form) -> None:
         """Fills in the data model from the form."""
-        for name in form.data.keys():
-            setattr(obj, name, form.data[name])
+        for name in form.fields:
+            setattr(obj, name, form[name].value())
 
     def get_error_url(self) -> str:
         """Returns the URL on error."""
