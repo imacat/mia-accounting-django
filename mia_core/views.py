@@ -185,8 +185,8 @@ class FormView(View):
 
     def get_current_object(self) -> Optional[Model]:
         """Finds and returns the current object, or None on a create form."""
-        if "pk" in self.request.resolver_match.kwargs:
-            pk = self.request.resolver_match.kwargs["pk"]
+        if "pk" in self.kwargs:
+            pk = self.kwargs["pk"]
             try:
                 return self._model.objects.get(pk=pk)
             except self._model.DoesNotExist:
@@ -232,7 +232,7 @@ class UserListView(ListView):
 class UserView(DetailView):
     """The view of a user."""
     def get_object(self, queryset=None):
-        return self.request.resolver_match.kwargs["user"]
+        return self.kwargs["user"]
 
 
 @method_decorator(login_required, name="dispatch")
@@ -278,8 +278,8 @@ class UserFormView(FormView):
 
     def get_current_object(self) -> Optional[Model]:
         """Returns the current object, or None on a create form."""
-        if "user" in self.request.resolver_match.kwargs:
-            return self.request.resolver_match.kwargs["user"]
+        if "user" in self.kwargs:
+            return self.kwargs["user"]
         return None
 
 
