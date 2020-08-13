@@ -805,11 +805,11 @@ class TransactionView(DetailView):
     context_object_name = "txn"
 
     def get_object(self, queryset=None):
-        return self.request.resolver_match.kwargs["txn"]
+        return self.kwargs["txn"]
 
     def get_template_names(self):
         return ["accounting/transaction_detail-%s.html"
-                % (self.request.resolver_match.kwargs["txn_type"],)]
+                % (self.kwargs["txn_type"],)]
 
 
 @require_GET
@@ -900,7 +900,7 @@ class TransactionDeleteView(DeleteView):
             "This transaction was deleted successfully.")
 
     def get_object(self, queryset=None):
-        return self.request.resolver_match.kwargs["txn"]
+        return self.kwargs["txn"]
 
     def get_success_url(self):
         return self.request.GET.get("r") or reverse("accounting:home")
@@ -978,7 +978,7 @@ class AccountListView(ListView):
 class AccountView(DetailView):
     """The view of an account."""
     def get_object(self, queryset=None):
-        return self.request.resolver_match.kwargs["account"]
+        return self.kwargs["account"]
 
 
 @method_decorator(login_required, name="dispatch")
