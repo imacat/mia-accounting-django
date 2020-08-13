@@ -24,7 +24,7 @@
 /**
  * Returns the regular payment data.
  *
- * @returns {{debits: [], credits: []}}
+ * @returns {{debit: [], credit: []}}
  */
 function getRegularPayments() {
     const today = new Date($("#txn-date").get(0).value);

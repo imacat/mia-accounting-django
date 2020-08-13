@@ -20,8 +20,7 @@
 """
 import datetime
 import re
-from datetime import date
-from typing import Optional, List, Any, Union
+from typing import Optional, List
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import defaultfilters
@@ -461,7 +460,7 @@ class Period:
                 self.start = datetime.date(year, month, 1)
                 self.end = self._month_last_day(timezone.localdate())
                 self.description = gettext("Since %s")\
-                                   % self._month_text(year, month)
+                    % self._month_text(year, month)
                 self.prep_desc = self.description
                 return
             # Until a specific month
@@ -474,7 +473,7 @@ class Period:
                 self.start = Period.Parser.VERY_START
                 self.end = self._month_last_day(until_month)
                 self.description = gettext("Until %s")\
-                                   % self._month_text(year, month)
+                    % self._month_text(year, month)
                 self.prep_desc = self.description
                 return
             # A specific year
@@ -495,7 +494,7 @@ class Period:
                 self.end = datetime.date(year, 12, 31)
                 self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
-                                   % self._year_text(year)
+                    % self._year_text(year)
                 self.prep_desc = self.description
                 return
             # All time
@@ -574,7 +573,7 @@ class Period:
                     int(m.group(3)))
                 self.start = Period.Parser.VERY_START
                 self.description = gettext("Until %s")\
-                                   % self._date_text(self.end)
+                    % self._date_text(self.end)
                 self.prep_desc = self.description
                 return
             # Wrong period format

@@ -146,7 +146,7 @@ class UserForm(forms.Form):
         raise error
 
     def _validate_passwords_equal(self) -> None:
-        """Validates whether the two passwords are equa.
+        """Validates whether the two passwords are equal.
 
         Raises:
             forms.ValidationError: When the validation fails.

@@ -43,7 +43,7 @@ def accounting_amount(value: Union[str, int]) -> str:
             break
         s = m.group(1) + "," + m.group(2)
     if value < 0:
-        s = "(%s)" % (s)
+        s = "(%s)" % s
     return s
 
 

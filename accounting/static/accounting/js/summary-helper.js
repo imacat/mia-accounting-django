@@ -142,7 +142,7 @@ function loadSummaryCategoryData() {
  */
 function startSummaryHelper(summary) {
     // Replaced common substitution character "*" with "×"
-    summary_content = summary.val();
+    let summary_content = summary.val();
     summary_content = summary_content.replace(/\*(\d+)$/, "×$1");
     const type = summary.data("type");
     const no = summary.data("no");
@@ -331,7 +331,7 @@ function switchSummaryTab(tab) {
 /**
  * Sets the known general category buttons.
  *
- * @param {string} category the general category
+ * @param {string|null} category the general category
  */
 function setSummaryGeneralCategoryButtons(category) {
     $(".btn-summary-general-category").each(function () {
@@ -480,7 +480,7 @@ function setSummaryRegularPaymentButtons(category) {
  *
  * @param {string} format the category format, either "general",
  *                        "travel", or "bus".
- * @param {string} category the category
+ * @param {string|null} category the category
  */
 function setSummaryAccount(format, category) {
     const recordId = $("#summary-record").get(0).value;

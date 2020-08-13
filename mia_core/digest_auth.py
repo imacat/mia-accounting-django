@@ -56,10 +56,10 @@ class AccountBackend:
         """Returns the user by her log in user name.
 
         Args:
-            username (str): The log in user name.
+            username: The log in user name.
 
         Return:
-            User: The user, or None if the user does not eixst.
+            The user, or None if the user does not exist.
         """
         return User.objects.filter(login_id=username).first()
 
@@ -133,7 +133,9 @@ def _get_host(ip: str) -> Optional[str]:
     """
     try:
         return socket.gethostbyaddr(ip)[0]
-    except Exception:
+    except socket.herror:
+        return None
+    except socket.gaierror:
         return None
 
 

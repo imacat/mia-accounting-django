@@ -211,4 +211,4 @@ def is_in_section(request: HttpRequest, section_name: str) -> bool:
         return False
     view_name = request.resolver_match.view_name
     return view_name == section_name\
-           or view_name.startswith(section_name + ".")
+        or view_name.startswith(section_name + ".")
