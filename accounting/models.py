@@ -82,6 +82,10 @@ class Account(DirtyFieldsMixin, models.Model):
             super().save(force_insert=force_insert, force_update=force_update,
                          using=using, update_fields=update_fields)
 
+    def get_absolute_url(self):
+        """REturns the """
+        return reverse("accounting:accounts.detail", args=(self,))
+
     class Meta:
         db_table = "accounting_accounts"
 
