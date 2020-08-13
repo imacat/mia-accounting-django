@@ -50,7 +50,6 @@ class FormView(View):
     form: Type[forms.Form] = None
     template_name: str = None
     context_object_name: str = "form"
-    error_url: str = None
     success_url: str = None
     not_modified_message: str = None
     success_message: str = None
@@ -88,8 +87,7 @@ class FormView(View):
         utils.strip_post(post)
         form = self.make_form_from_post(post)
         if not form.is_valid():
-            url = str(utils.UrlBuilder(self.get_error_url())
-                      .query(r=self.request.GET.get("r")))
+            url = str(utils.UrlBuilder(self.request.get_full_path()))
             return stored_post.error_redirect(self.request, url, post)
         if obj is None:
             obj = self._model()
@@ -153,14 +151,6 @@ class FormView(View):
         """Fills in the data model from the form."""
         for name in form.fields:
             setattr(obj, name, form[name].value())
-
-    def get_error_url(self) -> str:
-        """Returns the URL on error."""
-        if self.error_url is not None:
-            return self.error_url
-        raise AttributeError(
-            "Please define either the error_url property"
-            " or the get_error_url method.")
 
     def get_success_url(self) -> str:
         """Returns the URL on success."""
@@ -269,12 +259,6 @@ class UserFormView(FormView):
         obj.name = form["name"].value()
         obj.is_disabled = form["is_disabled"].value()
         obj.current_user = self.request.user
-
-    def get_error_url(self) -> str:
-        """Returns the URL on error."""
-        user = self.get_object()
-        return reverse("mia_core:users.create") if user is None\
-            else reverse("mia_core:users.update", args=(user,))
 
     def get_object(self) -> Optional[Model]:
         """Returns the current object, or None on a create form."""
