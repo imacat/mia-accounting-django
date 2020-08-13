@@ -983,6 +983,7 @@ class AccountView(DetailView):
 
 @method_decorator(login_required, name="dispatch")
 class AccountFormView(FormView):
+    """The account form."""
     model = Account
     form = AccountForm
     not_modified_message = gettext_noop("This account was not modified.")
