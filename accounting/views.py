@@ -1013,7 +1013,7 @@ class AccountFormView(FormView):
         """Returns the URL on error."""
         user = self.get_object()
         return reverse("accounting:accounts.create") if user is None\
-            else reverse("accounting:accounts.edit", args=(user,))
+            else reverse("accounting:accounts.update", args=(user,))
 
     def get_object(self) -> Optional[Account]:
         """Returns the current object, or None on a create form."""
