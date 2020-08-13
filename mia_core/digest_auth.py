@@ -22,6 +22,7 @@ application.
 import ipaddress
 import socket
 from functools import wraps
+from typing import Optional
 
 from django.conf import settings
 from django.db.models import F
@@ -35,23 +36,23 @@ from .models import User, Country
 class AccountBackend:
     """The account backend for the django-digest module."""
 
-    def get_partial_digest(self, username):
+    def get_partial_digest(self, username: str) -> Optional[str]:
         """Returns the HTTP digest authentication password digest hash
         of a user.
 
         Args:
-            username (str): The log in user name.
+            username: The log in user name.
 
         Return:
-            str: The HTTP digest authentication password hash of
-            the user, or None if the user does not exist.
+            The HTTP digest authentication password hash of the user, or None
+            if the user does not exist.
         """
         user = User.objects.filter(login_id=username).first()
         if user is None:
             return None
         return user.password
 
-    def get_user(self, username):
+    def get_user(self, username: str) -> Optional[User]:
         """Returns the user by her log in user name.
 
         Args:
@@ -86,7 +87,7 @@ def login_required(function=None):
     return decorator
 
 
-def _log_visit(request):
+def _log_visit(request: HttpRequest) -> None:
     """Logs the visit information for the logged-in user.
 
     Args:
@@ -106,21 +107,29 @@ def _log_visit(request):
     request.session["visit_logged"] = True
 
 
-def _get_remote_ip(request):
+def _get_remote_ip(request: HttpRequest) -> str:
+    """Returns the IP of the remote client.
+
+    Args:
+        request: The request.
+
+    Returns:
+        The IP of the remote client.
+    """
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
         return x_forwarded_for.split(",")[0]
     return request.META.get('REMOTE_ADDR')
 
 
-def _get_host(ip):
+def _get_host(ip: str) -> Optional[str]:
     """Look-up the host name by its IP.
 
     Args:
-        ip (str): The IP
+        ip: The IP
 
     Returns:
-        str: The host name, or None if the look-up fails.
+        The host name, or None if the look-up fails.
     """
     try:
         return socket.gethostbyaddr(ip)[0]
@@ -128,31 +137,30 @@ def _get_host(ip):
         return None
 
 
-def _get_country(ip):
+def _get_country(ip: str) -> Optional[Country]:
     """Look-up the country by its IP.
 
     Args:
-        ip (str): The IP
+        ip: The IP
 
     Returns:
-        Country: The country.
+        The country.
     """
     code = _get_country_code(ip)
     try:
         return Country.objects.get(code=code)
     except Country.DoesNotExist:
-        pass
-    return None
+        return None
 
 
-def _get_country_code(ip):
+def _get_country_code(ip: str) -> Optional[str]:
     """Look-up the country code by its IP.
 
     Args:
-        ip (str): The IP
+        ip: The IP
 
     Returns:
-        str: The country code, or None if the look-up fails.
+        The country code, or None if the look-up fails.
     """
     try:
         return geolite2.lookup(ip).country

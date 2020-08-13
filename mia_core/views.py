@@ -21,7 +21,8 @@
 from django.contrib import messages
 from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpRequest, \
+    HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -47,14 +48,14 @@ class DeleteView(SuccessMessageMixin, CoreDeleteView):
 
 
 @require_POST
-def logout(request):
+def logout(request: HttpRequest) -> HttpResponseRedirect:
     """The view to log out a user.
 
     Args:
-        request (HttpRequest): The request.
+        request: The request.
 
     Returns:
-        HttpRedirectResponse: The redirect response.
+        The redirect response.
     """
     logout_user(request)
     if "next" in request.POST:
@@ -80,15 +81,15 @@ class UserView(DetailView):
 
 @require_GET
 @login_required
-def user_form(request, user=None):
+def user_form(request: HttpRequest, user: User = None) -> HttpResponse:
     """The view to edit an accounting transaction.
 
     Args:
-        request (HttpRequest): The request.
-        user (User): The account.
+        request: The request.
+        user: The account.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     previous_post = stored_post.get_previous_post(request)
     if previous_post is not None:
@@ -108,15 +109,16 @@ def user_form(request, user=None):
     })
 
 
-def user_store(request, user=None):
+def user_store(request: HttpRequest,
+               user: User = None) -> HttpResponseRedirect:
     """The view to store a user.
 
     Args:
-        request (HttpRequest): The request.
-        user (Account): The user.
+        request: The request.
+        user: The user.
 
     Returns:
-        HttpResponseRedirect: The response.
+        The response.
     """
     post = request.POST.dict()
     strip_post(post)
@@ -148,15 +150,15 @@ def user_store(request, user=None):
 
 @require_POST
 @login_required
-def user_delete(request, user):
+def user_delete(request: HttpRequest, user: User) -> HttpResponseRedirect:
     """The view to delete an user.
 
     Args:
-        request (HttpRequest): The request.
-        user (User): The user.
+        request: The request.
+        user: The user.
 
     Returns:
-        HttpResponseRedirect: The response.
+        The response.
     """
     message = None
     if user.pk == request.user.pk:
@@ -177,14 +179,14 @@ def user_delete(request, user):
 
 @require_GET
 @login_required
-def my_account_form(request):
+def my_account_form(request: HttpRequest) -> HttpResponse:
     """The view to edit my account.
 
     Args:
-        request (HttpRequest): The request.
+        request: The request.
 
     Returns:
-        HttpResponse: The response.
+        The response.
     """
     previous_post = stored_post.get_previous_post(request)
     if previous_post is not None:
@@ -201,14 +203,14 @@ def my_account_form(request):
     })
 
 
-def my_account_store(request):
+def my_account_store(request: HttpRequest) -> HttpResponseRedirect:
     """The view to store my account.
 
     Args:
-        request (HttpRequest): The request.
+        request: The request.
 
     Returns:
-        HttpResponseRedirect: The response.
+        The response.
     """
     post = request.POST.dict()
     strip_post(post)
@@ -232,15 +234,15 @@ def my_account_store(request):
     return redirect("mia_core:my-account")
 
 
-def api_users_exists(request, login_id):
+def api_users_exists(request: HttpRequest, login_id: str) -> JsonResponse:
     """The view to check whether a user with a log in ID exists.
 
     Args:
-        request (HttpRequest): The request.
-        login_id (str): The log in ID.
+        request: The request.
+        login_id: The log in ID.
 
     Returns:
-        JsonResponse: The response.
+        The response.
     """
     try:
         User.objects.get(login_id=login_id)

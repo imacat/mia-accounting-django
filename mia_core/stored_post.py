@@ -19,16 +19,18 @@
 
 """
 import random
+from typing import Dict, Mapping, Any, Optional
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpRequest
 from django.shortcuts import redirect
 
 from .utils import UrlBuilder
 
-STORAGE_KEY = "stored_post"
+STORAGE_KEY: str = "stored_post"
 
 
-def error_redirect(request, url, post):
+def error_redirect(request: HttpRequest, url: str,
+                   post: Dict[str, str]) -> HttpResponseRedirect:
     """Redirects to a specific URL on error, with the POST data ID appended
     as the query parameter "s".  The POST data can be loaded with the
     get_previous_post() utility.
@@ -45,7 +47,7 @@ def error_redirect(request, url, post):
     return redirect(str(UrlBuilder(url).query(s=post_id)))
 
 
-def get_previous_post(request):
+def get_previous_post(request: HttpRequest) -> Optional[Dict[str, str]]:
     """Retrieves the previously-stored POST data.
 
     Args:
@@ -59,16 +61,16 @@ def get_previous_post(request):
     return _retrieve(request, request.GET["s"])
 
 
-def _store(request, post):
+def _store(request: HttpRequest, post: Dict[str, str]) -> str:
     """Stores the POST data into the session, and returns the POST data ID that
     can be used to retrieve it later with _retrieve().
 
     Args:
-        request (HttpRequest): The request.
-        post (dict): The POST data.
+        request: The request.
+        post: The POST data.
 
     Returns:
-        str: The POST data ID
+        The POST data ID
     """
     if STORAGE_KEY not in request.session:
         request.session[STORAGE_KEY] = {}
@@ -77,15 +79,15 @@ def _store(request, post):
     return post_id
 
 
-def _retrieve(request, post_id):
+def _retrieve(request: HttpRequest, post_id: str) -> Optional[Dict[str, str]]:
     """Retrieves the POST data from the storage.
 
     Args:
-        request (HttpRequest): The request.
-        post_id (str): The POST data ID.
+        request: The request.
+        post_id: The POST data ID.
 
     Returns:
-        dict: The POST data, or None if the corresponding data does not exist.
+        The POST data, or None if the corresponding data does not exist.
     """
     if STORAGE_KEY not in request.session:
         return None
@@ -94,7 +96,7 @@ def _retrieve(request, post_id):
     return request.session[STORAGE_KEY][post_id]
 
 
-def _new_post_id(post_store):
+def _new_post_id(post_store: Mapping[int, Any]) -> str:
     """Generates and returns a new POST ID that does not exist yet.
 
     Args:

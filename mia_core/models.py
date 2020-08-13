@@ -18,7 +18,6 @@
 """The data models of the Mia core application.
 
 """
-import datetime
 import hashlib
 
 from dirtyfields import DirtyFieldsMixin
@@ -57,11 +56,12 @@ class Country(DirtyFieldsMixin, models.Model):
         return self.code.__str__() + " " + self.name.__str__()
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """The country name in the current language."""
         return get_multi_lingual_attr(self, "name", "en")
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         set_multi_lingual_attr(self, "name", value)
 
     class Meta:
@@ -101,11 +101,11 @@ class User(DirtyFieldsMixin, models.Model):
     USERNAME_FIELD = "login_id"
 
     @property
-    def is_anonymous(self):
+    def is_anonymous(self) -> bool:
         return False
 
     @property
-    def is_authenticated(self):
+    def is_authenticated(self) -> bool:
         return True
 
     def set_password(self):
@@ -142,16 +142,16 @@ class User(DirtyFieldsMixin, models.Model):
             F"{login_id}:{settings.DIGEST_REALM}:{password}")
 
     @staticmethod
-    def md5(value):
+    def md5(value: str) -> str:
         m = hashlib.md5()
         m.update(value.encode("utf-8"))
         return m.hexdigest()
 
-    def is_in_use(self):
+    def is_in_use(self) -> bool:
         """Returns whether this user is in use.
 
         Returns:
-            bool: True if this user is in use, or False otherwise.
+            True if this user is in use, or False otherwise.
         """
         for table in connection.introspection.table_names():
             if self._is_in_use_with(F"SELECT * FROM {table}"
@@ -163,14 +163,14 @@ class User(DirtyFieldsMixin, models.Model):
                 return True
         return False
 
-    def _is_in_use_with(self, sql):
+    def _is_in_use_with(self, sql: str) -> bool:
         """Returns whether this user is in use with a specific SQL statement.
 
         Args:
-            sql (str): The SQL query statement
+            sql: The SQL query statement
 
         Returns:
-            bool: True if this user is in use, or False otherwise.
+            True if this user is in use, or False otherwise.
         """
         with connection.cursor() as cursor:
             try:

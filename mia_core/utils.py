@@ -20,20 +20,22 @@
 """
 import random
 import urllib.parse
+from typing import Dict, List, Any, Type
 
 from django.conf import settings
 from django.db.models import Model, Q
+from django.http import HttpRequest
 from django.utils.translation import pgettext, get_language
 
 
-def new_pk(cls):
+def new_pk(cls: Type[Model]) -> int:
     """Finds a random ID that does not conflict with the existing data records.
 
     Args:
-        cls (class): The Django model class.
+        cls: The Django model class.
 
     Returns:
-         int: The new random ID.
+         The new random ID.
     """
     while True:
         pk = random.randint(100000000, 999999999)
@@ -43,7 +45,7 @@ def new_pk(cls):
             return pk
 
 
-def strip_post(post):
+def strip_post(post: Dict[str, str]) -> None:
     """Strips the values of the POSTed data.  Empty strings are removed.
 
     Args:
@@ -59,7 +61,7 @@ class Language:
     """A language.
 
     Args:
-        language (str): The Django language code.
+        language: The Django language code.
 
     Attributes:
         id (str): The language ID
@@ -67,7 +69,7 @@ class Language:
         locale (str); The locale name of this language.
         is_default (bool): Whether this is the default language.
     """
-    def __init__(self, language):
+    def __init__(self, language: str):
         self.id = language
         self.db = "_" + language.lower().replace("-", "_")
         if language == "zh-hant":
@@ -87,17 +89,18 @@ class Language:
         return Language(get_language())
 
 
-def get_multi_lingual_attr(model, name, default=None):
+def get_multi_lingual_attr(model: Model, name: str,
+                           default: str = None) -> str:
     """Returns a multi-lingual attribute of a data model.
 
     Args:
-        model (object): The data model.
-        name (str): The attribute name.
-        default (str): The default language.
+        model: The data model.
+        name: The attribute name.
+        default: The default language.
 
     Returns:
-        (any): The attribute in this language, or in the default
-            language if there is no content in the current language.
+        The attribute in this language, or in the default language if there is
+        no content in the current language.
     """
     language = Language.current()
     title = getattr(model, name + language.db)
@@ -110,27 +113,27 @@ def get_multi_lingual_attr(model, name, default=None):
     return getattr(model, name + Language.default().db)
 
 
-def set_multi_lingual_attr(model, name, value):
+def set_multi_lingual_attr(model: Model, name: str, value: str) -> None:
     """Sets a multi-lingual attribute of a data model.
 
     Args:
-        model (object): The data model.
-        name (str): The attribute name.
-        value (any): The new value
+        model: The data model.
+        name: The attribute name.
+        value: The new value
     """
     language = Language.current()
     setattr(model, name + language.db, value)
 
 
-def get_multi_lingual_search(attr, query):
+def get_multi_lingual_search(attr: str, query: str) -> Q:
     """Returns the query condition on a multi-lingual attribute.
 
     Args:
-        attr (str): The base name of the multi-lingual attribute.
-        query (str): The query.
+        attr: The base name of the multi-lingual attribute.
+        query: The query.
 
     Returns:
-        Q: The query condition
+        The query condition
     """
     language = Language.current()
     if language.is_default:
@@ -147,10 +150,10 @@ class UrlBuilder:
     """The URL builder.
 
     Attributes:
-        base_path (str): the base path
+        path (str): the base path
         params (list[Param]): The query parameters
     """
-    def __init__(self, start_url):
+    def __init__(self, start_url: str):
         """Constructs a new URL builder.
 
         Args:
@@ -158,10 +161,10 @@ class UrlBuilder:
         """
         pos = start_url.find("?")
         if pos == -1:
-            self.base_path = start_url
+            self.path = start_url
             self.params = []
             return
-        self.base_path = start_url[:pos]
+        self.path = start_url[:pos]
         self.params = []
         for piece in start_url[pos + 1:].split("&"):
             pos = piece.find("=")
@@ -219,25 +222,25 @@ class UrlBuilder:
         Returns:
             UrlBuilder: A copy of this URL builder.
         """
-        another = UrlBuilder(self.base_path)
+        another = UrlBuilder(self.path)
         another.params = [
             self.Param(x.name, x.value) for x in self.params]
         return another
 
-    def __str__(self):
+    def __str__(self) -> str:
         if len(self.params) == 0:
-            return self.base_path
-        return self.base_path + "?" + "&".join([
+            return self.path
+        return self.path + "?" + "&".join([
             str(x) for x in self.params])
 
     class Param:
         """A query parameter.
 
         Attributes:
-            name (str): The parameter name
-            value (str): The parameter value
+            name: The parameter name
+            value: The parameter value
         """
-        def __init__(self, name, value):
+        def __init__(self, name: str, value: str):
             """Constructs a new query parameter
 
             Args:
@@ -247,7 +250,7 @@ class UrlBuilder:
             self.name = name
             self.value = value
 
-        def __str__(self):
+        def __str__(self) -> str:
             """Returns the string representation of this query
             parameter.
 
@@ -264,9 +267,9 @@ class Pagination:
     """The pagination.
 
     Args:
-        request (HttpRequest): The request.
-        items (list): All the items.
-        is_reversed (bool): Whether we should display the last page first.
+        request: The request.
+        items: All the items.
+        is_reversed: Whether we should display the last page first.
 
     Raises:
         PaginationException: With invalid pagination parameters
@@ -282,7 +285,8 @@ class Pagination:
     """
     DEFAULT_PAGE_SIZE = 10
 
-    def __init__(self, request, items, is_reversed=False):
+    def __init__(self, request: HttpRequest, items: List[Any],
+                 is_reversed: bool = False):
         self.current_url = UrlBuilder(request.get_full_path())
         self.is_reversed = is_reversed
         self.page_size = self.DEFAULT_PAGE_SIZE
@@ -334,7 +338,7 @@ class Pagination:
         """Returns the navigation links of the pagination bar.
 
         Returns:
-            list[Link]: The navigation links of the pagination bar.
+            List[Link]: The navigation links of the pagination bar.
         """
         base_url = self.current_url.clone().remove("page").remove("s")
         links = []
@@ -443,14 +447,14 @@ class Pagination:
         """Returns the page size options.
 
         Returns:
-            list[PageSizeOption]: The page size options.
+            List[PageSizeOption]: The page size options.
         """
         base_url = self.current_url.remove("page").remove("page-size")
         return [self.PageSizeOption(x, self._page_size_url(base_url, x))
                 for x in [10, 100, 200]]
 
     @staticmethod
-    def _page_size_url(base_url, size):
+    def _page_size_url(base_url: UrlBuilder, size: int) -> str:
         """Returns the URL for a new page size.
 
         Args:
@@ -468,14 +472,14 @@ class Pagination:
         """A page size option.
 
         Args:
-            size (int): The page size.
-            url (str): The URL of this page size.
+            size: The page size.
+            url: The URL of this page size.
 
         Attributes:
             size (int): The page size.
             url (str): The URL for this page size.
         """
-        def __init__(self, size, url):
+        def __init__(self, size: int, url: str):
             self.size = size
             self.url = url
 
@@ -484,10 +488,10 @@ class PaginationException(Exception):
     """The exception thrown with invalid pagination parameters.
 
     Args:
-        url_builder (UrlBuilder): The canonical URL to redirect to.
+        url_builder: The canonical URL to redirect to.
 
     Attributes:
         url (str): The canonical URL to redirect to.
     """
-    def __init__(self, url_builder):
+    def __init__(self, url_builder: UrlBuilder):
         self.url = str(url_builder)

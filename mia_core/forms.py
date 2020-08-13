@@ -75,7 +75,7 @@ class UserForm(forms.Form):
         if errors:
             raise forms.ValidationError(errors)
 
-    def _validate_login_id_unique(self):
+    def _validate_login_id_unique(self) -> None:
         """Validates whether the log in ID is unique.
 
         Raises:
@@ -93,7 +93,7 @@ class UserForm(forms.Form):
         self.add_error("login_id", error)
         raise error
 
-    def _validate_password_new_required(self):
+    def _validate_password_new_required(self) -> None:
         """Validates whether the password is entered for newly-created users.
 
         Raises:
@@ -108,7 +108,7 @@ class UserForm(forms.Form):
         self.add_error("password", error)
         raise error
 
-    def _validate_password_login_id_changed_required(self):
+    def _validate_password_login_id_changed_required(self) -> None:
         """Validates whether the password is entered for users whose login ID
         changed.
 
@@ -129,7 +129,7 @@ class UserForm(forms.Form):
         self.add_error("password", error)
         raise error
 
-    def _validate_password2_required(self):
+    def _validate_password2_required(self) -> None:
         """Validates whether the second password is entered.
 
         Raises:
@@ -145,7 +145,7 @@ class UserForm(forms.Form):
         self.add_error("password2", error)
         raise error
 
-    def _validate_passwords_equal(self):
+    def _validate_passwords_equal(self) -> None:
         """Validates whether the two passwords are equa.
 
         Raises:
@@ -162,7 +162,7 @@ class UserForm(forms.Form):
         self.add_error("password2", error)
         raise error
 
-    def _validate_is_disabled_not_oneself(self):
+    def _validate_is_disabled_not_oneself(self) -> None:
         """Validates whether the user tries to disable herself
 
         Raises:

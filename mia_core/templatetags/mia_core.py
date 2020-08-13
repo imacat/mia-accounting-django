@@ -18,12 +18,14 @@
 """The template tags and filters of the Mia core application.
 
 """
+import datetime
 from datetime import date
+from typing import Any
 
 import titlecase
 from django import template
 from django.http import HttpRequest
-from django.template import defaultfilters
+from django.template import defaultfilters, RequestContext
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
@@ -35,31 +37,31 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def setvar(context, key, value):
+def setvar(context: RequestContext, key: str, value: Any) -> str:
     """Sets a variable in the template.
 
     Args:
-        context (Context): the context
-        key (str): The variable name
-        value (str): The variable value
+        context: the context
+        key: The variable name
+        value: The variable value
 
     Returns:
-        str: An empty string.
+        An empty string.
     """
     context.dicts[0][key] = value
     return ""
 
 
 @register.simple_tag(takes_context=True)
-def url_period(context, period_spec):
+def url_period(context: RequestContext, period_spec: str) -> str:
     """Returns the current URL with a new period.
 
     Args:
-        context (RequestContext): The request context.
-        period_spec (str): The period specification.
+        context: The request context.
+        period_spec: The period specification.
 
     Returns:
-        str: The current URL with the new period.
+        The current URL with the new period.
     """
     view_name = "%s:%s" % (
         context.request.resolver_match.app_name,
@@ -70,47 +72,47 @@ def url_period(context, period_spec):
 
 
 @register.simple_tag(takes_context=True)
-def url_with_return(context, url):
+def url_with_return(context: RequestContext, url: str) -> str:
     """Returns the URL with the current page added as the "r" query parameter,
     so that returning to this page is possible.
 
     Args:
-        context (RequestContext): The request context.
-        url (str): The URL.
+        context: The request context.
+        url: The URL.
 
     Returns:
-        str: The URL with the current page added as the "r" query parameter.
+        The URL with the current page added as the "r" query parameter.
     """
     return str(UrlBuilder(url).query(
         r=str(UrlBuilder(context.request.get_full_path()).remove("s"))))
 
 
 @register.simple_tag(takes_context=True)
-def url_keep_return(context, url):
+def url_keep_return(context: RequestContext, url: str) -> str:
     """Returns the URL with the current "r" query parameter set, so that the
     next processor can still return to the same page.
 
     Args:
-        context (RequestContext): The request context.
-        url (str): The URL.
+        context: The request context.
+        url: The URL.
 
     Returns:
-        str: The URL with the current "r" query parameter set.
+        The URL with the current "r" query parameter set.
     """
     return str(UrlBuilder(url).query(r=context.request.GET.get("r")))
 
 
 @register.simple_tag(takes_context=True)
-def add_css(context, url):
+def add_css(context: RequestContext, url: str) -> str:
     """Adds a local CSS file.  The file is added to the "css" template
     list variable.
 
     Args:
-        context (RequestContext): The request context.
-        url (str): The URL or path of the CSS file.
+        context: The request context.
+        url: The URL or path of the CSS file.
 
     Returns:
-        str: An empty string
+        An empty string
     """
     if "css" not in context.dicts[0]:
         context.dicts[0]["css"] = []
@@ -119,16 +121,16 @@ def add_css(context, url):
 
 
 @register.simple_tag(takes_context=True)
-def add_js(context, url):
+def add_js(context: RequestContext, url: str) -> str:
     """Adds a local JavaScript file.  The file is added to the "js" template
     list variable.
 
     Args:
-        context (RequestContext): The request context.
-        url (str): The URL or path of the JavaScript file.
+        context: The request context.
+        url: The URL or path of the JavaScript file.
 
     Returns:
-        str: An empty string
+        An empty string
     """
     if "js" not in context.dicts[0]:
         context.dicts[0]["js"] = []
@@ -137,14 +139,14 @@ def add_js(context, url):
 
 
 @register.filter
-def smart_date(value):
+def smart_date(value: datetime.date) -> str:
     """Formats the date for human friendliness.
 
     Args:
-        value (datetime.date): The date.
+        value: The date.
 
     Returns:
-        str: The human-friendly format of the date.
+        The human-friendly format of the date.
     """
     if value == date.today():
         return gettext("Today")
@@ -156,14 +158,14 @@ def smart_date(value):
 
 
 @register.filter
-def smart_month(value):
+def smart_month(value: datetime.date) -> str:
     """Formats the month for human friendliness.
 
     Args:
-        value (datetime.date): The month.
+        value: The month.
 
     Returns:
-        str: The human-friendly format of the month.
+        The human-friendly format of the month.
     """
     today = timezone.localdate()
     if value.year == today.year and value.month == today.month:
@@ -179,14 +181,14 @@ def smart_month(value):
 
 
 @register.filter
-def title_case(value):
+def title_case(value: str) -> str:
     """Formats the title in a proper American-English case.
 
     Args:
-        value (str): The title.
+        value: The title.
 
     Returns:
-        str: The title in a proper American-English case.
+        The title in a proper American-English case.
     """
     value = str(value)
     if isinstance(value, SafeString):
@@ -195,16 +197,15 @@ def title_case(value):
 
 
 @register.filter
-def is_in_section(request, section_name):
+def is_in_section(request: HttpRequest, section_name: str) -> bool:
     """Returns whether the request is currently in a section.
 
     Args:
-        request (HttpRequest): The request.
-        section_name (str): The view name of this section.
+        request: The request.
+        section_name: The view name of this section.
 
     Returns:
-        bool: True if the request is currently in this section, or False
-            otherwise
+        True if the request is currently in this section, or False otherwise.
     """
     if request is None:
         return False

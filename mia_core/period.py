@@ -20,6 +20,8 @@
 """
 import datetime
 import re
+from datetime import date
+from typing import Optional, List, Any, Union
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import defaultfilters
@@ -33,72 +35,73 @@ class Period:
     """The template helper for the period chooser.
 
     Args:
-        spec (str): The current period specification
-        data_start (datetime.date): The available first day of the data.
-        data_end (datetime.date): The available last day of the data.
+        spec: The current period specification
+        data_start: The available first day of the data.
+        data_end: The available last day of the data.
 
     Raises:
         ValueError: When the period specification is invalid.
     """
-    def __init__(self, spec=None, data_start=None, data_end=None):
+    def __init__(self, spec: str = None, data_start: datetime.date = None,
+                 data_end: datetime.date = None):
         # Raises ValueError
         self._period = self.Parser(spec)
         self._data_start = data_start
         self._data_end = data_end
 
     @property
-    def spec(self):
+    def spec(self) -> str:
         """Returns the period specification.
 
         Returns:
-            str: The period specification.
+            The period specification.
         """
         return self._period.spec
 
     @property
-    def start(self):
+    def start(self) -> datetime.date:
         """Returns the start day of the currently-specified period.
 
         Returns:
-            datetime.date: The start day of the currently-specified period.
+            The start day of the currently-specified period.
         """
         return self._period.start
 
     @property
-    def end(self):
+    def end(self) -> datetime.date:
         """Returns the end day of the currently-specified period.
 
         Returns:
-            datetime.date: The end day of the currently-specified period.
+            The end day of the currently-specified period.
         """
         return self._period.end
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Returns the text description of the currently-specified period.
 
         Returns:
-            str: The text description of the currently-specified period
+            The text description of the currently-specified period
         """
         return self._period.description
 
     @property
-    def prep_desc(self):
+    def prep_desc(self) -> str:
         """Returns the text description with preposition of the
         currently-specified period.
 
         Returns:
-            str: The text description with preposition of the
-                currently-specified period
+            The text description with preposition of the currently-specified
+            period.
         """
         return self._period.prep_desc
 
     @staticmethod
-    def _get_last_month_start():
+    def _get_last_month_start() -> datetime.date:
         """Returns the first day of the last month.
 
         Returns:
-            datetime.date: The first day of the last month.
+            The first day of the last month.
         """
         today = timezone.localdate()
         month = today.month - 1
@@ -109,11 +112,11 @@ class Period:
         return datetime.date(year, month, 1)
 
     @staticmethod
-    def _get_next_month_start():
+    def _get_next_month_start() -> datetime.date:
         """Returns the first day of the next month.
 
         Returns:
-            datetime.date: The first day of the next month.
+            The first day of the next month.
         """
         today = timezone.localdate()
         month = today.month + 1
@@ -123,12 +126,12 @@ class Period:
             year = year + 1
         return datetime.date(year, month, 1)
 
-    def this_month(self):
+    def this_month(self) -> Optional[str]:
         """Returns the specification of this month.
 
         Returns:
-            str|None: The specification of this month, or None if there is no
-                data in or before this month.
+            The specification of this month, or None if there is no data in or
+            before this month.
         """
         if self._data_start is None:
             return None
@@ -139,12 +142,12 @@ class Period:
             return None
         return dateformat.format(today, "Y-m")
 
-    def last_month(self):
+    def last_month(self) -> Optional[str]:
         """Returns the specification of last month.
 
         Returns:
-            str|None: The specification of last month, or None if there is no
-                data in or before last month.
+            The specification of last month, or None if there is no data in or
+            before last month.
         """
         if self._data_start is None:
             return None
@@ -155,25 +158,25 @@ class Period:
             return None
         return dateformat.format(last_month_start, "Y-m")
 
-    def since_last_month(self):
+    def since_last_month(self) -> Optional[str]:
         """Returns the specification since last month.
 
         Returns:
-            str|None: The specification since last month, or None if there is
-                no data in or before last month.
+            The specification since last month, or None if there is no data in
+            or before last month.
         """
         last_month = self.last_month()
         if last_month is None:
             return None
         return last_month + "-"
 
-    def has_months_to_choose(self):
+    def has_months_to_choose(self) -> bool:
         """Returns whether there are months to choose besides this month and
         last month.
 
         Returns:
-            bool: True if there are months to choose besides this month and
-                last month, or False otherwise.
+            True if there are months to choose besides this month and last
+            month, or False otherwise.
         """
         if self._data_start is None:
             return False
@@ -183,14 +186,13 @@ class Period:
             return True
         return False
 
-    def chosen_month(self):
+    def chosen_month(self) -> Optional[str]:
         """Returns the specification of the chosen month, or None if the
         current period is not a month or is out of available data range.
 
         Returns:
-            str|None: The specification of the chosen month, or None if the
-                current period is not a month or is out of available data
-                range.
+            The specification of the chosen month, or None if the current
+            period is not a month or is out of available data range.
         """
         if self._data_start is None:
             return None
@@ -203,12 +205,12 @@ class Period:
             return None
         return self._period.spec
 
-    def this_year(self):
+    def this_year(self) -> Optional[str]:
         """Returns the specification of this year.
 
         Returns:
-            str|None: The specification of this year, or None if there is no
-                data in or before this year.
+            The specification of this year, or None if there is no data in or
+            before this year.
         """
         if self._data_start is None:
             return None
@@ -217,12 +219,12 @@ class Period:
             return None
         return str(this_year)
 
-    def last_year(self):
+    def last_year(self) -> Optional[str]:
         """Returns the specification of last year.
 
         Returns:
-            str|None: The specification of last year, or None if there is no
-                data in or before last year.
+            The specification of last year, or None if there is no data in or
+            before last year.
         """
         if self._data_start is None:
             return None
@@ -231,13 +233,13 @@ class Period:
             return None
         return str(last_year)
 
-    def has_years_to_choose(self):
+    def has_years_to_choose(self) -> bool:
         """Returns whether there are years to choose besides this year and
         last year.
 
         Returns:
-            bool: True if there are years to choose besides this year and
-                last year, or False otherwise.
+            True if there are years to choose besides this year and last year,
+            or False otherwise.
         """
         if self._data_start is None:
             return False
@@ -248,11 +250,12 @@ class Period:
             return True
         return False
 
-    def years_to_choose(self):
+    def years_to_choose(self) -> Optional[List[str]]:
         """Returns the years to choose besides this year and last year.
 
         Returns:
-            list[str]: The years to choose besides this year and last year.
+            The years to choose besides this year and last year, or None if
+            there is no data.
         """
         if self._data_start is None:
             return None
@@ -263,12 +266,12 @@ class Period:
             self._data_end.year, this_year, -1)]
         return after + before[::-1]
 
-    def today(self):
+    def today(self) -> Optional[None]:
         """Returns the specification of today.
 
         Returns:
-            (str): The specification of today, or None if there is no data
-                in or before today.
+            The specification of today, or None if there is no data in or
+            before today.
         """
         if self._data_start is None:
             return None
@@ -277,12 +280,12 @@ class Period:
             return None
         return dateformat.format(today, "Y-m-d")
 
-    def yesterday(self):
+    def yesterday(self) -> Optional[str]:
         """Returns the specification of yesterday.
 
         Returns:
-            (str): The specification of yesterday, or None if there is no data
-                in or before yesterday.
+            The specification of yesterday, or None if there is no data in or
+            before yesterday.
         """
         if self._data_start is None:
             return None
@@ -291,21 +294,21 @@ class Period:
             return None
         return dateformat.format(yesterday, "Y-m-d")
 
-    def chosen_day(self):
+    def chosen_day(self) -> str:
         """Returns the specification of the chosen day.
 
         Returns:
-            (str): The specification of the chosen day, or the start day
-                of the period if the current period is not a day.
+            The specification of the chosen day, or the start day of the period
+            if the current period is not a day.
         """
         return dateformat.format(self._period.start, "Y-m-d")
 
-    def has_days_to_choose(self):
+    def has_days_to_choose(self) -> bool:
         """Returns whether there are more than one day to choose from.
 
         Returns:
-            bool: True if there are more than one day to choose from,
-                or False otherwise.
+            True if there are more than one day to choose from, or False
+            otherwise.
         """
         if self._data_start is None:
             return False
@@ -313,33 +316,35 @@ class Period:
             return False
         return True
 
-    def first_day(self):
+    def first_day(self) -> Optional[str]:
         """Returns the specification of the available first day.
 
         Returns:
-            str: The specification of the available first day.
+            The specification of the available first day, or None if there is
+            no data.
         """
         if self._data_start is None:
             return None
         return dateformat.format(self._data_start, "Y-m-d")
 
-    def last_day(self):
+    def last_day(self) -> Optional[str]:
         """Returns the specification of the available last day.
 
         Returns:
-            str: The specification of the available last day.
+            The specification of the available last day, or None if there is no
+            data.
         """
         if self._data_end is None:
             return None
         return dateformat.format(self._data_end, "Y-m-d")
 
-    def chosen_start(self):
+    def chosen_start(self) -> Optional[str]:
         """Returns the specification of of the first day of the
         specified period.
 
         Returns:
-            str: The specification of of the first day of the
-                specified period.
+            The specification of of the first day of the specified period, or
+            None if there is no data.
         """
         if self._data_start is None:
             return None
@@ -348,13 +353,13 @@ class Period:
             else self._data_start
         return dateformat.format(day, "Y-m-d")
 
-    def chosen_end(self):
+    def chosen_end(self) -> Optional[str]:
         """Returns the specification of of the last day of the
         specified period.
 
         Returns:
-            str: The specification of of the last day of the
-                specified period.
+            The specification of of the last day of the specified period, or
+            None if there is data.
         """
         if self._data_end is None:
             return None
@@ -363,12 +368,12 @@ class Period:
             else self._data_end
         return dateformat.format(day, "Y-m-d")
 
-    def period_before(self):
+    def period_before(self) -> Optional[str]:
         """Returns the specification of the period before the current period.
 
         Returns:
-            str|None: The specification of the period before the current
-                period, or None if there is no data before the current period.
+            The specification of the period before the current period, or None
+            if there is no data before the current period.
         """
         if self._data_start is None:
             return None
@@ -381,11 +386,12 @@ class Period:
             return dateformat.format(previous_day, "-Y-m")
         return dateformat.format(previous_day, "-Y-m-d")
 
-    def month_picker_params(self):
+    def month_picker_params(self) -> Optional[str]:
         """Returns the parameters for the month-picker, as a JSON text string.
 
         Returns:
-            str: The parameters for the month-picker, as a JSON text string.
+            The parameters for the month-picker, as a JSON text string, or None
+            if there is no data.
         """
         if self._data_start is None:
             return None
@@ -398,7 +404,7 @@ class Period:
         })
 
     @staticmethod
-    def default_spec():
+    def default_spec() -> str:
         """Returns the specification for the default period.
 
         Returns:
@@ -422,9 +428,9 @@ class Period:
             description (str): The text description of the period.
             prep_desc (str): The text description with preposition.
         """
-        VERY_START = datetime.date(1990, 1, 1)
+        VERY_START: datetime.date = datetime.date(1990, 1, 1)
 
-        def __init__(self, spec):
+        def __init__(self, spec: str):
             self.spec = None
             self.start = None
             self.end = None
@@ -574,7 +580,7 @@ class Period:
             # Wrong period format
             raise ValueError
 
-        def _set_this_month(self):
+        def _set_this_month(self) -> None:
             """Sets the period to this month."""
             today = timezone.localdate()
             self.spec = dateformat.format(today, "Y-m")
@@ -583,14 +589,14 @@ class Period:
             self.description = gettext("This Month")
 
         @staticmethod
-        def _month_last_day(day):
+        def _month_last_day(day: datetime.date) -> datetime.date:
             """Calculates and returns the last day of a month.
 
             Args:
-                day (datetime.date): A day in the month.
+                day: A day in the month.
 
             Returns:
-                date: The last day in the month
+                The last day in the month
             """
             next_month = day.month + 1
             next_year = day.year
@@ -601,15 +607,15 @@ class Period:
                 next_year, next_month, 1) - datetime.timedelta(days=1)
 
         @staticmethod
-        def _month_text(year, month):
+        def _month_text(year: int, month: int) -> str:
             """Returns the text description of a month.
 
             Args:
-                year (int): The year.
-                month (int): The month.
+                year: The year.
+                month: The month.
 
             Returns:
-                str: The description of the month.
+                The description of the month.
             """
             today = timezone.localdate()
             if year == today.year and month == today.month:
@@ -625,14 +631,14 @@ class Period:
             return "%d/%d" % (year, month)
 
         @staticmethod
-        def _year_text(year):
+        def _year_text(year: int) -> str:
             """Returns the text description of a year.
 
             Args:
-                year (int): The year.
+                year: The year.
 
             Returns:
-                str: The description of the year.
+                The description of the year.
             """
             this_year = timezone.localdate().year
             if year == this_year:
@@ -642,14 +648,14 @@ class Period:
             return str(year)
 
         @staticmethod
-        def _date_text(day):
+        def _date_text(day: datetime.date) -> str:
             """Returns the text description of a day.
 
             Args:
-                day (datetime.date): The date.
+                day: The date.
 
             Returns:
-                str: The description of the day.
+                The description of the day.
             """
             today = timezone.localdate()
             if day == today:

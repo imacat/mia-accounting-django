@@ -25,11 +25,30 @@ class UserConverter:
     """The path converter for the user accounts."""
     regex = ".*"
 
-    def to_python(self, value):
+    def to_python(self, value: str) -> User:
+        """Returns the user by her log in ID.
+
+        Args:
+            value: The log in ID.
+
+        Returns:
+            The user.
+
+        Raises:
+            ValueError: When the value is invalid
+        """
         try:
             return User.objects.get(login_id=value)
         except User.DoesNotExist:
             raise ValueError
 
-    def to_url(self, value):
+    def to_url(self, value: User) -> str:
+        """Returns the log in ID of a user.
+
+        Args:
+            value: The user.
+
+        Returns:
+            The log in ID.
+        """
         return value.login_id
