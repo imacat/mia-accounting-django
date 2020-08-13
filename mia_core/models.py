@@ -24,6 +24,7 @@ from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models, connection, OperationalError, transaction
 from django.db.models.functions import Now
+from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
     new_pk
@@ -100,6 +101,10 @@ class User(DirtyFieldsMixin, models.Model):
     REQUIRED_FIELDS = ["id", "name"]
     USERNAME_FIELD = "login_id"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current_user = None
+
     @property
     def is_anonymous(self) -> bool:
         return False
@@ -119,19 +124,22 @@ class User(DirtyFieldsMixin, models.Model):
         return "%s (%s)" % (
             self.name.__str__(), self.login_id.__str__())
 
-    def save(self, current_user=None, force_insert=False, force_update=False,
-             using=None, update_fields=None):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         if self.pk is None:
             self.pk = new_pk(User)
-            if current_user is not None:
-                self.created_by = current_user
-        if current_user is not None:
-            self.updated_by = current_user
+            if self.current_user is not None:
+                self.created_by = self.current_user
+        if self.current_user is not None:
+            self.updated_by = self.current_user
         with transaction.atomic():
             super(User, self).save(
                 force_insert=force_insert, force_update=force_update,
                 using=using, update_fields=update_fields)
             User.objects.filter(pk=self.pk).update(updated_at=Now())
+
+    def get_absolute_url(self):
+        return reverse("mia_core:users.detail", args=(self,))
 
     class Meta:
         db_table = "users"

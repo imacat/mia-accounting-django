@@ -18,11 +18,16 @@
 """The views of the Mia core application.
 
 """
+from typing import Dict, Type, Optional, Union
+
+from dirtyfields import DirtyFieldsMixin
+from django import forms
 from django.contrib import messages
 from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Model
 from django.http import HttpResponse, JsonResponse, HttpRequest, \
-    HttpResponseRedirect
+    HttpResponseRedirect, Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -30,12 +35,157 @@ from django.utils.translation import gettext_noop
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import DeleteView as CoreDeleteView, ListView, \
     DetailView
+from django.views.generic.base import View
 
-from . import stored_post
+from . import stored_post, utils
 from .digest_auth import login_required
 from .forms import UserForm
 from .models import User
-from .utils import strip_post
+from .utils import strip_post, UrlBuilder
+
+
+class FormView(View):
+    """The base form view."""
+    model: Type[Model] = None
+    form: Type[forms.Form] = None
+    template_name: str = None
+    context_object_name: str = "form"
+    error_url: str = None
+    success_url: str = None
+    not_modified_message: str = None
+    success_message: str = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._object = None
+        self._is_object_requested = False
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        """The view to store an accounting transaction.
+
+        Returns:
+            The response.
+        """
+        obj = self.get_current_object()
+        if self.request.method != "POST":
+            previous_post = stored_post.get_previous_post(self.request)
+            if previous_post is not None:
+                form = self.make_form_from_post(previous_post)
+            elif obj is not None:
+                form = self.make_form_from_model(obj)
+            else:
+                form = self._form()
+            return render(self.request, self.get_template_name(), {
+                self.context_object_name: form
+            })
+        else:
+            post = self.request.POST.dict()
+            utils.strip_post(post)
+            form = self.make_form_from_post(post)
+            if not form.is_valid():
+                url = str(utils.UrlBuilder(self.get_error_url())
+                          .query(r=self.request.GET.get("r")))
+                return stored_post.error_redirect(request, url, post)
+            if obj is None:
+                obj = self._model()
+                self._set_current_object(obj)
+            self.fill_model_from_form(obj, form)
+            if isinstance(obj, DirtyFieldsMixin)\
+                    and not obj.is_dirty(check_relationship=True):
+                message = self.get_not_modified_message()
+            else:
+                obj.save()
+                message = self.get_success_message()
+            messages.success(request, message)
+            return redirect(str(UrlBuilder(self.get_success_url())
+                                .query(r=self.request.GET.get("r"))))
+
+    @property
+    def _form(self):
+        if self.form is None:
+            raise AttributeError("The form attribute was not set.")
+        return self.form
+
+    @property
+    def _model(self):
+        if self.model is None:
+            raise AttributeError("The model attribute was not set.")
+        return self.model
+
+    def _set_current_object(self, obj: Model) -> None:
+        """Sets the current object that we are operating."""
+        self._object = obj
+        self._is_object_requested = True
+
+    def _get_current_object(self) -> Optional[Model]:
+        """Returns the current object that we are operating and cached."""
+        if not self._is_object_requested:
+            self._object = self.get_current_object()
+            self._is_object_requested = True
+        return self._object
+
+    def get_template_name(self) -> str:
+        """Returns the name of the template."""
+        if self.template_name is not None:
+            return self.template_name
+        if self.model is not None:
+            app_name = self.request.resolver_match.app_name
+            model_name = self.model.__name__.lower()
+            return F"{app_name}/{model_name}_form.html"
+        raise AttributeError(
+            "Please either define the template_name or the model attribute.")
+
+    def make_form_from_post(self, post: Dict[str, str]) -> forms.Form:
+        """Creates and returns the form from the POST data."""
+        return self._form(post)
+
+    def make_form_from_model(self, obj: Model) -> forms.Form:
+        """Creates and returns the form from a data model."""
+        return self._form(obj)
+
+    def fill_model_from_form(self, obj: Model, form: forms.Form) -> None:
+        """Fills in the data model from the form."""
+        for name in form.data.keys():
+            setattr(obj, name, form.data[name])
+
+    def get_error_url(self) -> str:
+        """Returns the URL on error."""
+        if self.error_url is not None:
+            return self.error_url
+        raise AttributeError(
+            "Please define either the error_url attribute"
+            " or the get_error_url method.")
+
+    def get_success_url(self) -> str:
+        """Returns the URL on success."""
+        if self.success_url is not None:
+            return self.success_url
+        obj = self._get_current_object()
+        get_absolute_url = getattr(obj, "get_absolute_url", None)
+        if get_absolute_url is not None:
+            return get_absolute_url()
+        raise AttributeError(
+            "Please define either the success_url attribute,"
+            " the get_absolute_url method on the model,"
+            " or the get_success_url method.")
+
+    def get_not_modified_message(self) -> str:
+        """Returns the message when the data was not modified."""
+        return self.not_modified_message
+
+    def get_success_message(self) -> str:
+        """Returns the success message."""
+        return self.success_message
+
+    def get_current_object(self) -> Optional[Model]:
+        """Finds and returns the current object, or None on a create form."""
+        if "pk" in self.request.resolver_match.kwargs:
+            pk = self.request.resolver_match.kwargs["pk"]
+            try:
+                return self._model.objects.get(pk=pk)
+            except self._model.DoesNotExist:
+                raise Http404
+        return None
 
 
 class DeleteView(SuccessMessageMixin, CoreDeleteView):
@@ -79,73 +229,52 @@ class UserView(DetailView):
         return self.request.resolver_match.kwargs["user"]
 
 
-@require_GET
-@login_required
-def user_form(request: HttpRequest, user: User = None) -> HttpResponse:
-    """The view to edit an accounting transaction.
+@method_decorator(login_required, name="dispatch")
+class UserFormView(FormView):
+    model = User
+    form = UserForm
+    not_modified_message = gettext_noop("This user account was not changed.")
+    success_message = gettext_noop("This user account was saved successfully.")
 
-    Args:
-        request: The request.
-        user: The account.
+    def make_form_from_post(self, post: Dict[str, str]) -> UserForm:
+        """Creates and returns the form from the POST data."""
+        form = UserForm(post)
+        form.user = self.get_current_object()
+        form.current_user = self.request.user
+        return form
 
-    Returns:
-        The response.
-    """
-    previous_post = stored_post.get_previous_post(request)
-    if previous_post is not None:
-        form = UserForm(previous_post)
-    elif user is not None:
+    def make_form_from_model(self, obj: User) -> forms.Form:
+        """Creates and returns the form from a data model."""
         form = UserForm({
-            "login_id": user.login_id,
-            "name": user.name,
-            "is_disabled": user.is_disabled,
+            "login_id": obj.login_id,
+            "name": obj.name,
+            "is_disabled": obj.is_disabled,
         })
-    else:
-        form = UserForm()
-    form.user = user
-    form.current_user = request.user
-    return render(request, "mia_core/user_form.html", {
-        "form": form,
-    })
+        form.user = self.get_current_object()
+        form.current_user = self.request.user
+        return form
 
+    def fill_model_from_form(self, obj: User, form: UserForm) -> None:
+        """Fills in the data model from the form."""
+        obj.login_id = form["login_id"].value()
+        if form["password"].value() is not None:
+            obj.set_digest_password(
+                form["login_id"].value(), form["password"].value())
+        obj.name = form["name"].value()
+        obj.is_disabled = form["is_disabled"].value()
+        obj.current_user = self.request.user
 
-def user_store(request: HttpRequest,
-               user: User = None) -> HttpResponseRedirect:
-    """The view to store a user.
+    def get_error_url(self) -> str:
+        """Returns the URL on error."""
+        user = self.get_current_object()
+        return reverse("mia_core:users.create") if user is None\
+            else reverse("mia_core:users.edit", args=(user,))
 
-    Args:
-        request: The request.
-        user: The user.
-
-    Returns:
-        The response.
-    """
-    post = request.POST.dict()
-    strip_post(post)
-    form = UserForm(post)
-    form.user = user
-    form.current_user = request.user
-    if not form.is_valid():
-        if user is None:
-            url = reverse("mia_core:users.create")
-        else:
-            url = reverse("mia_core:users.edit", args=(user,))
-        return stored_post.error_redirect(request, url, post)
-    if user is None:
-        user = User()
-    user.login_id = form["login_id"].value()
-    if form["password"].value() is not None:
-        user.set_digest_password(
-            form["login_id"].value(), form["password"].value())
-    user.name = form["name"].value()
-    user.is_disabled = form["is_disabled"].value()
-    if not user.is_dirty():
-        message = gettext_noop("This user account was not changed.")
-    else:
-        user.save(current_user=request.user)
-        message = gettext_noop("This user account was saved successfully.")
-    messages.success(request, message)
-    return redirect("mia_core:users.detail", user)
+    def get_current_object(self) -> Optional[Model]:
+        """Returns the current object, or None on a create form."""
+        if "user" in self.request.resolver_match.kwargs:
+            return self.request.resolver_match.kwargs["user"]
+        return None
 
 
 @require_POST
