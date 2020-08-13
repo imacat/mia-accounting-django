@@ -69,7 +69,7 @@ class FormView(View):
 
     def do_get(self) -> HttpResponse:
         """Handles the GET requests."""
-        obj = self.get_current_object()
+        obj = self.get_object()
         previous_post = stored_post.get_previous_post(self.request)
         if previous_post is not None:
             form = self.make_form_from_post(previous_post)
@@ -83,7 +83,7 @@ class FormView(View):
 
     def do_post(self) -> HttpResponseRedirect:
         """Handles the POST requests."""
-        obj = self.get_current_object()
+        obj = self.get_object()
         post = self.request.POST.dict()
         utils.strip_post(post)
         form = self.make_form_from_post(post)
@@ -93,7 +93,7 @@ class FormView(View):
             return stored_post.error_redirect(self.request, url, post)
         if obj is None:
             obj = self._model()
-            self._set_current_object(obj)
+            self._set_object(obj)
         self.fill_model_from_form(obj, form)
         if isinstance(obj, DirtyFieldsMixin)\
                 and not obj.is_dirty(check_relationship=True):
@@ -117,15 +117,15 @@ class FormView(View):
             raise AttributeError("Please defined the model property.")
         return self.model
 
-    def _set_current_object(self, obj: Model) -> None:
+    def _set_object(self, obj: Model) -> None:
         """Sets the current object that we are operating."""
         self._object = obj
         self._is_object_requested = True
 
-    def _get_current_object(self) -> Optional[Model]:
+    def _get_object(self) -> Optional[Model]:
         """Returns the current object that we are operating and cached."""
         if not self._is_object_requested:
-            self._object = self.get_current_object()
+            self._object = self.get_object()
             self._is_object_requested = True
         return self._object
 
@@ -166,7 +166,7 @@ class FormView(View):
         """Returns the URL on success."""
         if self.success_url is not None:
             return self.success_url
-        obj = self._get_current_object()
+        obj = self._get_object()
         get_absolute_url = getattr(obj, "get_absolute_url", None)
         if get_absolute_url is not None:
             return get_absolute_url()
@@ -183,7 +183,7 @@ class FormView(View):
         """Returns the success message."""
         return self.success_message
 
-    def get_current_object(self) -> Optional[Model]:
+    def get_object(self) -> Optional[Model]:
         """Finds and returns the current object, or None on a create form."""
         if "pk" in self.kwargs:
             pk = self.kwargs["pk"]
@@ -245,7 +245,7 @@ class UserFormView(FormView):
     def make_form_from_post(self, post: Dict[str, str]) -> UserForm:
         """Creates and returns the form from the POST data."""
         form = UserForm(post)
-        form.user = self.get_current_object()
+        form.user = self.get_object()
         form.current_user = self.request.user
         return form
 
@@ -256,7 +256,7 @@ class UserFormView(FormView):
             "name": obj.name,
             "is_disabled": obj.is_disabled,
         })
-        form.user = self.get_current_object()
+        form.user = self.get_object()
         form.current_user = self.request.user
         return form
 
@@ -272,11 +272,11 @@ class UserFormView(FormView):
 
     def get_error_url(self) -> str:
         """Returns the URL on error."""
-        user = self.get_current_object()
+        user = self.get_object()
         return reverse("mia_core:users.create") if user is None\
             else reverse("mia_core:users.edit", args=(user,))
 
-    def get_current_object(self) -> Optional[Model]:
+    def get_object(self) -> Optional[Model]:
         """Returns the current object, or None on a create form."""
         if "user" in self.kwargs:
             return self.kwargs["user"]

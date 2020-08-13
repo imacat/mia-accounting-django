@@ -991,7 +991,7 @@ class AccountFormView(FormView):
     def make_form_from_post(self, post: Dict[str, str]) -> AccountForm:
         """Creates and returns the form from the POST data."""
         form = AccountForm(post)
-        form.account = self.get_current_object()
+        form.account = self.get_object()
         return form
 
     def make_form_from_model(self, obj: Account) -> AccountForm:
@@ -1011,11 +1011,11 @@ class AccountFormView(FormView):
 
     def get_error_url(self) -> str:
         """Returns the URL on error."""
-        user = self.get_current_object()
+        user = self.get_object()
         return reverse("accounting:accounts.create") if user is None\
             else reverse("accounting:accounts.edit", args=(user,))
 
-    def get_current_object(self) -> Optional[Account]:
+    def get_object(self) -> Optional[Account]:
         """Returns the current object, or None on a create form."""
         if "account" in self.kwargs:
             return self.kwargs["account"]
