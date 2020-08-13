@@ -63,21 +63,22 @@ class Account(DirtyFieldsMixin, models.Model):
         self.is_for_credit = None
         self._is_in_use = None
         self._is_parent_and_in_use = None
+        self.current_user = None
 
     def __str__(self):
         """Returns the string representation of this account."""
         return self.code.__str__() + " " + self.title
 
-    def save(self, current_user=None, force_insert=False, force_update=False,
-             using=None, update_fields=None):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
         self.parent = None if len(self.code) == 1\
             else Account.objects.get(code=self.code[:-1])
         if self.pk is None:
             self.pk = new_pk(Account)
-            if current_user is not None:
-                self.created_by = current_user
-        if current_user is not None:
-            self.updated_by = current_user
+            if self.current_user is not None:
+                self.created_by = self.current_user
+        if self.current_user is not None:
+            self.updated_by = self.current_user
         with transaction.atomic():
             super().save(force_insert=force_insert, force_update=force_update,
                          using=using, update_fields=update_fields)

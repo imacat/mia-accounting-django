@@ -21,11 +21,12 @@
 import datetime
 import json
 import re
+from typing import Dict, Optional
 
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
-    ExpressionWrapper
+    ExpressionWrapper, Exists, OuterRef
 from django.db.models.functions import TruncMonth, Coalesce
 from django.http import JsonResponse, HttpResponseRedirect, Http404, \
     HttpRequest, HttpResponse
@@ -43,7 +44,7 @@ from mia_core.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
     strip_post, PaginationException
-from mia_core.views import DeleteView
+from mia_core.views import DeleteView, FormView
 from . import utils
 from .forms import AccountForm, TransactionForm
 from .models import Record, Transaction, Account
@@ -965,10 +966,9 @@ def txn_sort(request: HttpRequest, date: datetime.date) -> HttpResponse:
 class AccountListView(ListView):
     """The view to list the accounts."""
     queryset = Account.objects\
-        .annotate(child_count=Count("child_set"),
-                  record_count=Count("record"))\
         .annotate(is_parent_and_in_use=ExpressionWrapper(
-            Q(child_count__gt=0) & Q(record_count__gt=0),
+            Exists(Account.objects.filter(parent=OuterRef("pk")))
+            & Exists(Record.objects.filter(account=OuterRef("pk"))),
             output_field=BooleanField()))\
         .order_by("code")
 
@@ -981,69 +981,45 @@ class AccountView(DetailView):
         return self.request.resolver_match.kwargs["account"]
 
 
-@require_GET
-@login_required
-def account_form(request: HttpRequest,
-                 account: Account = None) -> HttpResponse:
-    """The view to edit an accounting transaction.
+@method_decorator(login_required, name="dispatch")
+class AccountFormView(FormView):
+    model = Account
+    form = AccountForm
+    not_modified_message = gettext_noop("This account was not modified.")
+    success_message = gettext_noop("This account was saved successfully.")
 
-    Args:
-        request: The request.
-        account: The account.
+    def make_form_from_post(self, post: Dict[str, str]) -> AccountForm:
+        """Creates and returns the form from the POST data."""
+        form = AccountForm(post)
+        form.account = self.get_current_object()
+        return form
 
-    Returns:
-        The response.
-    """
-    previous_post = stored_post.get_previous_post(request)
-    if previous_post is not None:
-        form = AccountForm(previous_post)
-    elif account is not None:
+    def make_form_from_model(self, obj: Account) -> AccountForm:
+        """Creates and returns the form from a data model."""
         form = AccountForm({
-            "code": account.code,
-            "title": account.title,
+            "code": obj.code,
+            "title": obj.title,
         })
-    else:
-        form = AccountForm()
-    form.account = account
-    return render(request, "accounting/account_form.html", {
-        "form": form,
-    })
+        form.account = obj
+        return form
 
+    def fill_model_from_form(self, obj: Account, form: AccountForm) -> None:
+        """Fills in the data model from the form."""
+        obj.code = form["code"].value()
+        obj.title = form["title"].value()
+        obj.current_user = self.request.user
 
-@require_POST
-@login_required
-def account_store(request: HttpRequest,
-                  account: Account = None) -> HttpResponseRedirect:
-    """The view to store an account.
+    def get_error_url(self) -> str:
+        """Returns the URL on error."""
+        user = self.get_current_object()
+        return reverse("accounting:accounts.create") if user is None\
+            else reverse("accounting:accounts.edit", args=(user,))
 
-    Args:
-        request: The request.
-        account: The account.
-
-    Returns:
-        The response.
-    """
-    post = request.POST.dict()
-    strip_post(post)
-    form = AccountForm(post)
-    form.account = account
-    if not form.is_valid():
-        if account is None:
-            url = reverse("accounting:accounts.create")
-        else:
-            url = reverse("accounting:accounts.edit", args=(account,))
-        return stored_post.error_redirect(request, url, post)
-    if account is None:
-        account = Account()
-    account.code = form["code"].value()
-    account.title = form["title"].value()
-    if not account.is_dirty():
-        message = gettext_noop("This account was not modified.")
-    else:
-        account.save(current_user=request.user)
-        message = gettext_noop("This account was saved successfully.")
-    messages.success(request, message)
-    return redirect("accounting:accounts.detail", account)
+    def get_current_object(self) -> Optional[Account]:
+        """Returns the current object, or None on a create form."""
+        if "account" in self.kwargs:
+            return self.kwargs["account"]
+        return None
 
 
 @require_POST
