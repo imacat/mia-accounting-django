@@ -108,13 +108,13 @@ class FormView(View):
     @property
     def _form(self):
         if self.form is None:
-            raise AttributeError("The form attribute was not set.")
+            raise AttributeError("Please defined the form property.")
         return self.form
 
     @property
     def _model(self):
         if self.model is None:
-            raise AttributeError("The model attribute was not set.")
+            raise AttributeError("Please defined the model property.")
         return self.model
 
     def _set_current_object(self, obj: Model) -> None:
@@ -138,7 +138,7 @@ class FormView(View):
             model_name = self.model.__name__.lower()
             return F"{app_name}/{model_name}_form.html"
         raise AttributeError(
-            "Please either define the template_name or the model attribute.")
+            "Please either define the template_name or the model property.")
 
     def make_form_from_post(self, post: Dict[str, str]) -> forms.Form:
         """Creates and returns the form from the POST data."""
@@ -158,7 +158,7 @@ class FormView(View):
         if self.error_url is not None:
             return self.error_url
         raise AttributeError(
-            "Please define either the error_url attribute"
+            "Please define either the error_url property"
             " or the get_error_url method.")
 
     def get_success_url(self) -> str:
@@ -170,8 +170,8 @@ class FormView(View):
         if get_absolute_url is not None:
             return get_absolute_url()
         raise AttributeError(
-            "Please define either the success_url attribute,"
-            " the get_absolute_url method on the model,"
+            "Please define either the success_url property,"
+            " the get_absolute_url method on the data model,"
             " or the get_success_url method.")
 
     def get_not_modified_message(self) -> str:
