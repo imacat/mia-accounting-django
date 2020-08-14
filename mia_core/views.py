@@ -51,6 +51,7 @@ class FormView(View):
     template_name: str = None
     context_object_name: str = "form"
     success_url: str = None
+    error_url: str = None
     not_modified_message: str = None
     success_message: str = None
 
@@ -87,8 +88,8 @@ class FormView(View):
         utils.strip_post(post)
         form = self.make_form_from_post(post)
         if not form.is_valid():
-            url = str(utils.UrlBuilder(self.request.get_full_path()))
-            return stored_post.error_redirect(self.request, url, post)
+            return stored_post.error_redirect(
+                self.request, self.get_error_url(), post)
         if obj is None:
             obj = self._model()
             self._set_object(obj)
@@ -164,6 +165,12 @@ class FormView(View):
             "Please define either the success_url property,"
             " the get_absolute_url method on the data model,"
             " or the get_success_url method.")
+
+    def get_error_url(self) -> str:
+        """Returns the URL on error"""
+        if self.error_url is not None:
+            return self.error_url
+        return self.request.get_full_path()
 
     def get_not_modified_message(self) -> str:
         """Returns the message when the data was not modified."""
