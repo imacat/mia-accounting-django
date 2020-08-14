@@ -39,7 +39,6 @@ urlpatterns = [
          name="api.users.exists"),
     path("my-account", require_GET(login_required(TemplateView.as_view(
         template_name="mia_core/user_detail.html"))), name="my-account"),
-    path("my-account/edit", views.my_account_form, name="my-account.edit"),
-    path("my-account/update", views.my_account_store,
+    path("my-account/update", views.MyAccountFormView.as_view(),
          name="my-account.update"),
 ]

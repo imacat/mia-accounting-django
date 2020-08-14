@@ -18,7 +18,7 @@
 """The views of the Mia core application.
 
 """
-from typing import Dict, Type, Optional, Union
+from typing import Dict, Type, Optional
 
 from dirtyfields import DirtyFieldsMixin
 from django import forms
@@ -41,7 +41,7 @@ from . import stored_post, utils
 from .digest_auth import login_required
 from .forms import UserForm
 from .models import User
-from .utils import strip_post, UrlBuilder
+from .utils import UrlBuilder
 
 
 class FormView(View):
@@ -246,7 +246,7 @@ class UserFormView(FormView):
         form.current_user = self.request.user
         return form
 
-    def make_form_from_model(self, obj: User) -> forms.Form:
+    def make_form_from_model(self, obj: User) -> UserForm:
         """Creates and returns the form from a data model."""
         form = UserForm({
             "login_id": obj.login_id,
@@ -303,61 +303,28 @@ def user_delete(request: HttpRequest, user: User) -> HttpResponseRedirect:
     return redirect("mia_core:users")
 
 
-@require_GET
-@login_required
-def my_account_form(request: HttpRequest) -> HttpResponse:
-    """The view to edit my account.
+@method_decorator(login_required, name="dispatch")
+class MyAccountFormView(UserFormView):
+    """The form of the user's own account."""
+    not_modified_message = gettext_noop("Your user account was not changed.")
+    success_message = gettext_noop("Your user account was saved successfully.")
 
-    Args:
-        request: The request.
+    def fill_model_from_form(self, obj: User, form: UserForm) -> None:
+        """Fills in the data model from the form."""
+        obj.login_id = form["login_id"].value()
+        if form["password"].value() is not None:
+            obj.set_digest_password(
+                form["login_id"].value(), form["password"].value())
+        obj.name = form["name"].value()
+        obj.current_user = self.request.user
 
-    Returns:
-        The response.
-    """
-    previous_post = stored_post.get_previous_post(request)
-    if previous_post is not None:
-        form = UserForm(previous_post)
-    else:
-        form = UserForm({
-            "login_id": request.user.login_id,
-            "name": request.user.name,
-        })
-    form.user = request.user
-    form.current_user = request.user
-    return render(request, "mia_core/user_form.html", {
-        "form": form,
-    })
+    def get_success_url(self) -> str:
+        """Returns the URL on success."""
+        return reverse("mia_core:my-account")
 
-
-def my_account_store(request: HttpRequest) -> HttpResponseRedirect:
-    """The view to store my account.
-
-    Args:
-        request: The request.
-
-    Returns:
-        The response.
-    """
-    post = request.POST.dict()
-    strip_post(post)
-    form = UserForm(post)
-    form.user = request.user
-    form.current_user = request.user
-    if not form.is_valid():
-        url = reverse("mia_core:my-account.edit")
-        return stored_post.error_redirect(request, url, post)
-    request.user.login_id = form["login_id"].value()
-    if form["password"].value() is not None:
-        request.user.set_digest_password(
-            form["login_id"].value(), form["password"].value())
-    request.user.name = form["name"].value()
-    if not request.user.is_dirty():
-        message = gettext_noop("Your user account was not changed.")
-    else:
-        request.user.save(current_user=request.user)
-        message = gettext_noop("Your user account was saved successfully.")
-    messages.success(request, message)
-    return redirect("mia_core:my-account")
+    def get_object(self) -> Optional[Model]:
+        """Finds and returns the current object, or None on a create form."""
+        return self.request.user
 
 
 def api_users_exists(request: HttpRequest, login_id: str) -> JsonResponse:

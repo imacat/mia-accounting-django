@@ -34,7 +34,7 @@ First written: 2020/8/9
 
 {% if request|is_in_section:"mia_core:my-account" %}
   <div class="btn-group btn-actions">
-    <a class="btn btn-primary" role="button" href="{% url "mia_core:my-account.edit" %}">
+    <a class="btn btn-primary" role="button" href="{% url "mia_core:my-account.update" %}">
       <i class="fas fa-user-cog"></i>
       {{ _("Settings")|force_escape }}
     </a>

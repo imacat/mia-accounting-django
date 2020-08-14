@@ -42,7 +42,7 @@ First written: 2020/8/9
   </a>
 </div>
 
-<form id="user-form" action="{% if request|is_in_section:"mia_core:my-account" %}{% url "mia_core:my-account.update" %}{% elif form.user %}{% url "mia_core:users.update" form.user %}{% else %}{% url "mia_core:users.create" %}{% endif %}" method="POST">
+<form id="user-form" action="{{ request.get_full_path }}" method="POST">
   {% csrf_token %}
   <input id="exists-url" type="hidden" value="{% url "mia_core:api.users.exists" "ID" %}" />
   <input id="user-login-id-original" type="hidden" value="{{ form.user.login_id }}" />
