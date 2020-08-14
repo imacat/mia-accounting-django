@@ -43,7 +43,7 @@ First written: 2020/8/8
   </a>
 </div>
 
-<form id="account-form" action="{% if request.resolver_match.kwargs.account %}{% url "accounting:accounts.update" request.resolver_match.kwargs.account %}{% else %}{% url "accounting:accounts.create" %}{% endif %}" method="post">
+<form id="account-form" action="{{ request.get_full_path }}" method="post">
   {% csrf_token %}
   <input id="all-account-url" type="hidden" value="{% url "accounting:api.accounts" %}" />
   <input id="account-code-original" type="hidden" value="{% if request.resolver_match.kwargs.account %}{{ request.resolver_match.kwargs.account.code }}{% endif %}" />
