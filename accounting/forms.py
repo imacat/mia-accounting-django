@@ -18,8 +18,9 @@
 """The forms of the Mia core application.
 
 """
+import datetime
 import re
-from typing import Optional
+from typing import Optional, List, Dict
 
 from django import forms
 from django.core.validators import RegexValidator
@@ -27,7 +28,7 @@ from django.db.models import Q, Max
 from django.db.models.functions import Length
 from django.utils.translation import gettext as _
 
-from .models import Account, Record
+from .models import Account, Record, Transaction
 from .validators import validate_record_account_code, validate_record_id
 
 
@@ -340,6 +341,41 @@ class TransactionForm(forms.Form):
         """
         return sum([int(x.data["amount"]) for x in self.credit_records
                     if "amount" in x.data and "amount" not in x.errors])
+
+
+class TransactionSortForm(forms.Form):
+    """A form to sort the transactions in a same day."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.date = None
+        self.txn_list: Optional[List[Transaction]] = None
+        self.txn_orders: List[TransactionSortForm.Order] = []
+
+    @staticmethod
+    def from_post(date: datetime.date, post: Dict[str, str]):
+        form = TransactionSortForm({})
+        form.date = date
+        post_orders: List[TransactionSortForm.Order] = []
+        for txn in Transaction.objects.filter(date=date).all():
+            key = F"transaction-{txn.pk}-ord"
+            if key not in post:
+                post_orders.append(form.Order(txn, 9999))
+            elif not re.match("^[0-9]+$", post[key]):
+                post_orders.append(form.Order(txn, 9999))
+            else:
+                post_orders.append(form.Order(txn, int(post[key])))
+        post_orders.sort(key=lambda x: (x.order, x.txn.ord))
+        form.txn_orders = []
+        for i in range(len(post_orders)):
+            form.txn_orders.append(form.Order(post_orders[i].txn, i + 1))
+        form.txn_list = [x.txn for x in form.txn_orders]
+        return form
+
+    class Order:
+        """A transaction order"""
+        def __init__(self, txn: Transaction, order: int):
+            self.txn = txn
+            self.order = order
 
 
 class AccountForm(forms.Form):

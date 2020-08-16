@@ -27,7 +27,7 @@ First written: 2020/8/6
 {% load accounting %}
 
 {% block settings %}
-  {% blocktrans asvar title with date=date|smart_date %}Reorder the Transactions in {{ date }}{% endblocktrans %}
+  {% blocktrans asvar title with date=form.date|smart_date %}Reorder the Transactions in {{ date }}{% endblocktrans %}
   {% setvar "title" title %}
   {% setvar "use_jqueryui" True %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
@@ -50,12 +50,12 @@ First written: 2020/8/6
   </div>
 
   <div id="txn-date" class="col-sm-10">
-    {{ date|smart_date }}
+    {{ form.date|smart_date }}
   </div>
 </div>
 
-{% if txn_list|length > 1 %}
-  <form action="{% url "accounting:transactions.sort" date as url %}{% url_keep_return url %}" method="post">
+{% if form.txn_list|length > 1 %}
+  <form action="{% url "accounting:transactions.sort" form.date as url %}{% url_keep_return url %}" method="post">
     {% csrf_token %}
     <table class="table general-journal-table">
       <thead>
@@ -68,7 +68,7 @@ First written: 2020/8/6
         </tr>
       </thead>
       <tbody id="transactions">
-        {% for txn in txn_list %}
+        {% for txn in form.txn_list %}
           <tr id="transaction-{{ txn.pk }}" class="transaction {% if not txn.is_balanced %} table-danger {% endif %}">
             <td class="actions">
               <div class="btn-group">

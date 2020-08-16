@@ -18,7 +18,6 @@
 """The view controllers of the accounting application.
 
 """
-import datetime
 import json
 import re
 from typing import Dict, Optional
@@ -39,14 +38,13 @@ from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import RedirectView, ListView, DetailView
 
-from mia_core import stored_post
 from mia_core.digest_auth import login_required
 from mia_core.period import Period
-from mia_core.utils import Pagination, get_multi_lingual_search, UrlBuilder, \
-    strip_post, PaginationException
+from mia_core.utils import Pagination, get_multi_lingual_search, \
+    PaginationException
 from mia_core.views import DeleteView, FormView
 from . import utils
-from .forms import AccountForm, TransactionForm
+from .forms import AccountForm, TransactionForm, TransactionSortForm
 from .models import Record, Transaction, Account
 
 
@@ -882,59 +880,44 @@ class TransactionDeleteView(DeleteView):
         return self.request.GET.get("r") or reverse("accounting:home")
 
 
-@login_required
-def txn_sort(request: HttpRequest, date: datetime.date) -> HttpResponse:
-    """The view for the form to sort the transactions in a same day.
+@method_decorator(login_required, name="dispatch")
+class TransactionSortFormView(FormView):
+    """The form to sort the transactions in a same day."""
+    template_name = "accounting/transaction-sort.html"
+    form_class = TransactionSortForm
+    not_modified_message = gettext_noop(
+        "The transaction orders were not modified.")
+    success_message = gettext_noop(
+        "The transaction orders were saved successfully.")
 
-    Args:
-        request: The request.
-        date: The day.
+    def get_form(self, **kwargs):
+        """Returns the form for the template."""
+        form = super().get_form()
+        if form.txn_list is None:
+            form.date = self.kwargs["date"]
+            form.txn_list = Transaction.objects.filter(date=form.date)\
+                .order_by("ord").all()
+        if len(form.txn_list) < 2:
+            raise Http404
+        return form
 
-    Returns:
-        The response.
+    def make_form_from_post(self, post: Dict[str, str]) -> TransactionSortForm:
+        """Creates and returns the form from the POST data."""
+        return TransactionSortForm.from_post(self.kwargs["date"], post)
 
-    Raises:
-        Http404: When there are less than two transactions in this day.
-    """
-    transactions = Transaction.objects.filter(date=date).order_by("ord")
-    if len(transactions) < 2:
-        raise Http404
-    if request.method != "POST":
-        return render(request, "accounting/transaction-sort.html", {
-            "txn_list": transactions,
-            "date": date,
-        })
-    else:
-        post = request.POST.dict()
-        errors = {}
-        for txn in transactions:
-            key = F"transaction-{txn.pk}-ord"
-            if key not in post:
-                errors[key] = gettext_noop("Invalid arguments.")
-            elif not re.match("^[1-9][0-9]*", post[key]):
-                errors[key] = gettext_noop("Invalid order.")
-
-        if len(errors) > 0:
-            return stored_post.error_redirect(
-                request, reverse("accounting:transactions.sort"), post)
-
-        keys = [F"transaction-{x.pk}-ord" for x in transactions]
-        keys.sort(key=lambda x: int(post[x]))
-        for i in range(len(keys)):
-            post[keys[i]] = i + 1
-        modified = [[x, post[F"transaction-{x.pk}-ord"]] for x in transactions
-                    if x.ord != post[F"transaction-{x.pk}-ord"]]
-
+    def form_valid(self, form: TransactionSortForm) -> HttpResponseRedirect:
+        """Handles the action when the POST form is valid."""
+        modified = [x for x in form.txn_orders if x.txn.ord != x.order]
         if len(modified) == 0:
-            message = gettext_noop("The transaction orders were not modified.")
+            message = self.get_not_modified_message(form.cleaned_data)
         else:
             with transaction.atomic():
                 for x in modified:
-                    Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
-            message = gettext_noop(
-                "The transaction orders were saved successfully.")
-        messages.success(request, message)
-        return redirect(request.GET.get("r") or reverse("accounting:home"))
+                    Transaction.objects.filter(pk=x.txn.pk).update(ord=x.order)
+            message = self.get_success_message(form.cleaned_data)
+        messages.success(self.request, message)
+        return redirect(self.request.GET.get("r")
+                        or reverse("accounting:home"))
 
 
 @method_decorator(require_GET, name="dispatch")
