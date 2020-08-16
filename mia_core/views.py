@@ -97,10 +97,10 @@ class FormView(View):
         self.fill_model_from_form(obj, form)
         if isinstance(obj, DirtyFieldsMixin)\
                 and not obj.is_dirty(check_relationship=True):
-            message = self.get_not_modified_message()
+            message = self.get_not_modified_message(form.cleaned_data)
         else:
             obj.save()
-            message = self.get_success_message()
+            message = self.get_success_message(form.cleaned_data)
         messages.success(self.request, message)
         return redirect(str(UrlBuilder(self.get_success_url())
                             .query(r=self.request.GET.get("r"))))
@@ -174,13 +174,27 @@ class FormView(View):
             return self.error_url
         return self.request.get_full_path()
 
-    def get_not_modified_message(self) -> str:
-        """Returns the message when the data was not modified."""
-        return self.not_modified_message
+    def get_not_modified_message(self, cleaned_data: Dict[str, str]) -> str:
+        """Returns the message when the data was not modified.
 
-    def get_success_message(self) -> str:
-        """Returns the success message."""
-        return self.success_message
+        Args:
+            cleaned_data: The cleaned data of the form.
+
+        Returns:
+            The message when the data was not modified.
+        """
+        return self.not_modified_message % cleaned_data
+
+    def get_success_message(self, cleaned_data: Dict[str, str]) -> str:
+        """Returns the success message.
+
+        Args:
+            cleaned_data: The cleaned data of the form.
+
+        Returns:
+            The message when the data was not modified.
+        """
+        return self.success_message % cleaned_data
 
     def get_object(self) -> Optional[Model]:
         """Finds and returns the current object, or None on a create form."""
