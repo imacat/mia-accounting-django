@@ -75,9 +75,7 @@ class FormView(View):
     def post(self, request: HttpRequest, *args,
              **kwargs) -> HttpResponseRedirect:
         """Handles the POST requests."""
-        post = self.request.POST.dict()
-        utils.strip_post(post)
-        form = self.make_form_from_post(post)
+        form = self.get_form(**kwargs)
         if not form.is_valid():
             return self.form_invalid(form)
         return self.form_valid(form)
@@ -112,13 +110,18 @@ class FormView(View):
 
     def get_form(self, **kwargs) -> forms.Form:
         """Returns the form for the template."""
-        previous_post = stored_post.get_previous_post(self.request)
-        if previous_post is not None:
-            return self.make_form_from_post(previous_post)
-        obj = self.get_object()
-        if obj is not None:
-            return self.make_form_from_model(obj)
-        return self.get_form_class()()
+        if self.request.method != "POST":
+            previous_post = stored_post.get_previous_post(self.request)
+            if previous_post is not None:
+                return self.make_form_from_post(previous_post)
+            obj = self.get_object()
+            if obj is not None:
+                return self.make_form_from_model(obj)
+            return self.get_form_class()()
+        else:
+            post = self.request.POST.dict()
+            utils.strip_post(post)
+            return self.make_form_from_post(post)
 
     def get_template_name(self) -> str:
         """Returns the name of the template."""
