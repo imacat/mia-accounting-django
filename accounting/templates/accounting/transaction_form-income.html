@@ -56,7 +56,7 @@ First written: 2020/7/23
 <input id="account-option-url" type="hidden" value="{% url "accounting:api.accounts.options" %}" />
 <input id="summary-categories" type="hidden" value="{{ summary_categories }}" />
 <input id="new-record-template" type="hidden" value="{{ new_record_template }}" />
-<form id="txn-form" action="{% if form.transaction %}{% url "accounting:transactions.update" "income" form.transaction as url %}{% url_keep_return url %}{% else %}{% url "accounting:transactions.store" "income" as url %}{% url_keep_return url %}{% endif %}" method="post">
+<form id="txn-form" action="{% if form.transaction %}{% url "accounting:transactions.update" "income" form.transaction as url %}{% url_keep_return url %}{% else %}{% url "accounting:transactions.create" "income" as url %}{% url_keep_return url %}{% endif %}" method="post">
   {% csrf_token %}
   <div class="row form-group">
     <div class="col-sm-2">

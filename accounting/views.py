@@ -812,84 +812,60 @@ class TransactionView(DetailView):
                 % (self.kwargs["txn_type"],)]
 
 
-@require_GET
-@login_required
-def txn_form(request: HttpRequest, txn_type: str,
-             txn: Transaction = None) -> HttpResponse:
-    """The view to edit an accounting transaction.
+@method_decorator(login_required, name="dispatch")
+class TransactionFormView(FormView):
+    """The form to create or update an accounting transaction."""
+    model = Transaction
+    form_class = TransactionForm
+    not_modified_message = gettext_noop("This transaction was not modified.")
+    success_message = gettext_noop("This transaction was saved successfully.")
 
-    Args:
-        request: The request.
-        txn_type: The transaction type.
-        txn: The transaction.
+    def get_context_data(self, **kwargs):
+        """Returns the context data for the template."""
+        context = super().get_context_data(**kwargs)
+        context["summary_categories"] = utils.get_summary_categories()
+        context["new_record_template"] = self._get_new_record_template_json()
+        return context
 
-    Returns:
-        The response.
-    """
-    previous_post = stored_post.get_previous_post(request)
-    if previous_post is not None:
-        form = TransactionForm(previous_post)
-    elif txn is not None:
-        form = utils.make_txn_form_from_model(txn_type, txn)
-    else:
-        form = TransactionForm()
-    form.transaction = txn
-    form.txn_type = txn_type
-    new_record_context = {"record_type": "TTT", "no": "NNN"}
-    if txn_type == "transfer":
-        new_record_template = json.dumps(render_to_string(
-            "accounting/include/record_form-transfer.html",
-            new_record_context))
-    else:
-        new_record_template = json.dumps(render_to_string(
-            "accounting/include/record_form-non-transfer.html",
-            new_record_context))
-    return render(request, F"accounting/transaction_form-{txn_type}.html", {
-        "form": form,
-        "summary_categories": utils.get_summary_categories,
-        "new_record_template": new_record_template,
-    })
+    def get_template_name(self) -> str:
+        """Returns the name of the template."""
+        namespace = self.request.resolver_match.namespace
+        model_name = self.model.__name__.lower()
+        return F"{namespace}/{model_name}_form-{self.txn_type}.html"
 
+    def _get_new_record_template_json(self) -> str:
+        context = {"record_type": "TTT", "no": "NNN"}
+        template_name = "accounting/include/record_form-transfer.html"\
+            if self.txn_type == "transfer"\
+            else "accounting/include/record_form-non-transfer.html"
+        return json.dumps(render_to_string(template_name, context))
 
-@require_POST
-@login_required
-def txn_store(request: HttpRequest, txn_type: str,
-              txn: Transaction = None) -> HttpResponseRedirect:
-    """The view to store an accounting transaction.
+    def make_form_from_post(self, post: Dict[str, str]) -> TransactionForm:
+        """Creates and returns the form from the POST data."""
+        form = TransactionForm(post)
+        form.txn_type = self.txn_type
+        form.transaction = self.get_object()
+        return form
 
-    Args:
-        request: The request.
-        txn_type: The transaction type.
-        txn: The transaction.
+    def make_form_from_model(self, obj: Transaction) -> TransactionForm:
+        """Creates and returns the form from a data model."""
+        return utils.make_txn_form_from_model(self.txn_type, obj)
 
-    Returns:
-        The response.
-    """
-    post = request.POST.dict()
-    strip_post(post)
-    utils.sort_post_txn_records(post)
-    form = TransactionForm(post)
-    form.transaction = txn
-    form.txn_type = txn_type
-    if not form.is_valid():
-        if txn is None:
-            url = reverse("accounting:transactions.create", args=(txn_type,))
-        else:
-            url = reverse("accounting:transactions.edit", args=(txn_type, txn))
-        url = str(UrlBuilder(url).query(r=request.GET.get("r")))
-        return stored_post.error_redirect(request, url, post)
-    if txn is None:
-        txn = Transaction()
-    old_date = txn.date
-    utils.fill_txn_from_post(txn_type, txn, post)
-    if not txn.is_dirty(check_relationship=True):
-        message = gettext_noop("This transaction was not modified.")
-    else:
-        txn.save(current_user=request.user, old_date=old_date)
-        message = gettext_noop("This transaction was saved successfully.")
-    messages.success(request, message)
-    url = reverse("accounting:transactions.detail", args=(txn_type, txn))
-    return redirect(str(UrlBuilder(url).query(r=request.GET.get("r"))))
+    def fill_model_from_form(self, obj: Transaction,
+                             form: TransactionForm) -> None:
+        """Fills in the data model from the form."""
+        obj.old_date = obj.date
+        utils.fill_txn_from_post(self.txn_type, obj, form.data)
+        obj.current_user = self.request.user
+
+    def get_object(self) -> Optional[Account]:
+        """Returns the current object, or None on a create form."""
+        return self.kwargs.get("txn")
+
+    @property
+    def txn_type(self) -> str:
+        """Returns the transaction type of this form"""
+        return self.kwargs["txn_type"]
 
 
 @method_decorator(require_POST, name="dispatch")
