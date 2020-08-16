@@ -18,7 +18,7 @@
 """The views of the Mia core application.
 
 """
-from typing import Dict, Type, Optional
+from typing import Dict, Type, Optional, Any
 
 from dirtyfields import DirtyFieldsMixin
 from django import forms
@@ -120,11 +120,11 @@ class FormView(View):
             self._is_object_requested = True
         return self._object
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
         """Returns the context data for the template."""
         return {self.context_object_name: self.get_form()}
 
-    def get_form(self, **kwargs):
+    def get_form(self, **kwargs) -> forms.Form:
         """Returns the form for the template."""
         previous_post = stored_post.get_previous_post(self.request)
         if previous_post is not None:
