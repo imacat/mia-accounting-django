@@ -37,7 +37,7 @@ First written: 2020/8/8
 {% block content %}
 
 <div class="btn-group btn-actions">
-  <a class="btn btn-primary" role="button" href="{% if account %}{% url "accounting:accounts.detail" request.resolver_match.kwargs.account %}{% else %}{% url "accounting:accounts" %}{% endif %}">
+  <a class="btn btn-primary" role="button" href="{% if account %}{% url "accounting:accounts.detail" form.account %}{% else %}{% url "accounting:accounts" %}{% endif %}">
     <i class="fas fa-chevron-circle-left"></i>
     {{ _("Back")|force_escape }}
   </a>
@@ -46,7 +46,7 @@ First written: 2020/8/8
 <form id="account-form" action="{{ request.get_full_path }}" method="post">
   {% csrf_token %}
   <input id="all-account-url" type="hidden" value="{% url "accounting:api.accounts" %}" />
-  <input id="account-code-original" type="hidden" value="{% if request.resolver_match.kwargs.account %}{{ request.resolver_match.kwargs.account.code }}{% endif %}" />
+  <input id="account-code-original" type="hidden" value="{% if form.account %}{{ form.account.code }}{% endif %}" />
   <div class="row form-group">
     <label class="col-sm-2" for="account-parent">{{ _("Parent Account:")|force_escape }}</label>
     <div id="account-parent" class="col-sm-10">
