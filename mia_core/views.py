@@ -234,6 +234,7 @@ class UserView(DetailView):
 
 @method_decorator(login_required, name="dispatch")
 class UserFormView(FormView):
+    """The form to create or update a user."""
     model = User
     form = UserForm
     not_modified_message = gettext_noop("This user account was not changed.")
@@ -305,7 +306,7 @@ def user_delete(request: HttpRequest, user: User) -> HttpResponseRedirect:
 
 @method_decorator(login_required, name="dispatch")
 class MyAccountFormView(UserFormView):
-    """The form of the user's own account."""
+    """The form to update the information of the currently logged-in user."""
     not_modified_message = gettext_noop("Your user account was not changed.")
     success_message = gettext_noop("Your user account was saved successfully.")
 
