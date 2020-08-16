@@ -75,13 +75,21 @@ class FormView(View):
     def post(self, request: HttpRequest, *args,
              **kwargs) -> HttpResponseRedirect:
         """Handles the POST requests."""
-        obj = self.get_object()
         post = self.request.POST.dict()
         utils.strip_post(post)
         form = self.make_form_from_post(post)
         if not form.is_valid():
-            return stored_post.error_redirect(
-                self.request, self.get_error_url(), post)
+            return self.form_invalid(form)
+        return self.form_valid(form)
+
+    def form_invalid(self, form) -> HttpResponseRedirect:
+        """Handles the action when the POST form is invalid"""
+        return stored_post.error_redirect(
+            self.request, self.get_error_url(), form.data)
+
+    def form_valid(self, form) -> HttpResponseRedirect:
+        """Handles the action when the POST form is valid"""
+        obj = self.get_object()
         if obj is None:
             obj = self._model()
             self._set_object(obj)
