@@ -76,7 +76,7 @@ class FormView(View):
         elif obj is not None:
             form = self.make_form_from_model(obj)
         else:
-            form = self._form()
+            form = self.get_form_class()()
         return render(self.request, self.get_template_name(), {
             self.context_object_name: form
         })
@@ -104,8 +104,7 @@ class FormView(View):
         return redirect(str(UrlBuilder(self.get_success_url())
                             .query(r=self.request.GET.get("r"))))
 
-    @property
-    def _form(self):
+    def get_form_class(self):
         if self.form_class is None:
             raise AttributeError("Please defined the form_class property.")
         return self.form_class
@@ -141,12 +140,13 @@ class FormView(View):
 
     def make_form_from_post(self, post: Dict[str, str]) -> forms.Form:
         """Creates and returns the form from the POST data."""
-        return self._form(post)
+        return self.get_form_class()(post)
 
     def make_form_from_model(self, obj: Model) -> forms.Form:
         """Creates and returns the form from a data model."""
-        return self._form({x: getattr(obj, x, None)
-                           for x in self._form.base_fields})
+        form_class = self.get_form_class()
+        return form_class({x: getattr(obj, x, None)
+                           for x in form_class.base_fields})
 
     def fill_model_from_form(self, obj: Model, form: forms.Form) -> None:
         """Fills in the data model from the form."""
