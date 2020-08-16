@@ -69,17 +69,8 @@ class FormView(View):
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Handles the GET requests."""
-        obj = self.get_object()
-        previous_post = stored_post.get_previous_post(self.request)
-        if previous_post is not None:
-            form = self.make_form_from_post(previous_post)
-        elif obj is not None:
-            form = self.make_form_from_model(obj)
-        else:
-            form = self.get_form_class()()
-        return render(self.request, self.get_template_name(), {
-            self.context_object_name: form
-        })
+        return render(self.request, self.get_template_name(),
+                      self.get_context_data(**kwargs))
 
     def post(self, request: HttpRequest, *args,
              **kwargs) -> HttpResponseRedirect:
@@ -128,6 +119,20 @@ class FormView(View):
             self._object = self.get_object()
             self._is_object_requested = True
         return self._object
+
+    def get_context_data(self, **kwargs):
+        """Returns the context data for the template."""
+        return {self.context_object_name: self.get_form()}
+
+    def get_form(self, **kwargs):
+        """Returns the form for the template."""
+        previous_post = stored_post.get_previous_post(self.request)
+        if previous_post is not None:
+            return self.make_form_from_post(previous_post)
+        obj = self.get_object()
+        if obj is not None:
+            return self.make_form_from_model(obj)
+        return self.get_form_class()()
 
     def get_template_name(self) -> str:
         """Returns the name of the template."""
