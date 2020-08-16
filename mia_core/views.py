@@ -63,11 +63,11 @@ class FormView(View):
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """The view to store an accounting transaction."""
         if self.request.method != "POST":
-            return self.do_get()
+            return self.get(request, *args, **kwargs)
         else:
-            return self.do_post()
+            return self.post(request, *args, **kwargs)
 
-    def do_get(self) -> HttpResponse:
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Handles the GET requests."""
         obj = self.get_object()
         previous_post = stored_post.get_previous_post(self.request)
@@ -81,7 +81,8 @@ class FormView(View):
             self.context_object_name: form
         })
 
-    def do_post(self) -> HttpResponseRedirect:
+    def post(self, request: HttpRequest, *args,
+             **kwargs) -> HttpResponseRedirect:
         """Handles the POST requests."""
         obj = self.get_object()
         post = self.request.POST.dict()
