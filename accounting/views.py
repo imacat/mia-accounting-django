@@ -988,9 +988,7 @@ class AccountFormView(FormView):
 
     def get_object(self) -> Optional[Account]:
         """Returns the current object, or None on a create form."""
-        if "account" in self.kwargs:
-            return self.kwargs["account"]
-        return None
+        return self.kwargs.get("account")
 
 
 @require_POST
