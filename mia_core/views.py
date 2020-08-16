@@ -105,7 +105,8 @@ class FormView(View):
         return redirect(str(UrlBuilder(self.get_success_url())
                             .query(r=self.request.GET.get("r"))))
 
-    def get_form_class(self):
+    def get_form_class(self) -> Type[forms.Form]:
+        """Returns the form class."""
         if self.form_class is None:
             raise AttributeError("Please defined the form_class property.")
         return self.form_class
