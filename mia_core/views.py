@@ -47,7 +47,7 @@ from .utils import UrlBuilder
 class FormView(View):
     """The base form view."""
     model: Type[Model] = None
-    form: Type[forms.Form] = None
+    form_class: Type[forms.Form] = None
     template_name: str = None
     context_object_name: str = "form"
     success_url: str = None
@@ -106,9 +106,9 @@ class FormView(View):
 
     @property
     def _form(self):
-        if self.form is None:
-            raise AttributeError("Please defined the form property.")
-        return self.form
+        if self.form_class is None:
+            raise AttributeError("Please defined the form_class property.")
+        return self.form_class
 
     @property
     def _model(self):
@@ -236,7 +236,7 @@ class UserView(DetailView):
 class UserFormView(FormView):
     """The form to create or update a user."""
     model = User
-    form = UserForm
+    form_class = UserForm
     not_modified_message = gettext_noop("This user account was not changed.")
     success_message = gettext_noop("This user account was saved successfully.")
 

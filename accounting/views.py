@@ -985,7 +985,7 @@ class AccountView(DetailView):
 class AccountFormView(FormView):
     """The form to create or update an account."""
     model = Account
-    form = AccountForm
+    form_class = AccountForm
     not_modified_message = gettext_noop("This account was not modified.")
     success_message = gettext_noop("This account was saved successfully.")
 
