@@ -82,28 +82,6 @@ class FormView(View):
             return self.form_invalid(form)
         return self.form_valid(form)
 
-    def form_invalid(self, form) -> HttpResponseRedirect:
-        """Handles the action when the POST form is invalid"""
-        return stored_post.error_redirect(
-            self.request, self.get_error_url(), form.data)
-
-    def form_valid(self, form) -> HttpResponseRedirect:
-        """Handles the action when the POST form is valid"""
-        obj = self.get_object()
-        if obj is None:
-            obj = self._model()
-            self._set_object(obj)
-        self.fill_model_from_form(obj, form)
-        if isinstance(obj, DirtyFieldsMixin)\
-                and not obj.is_dirty(check_relationship=True):
-            message = self.get_not_modified_message(form.cleaned_data)
-        else:
-            obj.save()
-            message = self.get_success_message(form.cleaned_data)
-        messages.success(self.request, message)
-        return redirect(str(UrlBuilder(self.get_success_url())
-                            .query(r=self.request.GET.get("r"))))
-
     def get_form_class(self) -> Type[forms.Form]:
         """Returns the form class."""
         if self.form_class is None:
@@ -167,6 +145,28 @@ class FormView(View):
         """Fills in the data model from the form."""
         for name in form.fields:
             setattr(obj, name, form[name].value())
+
+    def form_invalid(self, form) -> HttpResponseRedirect:
+        """Handles the action when the POST form is invalid"""
+        return stored_post.error_redirect(
+            self.request, self.get_error_url(), form.data)
+
+    def form_valid(self, form) -> HttpResponseRedirect:
+        """Handles the action when the POST form is valid"""
+        obj = self.get_object()
+        if obj is None:
+            obj = self._model()
+            self._set_object(obj)
+        self.fill_model_from_form(obj, form)
+        if isinstance(obj, DirtyFieldsMixin)\
+                and not obj.is_dirty(check_relationship=True):
+            message = self.get_not_modified_message(form.cleaned_data)
+        else:
+            obj.save()
+            message = self.get_success_message(form.cleaned_data)
+        messages.success(self.request, message)
+        return redirect(str(UrlBuilder(self.get_success_url())
+                            .query(r=self.request.GET.get("r"))))
 
     def get_success_url(self) -> str:
         """Returns the URL on success."""
