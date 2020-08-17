@@ -351,7 +351,8 @@ class MyAccountFormView(UserFormView):
 
     def get_success_url(self) -> str:
         """Returns the URL on success."""
-        return reverse("mia_core:my-account")
+        return reverse("mia_core:my-account",
+                       current_app=self.request.resolver_match.namespace)
 
     def get_object(self) -> Optional[Model]:
         """Finds and returns the current object, or None on a create form."""
