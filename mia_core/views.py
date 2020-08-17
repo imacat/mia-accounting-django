@@ -302,7 +302,7 @@ class UserFormView(FormView):
 
     def get_success_url(self) -> str:
         """Returns the URL on success."""
-        return reverse("mia_core:users.detail", args=(self.get_object(),),
+        return reverse("mia_core:users.detail", args=[self.get_object()],
                        current_app=self.request.resolver_match.namespace)
 
     def get_object(self) -> Optional[Model]:
