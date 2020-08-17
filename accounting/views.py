@@ -705,7 +705,8 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
         .filter(Q(amount__isnull=False), ~Q(amount=0))
         .order_by("code"))
     for account in accounts:
-        account.url = reverse("accounting:ledger", args=[account, period])
+        account.url = reverse("accounting:ledger", args=[account, period],
+                              current_app=request.resolver_match.namespace)
     balance = Record.objects \
         .filter(
             Q(transaction__date__lt=period.start)
@@ -722,7 +723,8 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
             code=Account.ACCUMULATED_BALANCE)
         brought_forward.amount = balance
         brought_forward.url = reverse(
-            "accounting:income-statement", args=[period.period_before()])
+            "accounting:income-statement", args=[period.period_before()],
+            current_app=request.resolver_match.namespace)
         accounts.append(brought_forward)
     balance = Record.objects \
         .filter(
@@ -740,7 +742,8 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
         net_change = Account.objects.get(code=Account.NET_CHANGE)
         net_change.amount = balance
         net_change.url = reverse(
-            "accounting:income-statement", args=[period])
+            "accounting:income-statement", args=[period],
+            current_app=request.resolver_match.namespace)
         accounts.append(net_change)
     for account in [x for x in accounts if x.code[0] in "23"]:
         account.amount = -account.amount
@@ -883,7 +886,9 @@ class TransactionDeleteView(DeleteView):
         return self.kwargs["txn"]
 
     def get_success_url(self):
-        return self.request.GET.get("r") or reverse("accounting:home")
+        return self.request.GET.get("r")\
+               or reverse("accounting:home",
+                          current_app=self.request.resolver_match.namespace)
 
 
 @method_decorator(login_required, name="dispatch")

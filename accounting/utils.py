@@ -85,6 +85,7 @@ class ReportUrl:
     """The URL of the accounting reports.
 
     Args:
+        namespace: The namespace of the current application.
         cash: The currently-specified account of the
             cash account or cash summary.
         ledger: The currently-specified account of the
@@ -92,36 +93,45 @@ class ReportUrl:
         period: The currently-specified period.
     """
 
-    def __init__(self, cash: Account = None, ledger: Account = None,
-                 period: Period = None):
+    def __init__(self, namespace: str, cash: Account = None,
+                 ledger: Account = None, period: Period = None,):
         self._period = Period() if period is None else period
         self._cash = get_default_cash_account() if cash is None else cash
         self._ledger = get_default_ledger_account()\
             if ledger is None else ledger
+        self._namespace = namespace
 
     def cash(self) -> str:
-        return reverse("accounting:cash", args=[self._cash, self._period])
+        return reverse("accounting:cash", args=[self._cash, self._period],
+                       current_app=self._namespace)
 
     def cash_summary(self) -> str:
-        return reverse("accounting:cash-summary", args=[self._cash])
+        return reverse("accounting:cash-summary", args=[self._cash],
+                       current_app=self._namespace)
 
     def ledger(self) -> str:
-        return reverse("accounting:ledger", args=[self._ledger, self._period])
+        return reverse("accounting:ledger", args=[self._ledger, self._period],
+                       current_app=self._namespace)
 
     def ledger_summary(self) -> str:
-        return reverse("accounting:ledger-summary", args=[self._ledger])
+        return reverse("accounting:ledger-summary", args=[self._ledger],
+                       current_app=self._namespace)
 
     def journal(self) -> str:
-        return reverse("accounting:journal", args=[self._period])
+        return reverse("accounting:journal", args=[self._period],
+                       current_app=self._namespace)
 
     def trial_balance(self) -> str:
-        return reverse("accounting:trial-balance", args=[self._period])
+        return reverse("accounting:trial-balance", args=[self._period],
+                       current_app=self._namespace)
 
     def income_statement(self) -> str:
-        return reverse("accounting:income-statement", args=[self._period])
+        return reverse("accounting:income-statement", args=[self._period],
+                       current_app=self._namespace)
 
     def balance_sheet(self) -> str:
-        return reverse("accounting:balance-sheet", args=[self._period])
+        return reverse("accounting:balance-sheet", args=[self._period],
+                       current_app=self._namespace)
 
 
 class Populator:

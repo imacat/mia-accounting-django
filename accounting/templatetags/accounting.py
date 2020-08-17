@@ -22,6 +22,7 @@ import re
 from typing import Union, Optional
 
 from django import template
+from django.template import RequestContext
 
 from accounting.models import Account
 from accounting.utils import ReportUrl
@@ -47,13 +48,15 @@ def accounting_amount(value: Union[str, int]) -> str:
     return s
 
 
-@register.simple_tag
-def report_url(cash_account: Optional[Account],
+@register.simple_tag(takes_context=True)
+def report_url(context: RequestContext,
+               cash_account: Optional[Account],
                ledger_account: Optional[Account],
                period: Optional[Period]) -> ReportUrl:
     """Returns accounting report URL helper.
 
     Args:
+        context: The request context.
         cash_account: The current cash account.
         ledger_account: The current ledger account.
         period: The period.
@@ -62,6 +65,7 @@ def report_url(cash_account: Optional[Account],
         ReportUrl: The accounting report URL helper.
     """
     return ReportUrl(
+        namespace=context.request.resolver_match.namespace,
         cash=cash_account or None,
         ledger=ledger_account or None,
         period=period or None)
