@@ -979,6 +979,11 @@ class AccountFormView(FormView):
         """Returns the current object, or None on a create form."""
         return self.kwargs.get("account")
 
+    def get_success_url(self) -> str:
+        """Returns the URL on success."""
+        return reverse("accounting:accounts.detail", args=(self.get_object(),),
+                       current_app=self.request.resolver_match.namespace)
+
 
 @require_POST
 @login_required

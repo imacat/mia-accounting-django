@@ -18,14 +18,12 @@
 """The data models of the accounting application.
 
 """
-import datetime
 from typing import Dict, List, Optional
 
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q, Max
-from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
     new_pk
@@ -82,10 +80,6 @@ class Account(DirtyFieldsMixin, models.Model):
         with transaction.atomic():
             super().save(force_insert=force_insert, force_update=force_update,
                          using=using, update_fields=update_fields)
-
-    def get_absolute_url(self):
-        """REturns the """
-        return reverse("accounting:accounts.detail", args=(self,))
 
     class Meta:
         db_table = "accounting_accounts"
