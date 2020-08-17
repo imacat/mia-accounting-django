@@ -862,7 +862,7 @@ class TransactionFormView(FormView):
 
     @property
     def txn_type(self) -> str:
-        """Returns the transaction type of this form"""
+        """Returns the transaction type of this form."""
         return self.kwargs["txn_type"]
 
 
