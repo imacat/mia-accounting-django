@@ -139,9 +139,6 @@ class User(DirtyFieldsMixin, models.Model):
                 using=using, update_fields=update_fields)
             User.objects.filter(pk=self.pk).update(updated_at=Now())
 
-    def get_absolute_url(self):
-        return reverse("mia_core:users.detail", args=(self,))
-
     class Meta:
         db_table = "users"
         app_label = "mia_core"

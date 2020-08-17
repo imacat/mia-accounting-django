@@ -300,6 +300,11 @@ class UserFormView(FormView):
         obj.is_disabled = form["is_disabled"].value()
         obj.current_user = self.request.user
 
+    def get_success_url(self) -> str:
+        """Returns the URL on success."""
+        return reverse("mia_core:users.detail", args=(self.get_object(),),
+                       current_app=self.request.resolver_match.namespace)
+
     def get_object(self) -> Optional[Model]:
         """Returns the current object, or None on a create form."""
         return self.kwargs.get("user")
