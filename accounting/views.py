@@ -38,7 +38,6 @@ from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import RedirectView, ListView, DetailView
 
-from mia_womb.digest_auth import login_required
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, \
     PaginationException
@@ -49,7 +48,6 @@ from .models import Record, Transaction, Account
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class CashDefaultView(RedirectView):
     """The default cash account."""
     query_string = True
@@ -62,7 +60,6 @@ class CashDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def cash(request: HttpRequest, account: Account,
          period: Period) -> HttpResponse:
     """The cash account.
@@ -169,7 +166,6 @@ def cash(request: HttpRequest, account: Account,
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class CashSummaryDefaultView(RedirectView):
     """The default cash account summary."""
     query_string = True
@@ -181,7 +177,6 @@ class CashSummaryDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def cash_summary(request: HttpRequest, account: Account) -> HttpResponse:
     """The cash account summary.
 
@@ -266,7 +261,6 @@ def cash_summary(request: HttpRequest, account: Account) -> HttpResponse:
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class LedgerDefaultView(RedirectView):
     """The default ledger."""
     query_string = True
@@ -279,7 +273,6 @@ class LedgerDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def ledger(request: HttpRequest, account: Account,
            period: Period) -> HttpResponse:
     """The ledger.
@@ -344,7 +337,6 @@ def ledger(request: HttpRequest, account: Account,
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class LedgerSummaryDefaultView(RedirectView):
     """The default ledger summary."""
     query_string = True
@@ -356,7 +348,6 @@ class LedgerSummaryDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def ledger_summary(request: HttpRequest, account: Account) -> HttpResponse:
     """The ledger summary report.
 
@@ -406,7 +397,6 @@ def ledger_summary(request: HttpRequest, account: Account) -> HttpResponse:
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class JournalDefaultView(RedirectView):
     """The default journal."""
     query_string = True
@@ -418,7 +408,6 @@ class JournalDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def journal(request: HttpRequest, period: Period) -> HttpResponse:
     """The journal.
 
@@ -488,7 +477,6 @@ def journal(request: HttpRequest, period: Period) -> HttpResponse:
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class TrialBalanceDefaultView(RedirectView):
     """The default trial balance."""
     query_string = True
@@ -500,7 +488,6 @@ class TrialBalanceDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def trial_balance(request: HttpRequest, period: Period) -> HttpResponse:
     """The trial balance.
 
@@ -591,7 +578,6 @@ def trial_balance(request: HttpRequest, period: Period) -> HttpResponse:
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class IncomeStatementDefaultView(RedirectView):
     """The default income statement."""
     query_string = True
@@ -603,7 +589,6 @@ class IncomeStatementDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def income_statement(request: HttpRequest, period: Period) -> HttpResponse:
     """The income statement.
 
@@ -666,7 +651,6 @@ def income_statement(request: HttpRequest, period: Period) -> HttpResponse:
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class BalanceSheetDefaultView(RedirectView):
     """The default balance sheet."""
     query_string = True
@@ -678,7 +662,6 @@ class BalanceSheetDefaultView(RedirectView):
 
 
 @require_GET
-@login_required
 def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
     """The balance sheet.
 
@@ -769,7 +752,6 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
 
 
 @require_GET
-@login_required
 def search(request: HttpRequest) -> HttpResponse:
     """The search.
 
@@ -800,7 +782,6 @@ def search(request: HttpRequest) -> HttpResponse:
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class TransactionView(DetailView):
     """The view of the details of an accounting transaction."""
     context_object_name = "txn"
@@ -814,7 +795,6 @@ class TransactionView(DetailView):
         return [F"accounting/{model_name}_{txn_type}_detail.html"]
 
 
-@method_decorator(login_required, name="dispatch")
 class TransactionFormView(FormView):
     """The form to create or update an accounting transaction."""
     model = Transaction
@@ -876,7 +856,6 @@ class TransactionFormView(FormView):
 
 
 @method_decorator(require_POST, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class TransactionDeleteView(DeleteView):
     """The view to delete an accounting transaction."""
     success_message = gettext_noop(
@@ -891,7 +870,6 @@ class TransactionDeleteView(DeleteView):
                           current_app=self.request.resolver_match.namespace)
 
 
-@method_decorator(login_required, name="dispatch")
 class TransactionSortFormView(FormView):
     """The form to sort the transactions in a same day."""
     template_name = "accounting/transaction_sort_form.html"
@@ -937,7 +915,6 @@ class TransactionSortFormView(FormView):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class AccountListView(ListView):
     """The view to list the accounts."""
     queryset = Account.objects\
@@ -949,14 +926,12 @@ class AccountListView(ListView):
 
 
 @method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
 class AccountView(DetailView):
     """The view of an account."""
     def get_object(self, queryset=None):
         return self.kwargs["account"]
 
 
-@method_decorator(login_required, name="dispatch")
 class AccountFormView(FormView):
     """The form to create or update an account."""
     model = Account
@@ -996,7 +971,6 @@ class AccountFormView(FormView):
 
 
 @require_POST
-@login_required
 def account_delete(request: HttpRequest,
                    account: Account) -> HttpResponseRedirect:
     """The view to delete an account.
@@ -1019,7 +993,6 @@ def account_delete(request: HttpRequest,
 
 
 @require_GET
-@login_required
 def api_account_list(request: HttpRequest) -> JsonResponse:
     """The API view to return all the accounts.
 
@@ -1033,7 +1006,6 @@ def api_account_list(request: HttpRequest) -> JsonResponse:
 
 
 @require_GET
-@login_required
 def api_account_options(request: HttpRequest) -> JsonResponse:
     """The API view to return the account options.
 
