@@ -22,7 +22,8 @@ import hashlib
 
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
-from django.db import models, connection, OperationalError, transaction
+from django.db import models, connection, OperationalError, transaction, \
+    ProgrammingError
 from django.db.models.functions import Now
 from django.urls import reverse
 
@@ -184,6 +185,8 @@ class User(DirtyFieldsMixin, models.Model):
             try:
                 cursor.execute(sql, [self.pk, self.pk])
             except OperationalError:
+                return False
+            except ProgrammingError:
                 return False
             if cursor.fetchone() is None:
                 return False
