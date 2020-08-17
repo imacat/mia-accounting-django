@@ -25,7 +25,6 @@ from django.conf import settings
 from django.db import models, connection, OperationalError, transaction, \
     ProgrammingError
 from django.db.models.functions import Now
-from django.urls import reverse
 
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
     new_pk
