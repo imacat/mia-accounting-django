@@ -21,12 +21,14 @@
 import random
 import sys
 
+from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand, CommandParser
 from django.db import transaction
+from django.db.models import PositiveIntegerField
 from django.utils import timezone
 
 from accounting.utils import Populator
-from mia_womb.models import User
+from mia_core.utils import new_pk
 
 
 class Command(BaseCommand):
@@ -48,17 +50,27 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
-        if User.objects.first() is not None:
+        user_model = get_user_model()
+        if user_model.objects.first() is not None:
             print("Refused to fill in sample data with existing data.",
                   file=sys.stderr)
             return
 
         with transaction.atomic():
-            user = User(pk=923153018, login_id="imacat",
-                        password="5486b64881adaf7bc1485cc26e57e51e",
-                        name="依瑪貓", is_disabled=False, is_deleted=False)
-            user.created_by = user
-            user.updated_by = user
+            user = user_model()
+            setattr(user, user_model.USERNAME_FIELD, "admin")
+            for field in user_model.REQUIRED_FIELDS:
+                setattr(user, field, "admin")
+            if getattr(user_model, "EMAIL_FIELD", None) is not None:
+                setattr(user, user_model.EMAIL_FIELD, "guest@example.com")
+            if getattr(user_model, "created_by", None) is not None:
+                user.created_by = user
+            if getattr(user_model, "updated_by", None) is not None:
+                user.updated_by = user
+            if isinstance(user_model._meta.pk, PositiveIntegerField):
+                user.pk = new_pk(user_model)
+            if getattr(user_model, "set_digest_password", None) is not None:
+                user.set_digest_password("admin", "12345")
             user.save()
 
             p = Populator(user)
