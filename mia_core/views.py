@@ -23,24 +23,15 @@ from typing import Dict, Type, Optional, Any
 from dirtyfields import DirtyFieldsMixin
 from django import forms
 from django.contrib import messages
-from django.contrib.auth import logout as logout_user
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Model
-from django.http import HttpResponse, JsonResponse, HttpRequest, \
+from django.http import HttpResponse, HttpRequest, \
     HttpResponseRedirect, Http404
 from django.shortcuts import redirect, render
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.utils.translation import gettext_noop
-from django.views.decorators.http import require_POST, require_GET
-from django.views.generic import DeleteView as CoreDeleteView, ListView, \
-    DetailView
+from django.views.generic import DeleteView as CoreDeleteView
 from django.views.generic.base import View
 
 from . import stored_post, utils
-from .digest_auth import login_required
-from .forms import UserForm
-from .models import User
 from .utils import UrlBuilder
 
 
@@ -232,150 +223,3 @@ class DeleteView(SuccessMessageMixin, CoreDeleteView):
         return response
 
 
-@require_POST
-def logout(request: HttpRequest) -> HttpResponseRedirect:
-    """The view to log out a user.
-
-    Args:
-        request: The request.
-
-    Returns:
-        The redirect response.
-    """
-    logout_user(request)
-    if "next" in request.POST:
-        request.session["logout"] = True
-        return redirect(request.POST["next"])
-    return redirect("home")
-
-
-@method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
-class UserListView(ListView):
-    """The view to list the users."""
-    queryset = User.objects.order_by("login_id")
-
-
-@method_decorator(require_GET, name="dispatch")
-@method_decorator(login_required, name="dispatch")
-class UserView(DetailView):
-    """The view of a user."""
-    def get_object(self, queryset=None):
-        return self.kwargs["user"]
-
-
-@method_decorator(login_required, name="dispatch")
-class UserFormView(FormView):
-    """The form to create or update a user."""
-    model = User
-    form_class = UserForm
-    not_modified_message = gettext_noop("This user account was not changed.")
-    success_message = gettext_noop("This user account was saved successfully.")
-
-    def make_form_from_post(self, post: Dict[str, str]) -> UserForm:
-        """Creates and returns the form from the POST data."""
-        form = UserForm(post)
-        form.user = self.get_object()
-        form.current_user = self.request.user
-        return form
-
-    def make_form_from_model(self, obj: User) -> UserForm:
-        """Creates and returns the form from a data model."""
-        form = UserForm({
-            "login_id": obj.login_id,
-            "name": obj.name,
-            "is_disabled": obj.is_disabled,
-        })
-        form.user = self.get_object()
-        form.current_user = self.request.user
-        return form
-
-    def fill_model_from_form(self, obj: User, form: UserForm) -> None:
-        """Fills in the data model from the form."""
-        obj.login_id = form["login_id"].value()
-        if form["password"].value() is not None:
-            obj.set_digest_password(
-                form["login_id"].value(), form["password"].value())
-        obj.name = form["name"].value()
-        obj.is_disabled = form["is_disabled"].value()
-        obj.current_user = self.request.user
-
-    def get_success_url(self) -> str:
-        """Returns the URL on success."""
-        return reverse("mia_core:users.detail", args=[self.get_object()],
-                       current_app=self.request.resolver_match.namespace)
-
-    def get_object(self) -> Optional[Model]:
-        """Returns the current object, or None on a create form."""
-        return self.kwargs.get("user")
-
-
-@require_POST
-@login_required
-def user_delete(request: HttpRequest, user: User) -> HttpResponseRedirect:
-    """The view to delete an user.
-
-    Args:
-        request: The request.
-        user: The user.
-
-    Returns:
-        The response.
-    """
-    message = None
-    if user.pk == request.user.pk:
-        message = gettext_noop("You cannot delete your own account.")
-    elif user.is_in_use():
-        message = gettext_noop(
-            "You cannot delete this account because it is in use.")
-    elif user.is_deleted:
-        message = gettext_noop("This account is already deleted.")
-    if message is not None:
-        messages.error(request, message)
-        return redirect("mia_core:users.detail", user)
-    user.delete()
-    message = gettext_noop("This user account was deleted successfully.")
-    messages.success(request, message)
-    return redirect("mia_core:users")
-
-
-@method_decorator(login_required, name="dispatch")
-class MyAccountFormView(UserFormView):
-    """The form to update the information of the currently logged-in user."""
-    not_modified_message = gettext_noop("Your user account was not changed.")
-    success_message = gettext_noop("Your user account was saved successfully.")
-
-    def fill_model_from_form(self, obj: User, form: UserForm) -> None:
-        """Fills in the data model from the form."""
-        obj.login_id = form["login_id"].value()
-        if form["password"].value() is not None:
-            obj.set_digest_password(
-                form["login_id"].value(), form["password"].value())
-        obj.name = form["name"].value()
-        obj.current_user = self.request.user
-
-    def get_success_url(self) -> str:
-        """Returns the URL on success."""
-        return reverse("mia_core:my-account",
-                       current_app=self.request.resolver_match.namespace)
-
-    def get_object(self) -> Optional[Model]:
-        """Finds and returns the current object, or None on a create form."""
-        return self.request.user
-
-
-def api_users_exists(request: HttpRequest, login_id: str) -> JsonResponse:
-    """The view to check whether a user with a log in ID exists.
-
-    Args:
-        request: The request.
-        login_id: The log in ID.
-
-    Returns:
-        The response.
-    """
-    try:
-        User.objects.get(login_id=login_id)
-    except User.DoesNotExist:
-        return JsonResponse(False, safe=False)
-    return JsonResponse(True, safe=False)

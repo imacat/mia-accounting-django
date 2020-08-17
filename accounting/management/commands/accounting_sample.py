@@ -26,7 +26,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from accounting.utils import Populator
-from mia_core.models import User
+from mia_womb.models import User
 
 
 class Command(BaseCommand):

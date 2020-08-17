@@ -1,4 +1,4 @@
-# Traditional Chinese PO file for the Mia Website
+# Traditional Chinese PO file for the Mia core application
 # Copyright (C) 2020 imacat
 # This file is distributed under the same license as the Mia package.
 # imacat <imacat@mail.imacat.idv.tw>, 2020.
@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-core 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-11 21:41+0800\n"
-"PO-Revision-Date: 2020-08-11 21:44+0800\n"
+"POT-Creation-Date: 2020-08-17 23:56+0800\n"
+"PO-Revision-Date: 2020-08-18 00:02+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -16,101 +16,57 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: mia_core/forms.py:34
-msgid "Please fill in the log in ID."
-msgstr "請填寫登入帳號。"
-
-#: mia_core/forms.py:35
-msgid "This log in ID is too long (max 32 characters)."
-msgstr "登入帳號太長了（最長32個字）。"
-
-#: mia_core/forms.py:40
-msgid "You cannot use slash (/) in the log in ID."
-msgstr "登入帳號不可以包含斜線 (/) 。"
-
-#: mia_core/forms.py:47
-msgid "Please fill in the name."
-msgstr "請填寫姓名。"
-
-#: mia_core/forms.py:48
-msgid "This name is too long (max 32 characters)."
-msgstr "姓名太長了（最長32個字）。"
-
-#: mia_core/forms.py:91
-msgid "This log in ID is already in use."
-msgstr "登入帳號和其他人重複。"
-
-#: mia_core/forms.py:106
-msgid "Please fill in the password."
-msgstr "請填寫密碼。"
-
-#: mia_core/forms.py:127
-msgid "Please fill in the password to change the log in ID."
-msgstr "變更登入帳號時，請填寫密碼。"
-
-#: mia_core/forms.py:143
-msgid "Please enter the password again to verify it."
-msgstr "請再次確認密碼。"
-
-#: mia_core/forms.py:160
-msgid "The two passwords do not match."
-msgstr "兩次密碼不符，請重新輸入。"
-
-#: mia_core/forms.py:180 mia_core/templates/mia_core/user_form.html:85
-msgid "You cannot disable your own account."
-msgstr "不能停用自己的帳號。"
-
-#: mia_core/period.py:447 mia_core/period.py:482 mia_core/period.py:500
-#: mia_core/period.py:513 mia_core/period.py:559
+#: mia_core/period.py:452 mia_core/period.py:487 mia_core/period.py:505
+#: mia_core/period.py:518 mia_core/period.py:564
 #, python-format
 msgid "In %s"
 msgstr "%s"
 
-#: mia_core/period.py:457
+#: mia_core/period.py:462
 #, python-format
 msgid "Since %s"
 msgstr "%s至今"
 
-#: mia_core/period.py:470 mia_core/period.py:491 mia_core/period.py:570
+#: mia_core/period.py:475 mia_core/period.py:496 mia_core/period.py:575
 #, python-format
 msgid "Until %s"
 msgstr "至%s前"
 
-#: mia_core/period.py:499
+#: mia_core/period.py:504
 msgid "All Time"
 msgstr "全部"
 
-#: mia_core/period.py:583 mia_core/period.py:616
+#: mia_core/period.py:588 mia_core/period.py:621
 #: mia_core/templates/mia_core/include/period-chooser.html:60
-#: mia_core/templatetags/mia_core.py:170
+#: mia_core/templatetags/mia_core.py:173
 msgid "This Month"
 msgstr "這個月"
 
-#: mia_core/period.py:624
+#: mia_core/period.py:629
 #: mia_core/templates/mia_core/include/period-chooser.html:63
-#: mia_core/templatetags/mia_core.py:177
+#: mia_core/templatetags/mia_core.py:180
 msgid "Last Month"
 msgstr "上個月"
 
-#: mia_core/period.py:639
+#: mia_core/period.py:644
 #: mia_core/templates/mia_core/include/period-chooser.html:76
 msgid "This Year"
 msgstr "今年"
 
-#: mia_core/period.py:641
+#: mia_core/period.py:646
 #: mia_core/templates/mia_core/include/period-chooser.html:79
 msgid "Last Year"
 msgstr "去年"
 
-#: mia_core/period.py:656
+#: mia_core/period.py:661
 #: mia_core/templates/mia_core/include/period-chooser.html:95
-#: mia_core/templatetags/mia_core.py:150
+#: mia_core/templatetags/mia_core.py:153
 msgid "Today"
 msgstr "今天"
 
-#: mia_core/period.py:658
+#: mia_core/period.py:663
 #: mia_core/templates/mia_core/include/period-chooser.html:98
-#: mia_core/templatetags/mia_core.py:152
+#: mia_core/templatetags/mia_core.py:155
 msgid "Yesterday"
 msgstr "昨天"
 
@@ -144,7 +100,6 @@ msgstr "日期："
 
 #: mia_core/templates/mia_core/include/period-chooser.html:107
 #: mia_core/templates/mia_core/include/period-chooser.html:125
-#: mia_core/templates/mia_core/user_detail.html:69
 msgid "Confirm"
 msgstr "確定"
 
@@ -160,198 +115,17 @@ msgstr "從："
 msgid "To:"
 msgstr "到："
 
-#: mia_core/templates/mia_core/user_detail.html:39
-#: mia_core/templates/mia_core/user_detail.html:84
-msgid "Settings"
-msgstr "設定"
-
-#: mia_core/templates/mia_core/user_detail.html:46
-msgid "The account is not in use."
-msgstr "帳號未使用。"
-
-#: mia_core/templates/mia_core/user_detail.html:60
-msgid "User Deletion Confirmation"
-msgstr "帳號刪除確認"
-
-#: mia_core/templates/mia_core/user_detail.html:65
-msgid "Do you really want to delete this user?"
-msgstr "您真的要刪掉這個帳號嗎？"
-
-#: mia_core/templates/mia_core/user_detail.html:70
-msgid "Cancel"
-msgstr "取消"
-
-#: mia_core/templates/mia_core/user_detail.html:80
-#: mia_core/templates/mia_core/user_form.html:41
-msgid "Back"
-msgstr "回上頁"
-
-#: mia_core/templates/mia_core/user_detail.html:87 mia_core/views.py:163
-msgid "You cannot delete your own account."
-msgstr "不能刪除自己的帳號。"
-
-#: mia_core/templates/mia_core/user_detail.html:89
-#: mia_core/templates/mia_core/user_detail.html:94
-#: mia_core/templates/mia_core/user_detail.html:99
-#: mia_core/templates/mia_core/user_detail.html:104
-msgid "Delete"
-msgstr "刪除"
-
-#: mia_core/templates/mia_core/user_detail.html:92 mia_core/views.py:166
-msgid "You cannot delete this account because it is in use."
-msgstr "帳號使用中，不可刪除。"
-
-#: mia_core/templates/mia_core/user_detail.html:97 mia_core/views.py:168
-msgid "This account is already deleted."
-msgstr "帳號已刪除。"
-
-#: mia_core/templates/mia_core/user_detail.html:111
-#: mia_core/templates/mia_core/user_form.html:50
-msgid "Log in ID.:"
-msgstr "登入帳號："
-
-#: mia_core/templates/mia_core/user_detail.html:116
-#: mia_core/templates/mia_core/user_form.html:74
-msgid "Name:"
-msgstr "姓名："
-
-#: mia_core/templates/mia_core/user_detail.html:122
-#: mia_core/templates/mia_core/user_form.html:89
-msgid "This account is disabled."
-msgstr "帳號停用。"
-
-#: mia_core/templates/mia_core/user_detail.html:128
-msgid "This account is deleted."
-msgstr "帳號已刪。"
-
-#: mia_core/templates/mia_core/user_detail.html:134
-msgid "This user has not logged in yet."
-msgstr "使用者還沒登入過。"
-
-#: mia_core/templates/mia_core/user_detail.html:138
-msgid "# of visits:"
-msgstr "登入次數："
-
-#: mia_core/templates/mia_core/user_detail.html:143
-msgid "Last visit at:"
-msgstr "上次登入時間："
-
-#: mia_core/templates/mia_core/user_detail.html:148
-msgid "IP:"
-msgstr "IP:"
-
-#: mia_core/templates/mia_core/user_detail.html:153
-msgid "Host:"
-msgstr "主機名稱："
-
-#: mia_core/templates/mia_core/user_detail.html:158
-msgid "Country:"
-msgstr "國家："
-
-#: mia_core/templates/mia_core/user_detail.html:159
-msgid "(Not Available)"
-msgstr "（不可考）"
-
-#: mia_core/templates/mia_core/user_detail.html:164
-msgid "Created at:"
-msgstr "建檔時間："
-
-#: mia_core/templates/mia_core/user_detail.html:169
-msgid "Created by:"
-msgstr "建檔人："
-
-#: mia_core/templates/mia_core/user_detail.html:174
-msgid "Updated at:"
-msgstr "更新時間："
-
-#: mia_core/templates/mia_core/user_detail.html:179
-msgid "Updated by:"
-msgstr "更新人："
-
-#: mia_core/templates/mia_core/user_form.html:31
-msgid "Add a New Account"
-msgstr "建立帳號"
-
-#: mia_core/templates/mia_core/user_form.html:58
-msgid "Password:"
-msgstr "密碼："
-
-#: mia_core/templates/mia_core/user_form.html:66
-msgid "Confirm password:"
-msgstr "確認密碼："
-
-#: mia_core/templates/mia_core/user_form.html:99
-msgid "Submit"
-msgstr "傳送"
-
-#: mia_core/templates/mia_core/user_list.html:27
-msgid "Account Management"
-msgstr "帳號管理"
-
-#: mia_core/templates/mia_core/user_list.html:35
-msgid "New"
-msgstr "新增"
-
-#: mia_core/templates/mia_core/user_list.html:43
-msgid "Log in ID."
-msgstr "登入帳號"
-
-#: mia_core/templates/mia_core/user_list.html:44
-msgid "Name"
-msgstr "姓名"
-
-#: mia_core/templates/mia_core/user_list.html:45
-#: mia_core/templates/mia_core/user_list.html:67
-msgid "View"
-msgstr "查閱"
-
-#: mia_core/templates/mia_core/user_list.html:55
-msgid "Disabled"
-msgstr "停用"
-
-#: mia_core/templates/mia_core/user_list.html:58
-msgid "Deleted"
-msgstr "已刪"
-
-#: mia_core/templates/mia_core/user_list.html:61
-msgid "Not In Use"
-msgstr "未使用"
-
-#: mia_core/templates/mia_core/user_list.html:75
-msgid "There is currently no data."
-msgstr "目前沒有資料。"
-
-#: mia_core/utils.py:343
+#: mia_core/utils.py:347
 msgctxt "Pagination|"
 msgid "Previous"
 msgstr "上一頁"
 
-#: mia_core/utils.py:371 mia_core/utils.py:392
+#: mia_core/utils.py:375 mia_core/utils.py:396
 msgctxt "Pagination|"
 msgid "..."
 msgstr "…"
 
-#: mia_core/utils.py:411
+#: mia_core/utils.py:415
 msgctxt "Pagination|"
 msgid "Next"
 msgstr "下一頁"
-
-#: mia_core/views.py:141
-msgid "This user account was not changed."
-msgstr "帳號未異動。"
-
-#: mia_core/views.py:144
-msgid "This user account was saved successfully."
-msgstr "帳號已儲存。"
-
-#: mia_core/views.py:173
-msgid "This user account was deleted successfully."
-msgstr "帳號已刪除。"
-
-#: mia_core/views.py:229
-msgid "Your user account was not changed."
-msgstr "你的帳號未異動。"
-
-#: mia_core/views.py:232
-msgid "Your user account was saved successfully."
-msgstr "你的帳號已儲存。"
