@@ -922,8 +922,13 @@ class TransactionSortFormView(FormView):
                     Transaction.objects.filter(pk=x.txn.pk).update(ord=x.order)
             message = self.get_success_message(form.cleaned_data)
         messages.success(self.request, message)
-        return redirect(self.request.GET.get("r")
-                        or reverse("accounting:home"))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self) -> str:
+        """Returns the URL on success."""
+        return self.request.GET.get("r")\
+               or reverse("accounting:home",
+                          current_app=self.request.resolver_match.namespace)
 
 
 @method_decorator(require_GET, name="dispatch")
