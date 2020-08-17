@@ -68,7 +68,8 @@ def url_period(context: RequestContext, period_spec: str) -> str:
         context.request.resolver_match.url_name)
     kwargs = context.request.resolver_match.kwargs.copy()
     kwargs["period"] = period_spec
-    return reverse(view_name, kwargs=kwargs)
+    namespace = context.request.resolver_match.namespace
+    return reverse(view_name, kwargs=kwargs, current_app=namespace)
 
 
 @register.simple_tag(takes_context=True)
