@@ -806,8 +806,9 @@ class TransactionView(DetailView):
         return self.kwargs["txn"]
 
     def get_template_names(self):
-        return ["accounting/transaction_detail-%s.html"
-                % (self.kwargs["txn_type"],)]
+        model_name = self.get_object().__class__.__name__.lower()
+        txn_type = self.kwargs["txn_type"]
+        return [F"accounting/{model_name}_{txn_type}_detail.html"]
 
 
 @method_decorator(login_required, name="dispatch")
@@ -827,9 +828,8 @@ class TransactionFormView(FormView):
 
     def get_template_name(self) -> str:
         """Returns the name of the template."""
-        namespace = self.request.resolver_match.namespace
         model_name = self.model.__name__.lower()
-        return F"{namespace}/{model_name}_form-{self.txn_type}.html"
+        return F"accounting/{model_name}_{self.txn_type}_form.html"
 
     def _get_new_record_template_json(self) -> str:
         context = {"record_type": "TTT", "no": "NNN"}
@@ -883,7 +883,7 @@ class TransactionDeleteView(DeleteView):
 @method_decorator(login_required, name="dispatch")
 class TransactionSortFormView(FormView):
     """The form to sort the transactions in a same day."""
-    template_name = "accounting/transaction-sort.html"
+    template_name = "accounting/transaction_sort_form.html"
     form_class = TransactionSortForm
     not_modified_message = gettext_noop(
         "The transaction orders were not modified.")

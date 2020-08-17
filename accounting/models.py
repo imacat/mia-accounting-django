@@ -220,7 +220,8 @@ class Transaction(DirtyFieldsMixin, models.Model):
                 self.created_by = self.current_user
         if self.current_user is not None:
             self.updated_by = self.current_user
-        to_save = [x for x in self.records if x.is_dirty()]
+        to_save = [x for x in self.records
+                   if x.is_dirty(check_relationship=True)]
         for record in to_save:
             if record.pk is None:
                 record.pk = new_pk(Record)
