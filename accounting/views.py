@@ -860,6 +860,12 @@ class TransactionFormView(FormView):
         """Returns the current object, or None on a create form."""
         return self.kwargs.get("txn")
 
+    def get_success_url(self) -> str:
+        """Returns the URL on success."""
+        return reverse("accounting:transactions.detail",
+                       args=(self.txn_type, self.get_object()),
+                       current_app=self.request.resolver_match.namespace)
+
     @property
     def txn_type(self) -> str:
         """Returns the transaction type of this form."""

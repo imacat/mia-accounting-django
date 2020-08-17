@@ -160,18 +160,6 @@ class Transaction(DirtyFieldsMixin, models.Model):
         transaction."""
         return self.date.__str__() + " #" + self.ord.__str__()
 
-    def get_absolute_url(self) -> str:
-        """Returns the URL to view this transaction."""
-        if self.is_cash_expense:
-            return reverse(
-                "accounting:transactions.detail", args=("expense", self))
-        elif self.is_cash_income:
-            return reverse(
-                "accounting:transactions.detail", args=("income", self))
-        else:
-            return reverse(
-                "accounting:transactions.detail", args=("transfer", self))
-
     def is_dirty(self, check_relationship=False, check_m2m=None) -> bool:
         """Returns whether the data of this transaction is changed and need
         to be saved into the database.
