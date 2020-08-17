@@ -100,28 +100,28 @@ class ReportUrl:
             if ledger is None else ledger
 
     def cash(self) -> str:
-        return reverse("accounting:cash", args=(self._cash, self._period))
+        return reverse("accounting:cash", args=[self._cash, self._period])
 
     def cash_summary(self) -> str:
-        return reverse("accounting:cash-summary", args=(self._cash,))
+        return reverse("accounting:cash-summary", args=[self._cash])
 
     def ledger(self) -> str:
-        return reverse("accounting:ledger", args=(self._ledger, self._period))
+        return reverse("accounting:ledger", args=[self._ledger, self._period])
 
     def ledger_summary(self) -> str:
-        return reverse("accounting:ledger-summary", args=(self._ledger,))
+        return reverse("accounting:ledger-summary", args=[self._ledger])
 
     def journal(self) -> str:
-        return reverse("accounting:journal", args=(self._period,))
+        return reverse("accounting:journal", args=[self._period])
 
     def trial_balance(self) -> str:
-        return reverse("accounting:trial-balance", args=(self._period,))
+        return reverse("accounting:trial-balance", args=[self._period])
 
     def income_statement(self) -> str:
-        return reverse("accounting:income-statement", args=(self._period,))
+        return reverse("accounting:income-statement", args=[self._period])
 
     def balance_sheet(self) -> str:
-        return reverse("accounting:balance-sheet", args=(self._period,))
+        return reverse("accounting:balance-sheet", args=[self._period])
 
 
 class Populator:

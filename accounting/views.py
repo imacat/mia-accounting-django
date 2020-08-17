@@ -705,7 +705,7 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
         .filter(Q(amount__isnull=False), ~Q(amount=0))
         .order_by("code"))
     for account in accounts:
-        account.url = reverse("accounting:ledger", args=(account, period))
+        account.url = reverse("accounting:ledger", args=[account, period])
     balance = Record.objects \
         .filter(
             Q(transaction__date__lt=period.start)
@@ -722,7 +722,7 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
             code=Account.ACCUMULATED_BALANCE)
         brought_forward.amount = balance
         brought_forward.url = reverse(
-            "accounting:income-statement", args=(period.period_before(),))
+            "accounting:income-statement", args=[period.period_before()])
         accounts.append(brought_forward)
     balance = Record.objects \
         .filter(
@@ -740,7 +740,7 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
         net_change = Account.objects.get(code=Account.NET_CHANGE)
         net_change.amount = balance
         net_change.url = reverse(
-            "accounting:income-statement", args=(period,))
+            "accounting:income-statement", args=[period])
         accounts.append(net_change)
     for account in [x for x in accounts if x.code[0] in "23"]:
         account.amount = -account.amount
@@ -863,7 +863,7 @@ class TransactionFormView(FormView):
     def get_success_url(self) -> str:
         """Returns the URL on success."""
         return reverse("accounting:transactions.detail",
-                       args=(self.txn_type, self.get_object()),
+                       args=[self.txn_type, self.get_object()],
                        current_app=self.request.resolver_match.namespace)
 
     @property
@@ -986,7 +986,7 @@ class AccountFormView(FormView):
 
     def get_success_url(self) -> str:
         """Returns the URL on success."""
-        return reverse("accounting:accounts.detail", args=(self.get_object(),),
+        return reverse("accounting:accounts.detail", args=[self.get_object()],
                        current_app=self.request.resolver_match.namespace)
 
 
