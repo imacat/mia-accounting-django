@@ -837,6 +837,7 @@ class TransactionFormView(FormView):
         """Fills in the data model from the form."""
         obj.old_date = obj.date
         utils.fill_txn_from_post(self.txn_type, obj, form.data)
+        obj.current_user = self.request.user
 
     def get_object(self) -> Optional[Account]:
         """Returns the current object, or None on a create form."""
