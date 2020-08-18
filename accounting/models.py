@@ -21,17 +21,15 @@
 from typing import Dict, List, Optional
 
 from dirtyfields import DirtyFieldsMixin
-from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q, Max
 
-from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr, \
-    new_pk
+from mia_core.models import BaseModel
+from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
 
 
-class Account(DirtyFieldsMixin, models.Model):
+class Account(DirtyFieldsMixin, BaseModel):
     """An account."""
-    id = models.PositiveIntegerField(primary_key=True)
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True,
         related_name="child_set")
@@ -39,14 +37,6 @@ class Account(DirtyFieldsMixin, models.Model):
     title_zh_hant = models.CharField(max_length=32)
     title_en = models.CharField(max_length=128, null=True)
     title_zh_hans = models.CharField(max_length=32, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        related_name="created_accounting_accounts")
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        related_name="updated_accounting_accounts")
     CASH = "1111"
     ACCUMULATED_BALANCE = "3351"
     NET_CHANGE = "3353"
@@ -61,7 +51,6 @@ class Account(DirtyFieldsMixin, models.Model):
         self.is_for_credit = None
         self._is_in_use = None
         self._is_parent_and_in_use = None
-        self.current_user = None
 
     def __str__(self):
         """Returns the string representation of this account."""
@@ -71,15 +60,8 @@ class Account(DirtyFieldsMixin, models.Model):
              update_fields=None):
         self.parent = None if len(self.code) == 1\
             else Account.objects.get(code=self.code[:-1])
-        if self.pk is None:
-            self.pk = new_pk(Account)
-            if self.current_user is not None:
-                self.created_by = self.current_user
-        if self.current_user is not None:
-            self.updated_by = self.current_user
-        with transaction.atomic():
-            super().save(force_insert=force_insert, force_update=force_update,
-                         using=using, update_fields=update_fields)
+        super().save(force_insert=force_insert, force_update=force_update,
+                     using=using, update_fields=update_fields)
 
     class Meta:
         db_table = "accounting_accounts"
@@ -126,20 +108,11 @@ class Account(DirtyFieldsMixin, models.Model):
         self._is_in_use = value
 
 
-class Transaction(DirtyFieldsMixin, models.Model):
+class Transaction(DirtyFieldsMixin, BaseModel):
     """An accounting transaction."""
-    id = models.PositiveIntegerField(primary_key=True)
     date = models.DateField()
     ord = models.PositiveSmallIntegerField(default=1)
     notes = models.CharField(max_length=128, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        related_name="created_accounting_transactions")
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        related_name="updated_accounting_transactions")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -195,22 +168,10 @@ class Transaction(DirtyFieldsMixin, models.Model):
         # Collects the records to be deleted
         to_keep = [x.pk for x in self.records if x.pk is not None]
         to_delete = [x for x in self.record_set.all() if x.pk not in to_keep]
-        # Applies the created by and updated by
-        if self.pk is None:
-            self.pk = new_pk(Transaction)
-            if self.current_user is not None:
-                self.created_by = self.current_user
-        if self.current_user is not None:
-            self.updated_by = self.current_user
         to_save = [x for x in self.records
                    if x.is_dirty(check_relationship=True)]
         for record in to_save:
-            if record.pk is None:
-                record.pk = new_pk(Record)
-                if self.current_user is not None:
-                    record.created_by = self.current_user
-            if self.current_user is not None:
-                record.updated_by = self.current_user
+            record.current_user = self.current_user
         # Runs the update
         with transaction.atomic():
             super().save(force_insert=force_insert, force_update=force_update,
@@ -373,9 +334,8 @@ class Transaction(DirtyFieldsMixin, models.Model):
             return "transfer"
 
 
-class Record(DirtyFieldsMixin, models.Model):
+class Record(DirtyFieldsMixin, BaseModel):
     """An accounting record."""
-    id = models.PositiveIntegerField(primary_key=True)
     transaction = models.ForeignKey(
         Transaction, on_delete=models.CASCADE)
     is_credit = models.BooleanField()
@@ -384,14 +344,6 @@ class Record(DirtyFieldsMixin, models.Model):
         Account, on_delete=models.PROTECT)
     summary = models.CharField(max_length=128, blank=True, null=True)
     amount = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        related_name="created_accounting_records")
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
-        related_name="updated_accounting_records")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
