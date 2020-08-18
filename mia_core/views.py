@@ -54,10 +54,10 @@ class FormView(View):
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """The view to store an accounting transaction."""
         self.object = self.get_object()
-        if self.request.method != "POST":
-            return self.get(request, *args, **kwargs)
-        else:
+        if self.request.method == "POST":
             return self.post(request, *args, **kwargs)
+        else:
+            return self.get(request, *args, **kwargs)
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Handles the GET requests."""
@@ -90,17 +90,17 @@ class FormView(View):
 
     def get_form(self, **kwargs) -> forms.Form:
         """Returns the form for the template."""
-        if self.request.method != "POST":
+        if self.request.method == "POST":
+            post = self.request.POST.dict()
+            utils.strip_post(post)
+            return self.make_form_from_post(post)
+        else:
             previous_post = stored_post.get_previous_post(self.request)
             if previous_post is not None:
                 return self.make_form_from_post(previous_post)
             if self.object is not None:
                 return self.make_form_from_model(self.object)
             return self.get_form_class()()
-        else:
-            post = self.request.POST.dict()
-            utils.strip_post(post)
-            return self.make_form_from_post(post)
 
     def get_template_name(self) -> str:
         """Returns the name of the template."""
