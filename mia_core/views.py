@@ -32,7 +32,6 @@ from django.views.generic import DeleteView as CoreDeleteView
 from django.views.generic.base import View
 
 from . import stored_post, utils
-from .models import BaseModel
 from .utils import UrlBuilder
 
 
@@ -49,7 +48,7 @@ class FormView(View):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.object: Optional[BaseModel] = None
+        self.object: Optional[Model] = None
 
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """The view to store an accounting transaction."""
