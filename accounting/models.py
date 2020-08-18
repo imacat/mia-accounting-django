@@ -120,7 +120,6 @@ class Transaction(DirtyFieldsMixin, BaseModel):
         self._is_balanced = None
         self._has_order_hole = None
         self.old_date = None
-        self.current_user = None
 
     def __str__(self):
         """Returns the string representation of this accounting
