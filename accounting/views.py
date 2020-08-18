@@ -790,7 +790,7 @@ class TransactionView(DetailView):
         return self.kwargs["txn"]
 
     def get_template_names(self):
-        model_name = self.get_object().__class__.__name__.lower()
+        model_name = self.object.__class__.__name__.lower()
         txn_type = self.kwargs["txn_type"]
         return [F"accounting/{model_name}_{txn_type}_detail.html"]
 
@@ -825,7 +825,7 @@ class TransactionFormView(FormView):
         """Creates and returns the form from the POST data."""
         form = TransactionForm(post)
         form.txn_type = self.txn_type
-        form.transaction = self.get_object()
+        form.transaction = self.object
         return form
 
     def make_form_from_model(self, obj: Transaction) -> TransactionForm:
@@ -846,7 +846,7 @@ class TransactionFormView(FormView):
     def get_success_url(self) -> str:
         """Returns the URL on success."""
         return reverse("accounting:transactions.detail",
-                       args=[self.txn_type, self.get_object()],
+                       args=[self.txn_type, self.object],
                        current_app=self.request.resolver_match.namespace)
 
     @property
@@ -942,7 +942,7 @@ class AccountFormView(FormView):
     def make_form_from_post(self, post: Dict[str, str]) -> AccountForm:
         """Creates and returns the form from the POST data."""
         form = AccountForm(post)
-        form.account = self.get_object()
+        form.account = self.object
         return form
 
     def make_form_from_model(self, obj: Account) -> AccountForm:
@@ -966,7 +966,7 @@ class AccountFormView(FormView):
 
     def get_success_url(self) -> str:
         """Returns the URL on success."""
-        return reverse("accounting:accounts.detail", args=[self.get_object()],
+        return reverse("accounting:accounts.detail", args=[self.object],
                        current_app=self.request.resolver_match.namespace)
 
 

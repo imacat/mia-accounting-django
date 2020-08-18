@@ -32,6 +32,7 @@ from django.views.generic import DeleteView as CoreDeleteView
 from django.views.generic.base import View
 
 from . import stored_post, utils
+from .models import BaseModel
 from .utils import UrlBuilder
 
 
@@ -48,11 +49,11 @@ class FormView(View):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._object = None
-        self._is_object_requested = False
+        self.object: Optional[BaseModel] = None
 
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """The view to store an accounting transaction."""
+        self.object = self.get_object()
         if self.request.method != "POST":
             return self.get(request, *args, **kwargs)
         else:
@@ -83,18 +84,6 @@ class FormView(View):
             raise AttributeError("Please defined the model property.")
         return self.model
 
-    def _set_object(self, obj: Model) -> None:
-        """Sets the current object that we are operating."""
-        self._object = obj
-        self._is_object_requested = True
-
-    def _get_object(self) -> Optional[Model]:
-        """Returns the current object that we are operating and cached."""
-        if not self._is_object_requested:
-            self._object = self.get_object()
-            self._is_object_requested = True
-        return self._object
-
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         """Returns the context data for the template."""
         return {self.context_object_name: self.get_form()}
@@ -105,9 +94,8 @@ class FormView(View):
             previous_post = stored_post.get_previous_post(self.request)
             if previous_post is not None:
                 return self.make_form_from_post(previous_post)
-            obj = self.get_object()
-            if obj is not None:
-                return self.make_form_from_model(obj)
+            if self.object is not None:
+                return self.make_form_from_model(self.object)
             return self.get_form_class()()
         else:
             post = self.request.POST.dict()
@@ -147,16 +135,14 @@ class FormView(View):
 
     def form_valid(self, form: forms.Form) -> HttpResponseRedirect:
         """Handles the action when the POST form is valid."""
-        obj = self.get_object()
-        if obj is None:
-            obj = self._model()
-            self._set_object(obj)
-        self.fill_model_from_form(obj, form)
-        if isinstance(obj, DirtyFieldsMixin)\
-                and not obj.is_dirty(check_relationship=True):
+        if self.object is None:
+            self.object = self._model()
+        self.fill_model_from_form(self.object, form)
+        if isinstance(self.object, DirtyFieldsMixin)\
+                and not self.object.is_dirty(check_relationship=True):
             message = self.get_not_modified_message(form.cleaned_data)
         else:
-            obj.save()
+            self.object.save()
             message = self.get_success_message(form.cleaned_data)
         messages.success(self.request, message)
         return redirect(str(UrlBuilder(self.get_success_url())
@@ -166,8 +152,7 @@ class FormView(View):
         """Returns the URL on success."""
         if self.success_url is not None:
             return self.success_url
-        obj = self._get_object()
-        get_absolute_url = getattr(obj, "get_absolute_url", None)
+        get_absolute_url = getattr(self.object, "get_absolute_url", None)
         if get_absolute_url is not None:
             return get_absolute_url()
         raise AttributeError(
