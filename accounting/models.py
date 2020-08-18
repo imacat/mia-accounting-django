@@ -63,9 +63,6 @@ class Account(DirtyFieldsMixin, BaseModel):
         super().save(force_insert=force_insert, force_update=force_update,
                      using=using, update_fields=update_fields)
 
-    class Meta:
-        db_table = "accounting_accounts"
-
     @property
     def title(self) -> str:
         """The title in the current language."""
@@ -199,9 +196,6 @@ class Transaction(DirtyFieldsMixin, BaseModel):
             super().delete(using=using, keep_parents=keep_parents)
             for x in txn_to_sort:
                 Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
-
-    class Meta:
-        db_table = "accounting_transactions"
 
     @property
     def records(self):
@@ -364,9 +358,6 @@ class Record(DirtyFieldsMixin, BaseModel):
             self.account.title,
             self.summary,
             self.amount)
-
-    class Meta:
-        db_table = "accounting_records"
 
     @property
     def debit_amount(self) -> Optional[int]:
