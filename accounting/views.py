@@ -823,6 +823,7 @@ class TransactionFormView(FormView):
 
     def make_form_from_post(self, post: Dict[str, str]) -> TransactionForm:
         """Creates and returns the form from the POST data."""
+        utils.sort_post_txn_records(post)
         form = TransactionForm(post)
         form.txn_type = self.txn_type
         form.transaction = self.object
