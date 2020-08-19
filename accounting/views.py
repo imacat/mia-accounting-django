@@ -827,7 +827,7 @@ class TransactionFormView(FormView):
 
     def make_form_from_model(self, obj: Transaction) -> TransactionForm:
         """Creates and returns the form from a data model."""
-        return utils.make_txn_form_from_model(self.txn_type, obj)
+        return TransactionForm.from_model(obj, self.txn_type)
 
     def fill_model_from_form(self, obj: Transaction,
                              form: TransactionForm) -> None:

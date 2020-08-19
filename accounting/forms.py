@@ -23,6 +23,7 @@ import re
 from typing import Optional, List, Dict
 
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max, Model
 from django.db.models.functions import Length
@@ -294,6 +295,46 @@ class TransactionForm(forms.Form):
             del post[x]
         for key in new_post.keys():
             post[key] = new_post[key]
+
+    @staticmethod
+    def from_model(txn: Transaction, txn_type: str):
+        """Converts a transaction data model to a transaction form.
+
+        Args:
+            txn_type: The transaction type.
+            txn: The transaction data model.
+
+        Returns:
+            The transaction form.
+        """
+        form = TransactionForm(
+            {x: str(getattr(txn, x)) for x in ["date", "notes"]
+             if getattr(txn, x) is not None})
+        form.transaction = txn if txn.pk is not None else None
+        form.txn_type = txn_type
+        records = []
+        if txn_type != "income":
+            records = records + txn.debit_records
+        if txn_type != "expense":
+            records = records + txn.credit_records
+        for record in records:
+            data = {x: getattr(record, x)
+                    for x in ["summary", "amount"]
+                    if getattr(record, x) is not None}
+            if record.pk is not None:
+                data["id"] = record.pk
+            try:
+                data["account"] = record.account.code
+            except ObjectDoesNotExist:
+                pass
+            record_form = RecordForm(data)
+            record_form.txn_form = form
+            record_form.is_credit = record.is_credit
+            if record.is_credit:
+                form.credit_records.append(record_form)
+            else:
+                form.debit_records.append(record_form)
+        return form
 
     def clean(self):
         """Validates the form globally.
