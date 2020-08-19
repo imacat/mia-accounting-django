@@ -28,12 +28,25 @@ from django.db.models import Model
 from django.http import HttpResponse, HttpRequest, \
     HttpResponseRedirect, Http404
 from django.shortcuts import redirect, render
-from django.views.generic import DeleteView as CoreDeleteView
+from django.urls import reverse
+from django.views.generic import DeleteView as CoreDeleteView, \
+    RedirectView as CoreRedirectView
 from django.views.generic.base import View
 
 from . import stored_post, utils
 from .models import BaseModel
 from .utils import UrlBuilder
+
+
+class RedirectView(CoreRedirectView):
+    """The redirect view, with current_app at the current namespace."""
+
+    def get_redirect_url(self, *args, **kwargs):
+        url = reverse(self.pattern_name, kwargs=kwargs,
+                      current_app=self.request.resolver_match.namespace)
+        if self.query_string and self.request.META["QUERY_STRING"] != "":
+            url = url + "?" + self.request.META["QUERY_STRING"]
+        return url
 
 
 class FormView(View):
@@ -208,5 +221,3 @@ class DeleteView(SuccessMessageMixin, CoreDeleteView):
         response = super(DeleteView, self).delete(request, *args, **kwargs)
         messages.success(request, self.get_success_message({}))
         return response
-
-
