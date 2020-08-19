@@ -308,11 +308,11 @@ class TransactionForm(forms.Form):
 
     @staticmethod
     def from_model(txn: Transaction, txn_type: str):
-        """Converts a transaction data model to a transaction form.
+        """Constructs a transaction form from the transaction data model.
 
         Args:
-            txn_type: The transaction type.
             txn: The transaction data model.
+            txn_type: The transaction type.
 
         Returns:
             The transaction form.
