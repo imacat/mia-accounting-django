@@ -18,11 +18,14 @@
 """The data models of the accounting application.
 
 """
-from typing import Dict, List, Optional
+import datetime
+import re
+from typing import Dict, List, Optional, Mapping
 
 from dirtyfields import DirtyFieldsMixin
 from django.db import models, transaction
 from django.db.models import Q, Max
+from django.http import HttpRequest
 
 from mia_core.models import BaseModel
 from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
@@ -196,6 +199,95 @@ class Transaction(DirtyFieldsMixin, BaseModel):
             super().delete(using=using, keep_parents=keep_parents)
             for x in txn_to_sort:
                 Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
+
+    def fill_from_post(self, post: Dict[str, str], request: HttpRequest,
+                       txn_type: str):
+        """Fills the transaction from the POST data.  The POST data must be
+        validated and clean at this moment.
+
+        Args:
+            post: The POST data.
+            request: The request.
+            txn_type: The transaction type.
+        """
+        self.old_date = self.date
+        m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", post["date"])
+        self.date = datetime.date(
+            int(m.group(1)),
+            int(m.group(2)),
+            int(m.group(3)))
+        self.notes = post.get("notes")
+        # The records
+        max_no = self._find_max_record_no(txn_type, post)
+        records = []
+        for record_type in max_no.keys():
+            for i in range(max_no[record_type]):
+                no = i + 1
+                if F"{record_type}-{no}-id" in post:
+                    record = Record.objects.get(pk=post[F"{record_type}-{no}-id"])
+                else:
+                    record = Record(
+                        is_credit=(record_type == "credit"),
+                        transaction=self)
+                record.ord = no
+                record.account = Account.objects.get(
+                    code=post[F"{record_type}-{no}-account"])
+                if F"{record_type}-{no}-summary" in post:
+                    record.summary = post[F"{record_type}-{no}-summary"]
+                else:
+                    record.summary = None
+                record.amount = int(post[F"{record_type}-{no}-amount"])
+                records.append(record)
+        if txn_type != "transfer":
+            if txn_type == "expense":
+                if len(self.credit_records) > 0:
+                    record = self.credit_records[0]
+                else:
+                    record = Record(is_credit=True, transaction=self)
+            else:
+                if len(self.debit_records) > 0:
+                    record = self.debit_records[0]
+                else:
+                    record = Record(is_credit=False, transaction=self)
+            record.ord = 1
+            record.account = Account.objects.get(code=Account.CASH)
+            record.summary = None
+            record.amount = sum([x.amount for x in records])
+            records.append(record)
+        self.records = records
+        self.current_user = request.user
+
+    @staticmethod
+    def _find_max_record_no(txn_type: str,
+                            post: Mapping[str, str]) -> Dict[str, int]:
+        """Finds the max debit and record numbers from the POSTed form.
+
+        Args:
+            txn_type (str): The transaction type.
+            post (dict[str,str]): The POSTed data.
+
+        Returns:
+            dict[str,int]: The max debit and record numbers from the POSTed form.
+
+        """
+        max_no = {}
+        if txn_type != "credit":
+            max_no["debit"] = 0
+        if txn_type != "debit":
+            max_no["credit"] = 0
+        for key in post.keys():
+            m = re.match(
+                "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
+                key)
+            if m is None:
+                continue
+            record_type = m.group(1)
+            if record_type not in max_no:
+                continue
+            no = int(m.group(2))
+            if max_no[record_type] < no:
+                max_no[record_type] = no
+        return max_no
 
     @property
     def records(self):

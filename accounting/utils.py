@@ -20,8 +20,7 @@
 """
 import datetime
 import json
-import re
-from typing import Union, Tuple, List, Optional, Iterable, Mapping, Dict
+from typing import Union, Tuple, List, Optional, Iterable
 
 from django.conf import settings
 from django.db.models import Q, Sum, Case, When, F, Count, Max, Min, Value, \
@@ -517,94 +516,3 @@ def get_summary_categories() -> str:
                            for x in categories[key]]
     # Converts the dictionary to a list, as the category may not be US-ASCII
     return json.dumps(categories)
-
-
-def fill_txn_from_post(txn_type: str, txn: Transaction,
-                       post: Mapping[str, str]) -> None:
-    """Fills the transaction from the POSTed data.  The POSTed data must be
-    validated and clean at this moment.
-
-    Args:
-        txn_type: The transaction type.
-        txn: The transaction.
-        post: The POSTed data.
-    """
-    m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", post["date"])
-    txn.date = datetime.date(
-        int(m.group(1)),
-        int(m.group(2)),
-        int(m.group(3)))
-    if "notes" in post:
-        txn.notes = post["notes"]
-    else:
-        txn.notes = None
-    # The records
-    max_no = _find_max_record_no(txn_type, post)
-    records = []
-    for record_type in max_no.keys():
-        for i in range(max_no[record_type]):
-            no = i + 1
-            if F"{record_type}-{no}-id" in post:
-                record = Record.objects.get(pk=post[F"{record_type}-{no}-id"])
-            else:
-                record = Record(
-                    is_credit=(record_type == "credit"),
-                    transaction=txn)
-            record.ord = no
-            record.account = Account.objects.get(
-                code=post[F"{record_type}-{no}-account"])
-            if F"{record_type}-{no}-summary" in post:
-                record.summary = post[F"{record_type}-{no}-summary"]
-            else:
-                record.summary = None
-            record.amount = int(post[F"{record_type}-{no}-amount"])
-            records.append(record)
-    if txn_type != "transfer":
-        if txn_type == "expense":
-            if len(txn.credit_records) > 0:
-                record = txn.credit_records[0]
-            else:
-                record = Record(is_credit=True, transaction=txn)
-        else:
-            if len(txn.debit_records) > 0:
-                record = txn.debit_records[0]
-            else:
-                record = Record(is_credit=False, transaction=txn)
-        record.ord = 1
-        record.account = Account.objects.get(code=Account.CASH)
-        record.summary = None
-        record.amount = sum([x.amount for x in records])
-        records.append(record)
-    txn.records = records
-
-
-def _find_max_record_no(txn_type: str,
-                        post: Mapping[str, str]) -> Dict[str, int]:
-    """Finds the max debit and record numbers from the POSTed form.
-
-    Args:
-        txn_type (str): The transaction type.
-        post (dict[str,str]): The POSTed data.
-
-    Returns:
-        dict[str,int]: The max debit and record numbers from the POSTed form.
-
-    """
-    max_no = {}
-    if txn_type != "credit":
-        max_no["debit"] = 0
-    if txn_type != "debit":
-        max_no["credit"] = 0
-    for key in post.keys():
-        m = re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
-            key)
-        if m is None:
-            continue
-        record_type = m.group(1)
-        if record_type not in max_no:
-            continue
-        no = int(m.group(2))
-        if max_no[record_type] < no:
-            max_no[record_type] = no
-    return max_no
