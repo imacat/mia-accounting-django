@@ -809,17 +809,17 @@ class TransactionFormView(FormView):
         context["new_record_template"] = self._get_new_record_template_json()
         return context
 
-    def get_template_name(self) -> str:
-        """Returns the name of the template."""
-        model_name = self.model.__name__.lower()
-        return F"accounting/{model_name}_{self.txn_type}_form.html"
-
     def _get_new_record_template_json(self) -> str:
         context = {"record_type": "TTT", "no": "NNN"}
         template_name = "accounting/include/record_form-transfer.html"\
             if self.txn_type == "transfer"\
             else "accounting/include/record_form-non-transfer.html"
         return json.dumps(render_to_string(template_name, context))
+
+    def get_template_name(self) -> str:
+        """Returns the name of the template."""
+        model_name = self.model.__name__.lower()
+        return F"accounting/{model_name}_{self.txn_type}_form.html"
 
     def make_form_from_post(self, post: Dict[str, str]) -> TransactionForm:
         """Creates and returns the form from the POST data."""
