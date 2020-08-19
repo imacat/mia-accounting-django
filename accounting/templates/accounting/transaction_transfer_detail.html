@@ -152,7 +152,7 @@ First written: 2020/7/23
             {{ x.account.title|title_case }}
             <span class="badge badge-info">{{ x.amount|accounting_amount }}</span>
           </div>
-          <div>{{ x.summary|default:"" }}</div>x
+          <div>{{ x.summary|default:"" }}</div>
         </li>
       {% endfor %}
       <li class="list-group-item">
@@ -199,9 +199,8 @@ First written: 2020/7/23
             {{ x.account.title|title_case }}
             <span class="badge badge-info">{{ x.amount|accounting_amount }}</span>
           </div>
-          <div>{{ x.summary|default:"" }}</div>x
+          <div>{{ x.summary|default:"" }}</div>
         </li>
-      % }
       {% endfor %}
       <li class="list-group-item">
         <div class="d-flex justify-content-between align-items-center account-line">
