@@ -20,7 +20,7 @@
 """
 from django.test import TestCase
 
-from .utils import sort_post_txn_records
+from .forms import TransactionForm
 
 
 class SortTransactionPostTestCase(TestCase):
@@ -51,7 +51,7 @@ class SortTransactionPostTestCase(TestCase):
             "credit-7-summary": "",
             "credit-7-amount": "667",
         }
-        sort_post_txn_records(post)
+        TransactionForm._sort_post_txn_records(post)
         self.assertEqual(post.get("date"), "2020-07-15")
         self.assertEqual(post.get("notes"), "")
         self.assertEqual(post.get("debit-1-ord"), "1")

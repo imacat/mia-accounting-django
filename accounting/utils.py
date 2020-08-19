@@ -580,59 +580,6 @@ def fill_txn_from_post(txn_type: str, txn: Transaction,
     txn.records = records
 
 
-def sort_post_txn_records(post: Dict[str, str]) -> None:
-    """Sorts the records in the form by their specified order, so that the
-    form can be used to populate the data to return to the user.
-
-    Args:
-        post: The POSTed form.
-    """
-    # Collects the available record numbers
-    record_no = {
-        "debit": [],
-        "credit": [],
-    }
-    for key in post.keys():
-        m = re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
-            key)
-        if m is None:
-            continue
-        record_type = m.group(1)
-        no = int(m.group(2))
-        if no not in record_no[record_type]:
-            record_no[record_type].append(no)
-    # Sorts these record numbers by their specified orders
-    for record_type in record_no.keys():
-        orders = {}
-        for no in record_no[record_type]:
-            try:
-                orders[no] = int(post[F"{record_type}-{no}-ord"])
-            except KeyError:
-                orders[no] = 9999
-            except ValueError:
-                orders[no] = 9999
-        record_no[record_type].sort(key=lambda n: orders[n])
-    # Constructs the sorted new form
-    new_post = {}
-    for record_type in record_no.keys():
-        for i in range(len(record_no[record_type])):
-            old_no = record_no[record_type][i]
-            no = i + 1
-            new_post[F"{record_type}-{no}-ord"] = str(no)
-            for attr in ["id", "account", "summary", "amount"]:
-                if F"{record_type}-{old_no}-{attr}" in post:
-                    new_post[F"{record_type}-{no}-{attr}"]\
-                        = post[F"{record_type}-{old_no}-{attr}"]
-    # Purges the old form and fills it with the new form
-    for x in [x for x in post.keys() if re.match(
-            "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
-            x)]:
-        del post[x]
-    for key in new_post.keys():
-        post[key] = new_post[key]
-
-
 def make_txn_form_from_model(txn_type: str,
                              txn: Transaction) -> TransactionForm:
     """Converts a transaction data model to a transaction form.
