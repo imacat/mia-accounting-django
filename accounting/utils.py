@@ -128,7 +128,7 @@ class ReportUrl:
                        current_app=self._namespace)
 
 
-class Populator:
+class DataFiller:
     """The helper to populate the accounting data.
 
     Args:

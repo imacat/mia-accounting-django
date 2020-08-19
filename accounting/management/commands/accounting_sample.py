@@ -21,6 +21,7 @@
 import datetime
 import random
 import sys
+from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand, CommandParser
@@ -28,13 +29,17 @@ from django.db import transaction
 from django.db.models import PositiveIntegerField
 from django.utils import timezone
 
-from accounting.utils import Populator
+from accounting.utils import DataFiller
 from mia_core.utils import new_pk
 
 
 class Command(BaseCommand):
     """Populates the database with sample accounting data."""
-    help = "Populates the database with sample accounting data."
+    help = "Fills the database with sample accounting data."
+
+    def __init__(self):
+        super().__init__()
+        self._filler: Optional[DataFiller] = None
 
     def add_arguments(self, parser):
         """Adds command line arguments to the parser.
@@ -74,8 +79,8 @@ class Command(BaseCommand):
                 user.set_digest_password("admin", "12345")
             user.save()
 
-            self._populator: Populator = Populator(user)
-            self._populator.add_accounts([
+            self._filler = DataFiller(user)
+            self._filler.add_accounts([
                 (1, "資產", "assets", "资产"),
                 (2, "負債", "liabilities", "负债"),
                 (3, "業主權益", "owners’ equity", "业主权益"),
@@ -141,43 +146,43 @@ class Command(BaseCommand):
 
             self.add_payrolls(5)
 
-            self._populator.add_income_transaction(
+            self._filler.add_income_transaction(
                 -15,
                 [(1113, "ATM withdrawal", 2000)])
-            self._populator.add_transfer_transaction(
+            self._filler.add_transfer_transaction(
                 -14,
                 [(6254, "HSR—New Land→South Lake City", 1490)],
                 [(2141, "HSR—New Land→South Lake City", 1490)])
-            self._populator.add_transfer_transaction(
+            self._filler.add_transfer_transaction(
                 -14,
                 [(6273, "Movies—The Avengers", 80)],
                 [(2141, "Movies—The Avengers", 80)])
-            self._populator.add_transfer_transaction(
+            self._filler.add_transfer_transaction(
                 -13,
                 [(6273, "Movies—2001: A Space Odyssey", 80)],
                 [(2141, "Movies—2001: A Space Odyssey", 80)])
-            self._populator.add_transfer_transaction(
+            self._filler.add_transfer_transaction(
                 -11,
                 [(2141, "Movies—The Avengers", 80)],
                 [(1113, "Movies—The Avengers", 80)])
 
-            self._populator.add_expense_transaction(
+            self._filler.add_expense_transaction(
                 -13,
                 [(6273, "Bus—2623—Uptown→City Park", 30)])
 
-            self._populator.add_expense_transaction(
+            self._filler.add_expense_transaction(
                 -2,
                 [(6272, "Lunch—Spaghetti", random.randint(40, 200)),
                  (6272, "Drink—Tea", random.randint(40, 200))])
-            self._populator.add_expense_transaction(
+            self._filler.add_expense_transaction(
                 -1,
                 ([(6272, "Lunch—Pizza", random.randint(40, 200)),
                  (6272, "Drink—Tea", random.randint(40, 200))]))
-            self._populator.add_expense_transaction(
+            self._filler.add_expense_transaction(
                 -1,
                 [(6272, "Lunch—Spaghetti", random.randint(40, 200)),
                  (6272, "Drink—Soda", random.randint(40, 200))])
-            self._populator.add_expense_transaction(
+            self._filler.add_expense_transaction(
                 0,
                 [(6272, "Lunch—Salad", random.randint(40, 200)),
                  (6272, "Drink—Coffee", random.randint(40, 200))])
@@ -238,7 +243,7 @@ class Command(BaseCommand):
         if month < 1:
             month = 12
         month_text = months[month - 1]
-        self._populator.add_transfer_transaction(
+        self._filler.add_transfer_transaction(
             payday,
             [(1113, "Payroll Transfer", savings),
              (1314, F"Pension for {month_text}", pension),
