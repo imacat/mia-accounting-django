@@ -237,6 +237,16 @@ class TransactionForm(forms.Form):
 
     @staticmethod
     def from_post(post: Dict[str, str], txn_type: str, txn: Model):
+        """Constructs a transaction form from the POST data.
+
+        Args:
+            post: The post data.
+            txn_type: The transaction type.
+            txn: The transaction data model.
+
+        Returns:
+            The transaction form.
+        """
         TransactionForm._sort_post_txn_records(post)
         form = TransactionForm(post)
         form.txn_type = txn_type
