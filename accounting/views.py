@@ -25,8 +25,8 @@ from typing import Dict, Optional
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
-    ExpressionWrapper, Exists, OuterRef
-from django.db.models.functions import TruncMonth, Coalesce
+    ExpressionWrapper, Exists, OuterRef, Value, CharField
+from django.db.models.functions import TruncMonth, Coalesce, Left, StrIndex
 from django.http import JsonResponse, HttpResponseRedirect, Http404, \
     HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
@@ -805,9 +805,62 @@ class TransactionFormView(FormView):
     def get_context_data(self, **kwargs):
         """Returns the context data for the template."""
         context = super().get_context_data(**kwargs)
-        context["summary_categories"] = utils.get_summary_categories()
+        context["summary_categories"] = self._get_summary_categories()
         context["new_record_template"] = self._get_new_record_template_json()
         return context
+
+    @staticmethod
+    def _get_summary_categories() -> str:
+        """Finds and returns the summary categories and their corresponding
+        account hints as JSON.
+
+        Returns:
+            The summary categories and their account hints, by their record
+            types and category types.
+        """
+        rows = Record.objects \
+            .filter(Q(summary__contains="—"),
+                    ~Q(account__code__startswith="114"),
+                    ~Q(account__code__startswith="214"),
+                    ~Q(account__code__startswith="128"),
+                    ~Q(account__code__startswith="228")) \
+            .annotate(rec_type=Case(When(is_credit=True, then=Value("credit")),
+                                    default=Value("debit"),
+                                    output_field=CharField()),
+                      cat_type=Case(
+                          When(summary__regex=".+—.+—.+→.+",
+                               then=Value("bus")),
+                          When(summary__regex=".+—.+[→↔].+",
+                               then=Value("travel")),
+                          default=Value("general"),
+                          output_field=CharField()),
+                      category=Left("summary",
+                                    StrIndex("summary", Value("—")) - 1,
+                                    output_field=CharField())) \
+            .values("rec_type", "cat_type", "category", "account__code") \
+            .annotate(count=Count("category")) \
+            .order_by("rec_type", "cat_type", "category", "-count",
+                      "account__code")
+        # Sorts the rows by the record type and the category type
+        categories = {}
+        for row in rows:
+            key = "%s-%s" % (row["rec_type"], row["cat_type"])
+            if key not in categories:
+                categories[key] = {}
+            if row["category"] not in categories[key]:
+                categories[key][row["category"]] = []
+            categories[key][row["category"]].append(row)
+        for key in categories:
+            # Keeps only the first account with most records
+            categories[key] = [categories[key][x][0] for x in categories[key]]
+            # Sorts the categories by the frequency
+            categories[key].sort(key=lambda x: (-x["count"], x["category"]))
+            # Keeps only the category and the account
+            categories[key] = [[x["category"], x["account__code"]]
+                               for x in categories[key]]
+        # Converts the dictionary to a list, as the category may not be
+        # US-ASCII
+        return json.dumps(categories)
 
     def _get_new_record_template_json(self) -> str:
         context = {"record_type": "TTT", "no": "NNN"}
