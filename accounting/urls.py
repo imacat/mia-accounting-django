@@ -21,8 +21,8 @@
 
 from django.urls import path, register_converter
 from django.views.decorators.http import require_GET
-from django.views.generic import RedirectView
 
+from mia_core.views import RedirectView
 from . import converters, views
 
 register_converter(converters.PeriodConverter, "period")

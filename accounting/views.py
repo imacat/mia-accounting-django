@@ -36,12 +36,12 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, gettext_noop
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import RedirectView, ListView, DetailView
+from django.views.generic import ListView, DetailView
 
 from mia_core.period import Period
 from mia_core.utils import Pagination, get_multi_lingual_search, \
     PaginationException
-from mia_core.views import DeleteView, FormView
+from mia_core.views import DeleteView, FormView, RedirectView
 from . import utils
 from .forms import AccountForm, TransactionForm, TransactionSortForm
 from .models import Record, Transaction, Account
