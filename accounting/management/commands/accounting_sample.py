@@ -24,13 +24,12 @@ import sys
 from typing import Optional
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import BaseUserManager
 from django.core.management import BaseCommand, CommandParser
 from django.db import transaction
-from django.db.models import PositiveIntegerField
 from django.utils import timezone
 
 from accounting.utils import DataFiller
-from mia_core.utils import new_pk
 
 
 class Command(BaseCommand):
@@ -63,21 +62,11 @@ class Command(BaseCommand):
             return
 
         with transaction.atomic():
-            user = user_model()
-            setattr(user, user_model.USERNAME_FIELD, "admin")
-            for field in user_model.REQUIRED_FIELDS:
-                setattr(user, field, "admin")
-            if getattr(user_model, "EMAIL_FIELD", None) is not None:
-                setattr(user, user_model.EMAIL_FIELD, "guest@example.com")
-            if getattr(user_model, "created_by", None) is not None:
-                user.created_by = user
-            if getattr(user_model, "updated_by", None) is not None:
-                user.updated_by = user
-            if isinstance(user_model._meta.pk, PositiveIntegerField):
-                user.pk = new_pk(user_model)
-            if getattr(user_model, "set_digest_password", None) is not None:
-                user.set_digest_password("admin", "12345")
-            user.save()
+            user_manager: BaseUserManager = user_model.objects
+            user_manager.create_superuser("admin", password="12345")
+            user = user_model.objects.first()
+            print("Created the user \"admin\" with password \"12345\".",
+                  file=sys.stderr)
 
             self._filler = DataFiller(user)
             self._filler.add_accounts([
