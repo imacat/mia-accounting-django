@@ -19,6 +19,7 @@
 
 """
 import re
+from decimal import Decimal
 from typing import Union, Optional
 
 from django import template
@@ -32,14 +33,14 @@ register = template.Library()
 
 
 @register.filter
-def accounting_amount(value: Union[str, int]) -> str:
+def accounting_amount(value: Union[str, Decimal]) -> str:
     if value is None:
         return ""
     if value == 0:
         return "-"
     s = str(abs(value))
     while True:
-        m = re.match("^([1-9][0-9]*)([0-9]{3})", s)
+        m = re.match("^([1-9][0-9]*)([0-9]{3}.*)", s)
         if m is None:
             break
         s = m.group(1) + "," + m.group(2)

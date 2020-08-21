@@ -36,7 +36,7 @@ First written: 2020/8/5
         </div>
         <div class="col-lg-4">
           <label for="{{ record_type }}-{{ no }}-amount" class="record-label">{{ _("Amount:")|force_escape }}</label>
-          <input id="{{ record_type }}-{{ no }}-amount" class="form-control record-amount {{ record_type }}-to-sum {% if record.amount.errors %} is-invalid {% endif %}" type="number" min="1" name="{{ record_type }}-{{ no }}-amount" value="{{ record.amount.value|default:"" }}" required="required" data-type="{{ record_type }}" />
+          <input id="{{ record_type }}-{{ no }}-amount" class="form-control record-amount {{ record_type }}-to-sum {% if record.amount.errors %} is-invalid {% endif %}" type="number" step="0.01" min="0.01" name="{{ record_type }}-{{ no }}-amount" value="{{ record.amount.value|default:"" }}" required="required" data-type="{{ record_type }}" />
           <div id="{{ record_type }}-{{ no }}-amount-error" class="invalid-feedback">{{ record.amount.errors.0|default:"" }}</div>
         </div>
       </div>

@@ -20,6 +20,7 @@
 """
 import datetime
 import re
+from decimal import Decimal
 from typing import Optional, List, Dict
 
 from django import forms
@@ -57,12 +58,14 @@ class RecordForm(forms.Form):
         error_messages={
             "max_length": _("This summary is too long (max. 128 characters)."),
         })
-    amount = forms.IntegerField(
-        min_value=1,
+    amount = forms.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        min_value=0.01,
         error_messages={
             "required": _("Please fill in the amount."),
             "invalid": _("Please fill in a number."),
-            "min_value": _("The amount must be at least 1."),
+            "min_value": _("The amount must be more than 0."),
         })
 
     def __init__(self, *args, **kwargs):
@@ -436,22 +439,22 @@ class TransactionForm(forms.Form):
             return errors[0].message
         return None
 
-    def debit_total(self) -> int:
+    def debit_total(self) -> Decimal:
         """Returns the total amount of the debit records.
 
         Returns:
             The total amount of the credit records.
         """
-        return sum([int(x.data["amount"]) for x in self.debit_records
+        return sum([Decimal(x.data["amount"]) for x in self.debit_records
                     if "amount" in x.data and "amount" not in x.errors])
 
-    def credit_total(self) -> int:
+    def credit_total(self) -> Decimal:
         """Returns the total amount of the credit records.
 
         Returns:
             The total amount of the credit records.
         """
-        return sum([int(x.data["amount"]) for x in self.credit_records
+        return sum([Decimal(x.data["amount"]) for x in self.credit_records
                     if "amount" in x.data and "amount" not in x.errors])
 
 

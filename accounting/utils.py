@@ -33,7 +33,7 @@ from mia_core.utils import new_pk
 from .models import Account, Transaction, Record
 
 AccountData = Tuple[Union[str, int], str, str, str]
-RecordData = Tuple[Union[str, int], Optional[str], int]
+RecordData = Tuple[Union[str, int], Optional[str], float]
 
 DEFAULT_CASH_ACCOUNT = "1111"
 CASH_SHORTCUT_ACCOUNTS = ["0", "1111"]

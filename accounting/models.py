@@ -20,6 +20,7 @@
 """
 import datetime
 import re
+from decimal import Decimal
 from typing import Dict, List, Optional, Mapping
 
 from dirtyfields import DirtyFieldsMixin
@@ -236,7 +237,7 @@ class Transaction(DirtyFieldsMixin, BaseModel):
                     record.summary = post[F"{record_type}-{no}-summary"]
                 else:
                     record.summary = None
-                record.amount = int(post[F"{record_type}-{no}-amount"])
+                record.amount = Decimal(post[F"{record_type}-{no}-amount"])
                 records.append(record)
         if txn_type != "transfer":
             if txn_type == "expense":
@@ -314,10 +315,10 @@ class Transaction(DirtyFieldsMixin, BaseModel):
         """
         return [x for x in self.records if not x.is_credit]
 
-    def debit_total(self) -> int:
+    def debit_total(self) -> Decimal:
         """The total amount of the debit records."""
         return sum([x.amount for x in self.debit_records
-                    if isinstance(x.amount, int)])
+                    if isinstance(x.amount, Decimal)])
 
     @property
     def debit_summaries(self) -> List[str]:
@@ -334,10 +335,10 @@ class Transaction(DirtyFieldsMixin, BaseModel):
         """
         return [x for x in self.records if x.is_credit]
 
-    def credit_total(self) -> int:
+    def credit_total(self) -> Decimal:
         """The total amount of the credit records."""
         return sum([x.amount for x in self.credit_records
-                    if isinstance(x.amount, int)])
+                    if isinstance(x.amount, Decimal)])
 
     @property
     def credit_summaries(self) -> List[str]:
@@ -346,7 +347,7 @@ class Transaction(DirtyFieldsMixin, BaseModel):
                 for x in self.credit_records]
 
     @property
-    def amount(self) -> int:
+    def amount(self) -> Decimal:
         """The amount of this transaction."""
         return self.debit_total()
 
@@ -428,13 +429,13 @@ class Record(DirtyFieldsMixin, BaseModel):
     account = models.ForeignKey(
         Account, on_delete=models.PROTECT)
     summary = models.CharField(max_length=128, blank=True, null=True)
-    amount = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=18, decimal_places=2)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._debit_amount = None
-        self._credit_amount = None
-        self.balance = None
+        self._debit_amount: Optional[Decimal] = None
+        self._credit_amount: Optional[Decimal] = None
+        self.balance: Optional[Decimal] = None
         self._is_balanced = None
         self._has_order_hole = None
         self._is_payable = None
@@ -452,25 +453,25 @@ class Record(DirtyFieldsMixin, BaseModel):
             self.amount)
 
     @property
-    def debit_amount(self) -> Optional[int]:
+    def debit_amount(self) -> Optional[Decimal]:
         """The debit amount of this accounting record."""
         if self._debit_amount is None:
             self._debit_amount = self.amount if not self.is_credit else None
         return self._debit_amount
 
     @debit_amount.setter
-    def debit_amount(self, value: Optional[int]) -> None:
+    def debit_amount(self, value: Optional[Decimal]) -> None:
         self._debit_amount = value
 
     @property
-    def credit_amount(self) -> Optional[int]:
+    def credit_amount(self) -> Optional[Decimal]:
         """The credit amount of this accounting record."""
         if self._credit_amount is None:
             self._credit_amount = self.amount if self.is_credit else None
         return self._credit_amount
 
     @credit_amount.setter
-    def credit_amount(self, value: Optional[int]):
+    def credit_amount(self, value: Optional[Decimal]):
         self._credit_amount = value
 
     @property

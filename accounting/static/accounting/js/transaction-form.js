@@ -177,10 +177,10 @@ function removeBlankOption(select) {
  */
 function updateTotalAmount(element) {
     const type = element.data("type")
-    let total = 0;
+    let total = new Decimal("0");
     $("." + type + "-to-sum").each(function () {
         if (this.value !== "") {
-            total += parseInt(this.value);
+            total = total.plus(new Decimal(this.value));
         }
     });
     total = String(total);
@@ -465,19 +465,19 @@ function validateAmount(amount) {
 function validateBalance() {
     const balanceRows = $(".balance-row");
     const errorMessages = $(".balance-error");
-    let debitTotal = 0;
+    let debitTotal = new Decimal("0");
     $(".debit-to-sum").each(function () {
         if (this.value !== "") {
-            debitTotal += parseInt(this.value);
+            debitTotal = debitTotal.plus(new Decimal(this.value));
         }
     });
-    let creditTotal = 0;
+    let creditTotal = new Decimal("0");
     $(".credit-to-sum").each(function () {
         if (this.value !== "") {
-            creditTotal += parseInt(this.value);
+            creditTotal = creditTotal.plus(new Decimal(this.value));
         }
     });
-    if (debitTotal !== creditTotal) {
+    if (!debitTotal.equals(creditTotal)) {
         balanceRows.addClass("is-invalid");
         errorMessages.text(gettext("The total amount of debit and credit records are inconsistent."))
         return false;
