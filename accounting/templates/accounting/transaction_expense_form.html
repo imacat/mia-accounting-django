@@ -24,6 +24,7 @@ First written: 2020/7/23
 {% load static %}
 {% load i18n %}
 {% load mia_core %}
+{% load accounting %}
 
 {% block settings %}
   {% setvar "title" _("Cash Expense Transaction") %}
@@ -92,7 +93,7 @@ First written: 2020/7/23
         <li class="list-group-item">
           <div class="d-flex justify-content-between align-items-center">
             {{ _("Total")|force_escape }}
-            <span id="debit-total" class="amount">{{ form.debit_total }}</span>
+            <span id="debit-total" class="amount">{{ form.debit_total|short_amount }}</span>
           </div>
         </li>
       </ul>
