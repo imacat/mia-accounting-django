@@ -22,7 +22,6 @@ First written: 2020/7/21
 {% endcomment %}
 {% load static %}
 {% load i18n %}
-{% load humanize %}
 {% load mia_core %}
 {% load accounting %}
 
@@ -136,12 +135,12 @@ First written: 2020/7/21
               <div>
                 {% if record.debit_amount is not None %}
                   <span class="badge badge-success badge-pill">
-                    {{ record.debit_amount|intcomma:False }}
+                    {{ record.debit_amount|short_amount }}
                   </span>
                 {% endif %}
                 {% if record.credit_amount is not None %}
                   <span class="badge badge-warning badge-pill">
-                    {{ record.credit_amount|intcomma:False }}
+                    {{ record.credit_amount|short_amount }}
                   </span>
                 {% endif %}
               </div>

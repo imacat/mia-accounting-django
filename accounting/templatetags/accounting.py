@@ -32,20 +32,64 @@ from mia_core.period import Period
 register = template.Library()
 
 
-@register.filter
-def accounting_amount(value: Union[str, Decimal]) -> str:
-    if value is None:
-        return ""
-    if value == 0:
-        return "-"
-    s = str(abs(value))
+def _format_positive_amount(value: Union[str, Decimal]) -> str:
+    """Formats a positive amount, groups every 3 digits by commas.
+
+    Args:
+        value: The amount.
+
+    Returns:
+        ReportUrl: The formatted amount.
+    """
+    s = str(value)
     while True:
         m = re.match("^([1-9][0-9]*)([0-9]{3}.*)", s)
         if m is None:
             break
         s = m.group(1) + "," + m.group(2)
+    s = re.sub(r"^(.*\.[0-9]*?)0+$", r"\1", s)
+    s = re.sub(r"^(.*)\.$", r"\1", s)
+    return s
+
+
+@register.filter
+def accounting_amount(value: Union[str, Decimal]) -> str:
+    """Formats an amount with the accounting notation, grouping every 3 digits
+    by commas, and marking negative numbers with brackets instead of signs.
+
+    Args:
+        value: The amount.
+
+    Returns:
+        ReportUrl: The formatted amount.
+    """
+    if value is None:
+        return ""
+    if value == 0:
+        return "-"
+    s = _format_positive_amount(abs(value))
     if value < 0:
-        s = "(%s)" % s
+        s = F"({s})"
+    return s
+
+
+@register.filter
+def short_amount(value: Union[str, Decimal]) -> str:
+    """Formats an amount, groups every 3 digits by commas.
+
+    Args:
+        value: The amount.
+
+    Returns:
+        ReportUrl: The formatted amount.
+    """
+    if value is None:
+        return ""
+    if value == 0:
+        return "-"
+    s = _format_positive_amount(abs(value))
+    if value < 0:
+        s = "-" + s
     return s
 
 

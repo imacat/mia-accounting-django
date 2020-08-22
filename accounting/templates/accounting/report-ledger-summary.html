@@ -22,7 +22,6 @@ First written: 2020/7/16
 {% endcomment %}
 {% load static %}
 {% load i18n %}
-{% load humanize %}
 {% load mia_core %}
 {% load accounting %}
 
@@ -115,22 +114,22 @@ First written: 2020/7/16
             {{ month.label }}
             <div>
               <span class="badge badge-success badge-pill">
-                {{ month.debit|accounting_amount }}
+                {{ month.debit|short_amount }}
               </span>
               <span class="badge badge-warning badge-pill">
-                {{ month.credit|accounting_amount }}
+                {{ month.credit|short_amount }}
               </span>
               <span class="badge {% if month.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                {{ month.balance|intcomma:False }}
+                {{ month.balance|short_amount }}
               </span>
               <span class="badge {% if month.cumulative_balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                {{ month.cumulative_balance|intcomma:False }}
+                {{ month.cumulative_balance|short_amount }}
               </span>
               <span class="badge {% if month.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                {{ month.balance|intcomma:False }}
+                {{ month.balance|short_amount }}
               </span>
               <span class="badge {% if month.cumulative_balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
-                {{ month.cumulative_balance|intcomma:False }}
+                {{ month.cumulative_balance|short_amount }}
               </span>
             </div>
           </a>
@@ -139,16 +138,16 @@ First written: 2020/7/16
             {{ month.label }}
             <div>
               <span class="badge badge-success badge-pill">
-                {{ month.debit|accounting_amount }}
+                {{ month.debit|short_amount }}
               </span>
               <span class="badge badge-warning badge-pill">
-                {{ month.credit|accounting_amount }}
+                {{ month.credit|short_amount }}
               </span>
               <span class="badge {% if month.balance < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                {{ month.balance|intcomma:False }}
+                {{ month.balance|short_amount }}
               </span>
               <span class="badge {% if month.cumulative_balance < 0 %} badge-danger {% else %} badge-primary {% endif %} badge-pill">
-                {{ month.cumulative_balance|intcomma:False }}
+                {{ month.cumulative_balance|short_amount }}
               </span>
             </div>
           </div>

@@ -22,7 +22,6 @@ First written: 2020/7/19
 {% endcomment %}
 {% load static %}
 {% load i18n %}
-{% load humanize %}
 {% load mia_core %}
 {% load accounting %}
 
@@ -169,7 +168,7 @@ First written: 2020/7/19
                     {{ account.title|title_case }}
                     <div class="float-right">
                       <span class="badge {% if account.amount < 0 %} badge-warning {% else %} badge-secondary {% endif %} badge-pill">
-                        {{ account.amount|accounting_amount }}
+                        {{ account.amount|short_amount }}
                       </span>
                     </div>
                   </a>
@@ -179,7 +178,7 @@ First written: 2020/7/19
                 {{ _("Total")|force_escape }}
                 <div class="float-right">
                   <span class="badge {% if group.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                    {{ group.amount|accounting_amount }}
+                    {{ group.amount|short_amount }}
                   </span>
                 </div>
               </li>
@@ -197,7 +196,7 @@ First written: 2020/7/19
               {{ section.cumulative_total.title|title_case }}
               <div class="float-right">
                 <span class="badge {% if section.cumulative_total.amount < 0 %} badge-danger {% else %} badge-info {% endif %} badge-pill">
-                  {{ section.cumulative_total.amount|accounting_amount }}
+                  {{ section.cumulative_total.amount|short_amount }}
                 </span>
               </div>
             </li>
