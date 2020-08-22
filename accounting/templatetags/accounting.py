@@ -53,7 +53,7 @@ def _format_positive_amount(value: Union[str, Decimal]) -> str:
 
 
 @register.filter
-def accounting_amount(value: Union[str, Decimal]) -> str:
+def accounting_amount(value: Union[Decimal]) -> str:
     """Formats an amount with the accounting notation, grouping every 3 digits
     by commas, and marking negative numbers with brackets instead of signs.
 
@@ -74,7 +74,7 @@ def accounting_amount(value: Union[str, Decimal]) -> str:
 
 
 @register.filter
-def short_amount(value: Union[str, Decimal]) -> str:
+def short_amount(value: Union[Decimal]) -> str:
     """Formats an amount, groups every 3 digits by commas.
 
     Args:
