@@ -22,15 +22,30 @@ from typing import Any, Dict, List
 
 from dirtyfields import DirtyFieldsMixin
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from mia_core.utils import new_pk, Language
 
 
-class BaseModel(models.Model):
-    """The common abstract base model that has id, created_at, created_by,
-    updated_at, and updated_by."""
+class RandomPkModel(models.Model):
+    """The abstract data model that uses 9-digit random primary keys."""
     id = models.PositiveIntegerField(primary_key=True)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if self.pk is None:
+            self.pk = new_pk(self.__class__)
+        super().save(force_insert=force_insert, force_update=force_update,
+                     using=using, update_fields=update_fields)
+
+    class Meta:
+        abstract = True
+
+
+class StampedModel(models.Model):
+    """The abstract base model that has created_at, created_by, updated_at, and
+    updated_by."""
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT,
@@ -46,8 +61,9 @@ class BaseModel(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        if self.pk is None:
-            self.pk = new_pk(self.__class__)
+        try:
+            self.created_by
+        except ObjectDoesNotExist as e:
             if self.current_user is not None:
                 self.created_by = self.current_user
         if self.current_user is not None:
@@ -122,7 +138,8 @@ class LocalizedModel(models.Model):
         super().save(force_insert=force_insert, force_update=force_update,
                      using=using, update_fields=update_fields)
         for l10n_rec in l10n_to_save:
-            if isinstance(self, BaseModel) and isinstance(l10n_rec, BaseModel):
+            if isinstance(self, StampedModel)\
+                    and isinstance(l10n_rec, StampedModel):
                 l10n_rec.current_user = self.current_user
             l10n_rec.save(force_insert=force_insert, force_update=force_update,
                           using=using, update_fields=update_fields)

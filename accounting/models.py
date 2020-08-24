@@ -24,14 +24,15 @@ from decimal import Decimal
 from typing import Dict, List, Optional, Mapping
 
 from dirtyfields import DirtyFieldsMixin
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Q, Max
 from django.http import HttpRequest
 
-from mia_core.models import BaseModel, L10nModel, LocalizedModel
+from mia_core.models import L10nModel, LocalizedModel, StampedModel, \
+    RandomPkModel
 
 
-class Account(DirtyFieldsMixin, LocalizedModel, BaseModel):
+class Account(DirtyFieldsMixin, LocalizedModel, StampedModel, RandomPkModel):
     """An account."""
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True,
@@ -108,13 +109,13 @@ class Account(DirtyFieldsMixin, LocalizedModel, BaseModel):
         self._is_in_use = value
 
 
-class AccountL10n(DirtyFieldsMixin, L10nModel, BaseModel):
+class AccountL10n(DirtyFieldsMixin, L10nModel, StampedModel, RandomPkModel):
     """The localization content of an account."""
     master = models.ForeignKey(
         Account, on_delete=models.CASCADE, related_name="l10n_set")
 
 
-class Transaction(DirtyFieldsMixin, BaseModel):
+class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
     """An accounting transaction."""
     date = models.DateField()
     ord = models.PositiveSmallIntegerField(default=1)
@@ -422,7 +423,7 @@ class Transaction(DirtyFieldsMixin, BaseModel):
             return "transfer"
 
 
-class Record(DirtyFieldsMixin, BaseModel):
+class Record(DirtyFieldsMixin, StampedModel, RandomPkModel):
     """An accounting record."""
     transaction = models.ForeignKey(
         Transaction, on_delete=models.CASCADE)

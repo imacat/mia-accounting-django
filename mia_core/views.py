@@ -35,7 +35,7 @@ from django.views.generic import DeleteView as CoreDeleteView, \
 from django.views.generic.base import View
 
 from . import stored_post, utils
-from .models import BaseModel
+from .models import StampedModel
 from .utils import UrlBuilder
 
 
@@ -141,7 +141,7 @@ class FormView(View):
         """Fills in the data model from the form."""
         for name in form.fields:
             setattr(obj, name, form[name].value())
-        if isinstance(obj, BaseModel):
+        if isinstance(obj, StampedModel):
             obj.current_user = self.request.user
 
     def form_invalid(self, form: forms.Form) -> HttpResponseRedirect:
