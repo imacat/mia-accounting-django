@@ -89,63 +89,6 @@ class Language:
         return Language(get_language())
 
 
-def get_multi_lingual_attr(model: Model, name: str,
-                           default: str = None) -> str:
-    """Returns a multi-lingual attribute of a data model.
-
-    Args:
-        model: The data model.
-        name: The attribute name.
-        default: The default language.
-
-    Returns:
-        The attribute in this language, or in the default language if there is
-        no content in the current language.
-    """
-    language = Language.current()
-    title = getattr(model, name + language.db)
-    if default is None:
-        default = Language.default().id
-    if language.id == default:
-        return title
-    if title is not None:
-        return title
-    return getattr(model, name + Language.default().db)
-
-
-def set_multi_lingual_attr(model: Model, name: str, value: str) -> None:
-    """Sets a multi-lingual attribute of a data model.
-
-    Args:
-        model: The data model.
-        name: The attribute name.
-        value: The new value
-    """
-    language = Language.current()
-    setattr(model, name + language.db, value)
-
-
-def get_multi_lingual_search(attr: str, query: str) -> Q:
-    """Returns the query condition on a multi-lingual attribute.
-
-    Args:
-        attr: The base name of the multi-lingual attribute.
-        query: The query.
-
-    Returns:
-        The query condition
-    """
-    language = Language.current()
-    if language.is_default:
-        return Q(**{attr + language.db + "__icontains": query})
-    default = Language.default()
-    q = (Q(**{attr + language.db + "__isnull": False})
-         & Q(**{attr + language.db + "__icontains": query}))\
-        | (Q(**{attr + language.db + "__isnull": True})
-           & Q(**{attr + default.db + "__icontains": query}))
-    return q
-
-
 class UrlBuilder:
     """The URL builder.
 

@@ -39,8 +39,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import ListView, DetailView
 
 from mia_core.period import Period
-from mia_core.utils import Pagination, get_multi_lingual_search, \
-    PaginationException
+from mia_core.utils import Pagination, PaginationException
 from mia_core.views import DeleteView, FormView, RedirectView
 from . import utils
 from .forms import AccountForm, TransactionForm, TransactionSortForm
@@ -767,7 +766,8 @@ def search(request: HttpRequest) -> HttpResponse:
         records = []
     else:
         records = Record.objects.filter(
-            get_multi_lingual_search("account__title", query)
+            Q(account__title_l10n__icontains=query)
+            | Q(account__l10n_set__value__icontains=query)
             | Q(account__code__icontains=query)
             | Q(summary__icontains=query)
             | Q(transaction__notes__icontains=query))

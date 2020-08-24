@@ -155,10 +155,12 @@ class DataFiller:
                 code = str(code)
             parent = None if len(code) == 1\
                 else Account.objects.get(code=code[:-1])
-            Account(pk=new_pk(Account), parent=parent, code=code,
-                    title_zh_hant=data[1], title_en=data[2],
-                    title_zh_hans=data[3],
-                    created_by=self.user, updated_by=self.user).save()
+            account = Account(parent=parent, code=code)
+            account.current_user = self.user
+            account.set_l10n_in("title", "zh-hant", data[1])
+            account.set_l10n_in("title", "en", data[2])
+            account.set_l10n_in("title", "zh-hans", data[3])
+            account.save()
 
     def add_transfer_transaction(self, date: Union[datetime.date, int],
                                  debit: List[RecordData],

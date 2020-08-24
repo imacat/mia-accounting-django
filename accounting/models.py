@@ -28,24 +28,24 @@ from django.db import models, transaction
 from django.db.models import Q, Max
 from django.http import HttpRequest
 
-from mia_core.models import BaseModel
-from mia_core.utils import get_multi_lingual_attr, set_multi_lingual_attr
+from mia_core.models import BaseModel, L10nModel, LocalizedModel
 
 
-class Account(DirtyFieldsMixin, BaseModel):
+class Account(DirtyFieldsMixin, LocalizedModel, BaseModel):
     """An account."""
     parent = models.ForeignKey(
         "self", on_delete=models.PROTECT, null=True,
         related_name="child_set")
     code = models.CharField(max_length=5, unique=True)
-    title_zh_hant = models.CharField(max_length=32)
-    title_en = models.CharField(max_length=128, null=True)
-    title_zh_hans = models.CharField(max_length=32, null=True)
+    title_l10n = models.CharField(max_length=32, db_column="title")
     CASH = "1111"
     ACCUMULATED_BALANCE = "3351"
     NET_CHANGE = "3353"
 
     def __init__(self, *args, **kwargs):
+        if "title" in kwargs:
+            self.title = kwargs["title"]
+            del kwargs["title"]
         super().__init__(*args, **kwargs)
         self.url = None
         self.debit_amount = None
@@ -69,12 +69,11 @@ class Account(DirtyFieldsMixin, BaseModel):
 
     @property
     def title(self) -> str:
-        """The title in the current language."""
-        return get_multi_lingual_attr(self, "title")
+        return self.get_l10n("title")
 
     @title.setter
-    def title(self, value: str) -> None:
-        set_multi_lingual_attr(self, "title", value)
+    def title(self, value):
+        self.set_l10n("title", value)
 
     @property
     def option_data(self) -> Dict[str, str]:
@@ -107,6 +106,12 @@ class Account(DirtyFieldsMixin, BaseModel):
     @is_in_use.setter
     def is_in_use(self, value: bool) -> None:
         self._is_in_use = value
+
+
+class AccountL10n(DirtyFieldsMixin, L10nModel, BaseModel):
+    """The localization content of an account."""
+    master = models.ForeignKey(
+        Account, on_delete=models.CASCADE, related_name="l10n_set")
 
 
 class Transaction(DirtyFieldsMixin, BaseModel):
