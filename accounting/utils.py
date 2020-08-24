@@ -155,8 +155,7 @@ class DataFiller:
                 code = str(code)
             parent = None if len(code) == 1\
                 else Account.objects.get(code=code[:-1])
-            account = Account(parent=parent, code=code)
-            account.current_user = self.user
+            account = Account(parent=parent, code=code, current_user=self.user)
             account.set_l10n_in("title", "zh-hant", data[1])
             account.set_l10n_in("title", "en", data[2])
             account.set_l10n_in("title", "zh-hans", data[3])
@@ -177,7 +176,7 @@ class DataFiller:
             date = timezone.localdate() + timezone.timedelta(days=date)
         order = Transaction.objects.filter(date=date).count() + 1
         transaction = Transaction(pk=new_pk(Transaction), date=date, ord=order,
-                                  created_by=self.user, updated_by=self.user)
+                                  current_user=self.user)
         transaction.save()
         order = 1
         for data in debit:
@@ -189,8 +188,7 @@ class DataFiller:
             transaction.record_set.create(pk=new_pk(Record), is_credit=False,
                                           ord=order, account=account,
                                           summary=data[1], amount=data[2],
-                                          created_by=self.user,
-                                          updated_by=self.user)
+                                          current_user=self.user)
             order = order + 1
         order = 1
         for data in credit:
@@ -202,8 +200,7 @@ class DataFiller:
             transaction.record_set.create(pk=new_pk(Record), is_credit=True,
                                           ord=order, account=account,
                                           summary=data[1], amount=data[2],
-                                          created_by=self.user,
-                                          updated_by=self.user)
+                                          current_user=self.user)
             order = order + 1
 
     def add_income_transaction(self, date: Union[datetime.date, int],

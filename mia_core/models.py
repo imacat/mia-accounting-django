@@ -56,18 +56,22 @@ class StampedModel(models.Model):
         related_name="updated_%(app_label)s_%(class)s")
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.current_user = None
+        if "current_user" in kwargs:
+            self.current_user = kwargs["current_user"]
+            del kwargs["current_user"]
+        super().__init__(*args, **kwargs)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
+        if self.current_user is None:
+            raise AttributeError(
+                F"Missing current_user in {self.__class__.__name__}")
         try:
             self.created_by
         except ObjectDoesNotExist as e:
-            if self.current_user is not None:
-                self.created_by = self.current_user
-        if self.current_user is not None:
-            self.updated_by = self.current_user
+            self.created_by = self.current_user
+        self.updated_by = self.current_user
         super().save(force_insert=force_insert, force_update=force_update,
                      using=using, update_fields=update_fields)
 
