@@ -178,17 +178,16 @@ class Transaction(DirtyFieldsMixin, BaseModel):
         for record in to_save:
             record.current_user = self.current_user
         # Runs the update
-        with transaction.atomic():
-            super().save(force_insert=force_insert, force_update=force_update,
-                         using=using, update_fields=update_fields)
-            for record in to_delete:
-                record.delete()
-            for record in to_save:
-                record.save(force_insert=force_insert,
-                            force_update=force_update,
-                            using=using, update_fields=update_fields)
-            for x in txn_to_sort:
-                Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
+        super().save(force_insert=force_insert, force_update=force_update,
+                     using=using, update_fields=update_fields)
+        for record in to_delete:
+            record.delete()
+        for record in to_save:
+            record.save(force_insert=force_insert,
+                        force_update=force_update,
+                        using=using, update_fields=update_fields)
+        for x in txn_to_sort:
+            Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
 
     def delete(self, using=None, keep_parents=False):
         txn_same_day = list(
@@ -199,12 +198,10 @@ class Transaction(DirtyFieldsMixin, BaseModel):
         for i in range(len(txn_same_day)):
             if txn_same_day[i].ord != i + 1:
                 txn_to_sort.append([txn_same_day[i], i + 1])
-        with transaction.atomic():
-            for record in self.record_set.all():
-                record.delete()
-            super().delete(using=using, keep_parents=keep_parents)
-            for x in txn_to_sort:
-                Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
+        Record.objects.filter(transaction=self).delete()
+        super().delete(using=using, keep_parents=keep_parents)
+        for x in txn_to_sort:
+            Transaction.objects.filter(pk=x[0].pk).update(ord=x[1])
 
     def fill_from_post(self, post: Dict[str, str], request: HttpRequest,
                        txn_type: str):

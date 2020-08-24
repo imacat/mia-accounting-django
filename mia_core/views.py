@@ -24,6 +24,7 @@ from dirtyfields import DirtyFieldsMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.db.models import Model
 from django.http import HttpResponse, HttpRequest, \
     HttpResponseRedirect, Http404
@@ -157,7 +158,8 @@ class FormView(View):
                 and not self.object.is_dirty(check_relationship=True):
             message = self.get_not_modified_message(form.cleaned_data)
         else:
-            self.object.save()
+            with transaction.atomic():
+                self.object.save()
             message = self.get_success_message(form.cleaned_data)
         messages.success(self.request, message)
         return redirect(str(UrlBuilder(self.get_success_url())
