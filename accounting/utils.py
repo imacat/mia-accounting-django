@@ -146,7 +146,7 @@ class DataFiller:
 
         Args:
             accounts (tuple[tuple[any]]): Tuples of
-                (code, Traditional Chinese, English, Simplified Chinese)
+                (code, English, Traditional Chinese, Simplified Chinese)
                 of the accounts.
         """
         for data in accounts:
@@ -156,8 +156,8 @@ class DataFiller:
             parent = None if len(code) == 1\
                 else Account.objects.get(code=code[:-1])
             account = Account(parent=parent, code=code, current_user=self.user)
-            account.set_l10n_in("title", "zh-hant", data[1])
-            account.set_l10n_in("title", "en", data[2])
+            account.set_l10n_in("title", "en", data[1])
+            account.set_l10n_in("title", "zh-hant", data[2])
             account.set_l10n_in("title", "zh-hans", data[3])
             account.save()
 
