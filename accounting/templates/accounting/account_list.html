@@ -59,7 +59,7 @@ First written: 2020/8/7
         <tr class="{% if account.is_parent_and_in_use %} table-danger {% endif %}">
           <td>{{ account.code }}</td>
           <td>
-            {{ account.title }}
+            {{ account.title|title_case }}
             {% if account.is_parent_and_in_use %}
               <span class="badge badge-danger badge-pill">
                 {{ _("Parent Account In Use")|force_escape }}
