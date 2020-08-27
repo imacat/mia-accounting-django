@@ -20,15 +20,15 @@
 """
 import datetime
 import random
-import sys
 from typing import Optional
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.base_user import BaseUserManager
-from django.core.management import BaseCommand, CommandParser
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.management import BaseCommand, CommandParser, CommandError
 from django.db import transaction
 from django.utils import timezone
 
+from accounting.models import Account
 from accounting.utils import DataFiller
 
 
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         Args:
             parser (CommandParser): The command line argument parser.
         """
-        pass
+        parser.add_argument("--user", "-u", help="User")
 
     def handle(self, *args, **options):
         """Runs the command.
@@ -55,19 +55,29 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
+        if Account.objects.count() > 0:
+            error = "Refuse to fill in sample data with existing data."
+            raise CommandError(error, returncode=1)
+        # Gets the user to use
         user_model = get_user_model()
-        if user_model.objects.first() is not None:
-            print("Refused to fill in sample data with existing data.",
-                  file=sys.stderr)
-            return
+        if options["user"] is not None:
+            try:
+                user = user_model.objects.get(**{
+                    user_model.USERNAME_FIELD: options["user"]
+                })
+            except ObjectDoesNotExist:
+                error = "User \"%s\" does not exist." % options["user"]
+                raise CommandError(error, returncode=1)
+        elif user_model.objects.count() == 0:
+            error = "Please run the \"createsuperuser\" command first."
+            raise CommandError(error, returncode=1)
+        elif user_model.objects.count() == 1:
+            user = user_model.objects.first()
+        else:
+            error = "Please specify the user with -u."
+            raise CommandError(error, returncode=1)
 
         with transaction.atomic():
-            user_manager: BaseUserManager = user_model.objects
-            user_manager.create_superuser("admin", password="12345")
-            user = user_model.objects.first()
-            print("Created the user \"admin\" with password \"12345\".",
-                  file=sys.stderr)
-
             self._filler = DataFiller(user)
             self._filler.add_accounts([
                 (1, "assets", "資產", "资产"),
