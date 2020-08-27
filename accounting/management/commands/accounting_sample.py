@@ -26,7 +26,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand, CommandParser, CommandError
 from django.db import transaction
-from django.utils import timezone
+from django.utils import timezone, formats
+from django.utils.translation import gettext as _
 
 from accounting.models import Account
 from accounting.utils import DataFiller
@@ -147,44 +148,44 @@ class Command(BaseCommand):
 
             self._filler.add_income_transaction(
                 -15,
-                [(1113, "ATM withdrawal", 2000)])
+                [(1113, _("ATM withdrawal"), 2000)])
             self._filler.add_transfer_transaction(
                 -14,
-                [(6254, "HSR—New Land→South Lake City", 1490)],
-                [(2141, "HSR—New Land→South Lake City", 1490)])
+                [(6254, _("HSR—New Land→South Lake City"), 1490)],
+                [(2141, _("HSR—New Land→South Lake City"), 1490)])
             self._filler.add_transfer_transaction(
                 -14,
-                [(6273, "Movies—The Avengers", 80)],
-                [(2141, "Movies—The Avengers", 80)])
+                [(6273, _("Movies—The Avengers"), 80)],
+                [(2141, _("Movies—The Avengers"), 80)])
             self._filler.add_transfer_transaction(
                 -13,
-                [(6273, "Movies—2001: A Space Odyssey", 80)],
-                [(2141, "Movies—2001: A Space Odyssey", 80)])
+                [(6273, _("Movies—2001: A Space Odyssey"), 80)],
+                [(2141, _("Movies—2001: A Space Odyssey"), 80)])
             self._filler.add_transfer_transaction(
                 -11,
-                [(2141, "Movies—The Avengers", 80)],
-                [(1113, "Movies—The Avengers", 80)])
+                [(2141, _("Movies—The Avengers"), 80)],
+                [(1113, _("Movies—The Avengers"), 80)])
 
             self._filler.add_expense_transaction(
                 -13,
-                [(6273, "Bus—2623—Uptown→City Park", 477543627.4775)])
+                [(6273, _("Bus—2623—Uptown→City Park"), 477543627.4775)])
 
             self._filler.add_expense_transaction(
                 -2,
-                [(6272, "Lunch—Spaghetti", random.randint(40, 200)),
-                 (6272, "Drink—Tea", random.randint(40, 200))])
+                [(6272, _("Lunch—Spaghetti"), random.randint(40, 200)),
+                 (6272, _("Drink—Tea"), random.randint(40, 200))])
             self._filler.add_expense_transaction(
                 -1,
-                ([(6272, "Lunch—Pizza", random.randint(40, 200)),
-                 (6272, "Drink—Tea", random.randint(40, 200))]))
+                ([(6272, _("Lunch—Pizza"), random.randint(40, 200)),
+                 (6272, _("Drink—Tea"), random.randint(40, 200))]))
             self._filler.add_expense_transaction(
                 -1,
-                [(6272, "Lunch—Spaghetti", random.randint(40, 200)),
-                 (6272, "Drink—Soda", random.randint(40, 200))])
+                [(6272, _("Lunch—Spaghetti"), random.randint(40, 200)),
+                 (6272, _("Drink—Soda"), random.randint(40, 200))])
             self._filler.add_expense_transaction(
                 0,
-                [(6272, "Lunch—Salad", random.randint(40, 200)),
-                 (6272, "Drink—Coffee", random.randint(40, 200))])
+                [(6272, _("Lunch—Salad"), random.randint(40, 200)),
+                 (6272, _("Drink—Coffee"), random.randint(40, 200))])
 
     def add_payrolls(self, months: int):
         """Adds the payrolls for certain number of months.
@@ -235,17 +236,13 @@ class Command(BaseCommand):
             else 712
         tax = round(income * 0.05)
         savings = income - pension - insurance - tax
-        months = ["January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November",
-                  "December"]
-        month = payday.month - 1
-        if month < 1:
-            month = 12
-        month_text = months[month - 1]
+        previous_month = self.previous_month(payday)
+        month = formats.date_format(previous_month, format="F")
         self._filler.add_transfer_transaction(
             payday,
-            [(1113, "Payroll Transfer", savings),
-             (1314, F"Pension for {month_text}", pension),
-             (6262, F"Health insurance for {month_text}", insurance),
-             (1255, "Income Tax", tax)],
-            [(4611, F"Payroll for {month_text}", income)])
+            [(1113, _("Payroll Transfer"), savings),
+             (1314, _("Pension for {month}").format(month=month), pension),
+             (6262, _("Health insurance for {month}").format(month=month),
+              insurance),
+             (1255, _("Income Tax"), tax)],
+            [(4611, _("Payroll for {month}").format(month=month), income)])
