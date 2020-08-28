@@ -23,7 +23,7 @@ import urllib.parse
 from typing import Dict, List, Any, Type
 
 from django.conf import settings
-from django.db.models import Model, Q
+from django.db.models import Model
 from django.http import HttpRequest
 from django.utils.translation import pgettext, get_language
 
