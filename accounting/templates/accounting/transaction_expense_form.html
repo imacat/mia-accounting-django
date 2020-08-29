@@ -28,8 +28,7 @@ First written: 2020/7/23
 
 {% block settings %}
   {% setvar "title" _("Cash Expense Transaction") %}
-  {% setvar "use_jqueryui" True %}
-  {% static "ext-libs/decimal/decimal.min.js" as file %}{% add_js file %}
+  {% add_lib "jquery-ui" "decimal-js" %}
   {% static "accounting/css/transactions.css" as file %}{% add_css file %}
   {% static "accounting/css/summary-helper.css" as file %}{% add_css file %}
   {% static "accounting/js/transaction-form.js" as file %}{% add_js file %}

@@ -39,11 +39,13 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import ListView, DetailView
 
 from mia_core.period import Period
-from mia_core.utils import Pagination, PaginationException
+from mia_core.utils import Pagination, PaginationException, add_default_libs
 from mia_core.views import DeleteView, FormView, RedirectView
 from . import utils
 from .forms import AccountForm, TransactionForm, TransactionSortForm
 from .models import Record, Transaction, Account
+
+add_default_libs("bootstrap4", "font-awesome-5", "i18n")
 
 
 @method_decorator(require_GET, name="dispatch")

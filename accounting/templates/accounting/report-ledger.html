@@ -28,7 +28,7 @@ First written: 2020/7/16
 {% block settings %}
   {% blocktrans asvar title with account=request.resolver_match.kwargs.account.title prep_period=request.resolver_match.kwargs.period.prep_desc %}Ledger for {{ account }} {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
-  {% setvar "use_period_chooser" True %}
+  {% add_lib "period-chooser" %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
 

@@ -29,7 +29,7 @@ First written: 2020/7/20
 {% block settings %}
   {% blocktrans asvar title with prep_period=request.resolver_match.kwargs.period.prep_desc %}Balance Sheet {{ prep_period }}{% endblocktrans %}
   {% setvar "title" title %}
-  {% setvar "use_period_chooser" True %}
+  {% add_lib "period-chooser" %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
 {% endblock %}
 

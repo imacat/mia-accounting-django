@@ -29,7 +29,7 @@ First written: 2020/8/6
 {% block settings %}
   {% blocktrans asvar title with date=form.date|smart_date %}Reorder the Transactions in {{ date }}{% endblocktrans %}
   {% setvar "title" title %}
-  {% setvar "use_jqueryui" True %}
+  {% add_lib "jquery-ui" %}
   {% static "accounting/css/report.css" as file %}{% add_css file %}
   {% static "accounting/css/transactions-sort.css" as file %}{% add_css file %}
   {% static "accounting/js/transaction-sort.js" as file %}{% add_js file %}

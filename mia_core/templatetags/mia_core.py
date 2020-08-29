@@ -19,8 +19,9 @@
 
 """
 import datetime
+import re
 from datetime import date
-from typing import Any
+from typing import Any, List
 
 import titlecase
 from django import template
@@ -31,7 +32,7 @@ from django.utils import timezone
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext
 
-from mia_core.utils import UrlBuilder
+from mia_core.utils import UrlBuilder, CssAndJavaScriptLibraries
 
 register = template.Library()
 
@@ -104,6 +105,24 @@ def url_keep_return(context: RequestContext, url: str) -> str:
 
 
 @register.simple_tag(takes_context=True)
+def add_lib(context: RequestContext, *args) -> str:
+    """Adds CSS and JavaScript libraries.
+
+    Args:
+        context: The request context.
+        args: The names of the CSS and JavaScript libraries.
+
+    Returns:
+        An empty string.
+    """
+    if "libs" not in context.dicts[0]:
+        context.dicts[0]["libs"] = CssAndJavaScriptLibraries(args)
+    else:
+        context.dicts[0]["libs"].use(args)
+    return ""
+
+
+@register.simple_tag(takes_context=True)
 def add_css(context: RequestContext, url: str) -> str:
     """Adds a local CSS file.  The file is added to the "css" template
     list variable.
@@ -113,11 +132,11 @@ def add_css(context: RequestContext, url: str) -> str:
         url: The URL or path of the CSS file.
 
     Returns:
-        An empty string
+        An empty string.
     """
-    if "css" not in context.dicts[0]:
-        context.dicts[0]["css"] = []
-    context.dicts[0]["css"].append(url)
+    if "libs" not in context.dicts[0]:
+        context.dicts[0]["libs"] = CssAndJavaScriptLibraries()
+    context.dicts[0]["libs"].add_css(url)
     return ""
 
 
@@ -131,11 +150,11 @@ def add_js(context: RequestContext, url: str) -> str:
         url: The URL or path of the JavaScript file.
 
     Returns:
-        An empty string
+        An empty string.
     """
-    if "js" not in context.dicts[0]:
-        context.dicts[0]["js"] = []
-    context.dicts[0]["js"].append(url)
+    if "libs" not in context.dicts[0]:
+        context.dicts[0]["libs"] = CssAndJavaScriptLibraries()
+    context.dicts[0]["libs"].add_js(url)
     return ""
 
 
@@ -215,3 +234,18 @@ def is_in_section(request: HttpRequest, section_name: str) -> bool:
     view_name = request.resolver_match.view_name
     return view_name == section_name\
         or view_name.startswith(section_name + ".")
+
+
+@register.filter
+def is_static_url(target: str) -> bool:
+    """Returns whether the target URL is a static path
+
+    Args:
+        target: The target, either a static path that need to be passed to
+            the static template tag, or an HTTP, HTTPS URL or absolute path
+            that should be displayed directly.
+
+    Returns:
+        True if the target URL is a static path, or False otherwise.
+    """
+    return not (re.match("^https?://", target) or target.startswith("/"))

@@ -20,11 +20,12 @@
 """
 import random
 import urllib.parse
-from typing import Dict, List, Any, Type
+from typing import Dict, List, Any, Type, Tuple
 
 from django.conf import settings
 from django.db.models import Model
 from django.http import HttpRequest
+from django.urls import reverse
 from django.utils.translation import pgettext, get_language
 
 
@@ -438,3 +439,159 @@ class PaginationException(Exception):
     """
     def __init__(self, url_builder: UrlBuilder):
         self.url = str(url_builder)
+
+
+CDN_LIBRARIES = {
+    "jquery": {"css": [], "js": ["https://code.jquery.com/jquery-3.5.1.min.js"]},
+    "bootstrap4": {
+        "css": ["https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"],
+        "js": ["https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js",
+               "https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"]},
+    "font-awesome-5": {
+        "css": ["https://use.fontawesome.com/releases/v5.14.0/css/all.css"],
+        "js": []},
+    "bootstrap4-datatables": {
+        "css": ["https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css",
+                "https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css"],
+        "js": ["https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js",
+               "https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"]},
+    "jquery-ui": {"css": ["https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"],
+                  "js": ["https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"]},
+    "bootstrap4-tempusdominus": {
+        "css": ["https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css"],
+        "js": ["https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment-with-locales.min.js",
+               "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.js"]},
+    "decimal-js": {"css": [],
+                   "js": ["https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.2.0/decimal.min.js"]},
+    "period-chooser": {"css": ["mia_core/css/period-chooser.css"],
+                       "js": ["mia_core/js/period-chooser.js"]}
+}
+DEFAULT_LIBS = []
+
+
+class CssAndJavaScriptLibraries:
+    """The CSS and JavaScript library resolver."""
+    AVAILABLE_LIBS: List[str] = ["jquery", "bootstrap4", "font-awesome-5",
+                                 "bootstrap4-datatables", "jquery-ui",
+                                 "bootstrap4-tempusdominus", "decimal-js",
+                                 "i18n", "period-chooser"]
+
+    def __init__(self, *args):
+        self._use: Dict[str, bool] = {x: False for x in self.AVAILABLE_LIBS}
+        self._add_default_libs()
+        # The specified libraries
+        if len(args) > 0:
+            libs = args[0]
+            invalid = [x for x in libs if x not in self.AVAILABLE_LIBS]
+            if len(invalid) > 0:
+                raise NameError("library %s invalid" % ", ".join(invalid))
+            for lib in libs:
+                self._use[lib] = True
+        self._css = []
+        try:
+            self._css = self._css + settings.DEFAULT_CSS
+        except AttributeError:
+            pass
+        self._js = []
+        try:
+            self._css = self._css + settings.DEFAULT_JS
+        except AttributeError:
+            pass
+
+    def _add_default_libs(self):
+        """Adds the default libraries."""
+        invalid = [x for x in DEFAULT_LIBS if x not in self.AVAILABLE_LIBS]
+        if len(invalid) > 0:
+            raise NameError("library %s invalid" % ", ".join(invalid))
+        for lib in DEFAULT_LIBS:
+            self._use[lib] = True
+
+    def use(self, *args) -> None:
+        """Use the specific libraries.
+
+        Args:
+            args: The libraries.
+        """
+        if len(args) == 0:
+            return
+        libs = args[0]
+        invalid = [x for x in libs if x not in self.AVAILABLE_LIBS]
+        if len(invalid) > 0:
+            raise NameError("library %s invalid" % ", ".join(invalid))
+        for lib in libs:
+            self._use[lib] = True
+
+    def add_css(self, css) -> None:
+        """Adds a custom CSS file."""
+        self._css.append(css)
+
+    def add_js(self, js) -> None:
+        """Adds a custom JavaScript file."""
+        self._js.append(js)
+
+    def css(self) -> List[str]:
+        """Returns the stylesheet files to use."""
+        use: Dict[str, bool] = self._solve_use_depencies()
+        css = []
+        for lib in [x for x in self.AVAILABLE_LIBS if use[x]]:
+            if lib == "i18n":
+                continue
+            try:
+                css = css + settings.STATIC_LIBS[lib]["css"]
+            except AttributeError:
+                css = css + CDN_LIBRARIES[lib]["css"]
+            except TypeError:
+                css = css + CDN_LIBRARIES[lib]["css"]
+            except KeyError:
+                css = css + CDN_LIBRARIES[lib]["css"]
+        return css + self._css
+
+    def js(self) -> List[str]:
+        """Returns the JavaScript files to use."""
+        use: Dict[str, bool] = self._solve_use_depencies()
+        js = []
+        for lib in [x for x in self.AVAILABLE_LIBS if use[x]]:
+            if lib == "i18n":
+                js.append(reverse("javascript-catalog"))
+                continue
+            try:
+                js = js + settings.STATIC_LIBS[lib]["js"]
+            except AttributeError:
+                js = js + CDN_LIBRARIES[lib]["js"]
+            except TypeError:
+                js = js + CDN_LIBRARIES[lib]["js"]
+            except KeyError:
+                js = js + CDN_LIBRARIES[lib]["js"]
+        return js + self._js
+
+    def _solve_use_depencies(self) -> Dict[str, bool]:
+        """Solves and returns the library dependencies."""
+        use: Dict[str, bool] = {x: self._use[x] for x in self._use}
+        if use["period-chooser"]:
+            use["bootstrap4-tempusdominus"] = True
+        if use["bootstrap4-tempusdominus"]:
+            use["bootstrap4"] = True
+        if use["bootstrap4-datatables"]:
+            use["bootstrap4"] = True
+        if use["jquery-ui"]:
+            use["jquery"] = True
+        if use["bootstrap4"]:
+            use["jquery"] = True
+        return use
+
+
+def add_default_libs(*args) -> None:
+    """Adds the specified libraries to the default CSS and JavaScript
+    libraries.
+
+    Args:
+        args: The libraries to be added to the default libraries
+    """
+    libs = args
+    invalid = [x for x in libs
+               if x not in CssAndJavaScriptLibraries.AVAILABLE_LIBS]
+    if len(invalid) > 0:
+        raise NameError("library %s invalid" % ", ".join(invalid))
+    for lib in libs:
+        if lib not in DEFAULT_LIBS:
+            DEFAULT_LIBS.append(lib)

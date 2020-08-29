@@ -28,7 +28,7 @@ First written: 2020/8/7
 {% block settings %}
   {% trans "Accounts" context "Accounting" as text %}
   {% setvar "title" text %}
-  {% setvar "use_datatables" True %}
+  {% add_lib "bootstrap4-datatables" %}
   {% static "accounting/js/account-list.js" as file %}{% add_js file %}
 {% endblock %}
 
