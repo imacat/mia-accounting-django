@@ -105,6 +105,21 @@ def url_keep_return(context: RequestContext, url: str) -> str:
 
 
 @register.simple_tag(takes_context=True)
+def init_libs(context: RequestContext) -> str:
+    """Initializes the static libraries.
+
+    Args:
+        context: The request context.
+
+    Returns:
+        An empty string.
+    """
+    if "libs" not in context.dicts[0]:
+        context.dicts[0]["libs"] = CssAndJavaScriptLibraries()
+    return ""
+
+
+@register.simple_tag(takes_context=True)
 def add_lib(context: RequestContext, *args) -> str:
     """Adds CSS and JavaScript libraries.
 
