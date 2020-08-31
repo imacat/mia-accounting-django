@@ -289,6 +289,7 @@ function setRegularAccountSummary(regularAccounts)
  * Parses the summary and sets up the summary helper.
  *
  * @param {string} summary the summary
+ * @private
  */
 function parseSummaryForHelper(summary) {
     // Parses the summary and sets up the category helpers.
@@ -309,6 +310,7 @@ function parseSummaryForHelper(summary) {
  * Parses the summary and sets up the category helpers.
  *
  * @param {string} summary the summary
+ * @private
  */
 function parseSummaryForCategoryHelpers(summary) {
     $(".btn-summary-helper")
@@ -388,6 +390,7 @@ function switchSummaryTab(tab) {
  * Sets the known general category buttons.
  *
  * @param {string|null} category the general category
+ * @private
  */
 function setSummaryGeneralCategoryButtons(category) {
     $(".btn-summary-general-category").each(function () {
@@ -404,6 +407,7 @@ function setSummaryGeneralCategoryButtons(category) {
 /**
  * Sets the summary of a general category.
  *
+ * @private
  */
 function setGeneralCategorySummary() {
     const summary = $("#summary-summary").get(0);
@@ -421,6 +425,7 @@ function setGeneralCategorySummary() {
  * Sets the known travel category buttons.
  *
  * @param {string} category the travel category
+ * @private
  */
 function setSummaryTravelCategoryButtons(category) {
     $(".btn-summary-travel-category").each(function () {
@@ -437,6 +442,7 @@ function setSummaryTravelCategoryButtons(category) {
 /**
  * Sets the summary of a general travel.
  *
+ * @private
  */
 function setTravelSummary() {
     $(".summary-travel-part").each(function () {
@@ -461,6 +467,7 @@ function setTravelSummary() {
  * Sets the known summary travel direction buttons.
  *
  * @param {string} direction the known summary travel direction
+ * @private
  */
 function setSummaryTravelDirectionButtons(direction) {
     $(".btn-summary-travel-direction").each(function () {
@@ -478,6 +485,7 @@ function setSummaryTravelDirectionButtons(direction) {
  * Sets the known bus category buttons.
  *
  * @param {string} category the bus category
+ * @private
  */
 function setSummaryBusCategoryButtons(category) {
     $(".btn-summary-bus-category").each(function () {
@@ -494,6 +502,7 @@ function setSummaryBusCategoryButtons(category) {
 /**
  * Sets the summary of a bus travel.
  *
+ * @private
  */
 function setBusSummary() {
     $(".summary-bus-part").each(function () {
@@ -518,6 +527,7 @@ function setBusSummary() {
  * Sets the regular account buttons.
  *
  * @param {string} category the regular account
+ * @private
  */
 function setSummaryRegularAccountButtons(category) {
     $(".btn-summary-regular").each(function () {
@@ -537,6 +547,7 @@ function setSummaryRegularAccountButtons(category) {
  * @param {string} format the category format, either "general",
  *                        "travel", or "bus".
  * @param {string|null} category the category
+ * @private
  */
 function setSummaryAccount(format, category) {
     const recordId = $("#summary-record").get(0).value;
