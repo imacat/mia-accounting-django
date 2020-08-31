@@ -19,6 +19,7 @@
 
 """
 import datetime
+import getpass
 import random
 from typing import Optional
 
@@ -75,8 +76,14 @@ class Command(BaseCommand):
         elif user_model.objects.count() == 1:
             user = user_model.objects.first()
         else:
-            error = "Please specify the user with -u."
-            raise CommandError(error, returncode=1)
+            try:
+                user = user_model.objects.get(**{
+                    user_model.USERNAME_FIELD: getpass.getuser()
+                })
+            except ObjectDoesNotExist:
+                error = "Please specify the user with -u."
+                raise CommandError(error, returncode=1)
+        self.stdout.write(F"Filling sample data as \"{user}\"")
 
         with transaction.atomic():
             self._filler = DataFiller(user)
