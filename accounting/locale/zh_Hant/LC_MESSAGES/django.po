@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-accounting 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-27 23:04+0800\n"
-"PO-Revision-Date: 2020-08-27 23:07+0800\n"
+"POT-Creation-Date: 2020-08-31 09:53+0800\n"
+"PO-Revision-Date: 2020-08-31 09:58+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -195,22 +195,22 @@ msgstr "勞保{month}"
 msgid "Health insurance for {month}"
 msgstr "健保{month}"
 
-#: accounting/management/commands/accounting_sample.py:246
+#: accounting/management/commands/accounting_sample.py:247
 msgid "Income Tax"
 msgstr "代扣所得稅"
 
-#: accounting/management/commands/accounting_sample.py:247
+#: accounting/management/commands/accounting_sample.py:248
 #, python-brace-format
 msgid "Payroll for {month}"
 msgstr "{month}份薪水"
 
 #: accounting/templates/accounting/account_detail.html:37
 #: accounting/templates/accounting/transaction_expense_detail.html:39
-#: accounting/templates/accounting/transaction_expense_form.html:47
+#: accounting/templates/accounting/transaction_expense_form.html:45
 #: accounting/templates/accounting/transaction_income_detail.html:39
-#: accounting/templates/accounting/transaction_income_form.html:47
+#: accounting/templates/accounting/transaction_income_form.html:45
 #: accounting/templates/accounting/transaction_transfer_detail.html:39
-#: accounting/templates/accounting/transaction_transfer_form.html:47
+#: accounting/templates/accounting/transaction_transfer_form.html:45
 msgid "Error:"
 msgstr "錯誤："
 
@@ -246,12 +246,12 @@ msgstr "取消"
 #: accounting/templates/accounting/account_detail.html:71
 #: accounting/templates/accounting/account_form.html:42
 #: accounting/templates/accounting/transaction_expense_detail.html:73
-#: accounting/templates/accounting/transaction_expense_form.html:54
+#: accounting/templates/accounting/transaction_expense_form.html:52
 #: accounting/templates/accounting/transaction_income_detail.html:73
-#: accounting/templates/accounting/transaction_income_form.html:54
+#: accounting/templates/accounting/transaction_income_form.html:52
 #: accounting/templates/accounting/transaction_sort_form.html:43
 #: accounting/templates/accounting/transaction_transfer_detail.html:73
-#: accounting/templates/accounting/transaction_transfer_form.html:54
+#: accounting/templates/accounting/transaction_transfer_form.html:52
 msgid "Back"
 msgstr "回上頁"
 
@@ -274,7 +274,7 @@ msgid "Ledger"
 msgstr "分類帳"
 
 #: accounting/templates/accounting/account_detail.html:107
-#: accounting/views.py:1028
+#: accounting/views.py:1076
 msgid "This account is in use."
 msgstr "會計科目使用中。"
 
@@ -347,10 +347,10 @@ msgid "Add a New Account"
 msgstr "建新會計科目"
 
 #: accounting/templates/accounting/account_form.html:81
-#: accounting/templates/accounting/transaction_expense_form.html:117
-#: accounting/templates/accounting/transaction_income_form.html:116
+#: accounting/templates/accounting/transaction_expense_form.html:116
+#: accounting/templates/accounting/transaction_income_form.html:115
 #: accounting/templates/accounting/transaction_sort_form.html:137
-#: accounting/templates/accounting/transaction_transfer_form.html:149
+#: accounting/templates/accounting/transaction_transfer_form.html:148
 msgid "Save"
 msgstr "儲存"
 
@@ -626,18 +626,18 @@ msgstr "期間"
 #: accounting/templates/accounting/report-trial-balance.html:146
 #: accounting/templates/accounting/transaction_expense_detail.html:146
 #: accounting/templates/accounting/transaction_expense_detail.html:164
-#: accounting/templates/accounting/transaction_expense_form.html:95
+#: accounting/templates/accounting/transaction_expense_form.html:94
 #: accounting/templates/accounting/transaction_income_detail.html:146
 #: accounting/templates/accounting/transaction_income_detail.html:164
-#: accounting/templates/accounting/transaction_income_form.html:94
+#: accounting/templates/accounting/transaction_income_form.html:93
 #: accounting/templates/accounting/transaction_transfer_detail.html:142
 #: accounting/templates/accounting/transaction_transfer_detail.html:160
 #: accounting/templates/accounting/transaction_transfer_detail.html:189
 #: accounting/templates/accounting/transaction_transfer_detail.html:207
-#: accounting/templates/accounting/transaction_transfer_form.html:96
-#: accounting/templates/accounting/transaction_transfer_form.html:126
-#: accounting/views.py:132 accounting/views.py:241 accounting/views.py:381
-#: accounting/views.py:568
+#: accounting/templates/accounting/transaction_transfer_form.html:95
+#: accounting/templates/accounting/transaction_transfer_form.html:125
+#: accounting/views.py:135 accounting/views.py:244 accounting/views.py:384
+#: accounting/views.py:571
 msgid "Total"
 msgstr "合計"
 
@@ -756,7 +756,7 @@ msgstr "%(prep_period)s的日記簿"
 #: accounting/templates/accounting/report-trial-balance.html:84
 #: accounting/templates/accounting/search.html:78
 #: accounting/templates/accounting/transaction_transfer_detail.html:121
-#: accounting/templates/accounting/transaction_transfer_form.html:75
+#: accounting/templates/accounting/transaction_transfer_form.html:74
 msgid "Debit"
 msgstr "借方"
 
@@ -766,7 +766,7 @@ msgstr "借方"
 #: accounting/templates/accounting/report-trial-balance.html:85
 #: accounting/templates/accounting/search.html:79
 #: accounting/templates/accounting/transaction_transfer_detail.html:168
-#: accounting/templates/accounting/transaction_transfer_form.html:105
+#: accounting/templates/accounting/transaction_transfer_form.html:104
 msgid "Credit"
 msgstr "貸方"
 
@@ -864,12 +864,12 @@ msgid "To Transfer"
 msgstr "改轉帳"
 
 #: accounting/templates/accounting/transaction_expense_detail.html:123
-#: accounting/templates/accounting/transaction_expense_form.html:65
+#: accounting/templates/accounting/transaction_expense_form.html:64
 #: accounting/templates/accounting/transaction_income_detail.html:123
-#: accounting/templates/accounting/transaction_income_form.html:65
+#: accounting/templates/accounting/transaction_income_form.html:64
 #: accounting/templates/accounting/transaction_sort_form.html:49
 #: accounting/templates/accounting/transaction_transfer_detail.html:115
-#: accounting/templates/accounting/transaction_transfer_form.html:65
+#: accounting/templates/accounting/transaction_transfer_form.html:64
 msgid "Date:"
 msgstr "日期："
 
@@ -881,11 +881,11 @@ msgid "$"
 msgstr "$"
 
 #: accounting/templates/accounting/transaction_expense_detail.html:172
-#: accounting/templates/accounting/transaction_expense_form.html:105
+#: accounting/templates/accounting/transaction_expense_form.html:104
 #: accounting/templates/accounting/transaction_income_detail.html:172
-#: accounting/templates/accounting/transaction_income_form.html:104
+#: accounting/templates/accounting/transaction_income_form.html:103
 #: accounting/templates/accounting/transaction_transfer_detail.html:217
-#: accounting/templates/accounting/transaction_transfer_form.html:137
+#: accounting/templates/accounting/transaction_transfer_form.html:136
 msgid "Notes:"
 msgstr "註記："
 
@@ -940,62 +940,119 @@ msgstr "沒有這個會計科目。"
 msgid "You cannot select a parent account."
 msgstr "請勿選擇上層會計科目。"
 
-#: accounting/views.py:308
+#: accounting/views.py:311
 msgid "Brought Forward"
 msgstr "上期結轉"
 
-#: accounting/views.py:622
+#: accounting/views.py:625
 msgid "Gross Income"
 msgstr "營業毛利"
 
-#: accounting/views.py:623
+#: accounting/views.py:626
 msgid "Operating Income"
 msgstr "營業淨利"
 
-#: accounting/views.py:624
+#: accounting/views.py:627
 msgid "Before Tax Income"
 msgstr "稅前淨利"
 
-#: accounting/views.py:625
+#: accounting/views.py:628
 msgid "After Tax Income"
 msgstr "稅後淨利"
 
-#: accounting/views.py:802
+#: accounting/views.py:805
 msgid "This transaction was not modified."
 msgstr "會計傳票未異動。"
 
-#: accounting/views.py:803
+#: accounting/views.py:806
 msgid "This transaction was saved successfully."
 msgstr "會計傳票已存檔。"
 
-#: accounting/views.py:910
+#: accounting/views.py:809
+msgid "Pension"
+msgstr "國民年金"
+
+#: accounting/views.py:809
+msgid "Pension for (last_month_name)"
+msgstr "國民年金(last_month_no)月"
+
+#: accounting/views.py:811
+msgid "Health insurance"
+msgstr "健保"
+
+#: accounting/views.py:812
+msgid "Health insurance for (last_month_name)"
+msgstr "健保(last_month_no)月"
+
+#: accounting/views.py:813
+msgid "Electricity bill"
+msgstr "電費"
+
+#: accounting/views.py:814
+msgid ""
+"Electricity bill for (last_bimonthly_from_name)-(last_bimonthly_to_name)"
+msgstr "電費(last_bimonthly_from_no)–(last_bimonthly_to_no)月"
+
+#: accounting/views.py:817
+msgid "Water bill"
+msgstr "水費"
+
+#: accounting/views.py:818
+msgid "Water bill for (last_bimonthly_from_name)-(last_bimonthly_to_name)"
+msgstr "水費(last_bimonthly_from_no)–(last_bimonthly_to_no)月"
+
+#: accounting/views.py:821
+msgid "Gas bill"
+msgstr "瓦斯費"
+
+#: accounting/views.py:822
+msgid "Gas bill for (last_bimonthly_from_name)-(last_bimonthly_to_name)"
+msgstr "瓦斯費(last_bimonthly_from_no)–(last_bimonthly_to_no)月"
+
+#: accounting/views.py:825
+msgid "Phone bill"
+msgstr "電話費"
+
+#: accounting/views.py:826
+msgid "Phone bill for (last_month_name)"
+msgstr "電話費(last_month_no)月"
+
+#: accounting/views.py:830
+msgid "Payroll"
+msgstr "薪水"
+
+#: accounting/views.py:830
+msgid "Payroll for (last_month_name)"
+msgstr "(last_month_no)月份薪水"
+
+#: accounting/views.py:958
 msgid "This transaction was deleted successfully."
 msgstr "會計傳票已刪除。"
 
-#: accounting/views.py:926
+#: accounting/views.py:974
 msgid "The transaction orders were not modified."
 msgstr "會計傳票次序未異動。"
 
-#: accounting/views.py:928
+#: accounting/views.py:976
 msgid "The transaction orders were saved successfully."
 msgstr "會計傳票次序已儲存。"
 
-#: accounting/views.py:987
+#: accounting/views.py:1035
 msgid "This account was not modified."
 msgstr "會計科目未異動。"
 
-#: accounting/views.py:988
+#: accounting/views.py:1036
 msgid "This account was saved successfully."
 msgstr "會計科目已存檔。"
 
-#: accounting/views.py:1032
+#: accounting/views.py:1080
 msgid "This account was deleted successfully."
 msgstr "會計科目已刪除。"
 
-#: accounting/views.py:1073
+#: accounting/views.py:1121
 msgid "---Accounts In Use---"
 msgstr "-----使用中科目-----"
 
-#: accounting/views.py:1078
+#: accounting/views.py:1126
 msgid "---Accounts Not In Use---"
 msgstr "-----未使用科目-----"

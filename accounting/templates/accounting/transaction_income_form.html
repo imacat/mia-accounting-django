@@ -32,7 +32,6 @@ First written: 2020/7/23
   {% static "accounting/css/transactions.css" as file %}{% add_css file %}
   {% static "accounting/css/summary-helper.css" as file %}{% add_css file %}
   {% static "accounting/js/transaction-form.js" as file %}{% add_js file %}
-  {% static "js/regular-payments.js" as file %}{% add_js file %}
   {% static "accounting/js/summary-helper.js" as file %}{% add_js file %}
 {% endblock %}
 
@@ -56,6 +55,7 @@ First written: 2020/7/23
 
 <input id="account-option-url" type="hidden" value="{% url "accounting:api.accounts.options" %}" />
 <input id="summary-categories" type="hidden" value="{{ summary_categories }}" />
+<input id="regular-accounts" type="hidden" value="{{ regular_accounts }}" />
 <input id="new-record-template" type="hidden" value="{{ new_record_template }}" />
 <form id="txn-form" action="{% if form.transaction %}{% url "accounting:transactions.update" "income" form.transaction as url %}{% url_keep_return url %}{% else %}{% url "accounting:transactions.create" "income" as url %}{% url_keep_return url %}{% endif %}" method="post">
   {% csrf_token %}

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-accounting-js 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-09 21:54+0800\n"
-"PO-Revision-Date: 2020-08-11 10:14+0800\n"
+"POT-Creation-Date: 2020-08-31 09:42+0800\n"
+"PO-Revision-Date: 2020-08-31 09:58+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -52,6 +52,54 @@ msgstr "子科目的代碼會太長（最長5位數字）。"
 #: accounting/static/accounting/js/account-form.js:183
 msgid "Please fill in the title."
 msgstr "請填寫標題。"
+
+#: accounting/static/accounting/js/summary-helper.js:254
+msgid "January"
+msgstr "一月"
+
+#: accounting/static/accounting/js/summary-helper.js:255
+msgid "February"
+msgstr "二月"
+
+#: accounting/static/accounting/js/summary-helper.js:256
+msgid "March"
+msgstr "三月"
+
+#: accounting/static/accounting/js/summary-helper.js:257
+msgid "April"
+msgstr "四月"
+
+#: accounting/static/accounting/js/summary-helper.js:258
+msgid "May"
+msgstr "五月"
+
+#: accounting/static/accounting/js/summary-helper.js:259
+msgid "June"
+msgstr "六月"
+
+#: accounting/static/accounting/js/summary-helper.js:260
+msgid "July"
+msgstr "七月"
+
+#: accounting/static/accounting/js/summary-helper.js:261
+msgid "August"
+msgstr "八月"
+
+#: accounting/static/accounting/js/summary-helper.js:262
+msgid "September"
+msgstr "九月"
+
+#: accounting/static/accounting/js/summary-helper.js:263
+msgid "October"
+msgstr "十月"
+
+#: accounting/static/accounting/js/summary-helper.js:264
+msgid "November"
+msgstr "十一月"
+
+#: accounting/static/accounting/js/summary-helper.js:265
+msgid "December"
+msgstr "十二月"
 
 #: accounting/static/accounting/js/transaction-form.js:376
 msgid "Please fill in the date."

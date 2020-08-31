@@ -178,27 +178,8 @@ function loadKnownSummaryCategories(type) {
         });
     });
 
-    // The regular payments
-    const regularPayments = getRegularPayments();
-    ["debit", "credit"].forEach(function (type) {
-        summaryCategories[type].regular = [];
-        summaryAccounts[type].regular = {};
-        regularPayments[type].forEach(function (item) {
-            summaryCategories[type].regular.push(item);
-            summaryAccounts[type].regular[item.title] = item.account;
-        });
-    });
-    const regularPaymentButtons = $("#summary-regular-payments");
-    regularPaymentButtons.html("");
-    summaryCategories[type].regular.forEach(function (item) {
-        regularPaymentButtons.append(
-            $("<span/>")
-                .attr("title", item.summary)
-                .addClass("btn btn-outline-primary")
-                .addClass("btn-summary-helper")
-                .addClass("btn-summary-regular")
-                .text(item.title));
-    });
+    // The regular accounts
+    loadRegularAccounts(type);
 
     $(".btn-summary-general-category")
         .on("click", function () {
@@ -221,13 +202,88 @@ function loadKnownSummaryCategories(type) {
             setBusSummary();
             setSummaryAccount("bus", this.innerText);
         });
+}
+
+/**
+ * Loads the regular accounts.
+ *
+ * @param {string} type the record type
+ * @private
+ */
+function loadRegularAccounts(type) {
+    const regularAccounts = JSON.parse(document.getElementById("regular-accounts").value);
+    setRegularAccountSummary(regularAccounts);
+    Object.keys(regularAccounts).forEach(function (type) {
+        summaryCategories[type].regular = [];
+        summaryAccounts[type].regular = {};
+        regularAccounts[type].forEach(function (item) {
+            summaryCategories[type].regular.push(item);
+            summaryAccounts[type].regular[item.title] = item.account;
+        });
+        console.log(summaryAccounts[type].regular);
+    });
+    const regularAccountButtons = $("#summary-regular-accounts");
+    regularAccountButtons.html("");
+    summaryCategories[type].regular.forEach(function (item) {
+        regularAccountButtons.append(
+            $("<span/>")
+                .attr("title", item.summary)
+                .addClass("btn btn-outline-primary")
+                .addClass("btn-summary-helper")
+                .addClass("btn-summary-regular")
+                .text(item.title));
+    });
     $(".btn-summary-regular")
         .on("click", function () {
             $("#summary-summary").get(0).value = this.title;
-            setSummaryRegularPaymentButtons(this.innerText);
+            setSummaryRegularAccountButtons(this.innerText);
             setSummaryAccount("regular", this.innerText);
         });
 }
+
+/**
+ * Sets the summary of the regular accounts according to the date
+ *
+ * @param {{}} regularAccounts the regular account data
+ * @private
+ */
+function setRegularAccountSummary(regularAccounts)
+{
+    const monthNames = [
+        "",
+        gettext("January"),
+        gettext("February"),
+        gettext("March"),
+        gettext("April"),
+        gettext("May"),
+        gettext("June"),
+        gettext("July"),
+        gettext("August"),
+        gettext("September"),
+        gettext("October"),
+        gettext("November"),
+        gettext("December"),
+    ];
+    const today = new Date($("#txn-date").get(0).value);
+    const thisMonth = today.getMonth() + 1;
+    const lastMonth = (thisMonth + 10) % 12 + 1;
+    const lastBimonthlyFrom = ((thisMonth + thisMonth % 2 + 8) % 12 + 1);
+    const lastBimonthlyTo = ((thisMonth + thisMonth % 2 + 9) % 12 + 1);
+    Object.keys(regularAccounts).forEach(function (type) {
+        regularAccounts[type].forEach(function (item) {
+            item.summary = item.format
+                .replaceAll("(month_no)", String(thisMonth))
+                .replaceAll("(month_name)", monthNames[thisMonth])
+                .replaceAll("(last_month_no)", String(lastMonth))
+                .replaceAll("(last_month_name)", monthNames[lastMonth])
+                .replaceAll("(last_bimonthly_from_no)", String(lastBimonthlyFrom))
+                .replaceAll("(last_bimonthly_from_name)", monthNames[lastBimonthlyFrom])
+                .replaceAll("(last_bimonthly_to_no)", String(lastBimonthlyTo))
+                .replaceAll("(last_bimonthly_to_name)", monthNames[lastBimonthlyTo]);
+        });
+    });
+}
+
 
 /**
  * Parses the summary and sets up the summary helper.
@@ -459,11 +515,11 @@ function setBusSummary() {
 }
 
 /**
- * Sets the regular payment buttons.
+ * Sets the regular account buttons.
  *
- * @param {string} category the regular payment
+ * @param {string} category the regular account
  */
-function setSummaryRegularPaymentButtons(category) {
+function setSummaryRegularAccountButtons(category) {
     $(".btn-summary-regular").each(function () {
         if (this.innerText === category) {
             this.classList.remove("btn-outline-primary");

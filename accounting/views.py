@@ -20,8 +20,9 @@
 """
 import json
 import re
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Tuple
 
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
@@ -34,7 +35,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _, gettext_noop
+from django.utils.translation import gettext as _, gettext_noop, gettext
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import ListView, DetailView
 
@@ -803,11 +804,42 @@ class TransactionFormView(FormView):
     form_class = TransactionForm
     not_modified_message = gettext_noop("This transaction was not modified.")
     success_message = gettext_noop("This transaction was saved successfully.")
+    DEFAULT_REGULAR_ACCOUNTS = {
+        "debit": [
+            (gettext_noop("Pension"),
+             gettext_noop("Pension for (last_month_name)"),
+             "1314"),
+            (gettext_noop("Health insurance"),
+             gettext_noop("Health insurance for (last_month_name)"),
+             "6262"),
+            (gettext_noop("Electricity bill"),
+             gettext_noop("Electricity bill for (last_bimonthly_from_name)"
+                          "-(last_bimonthly_to_name)"),
+             "6261"),
+            (gettext_noop("Water bill"),
+             gettext_noop("Water bill for (last_bimonthly_from_name)"
+                          "-(last_bimonthly_to_name)"),
+             "6261"),
+            (gettext_noop("Gas bill"),
+             gettext_noop("Gas bill for (last_bimonthly_from_name)"
+                          "-(last_bimonthly_to_name)"),
+             "6261"),
+            (gettext_noop("Phone bill"),
+             gettext_noop("Phone bill for (last_month_name)"),
+             "6261"),
+        ],
+        "credit": [
+            (gettext_noop("Payroll"),
+             gettext_noop("Payroll for (last_month_name)"),
+             "4611"),
+        ],
+    }
 
     def get_context_data(self, **kwargs):
         """Returns the context data for the template."""
         context = super().get_context_data(**kwargs)
         context["summary_categories"] = self._get_summary_categories()
+        context["regular_accounts"] = self._get_regular_accounts()
         context["new_record_template"] = self._get_new_record_template_json()
         return context
 
@@ -863,6 +895,28 @@ class TransactionFormView(FormView):
         # Converts the dictionary to a list, as the category may not be
         # US-ASCII
         return json.dumps(categories)
+
+    @staticmethod
+    def _get_regular_accounts() -> str:
+        """Returns the regular account data, as JSON.
+
+        Returns:
+            Two lists of the (title, format pattern, account code) tuple, sorted by
+            debit or credit.
+        """
+        try:
+            regular = settings.REGULAR_ACCOUNTS
+            regular = {t: [{"title": x[0],
+                            "format": x[1],
+                            "account": x[2]} for x in regular[t]]
+                       for t in regular}
+        except AttributeError:
+            regular = TransactionFormView.DEFAULT_REGULAR_ACCOUNTS
+            regular = {t: [{"title": gettext(x[0]),
+                            "format": gettext(x[1]),
+                            "account": x[2]} for x in regular[t]]
+                       for t in regular}
+        return json.dumps(regular)
 
     def _get_new_record_template_json(self) -> str:
         context = {"record_type": "TTT", "no": "NNN"}
