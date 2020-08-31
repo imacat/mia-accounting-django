@@ -21,6 +21,20 @@
  * First written: 2019/9/12
  */
 
+/* The report tables */
+.table .amount {
+    text-align: right;
+}
+.table td.amount {
+    font-style: italic;
+}
+.table .actions {
+    text-align: center;
+}
+.table .actions .btn {
+    white-space: nowrap;
+}
+
 /* The list view for small screens*/
 .account-picker {
     height: auto;
