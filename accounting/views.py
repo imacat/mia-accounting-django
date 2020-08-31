@@ -98,7 +98,7 @@ def cash(request: HttpRequest, account: Account,
                 (Q(account__code__startswith="11") |
                  Q(account__code__startswith="12") |
                  Q(account__code__startswith="21") |
-                 Q(account__code__startswith="21"))) \
+                 Q(account__code__startswith="22"))) \
             .aggregate(
                 balance=Coalesce(Sum(Case(
                     When(is_credit=True, then=-1),
