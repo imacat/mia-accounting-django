@@ -20,7 +20,7 @@
 """
 import json
 import re
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional
 
 from django.conf import settings
 from django.contrib import messages
