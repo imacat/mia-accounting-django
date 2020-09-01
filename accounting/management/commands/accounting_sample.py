@@ -94,7 +94,7 @@ class Command(BaseCommand):
 
             self._filler.add_expense_transaction(
                 -13,
-                [(6273, _("Bus—2623—Uptown→City Park"), 477543627.4775)])
+                [(6273, _("Bus—2623—Uptown→City Park"), 15.5)])
 
             self._filler.add_expense_transaction(
                 -2,
