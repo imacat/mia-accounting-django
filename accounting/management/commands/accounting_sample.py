@@ -25,7 +25,8 @@ from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.management import BaseCommand, CommandParser, CommandError
+from django.core.management import BaseCommand, CommandParser, CommandError, \
+    call_command
 from django.db import transaction
 from django.utils import timezone, formats
 from django.utils.translation import gettext as _
@@ -57,14 +58,14 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
-        if Account.objects.count() == 0:
-            error = "Please run the \"accounting_accounts\" command first."
-            raise CommandError(error, returncode=1)
         if Record.objects.count() > 0:
             error = "Refuse to fill in sample data with existing data."
             raise CommandError(error, returncode=1)
         # Gets the user to use
         user = self.get_user(options["user"])
+        if Account.objects.count() == 0:
+            username = getattr(user, user.USERNAME_FIELD)
+            call_command("accounting_accounts", F"-u={username}")
         self.stdout.write(F"Filling sample data as \"{user}\"")
 
         with transaction.atomic():
