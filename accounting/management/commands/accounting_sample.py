@@ -30,7 +30,7 @@ from django.db import transaction
 from django.utils import timezone, formats
 from django.utils.translation import gettext as _
 
-from accounting.models import Account
+from accounting.models import Account, Record
 from accounting.utils import DataFiller
 
 
@@ -57,100 +57,18 @@ class Command(BaseCommand):
             *args (list[str]): The command line arguments.
             **options (dict[str,str]): The command line switches.
         """
-        if Account.objects.count() > 0:
+        if Account.objects.count() == 0:
+            error = "Please run the \"accounting_accounts\" command first."
+            raise CommandError(error, returncode=1)
+        if Record.objects.count() > 0:
             error = "Refuse to fill in sample data with existing data."
             raise CommandError(error, returncode=1)
         # Gets the user to use
-        user_model = get_user_model()
-        if options["user"] is not None:
-            try:
-                user = user_model.objects.get(**{
-                    user_model.USERNAME_FIELD: options["user"]
-                })
-            except ObjectDoesNotExist:
-                error = "User \"%s\" does not exist." % options["user"]
-                raise CommandError(error, returncode=1)
-        elif user_model.objects.count() == 0:
-            error = "Please run the \"createsuperuser\" command first."
-            raise CommandError(error, returncode=1)
-        elif user_model.objects.count() == 1:
-            user = user_model.objects.first()
-        else:
-            try:
-                user = user_model.objects.get(**{
-                    user_model.USERNAME_FIELD: getpass.getuser()
-                })
-            except ObjectDoesNotExist:
-                error = "Please specify the user with -u."
-                raise CommandError(error, returncode=1)
+        user = self.get_user(options["user"])
         self.stdout.write(F"Filling sample data as \"{user}\"")
 
         with transaction.atomic():
             self._filler = DataFiller(user)
-            self._filler.add_accounts([
-                (1, "assets", "資產", "资产"),
-                (2, "liabilities", "負債", "负债"),
-                (3, "owners’ equity", "業主權益", "业主权益"),
-                (4, "operating revenue", "營業收入", "营业收入"),
-                (5, "operating costs", "營業成本", "营业成本"),
-                (6, "operating expenses", "營業費用", "营业费用"),
-                (7,
-                 "non-operating revenue and expenses, other income (expense)",
-                 "營業外收入及費用", "营业外收入及费用"),
-                (8, "income tax expense (or benefit)", "所得稅費用(或利益)",
-                 "所得税费用(或利益)"),
-                (9, "nonrecurring gain or loss", "非經常營業損益",
-                 "非经常营业损益"),
-
-                (11, "current assets", "流動資產", "流动资产"),
-                (111, "cash and cash equivalents", "現金及約當現金",
-                 "现金及约当现金"),
-                (1111, "petty cash/revolving funds", "庫存現金", "库存现金"),
-                (1112, "cash on hand", "零用金/週轉金", "零用金/周转金"),
-                (1113, "cash in banks", "銀行存款", "银行存款"),
-                (12, "current assets", "流動資產", "流动资产"),
-                (125, "prepaid expenses", "預付費用", "预付费用"),
-                (1255, "prepaid income tax", "預付所得稅", "预付所得税"),
-                (13, "funds and long-term investments", "基金及長期投資",
-                 "基金及长期投资"),
-                (131, "funds", "基金", "基金"),
-                (1314, "pension fund", "退休基金", "退休基金"),
-                (14, "property , plant, and equipment", "固定資產", "固定资产"),
-                (144, "machinery and equipment", "機(器)具及設備",
-                 "机(器)具及设备"),
-                (1441, "machinery", "機(器)具", "机(器)具"),
-
-                (21, "current liabilities", "流動負債", "流动负债"),
-                (214, "accounts payable", "應付帳款", "应付帐款"),
-                (2141, "accounts payable", "應付帳款", "应付帐款"),
-
-                (33, "retained earnings (accumulated deficit)",
-                 "保留盈餘(或累積虧損)", "保留盈余(或累积亏损)"),
-                (335,
-                 "retained earnings-unappropriated (or accumulated deficit)",
-                 "未分配盈餘(或累積虧損)", "未分配盈余(或累积亏损)"),
-                (3351, "accumulated profit or loss", "累積盈虧", "累积盈亏"),
-                (3353, "net income or loss for current period", "本期損益",
-                 "本期损益"),
-
-                (46, "service revenue", "勞務收入", "劳务收入"),
-                (461, "service revenue", "勞務收入", "劳务收入"),
-                (4611, "service revenue", "勞務收入", "劳务收入"),
-
-                (62, "general & administrative expenses", "管理及總務費用",
-                 "管理及总务费用"),
-                (625, "general & administrative expenses", "管理及總務費用",
-                 "管理及总务费用"),
-                (6254, "travelling expense, travel", "旅費", "旅费"),
-                (626, "general & administrative expenses", "管理及總務費用",
-                 "管理及总务费用"),
-                (6262, "insurance (expense)", "保險費", "保险费"),
-                (627, "general & administrative expenses", "管理及總務費用",
-                 "管理及总务费用"),
-                (6272, "meal (expenses)", "伙食費", "伙食费"),
-                (6273, "employee benefits/welfare", "職工福利", "职工福利"),
-            ])
-
             self.add_payrolls(5)
 
             self._filler.add_income_transaction(
@@ -193,6 +111,38 @@ class Command(BaseCommand):
                 0,
                 [(6272, _("Lunch—Salad"), random.randint(40, 200)),
                  (6272, _("Drink—Coffee"), random.randint(40, 200))])
+
+    @staticmethod
+    def get_user(username_option):
+        """Returns the current user.
+
+        Args:
+            username_option: The username specified in the options.
+
+        Returns:
+            The current user.
+        """
+        user_model = get_user_model()
+        if username_option is not None:
+            try:
+                return user_model.objects.get(**{
+                    user_model.USERNAME_FIELD: username_option
+                })
+            except ObjectDoesNotExist:
+                error = F"User \"{username_option}\" does not exist."
+                raise CommandError(error, returncode=1)
+        if user_model.objects.count() == 0:
+            error = "Please run the \"createsuperuser\" command first."
+            raise CommandError(error, returncode=1)
+        if user_model.objects.count() == 1:
+            return user_model.objects.first()
+        try:
+            return user_model.objects.get(**{
+                user_model.USERNAME_FIELD: getpass.getuser()
+            })
+        except ObjectDoesNotExist:
+            error = "Please specify the user with -u."
+            raise CommandError(error, returncode=1)
 
     def add_payrolls(self, months: int):
         """Adds the payrolls for certain number of months.
