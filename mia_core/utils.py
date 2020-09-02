@@ -442,27 +442,43 @@ class PaginationException(Exception):
 
 
 CDN_LIBRARIES = {
-    "jquery": {"css": [], "js": ["https://code.jquery.com/jquery-3.5.1.min.js"]},
+    "jquery": {"css": [],
+               "js": ["https://code.jquery.com/jquery-3.5.1.min.js"]},
     "bootstrap4": {
-        "css": ["https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"],
-        "js": ["https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js",
-               "https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"]},
+        "css": [("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/"
+                 "bootstrap.min.css")],
+        "js": [("https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/"
+                "popper.min.js"),
+               ("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/"
+                "bootstrap.min.js")]},
     "font-awesome-5": {
         "css": ["https://use.fontawesome.com/releases/v5.14.0/css/all.css"],
         "js": []},
     "bootstrap4-datatables": {
-        "css": ["https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css",
-                "https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css"],
-        "js": ["https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js",
-               "https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"]},
-    "jquery-ui": {"css": ["https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"],
-                  "js": ["https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"]},
+        "css": [("https://cdn.datatables.net/1.10.21/css/"
+                 "jquery.dataTables.min.css"),
+                ("https://cdn.datatables.net/1.10.21/css/"
+                 "dataTables.bootstrap4.min.css")],
+        "js": [("https://cdn.datatables.net/1.10.21/js/"
+                "jquery.dataTables.min.js"),
+               ("https://cdn.datatables.net/1.10.21/js/"
+                "dataTables.bootstrap4.min.js")]},
+    "jquery-ui": {"css": [("https://cdnjs.cloudflare.com/ajax/libs/jqueryui/"
+                           "1.12.1/jquery-ui.min.css")],
+                  "js": [("https://cdnjs.cloudflare.com/ajax/libs/jqueryui/"
+                          "1.12.1/jquery-ui.min.js")]},
     "bootstrap4-tempusdominus": {
-        "css": ["https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css"],
-        "js": ["https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment-with-locales.min.js",
-               "https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.js"]},
+        "css": [("https://cdnjs.cloudflare.com/ajax/libs/"
+                 "tempusdominus-bootstrap-4/5.1.2/css/"
+                 "tempusdominus-bootstrap-4.min.css")],
+        "js": [("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/"
+                "moment-with-locales.min.js"),
+               ("https://cdnjs.cloudflare.com/ajax/libs/"
+                "tempusdominus-bootstrap-4/5.1.2/js/"
+                "tempusdominus-bootstrap-4.js")]},
     "decimal-js": {"css": [],
-                   "js": ["https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.2.0/decimal.min.js"]},
+                   "js": [("https://cdnjs.cloudflare.com/ajax/libs/decimal.js/"
+                           "10.2.0/decimal.min.js")]},
     "period-chooser": {"css": ["mia_core/css/period-chooser.css"],
                        "js": ["mia_core/js/period-chooser.js"]}
 }
