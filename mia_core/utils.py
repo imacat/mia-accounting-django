@@ -20,7 +20,7 @@
 """
 import random
 import urllib.parse
-from typing import Dict, List, Any, Type, Tuple
+from typing import Dict, List, Any, Type
 
 from django.conf import settings
 from django.db.models import Model
