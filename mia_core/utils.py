@@ -547,7 +547,7 @@ class CssAndJavaScriptLibraries:
 
     def css(self) -> List[str]:
         """Returns the stylesheet files to use."""
-        use: Dict[str, bool] = self._solve_use_depencies()
+        use: Dict[str, bool] = self._solve_use_dependencies()
         css = []
         for lib in [x for x in self.AVAILABLE_LIBS if use[x]]:
             if lib == "i18n":
@@ -564,7 +564,7 @@ class CssAndJavaScriptLibraries:
 
     def js(self) -> List[str]:
         """Returns the JavaScript files to use."""
-        use: Dict[str, bool] = self._solve_use_depencies()
+        use: Dict[str, bool] = self._solve_use_dependencies()
         js = []
         for lib in [x for x in self.AVAILABLE_LIBS if use[x]]:
             if lib == "i18n":
@@ -580,7 +580,7 @@ class CssAndJavaScriptLibraries:
                 js = js + CDN_LIBRARIES[lib]["js"]
         return js + self._js
 
-    def _solve_use_depencies(self) -> Dict[str, bool]:
+    def _solve_use_dependencies(self) -> Dict[str, bool]:
         """Solves and returns the library dependencies."""
         use: Dict[str, bool] = {x: self._use[x] for x in self._use}
         if use["period-chooser"]:
