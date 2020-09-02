@@ -23,7 +23,8 @@ from typing import Optional, Dict
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.management import BaseCommand, CommandParser, CommandError
+from django.core.management import BaseCommand, CommandParser, CommandError, \
+    call_command
 from django.db import transaction
 
 from accounting.models import Account
@@ -875,8 +876,8 @@ class Command(BaseCommand):
                 error = F"User \"{username_option}\" does not exist."
                 raise CommandError(error, returncode=1)
         if user_model.objects.count() == 0:
-            error = "Please run the \"createsuperuser\" command first."
-            raise CommandError(error, returncode=1)
+            call_command("createsuperuser")
+            return user_model.objects.first()
         if user_model.objects.count() == 1:
             return user_model.objects.first()
         try:

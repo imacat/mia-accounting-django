@@ -133,8 +133,8 @@ class Command(BaseCommand):
                 error = F"User \"{username_option}\" does not exist."
                 raise CommandError(error, returncode=1)
         if user_model.objects.count() == 0:
-            error = "Please run the \"createsuperuser\" command first."
-            raise CommandError(error, returncode=1)
+            call_command("createsuperuser")
+            return user_model.objects.first()
         if user_model.objects.count() == 1:
             return user_model.objects.first()
         try:
