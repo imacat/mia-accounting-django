@@ -18,6 +18,7 @@
 """The view controllers of the accounting application.
 
 """
+import datetime
 import json
 import re
 from decimal import Decimal
@@ -41,7 +42,8 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import ListView, DetailView
 
 from mia_core.period import Period
-from mia_core.utils import Pagination, PaginationException, add_default_libs
+from mia_core.utils import Pagination, PaginationException, add_default_libs, \
+    parse_date
 from mia_core.views import DeleteView, FormView, RedirectView
 from . import utils
 from .forms import AccountForm, TransactionForm, TransactionSortForm
@@ -776,12 +778,26 @@ def search(request: HttpRequest) -> HttpResponse:
                 | Q(code=query)))\
             | Q(summary__icontains=query)\
             | Q(transaction__notes__icontains=query)
-        if re.match("^[0-9]+(?:\\.[0-9]+)$", query):
+        if re.match("^[0-9]+(?:\\.[0-9]+)?$", query):
             conditions = conditions | Q(amount=Decimal(query))
-        if re.match("^[0-9]+$", query):
+        if re.match("^[0-9]{9}$", query):
             conditions = conditions\
                          | Q(pk=int(query))\
                          | Q(transaction__pk=int(query))
+        if re.match("^[0-9]{4}$", query):
+            conditions = conditions\
+                         | Q(transaction__date__year=int(query))
+        try:
+            conditions = conditions | Q(transaction__date=parse_date(query))
+        except ValueError:
+            pass
+        try:
+            date = datetime.datetime.strptime(query, "%m/%d")
+            conditions = conditions\
+                         | (Q(transaction__date__month=date.month)
+                            & Q(transaction__date__day=date.day))
+        except ValueError:
+            pass
         records = Record.objects.filter(conditions)
     try:
         pagination = Pagination(request, records, True)
