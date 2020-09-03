@@ -772,7 +772,7 @@ def search(request: HttpRequest) -> HttpResponse:
             Q(account__in=Account.objects.filter(
                 Q(title_l10n__icontains=query)
                 | Q(l10n_set__value__icontains=query)
-                | Q(code__icontains=query)))
+                | Q(code=query)))
             | Q(summary__icontains=query)
             | Q(transaction__notes__icontains=query))
     try:
