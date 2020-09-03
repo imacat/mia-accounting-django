@@ -910,8 +910,8 @@ class TransactionFormView(FormView):
         """Returns the regular account data, as JSON.
 
         Returns:
-            Two lists of the (title, format pattern, account code) tuple, sorted by
-            debit or credit.
+            Two lists of the (title, format pattern, account code) tuple,
+            sorted by debit or credit.
         """
         try:
             regular = settings.REGULAR_ACCOUNTS
