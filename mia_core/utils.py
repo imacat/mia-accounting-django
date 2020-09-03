@@ -18,6 +18,7 @@
 """The utilities of the Mia core application.
 
 """
+import datetime
 import random
 import urllib.parse
 from typing import Dict, List, Any, Type
@@ -56,6 +57,27 @@ def strip_post(post: Dict[str, str]) -> None:
         post[key] = post[key].strip()
         if post[key] == "":
             del post[key]
+
+
+def parse_date(s: str):
+    """Parses a string for a date.  The date can be either YYYY-MM-DD,
+    Y/M/D, or M/D/Y.
+
+    Args:
+        s: The string.
+
+    Returns:
+        The date.
+
+    Raises:
+        ValueError: When the string is not in a valid format.
+    """
+    for f in ["%Y-%m-%d", "%m/%d/%Y", "%Y/%m/%d"]:
+        try:
+            return datetime.datetime.strptime(s, f)
+        except ValueError:
+            pass
+    raise ValueError(F"not a recognized date {s}")
 
 
 class Language:
