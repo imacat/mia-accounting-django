@@ -769,9 +769,10 @@ def search(request: HttpRequest) -> HttpResponse:
         records = []
     else:
         records = Record.objects.filter(
-            Q(account__title_l10n__icontains=query)
-            | Q(account__l10n_set__value__icontains=query)
-            | Q(account__code__icontains=query)
+            Q(account__in=Account.objects.filter(
+                Q(title_l10n__icontains=query)
+                | Q(l10n_set__value__icontains=query)
+                | Q(code__icontains=query)))
             | Q(summary__icontains=query)
             | Q(transaction__notes__icontains=query))
     try:
