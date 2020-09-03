@@ -20,6 +20,7 @@
 """
 import json
 import re
+from decimal import Decimal
 from typing import Dict, Optional
 
 from django.conf import settings
@@ -768,13 +769,20 @@ def search(request: HttpRequest) -> HttpResponse:
     if query is None:
         records = []
     else:
-        records = Record.objects.filter(
+        conditions =\
             Q(account__in=Account.objects.filter(
                 Q(title_l10n__icontains=query)
                 | Q(l10n_set__value__icontains=query)
-                | Q(code=query)))
-            | Q(summary__icontains=query)
-            | Q(transaction__notes__icontains=query))
+                | Q(code=query)))\
+            | Q(summary__icontains=query)\
+            | Q(transaction__notes__icontains=query)
+        if re.match("^[0-9]+(?:\\.[0-9]+)$", query):
+            conditions = conditions | Q(amount=Decimal(query))
+        if re.match("^[0-9]+$", query):
+            conditions = conditions\
+                         | Q(pk=int(query))\
+                         | Q(transaction__pk=int(query))
+        records = Record.objects.filter(conditions)
     try:
         pagination = Pagination(request, records, True)
     except PaginationException as e:
