@@ -783,7 +783,8 @@ def search(request: HttpRequest) -> HttpResponse:
         if re.match("^[0-9]{9}$", query):
             conditions = conditions\
                          | Q(pk=int(query))\
-                         | Q(transaction__pk=int(query))
+                         | Q(transaction__pk=int(query))\
+                         | Q(account__pk=int(query))
         if re.match("^[0-9]{4}$", query):
             conditions = conditions\
                          | Q(transaction__date__year=int(query))
