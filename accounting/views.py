@@ -786,13 +786,13 @@ def search(request: HttpRequest) -> HttpResponse:
                          | Q(transaction__pk=int(query))\
                          | Q(account__pk=int(query))
         try:
-            date = datetime.datetime.strptime(query, "%Y")
-            conditions = conditions\
-                         | Q(transaction__date__year=date.year)
+            conditions = conditions | Q(transaction__date=parse_date(query))
         except ValueError:
             pass
         try:
-            conditions = conditions | Q(transaction__date=parse_date(query))
+            date = datetime.datetime.strptime(query, "%Y")
+            conditions = conditions\
+                         | Q(transaction__date__year=date.year)
         except ValueError:
             pass
         try:
