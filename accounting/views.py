@@ -780,7 +780,7 @@ def search(request: HttpRequest) -> HttpResponse:
             | Q(transaction__notes__icontains=query)
         if re.match("^[0-9]+(?:\\.[0-9]+)?$", query):
             conditions = conditions | Q(amount=Decimal(query))
-        if re.match("^[0-9]{9}$", query):
+        if re.match("^[1-9][0-8]{9}$", query):
             conditions = conditions\
                          | Q(pk=int(query))\
                          | Q(transaction__pk=int(query))\
