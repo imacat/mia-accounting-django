@@ -22,7 +22,7 @@ import datetime
 import json
 import re
 from decimal import Decimal
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from django.conf import settings
 from django.contrib import messages
@@ -758,53 +758,11 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
 
 @method_decorator(require_GET, name="dispatch")
 class SearchListView(TemplateView):
-    "The search."""
+    """The search."""
     template_name = "accounting/search.html"
 
     def get_context_data(self, **kwargs):
-        query = self.request.GET.get("q")
-        if query is None:
-            records = []
-        else:
-            conditions =\
-                Q(account__in=Account.objects.filter(
-                    Q(title_l10n__icontains=query)
-                    | Q(l10n_set__value__icontains=query)
-                    | Q(code=query)))\
-                | Q(summary__icontains=query)\
-                | Q(transaction__notes__icontains=query)
-            if re.match("^[0-9]+(?:\\.[0-9]+)?$", query):
-                conditions = conditions | Q(amount=Decimal(query))
-            if re.match("^[1-9][0-8]{9}$", query):
-                conditions = conditions\
-                             | Q(pk=int(query))\
-                             | Q(transaction__pk=int(query))\
-                             | Q(account__pk=int(query))
-            try:
-                conditions = conditions | Q(transaction__date=parse_date(query))
-            except ValueError:
-                pass
-            try:
-                date = datetime.datetime.strptime(query, "%Y")
-                conditions = conditions\
-                             | Q(transaction__date__year=date.year)
-            except ValueError:
-                pass
-            try:
-                date = datetime.datetime.strptime(query, "%Y/%m")
-                conditions = conditions\
-                             | (Q(transaction__date__year=date.year)
-                                & Q(transaction__date__month=date.month))
-            except ValueError:
-                pass
-            try:
-                date = datetime.datetime.strptime(query, "%m/%d")
-                conditions = conditions\
-                             | (Q(transaction__date__month=date.month)
-                                & Q(transaction__date__day=date.day))
-            except ValueError:
-                pass
-            records = Record.objects.filter(conditions)
+        records = self._get_records()
         try:
             pagination = Pagination(self.request, records, True)
         except PaginationException as e:
@@ -813,6 +771,104 @@ class SearchListView(TemplateView):
         context["record_list"] = pagination.items
         context["pagination"] = pagination
         return context
+
+    def _get_records(self) -> List[Record]:
+        """Returns the search result."""
+        query = self.request.GET.get("q")
+        if query is None:
+            return []
+        terms = self._parse_search_terms(query)
+        if len(terms) == 0:
+            return []
+        conditions = [self._get_conditions_for_term(x) for x in terms]
+        if len(conditions) == 1:
+            return Record.objects.filter(conditions[0])
+        combined = conditions[0]
+        for x in conditions[1:]:
+            combined = combined & x
+        return Record.objects.filter(combined)
+
+    @staticmethod
+    def _get_conditions_for_term(term: str) -> Q:
+        """Returns the search conditions for a term.
+
+        Args:
+            term: The term.
+
+        Returns:
+            The search conditions for this term.
+        """
+        conditions =\
+            Q(account__in=Account.objects.filter(
+                Q(title_l10n__icontains=term)
+                | Q(l10n_set__value__icontains=term)
+                | Q(code=term)))\
+            | Q(summary__icontains=term)\
+            | Q(transaction__notes__icontains=term)
+        if re.match("^[0-9]+(?:\\.[0-9]+)?$", term):
+            conditions = conditions | Q(amount=Decimal(term))
+        if re.match("^[1-9][0-8]{9}$", term):
+            conditions = conditions\
+                         | Q(pk=int(term))\
+                         | Q(transaction__pk=int(term))\
+                         | Q(account__pk=int(term))
+        try:
+            conditions = conditions | Q(transaction__date=parse_date(term))
+        except ValueError:
+            pass
+        try:
+            date = datetime.datetime.strptime(term, "%Y")
+            conditions = conditions\
+                         | Q(transaction__date__year=date.year)
+        except ValueError:
+            pass
+        try:
+            date = datetime.datetime.strptime(term, "%Y/%m")
+            conditions = conditions\
+                         | (Q(transaction__date__year=date.year)
+                            & Q(transaction__date__month=date.month))
+        except ValueError:
+            pass
+        try:
+            date = datetime.datetime.strptime(term, "%m/%d")
+            conditions = conditions\
+                         | (Q(transaction__date__month=date.month)
+                            & Q(transaction__date__day=date.day))
+        except ValueError:
+            pass
+        return conditions
+
+    @staticmethod
+    def _parse_search_terms(query: str) -> List[str]:
+        """Parses the search query and returns the search terms.  The search
+        terms are separated by spaces but quoted with double quotes.
+
+        Args:
+            query: The search query
+
+        Returns:
+            The search terms.
+        """
+        query = query.strip()
+        terms = []
+        while True:
+            m = re.match("^([^\"\\s]+)\\s*(.*)$", query)
+            if m is not None:
+                terms.append(m[1])
+                query = m[2]
+                continue
+            m = re.match("^\"([^\"]*)\"\\s*(.*)$", query)
+            if m is not None:
+                if m[1] != "":
+                    terms.append(m[1])
+                query = m[2]
+                continue
+            m = re.match("^\"([^\"]*)", query)
+            if m is not None:
+                if m[1] != "":
+                    terms.append(m[1])
+            break
+        return terms
 
 
 @method_decorator(require_GET, name="dispatch")
