@@ -39,7 +39,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _, gettext_noop, gettext
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
 from mia_core.period import Period
 from mia_core.utils import Pagination, PaginationException, add_default_libs, \
@@ -756,68 +756,63 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
     })
 
 
-@require_GET
-def search(request: HttpRequest) -> HttpResponse:
-    """The search.
+@method_decorator(require_GET, name="dispatch")
+class SearchListView(TemplateView):
+    "The search."""
+    template_name = "accounting/search.html"
 
-    Args:
-        request: The request.
-
-    Returns:
-        The response.
-    """
-    # The accounting records
-    query = request.GET.get("q")
-    if query is None:
-        records = []
-    else:
-        conditions =\
-            Q(account__in=Account.objects.filter(
-                Q(title_l10n__icontains=query)
-                | Q(l10n_set__value__icontains=query)
-                | Q(code=query)))\
-            | Q(summary__icontains=query)\
-            | Q(transaction__notes__icontains=query)
-        if re.match("^[0-9]+(?:\\.[0-9]+)?$", query):
-            conditions = conditions | Q(amount=Decimal(query))
-        if re.match("^[1-9][0-8]{9}$", query):
-            conditions = conditions\
-                         | Q(pk=int(query))\
-                         | Q(transaction__pk=int(query))\
-                         | Q(account__pk=int(query))
+    def get_context_data(self, **kwargs):
+        query = self.request.GET.get("q")
+        if query is None:
+            records = []
+        else:
+            conditions =\
+                Q(account__in=Account.objects.filter(
+                    Q(title_l10n__icontains=query)
+                    | Q(l10n_set__value__icontains=query)
+                    | Q(code=query)))\
+                | Q(summary__icontains=query)\
+                | Q(transaction__notes__icontains=query)
+            if re.match("^[0-9]+(?:\\.[0-9]+)?$", query):
+                conditions = conditions | Q(amount=Decimal(query))
+            if re.match("^[1-9][0-8]{9}$", query):
+                conditions = conditions\
+                             | Q(pk=int(query))\
+                             | Q(transaction__pk=int(query))\
+                             | Q(account__pk=int(query))
+            try:
+                conditions = conditions | Q(transaction__date=parse_date(query))
+            except ValueError:
+                pass
+            try:
+                date = datetime.datetime.strptime(query, "%Y")
+                conditions = conditions\
+                             | Q(transaction__date__year=date.year)
+            except ValueError:
+                pass
+            try:
+                date = datetime.datetime.strptime(query, "%Y/%m")
+                conditions = conditions\
+                             | (Q(transaction__date__year=date.year)
+                                & Q(transaction__date__month=date.month))
+            except ValueError:
+                pass
+            try:
+                date = datetime.datetime.strptime(query, "%m/%d")
+                conditions = conditions\
+                             | (Q(transaction__date__month=date.month)
+                                & Q(transaction__date__day=date.day))
+            except ValueError:
+                pass
+            records = Record.objects.filter(conditions)
         try:
-            conditions = conditions | Q(transaction__date=parse_date(query))
-        except ValueError:
-            pass
-        try:
-            date = datetime.datetime.strptime(query, "%Y")
-            conditions = conditions\
-                         | Q(transaction__date__year=date.year)
-        except ValueError:
-            pass
-        try:
-            date = datetime.datetime.strptime(query, "%Y/%m")
-            conditions = conditions\
-                         | (Q(transaction__date__year=date.year)
-                            & Q(transaction__date__month=date.month))
-        except ValueError:
-            pass
-        try:
-            date = datetime.datetime.strptime(query, "%m/%d")
-            conditions = conditions\
-                         | (Q(transaction__date__month=date.month)
-                            & Q(transaction__date__day=date.day))
-        except ValueError:
-            pass
-        records = Record.objects.filter(conditions)
-    try:
-        pagination = Pagination(request, records, True)
-    except PaginationException as e:
-        return redirect(e.url)
-    return render(request, "accounting/search.html", {
-        "record_list": pagination.items,
-        "pagination": pagination,
-    })
+            pagination = Pagination(self.request, records, True)
+        except PaginationException as e:
+            return redirect(e.url)
+        context = super().get_context_data(**kwargs)
+        context["record_list"] = pagination.items
+        context["pagination"] = pagination
+        return context
 
 
 @method_decorator(require_GET, name="dispatch")

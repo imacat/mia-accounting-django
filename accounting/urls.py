@@ -73,7 +73,7 @@ urlpatterns = [
     path("balance-sheet/<period:period>",
          views.balance_sheet, name="balance-sheet"),
     path("search",
-         views.search, name="search"),
+         views.SearchListView.as_view(), name="search"),
     path("transactions/<txn-type:txn_type>/create",
          views.TransactionFormView.as_view(), name="transactions.create"),
     path("transactions/<txn-type:txn_type>/<txn:txn>",
