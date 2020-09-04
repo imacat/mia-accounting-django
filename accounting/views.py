@@ -796,6 +796,13 @@ def search(request: HttpRequest) -> HttpResponse:
         except ValueError:
             pass
         try:
+            date = datetime.datetime.strptime(query, "%Y/%m")
+            conditions = conditions\
+                         | (Q(transaction__date__year=date.year)
+                            & Q(transaction__date__month=date.month))
+        except ValueError:
+            pass
+        try:
             date = datetime.datetime.strptime(query, "%m/%d")
             conditions = conditions\
                          | (Q(transaction__date__month=date.month)
