@@ -785,9 +785,12 @@ def search(request: HttpRequest) -> HttpResponse:
                          | Q(pk=int(query))\
                          | Q(transaction__pk=int(query))\
                          | Q(account__pk=int(query))
-        if re.match("^[0-9]{4}$", query):
+        try:
+            date = datetime.datetime.strptime(query, "%Y")
             conditions = conditions\
-                         | Q(transaction__date__year=int(query))
+                         | Q(transaction__date__year=date.year)
+        except ValueError:
+            pass
         try:
             conditions = conditions | Q(transaction__date=parse_date(query))
         except ValueError:
