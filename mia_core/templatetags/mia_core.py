@@ -21,7 +21,7 @@
 import datetime
 import re
 from datetime import date
-from typing import Any, List
+from typing import Any
 
 import titlecase
 from django import template
