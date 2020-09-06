@@ -18,6 +18,12 @@ The Mia! Accounting Application Built on Python Django
  limitations under the License.
 ```
 
+## Live Demonstration
+
+https://accounting.imacat.idv.tw/accounting
+* Username: admin
+* Password: 12345
+
 ## Installation
 
 ### Requirements
