@@ -19,7 +19,7 @@
 
 """
 import getpass
-from typing import Optional, Dict
+from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
