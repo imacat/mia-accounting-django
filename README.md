@@ -1,6 +1,6 @@
 # mia-accounting
 
-The Mia! Accounting Application Built on Python Django
+The Mia! Accounting Django Application
 
 ```
  Copyright (c) 2020 imacat.
@@ -21,64 +21,89 @@ The Mia! Accounting Application Built on Python Django
 ## Live Demonstration
 
 https://accounting.imacat.idv.tw/accounting
-* Username: admin
-* Password: 12345
+* Username: `admin`
+* Password: `12345`
 
 ## Installation
 
 ### Requirements
 
-Installs the following requirements with pip:
+`mia-accounting` requires Python 3.6 or above to work.
 
-* Python 3.6 or above
-* Django 3.0 or above
-* django-dirtyfields
-* django-decorator-include
-* titlecase
+Install the required packages with `pip`.
+
+```
+pip install django django-dirtyfields titlecase django-decorator-include
+```
+
 
 ### Download
 
-Clones the project from GitHub
+The Mia! Accounting project is hosted on GitHub.
+
+https://github.com/imacat/mia-accounting
+
+You can download or clone
+the project from from GitHub
 
 ```
 git clone git@github.com:imacat/mia-accounting.git
 ```
 
-Moves the accounting and mia_core directories into your Django project root
+Move the `accounting` and `mia_core` directories into your Django project root
 directory.
 
-### Configure Your settings.py
+### `settings.py`
 
-Adds these two applications into your INSTALL_APPS.
-
-```
-'mia_core.apps.MiaCoreConfig'
-'accounting.apps.AccountingConfig'
-```
-
-Adds the locale middleware if it is not added yet.
+Add these two applications in the `INSTALL_APPS` section of your `settings.py`.
 
 ```
-'django.middleware.locale.LocaleMiddleware'
+INSTALLED_APPS = [
+  'mia_core.apps.MiaCoreConfig',
+  'accounting.apps.AccountingConfig',
+  ...
+]
 ```
 
-### Configure Your urls.py:
-
-Adds this line into your urls.py:
-
-```
-path('accounting/', decorator_include(login_required, 'accounting.urls')),
-```
-
-Ensures these two lines are also in your urls.py, if they are not yet:
+Make sure the locale middleware is in the `MIDDLEWARE` section of your
+`settings.py`, and add it if it is not added yet.
 
 ```
-path('i18n/', include("django.conf.urls.i18n")),
-path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+MIDDLEWARE = [
+  ...
+  'django.middleware.locale.LocaleMiddleware',
+  ...
+]
 ```
 
-### Restarts Your Web Project
+### `urls.py`
+
+Add the `accounting` application in the `urlpatterns` of your `urls.py`.
+
+```
+urlpatterns = [
+  ...
+  path('accounting/', decorator_include(login_required, 'accounting.urls')),
+  ...
+]
+```
+
+Make sure `i18n` and `jsi18n` are also in the `urlpatterns` of your `urls.py`,
+and add them if they are not added yet.
+
+```
+urlpatterns = [
+  ...
+  path('i18n/', include("django.conf.urls.i18n")),
+  path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+  ...
+]
+```
+
+### Restart Your Web Project
 
 ## Bugs and Supports
 
 Address all bugs and support requests to imacat@mail.imacat.idv.tw.
+
+2020/9/7
