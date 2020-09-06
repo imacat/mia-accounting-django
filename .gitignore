@@ -1,14 +1,9 @@
 *.pyc
 __pycache__
 migrations
-local_settings.py
-db.sqlite3
 *.mo
-static/ext-libs
 .idea
 venv
 mirror
 excludes
 zh_Hans
-django_digest
-test_app
