@@ -100,6 +100,29 @@ urlpatterns = [
 ]
 ```
 
+### `base.html`
+
+Add the following to the very beginning of your base template
+`base.html`, before your first real HTML tag.
+
+```
+{% load mia_core %}
+{% init_libs %}
+{% block settings %}{% endblock %}
+```
+
+And the CSS and JavaScripts in the `<head>...</head>` section of your
+base template `base.html`.
+
+```
+{% for css in libs.css %}
+  <link rel="stylesheet" type="text/css" href="{% if css|is_static_url %}{% static css %}{% else %}{{ css }}{% endif %}" />
+{% endfor %}
+{% for js in libs.js %}
+  <script src="{% if js|is_static_url %}{% static js %}{% else %}{{ js }}{% endif %}"></script>
+{% endfor %}
+```
+
 ### Restart Your Web Project
 
 ## Bugs and Supports
