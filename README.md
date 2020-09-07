@@ -122,6 +122,83 @@ base template `base.html`.
 
 ### Restart Your Web Project
 
+## Advanced Settings
+
+The following advanced settings are available in `settings.py`.
+
+```
+# Settings for the accounting application
+ACCOUNTING = {
+    # The default cash acount, for ex., "0" (current assets and liabilities),
+    # "1111" (cash on hand), "1113" (cash in banks) or any  
+    "DEFAULT_CASH_ACCOUNT": "1111",
+    # The shortcut cash accounts
+    "CASH_SHORTCUT_ACCOUNTS": ["0", "1111"],
+    # The default ledger account
+    "DEFAULT_LEDGER_ACCOUNT": "1111",
+    # The payable accounts to track
+    "PAYABLE_ACCOUNTS": ["2141"],
+    # The asset accounts to track
+    "EQUIPMENT_ACCOUNTS": ["1441"],
+}
+
+# The local static CSS and JavaScript libraries
+# The default is to use the libraries from CDN.  You may set them to use the
+# local static copies of these libraries
+STATIC_LIBS = {
+    "jquery": {"css": [], "js": ["jquery/jquery-3.5.1.min.js"]},
+    "bootstrap4": {"css": ["bootstrap4/css/bootstrap.min.css"],
+                   "js": ["bootstrap4/js/bootstrap.bundle.min.js"]},
+    "font-awesome-5": {"css": ["font-awesome-5/css/all.min.css"],
+                       "js": []},
+    "bootstrap4-datatables": {
+        "css": ["datatables/css/jquery.dataTables.min.css",
+                "edatatables/css/dataTables.bootstrap4.min.css"],
+        "js": ["datatables/js/jquery.dataTables.min.js",
+               "datatables/js/dataTables.bootstrap4.min.js"]},
+    "jquery-ui": {"css": ["jquery-ui/jquery-ui.min.css"],
+                  "js": ["jquery-ui/jquery-ui.min.js"]},
+    "bootstrap4-tempusdominus": {
+        "css": [("tempusdominus-bootstrap-4/css/"
+                 "tempusdominus-bootstrap-4.min.css")],
+        "js": ["moment/moment-with-locales.min.js",
+               ("tempusdominus-bootstrap-4/js/"
+                "tempusdominus-bootstrap-4.min.js")]},
+    "decimal.js": {"css": [], "js": ["decimal/decimal.min.js"]},
+}
+
+# The default static stylesheets to include.  Default is none.
+DEFAULT_CSS = ["css/app.css"]
+# The default static JavaScript to include.  Default is none.
+DEFAULT_JS = ["js/app.js"]
+
+# The regular accounts in the summary helper.  They should be lists of tuples
+# of (generic title, title format, account code).
+# 
+# The following variables are available.  Variables are surrounded in brackets. 
+# 
+#  month_no: The numeric month of the current date
+#  month_name: The month name of the current date
+#  last_month_no: The numeric previous month of the current date
+#  last_month_name: The previous month name of the current date
+#  last_bimonthly_from_no: The first month number of the last bimonthly period
+#  last_bimonthly_from_name: The first month name of the last bimonthly period
+#  last_bimonthly_to_no: The second month number of the last bimonthly period
+#  last_bimonthly_to_name: The second month name of the last bimonthly period
+#
+REGULAR_ACCOUNTS = {
+    "debit": [
+        ("Rent", "Rent for (month_name)", "6252"),
+        ("Gas bill",
+         "Gas bill for (last_bimonthly_from_name)-(last_bimonthly_to_name)",
+         "6261"),
+    ],
+    "credit": [
+        ("Payroll", "Payroll for (last_month_name)", "46116"),
+    ],
+}
+```
+
 ## Bugs and Supports
 
 Address all bugs and support requests to imacat@mail.imacat.idv.tw.
