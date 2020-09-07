@@ -25,30 +25,15 @@ https://accounting.imacat.idv.tw/accounting .
 
 ## Installation
 
-### Requirements
+### Install
 
 `mia-accounting` requires Python 3.6 or above to work.
 
-Install the required packages with `pip`.
+Install `mia-accounting` with `pip`.
 
 ```
-pip install django django-dirtyfields titlecase django-decorator-include
+pip install mia-accounting
 ```
-
-### Download
-
-The Mia! Accounting project is hosted on GitHub.
-
-https://github.com/imacat/mia-accounting
-
-You can download or clone the project from from GitHub
-
-```
-git clone git@github.com:imacat/mia-accounting.git
-```
-
-Move the `accounting` and `mia_core` directories into your Django project root
-directory.
 
 ### `settings.py`
 
