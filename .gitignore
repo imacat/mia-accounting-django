@@ -1,5 +1,7 @@
 *.pyc
 __pycache__
+dist
+*.egg-info
 migrations
 *.mo
 .idea
