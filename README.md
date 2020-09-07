@@ -111,7 +111,7 @@ Add the following to the very beginning of your base template
 {% block settings %}{% endblock %}
 ```
 
-And the CSS and JavaScripts in the `<head>...</head>` section of your
+Add the CSS and JavaScripts in the `<head>...</head>` section of your
 base template `base.html`.
 
 ```
