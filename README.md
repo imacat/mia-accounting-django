@@ -186,6 +186,10 @@ REGULAR_ACCOUNTS = {
 
 ## Bugs and Supports
 
+The `mia-accounting` project is hosted on GitHub.
+
+https://github.com/imacat/mia-accounting
+
 Address all bugs and support requests to imacat@mail.imacat.idv.tw.
 
 ## Copyright
