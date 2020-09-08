@@ -21,7 +21,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="mia-accounting",
-    version="0.0.1",
+    version="0.0.2",
     author="imacat",
     author_email="imacat@mail.imacat.idv.tw",
     description="A Django accounting application",
