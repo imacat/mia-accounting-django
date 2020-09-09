@@ -105,6 +105,22 @@ base template `base.html`.
 {% endfor %}
 ```
 
+### Database Initialization
+
+Run the management commands to initialize the database.
+
+```
+./manage.py makemigrations
+./manage.py migrate accounting
+./manage.py accounting_accounts
+```
+
+Optionally you can populate the database with some sample data.
+
+```
+./manage.py accounting_sample
+```
+
 ### Restart Your Web Project
 
 ## Advanced Settings
