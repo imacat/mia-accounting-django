@@ -781,12 +781,12 @@ class SearchListView(TemplateView):
         if len(terms) == 0:
             return []
         conditions = [self._get_conditions_for_term(x) for x in terms]
-        if len(conditions) == 1:
-            return Record.objects.filter(conditions[0])
         combined = conditions[0]
         for x in conditions[1:]:
             combined = combined & x
-        return Record.objects.filter(combined)
+        return Record.objects.filter(combined)\
+            .order_by("transaction__date", "transaction__ord", "is_credit",
+                      "ord")
 
     @staticmethod
     def _get_conditions_for_term(term: str) -> Q:
