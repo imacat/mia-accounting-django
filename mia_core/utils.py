@@ -21,7 +21,7 @@
 import datetime
 import random
 import urllib.parse
-from typing import Dict, List, Any, Type
+from typing import Dict, List, Any, Type, Optional
 
 from django.conf import settings
 from django.db.models import Model
@@ -57,6 +57,35 @@ def strip_post(post: Dict[str, str]) -> None:
         post[key] = post[key].strip()
         if post[key] == "":
             del post[key]
+
+
+STORAGE_KEY: str = "stored_post"
+
+
+def store_post(request: HttpRequest, post: Dict[str, str]):
+    """Stores the POST data into the session.
+
+    Args:
+        request: The request.
+        post: The POST data.
+    """
+    request.session[STORAGE_KEY] = post
+
+
+def retrieve_store(request: HttpRequest) -> Optional[Dict[str, str]]:
+    """Retrieves the POST data from the storage.
+
+    Args:
+        request: The request.
+
+    Returns:
+        The POST data, or None if the previously-stored data does not exist.
+    """
+    if STORAGE_KEY not in request.session:
+        return None
+    post = request.session[STORAGE_KEY]
+    del request.session[STORAGE_KEY]
+    return post
 
 
 def parse_date(s: str):

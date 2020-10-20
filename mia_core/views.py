@@ -34,7 +34,7 @@ from django.views.generic import DeleteView as CoreDeleteView, \
     RedirectView as CoreRedirectView
 from django.views.generic.base import View
 
-from . import stored_post, utils
+from . import utils
 from .models import StampedModel
 from .utils import UrlBuilder
 
@@ -109,7 +109,7 @@ class FormView(View):
             utils.strip_post(post)
             return self.make_form_from_post(post)
         else:
-            previous_post = stored_post.get_previous_post(self.request)
+            previous_post = utils.retrieve_store(self.request)
             if previous_post is not None:
                 return self.make_form_from_post(previous_post)
             if self.object is not None:
@@ -146,8 +146,8 @@ class FormView(View):
 
     def form_invalid(self, form: forms.Form) -> HttpResponseRedirect:
         """Handles the action when the POST form is invalid."""
-        return stored_post.error_redirect(
-            self.request, self.get_error_url(), form.data)
+        utils.store_post(self.request, form.data)
+        return redirect(self.get_error_url())
 
     def form_valid(self, form: forms.Form) -> HttpResponseRedirect:
         """Handles the action when the POST form is valid."""
