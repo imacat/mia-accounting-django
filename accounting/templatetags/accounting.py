@@ -20,7 +20,7 @@
 """
 import re
 from decimal import Decimal
-from typing import Union, Optional
+from typing import Optional
 
 from django import template
 from django.template import RequestContext
@@ -32,14 +32,14 @@ from mia_core.period import Period
 register = template.Library()
 
 
-def _format_positive_amount(value: Union[str, Decimal]) -> str:
+def _format_positive_amount(value: Decimal) -> str:
     """Formats a positive amount, groups every 3 digits by commas.
 
     Args:
         value: The amount.
 
     Returns:
-        ReportUrl: The formatted amount.
+        str: The amount in the desired format.
     """
     s = str(value)
     while True:
@@ -53,7 +53,7 @@ def _format_positive_amount(value: Union[str, Decimal]) -> str:
 
 
 @register.filter
-def accounting_amount(value: Union[Decimal]) -> str:
+def accounting_amount(value: Optional[Decimal]) -> str:
     """Formats an amount with the accounting notation, grouping every 3 digits
     by commas, and marking negative numbers with brackets instead of signs.
 
@@ -61,7 +61,7 @@ def accounting_amount(value: Union[Decimal]) -> str:
         value: The amount.
 
     Returns:
-        ReportUrl: The formatted amount.
+        str: The amount in the desired format.
     """
     if value is None:
         return ""
@@ -74,14 +74,14 @@ def accounting_amount(value: Union[Decimal]) -> str:
 
 
 @register.filter
-def short_amount(value: Union[Decimal]) -> str:
+def short_amount(value: Optional[Decimal]) -> str:
     """Formats an amount, groups every 3 digits by commas.
 
     Args:
         value: The amount.
 
     Returns:
-        ReportUrl: The formatted amount.
+        str: The amount in the desired format.
     """
     if value is None:
         return ""
