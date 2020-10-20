@@ -19,6 +19,7 @@ form-record-non-transfer.html: The template for a record in the non-transfer tra
 Author: imacat@mail.imacat.idv.tw (imacat)
 First written: 2020/8/5
 {% endcomment %}
+{% load accounting %}
 
 <li id="{{ record_type }}-{{ no }}" class="list-group-item {% if record.non_field_errors %} list-group-item-danger {% endif %} draggable-record {{ record_type }}-record" data-no="{{ no }}">
   <div id="{{ record_type }}-{{ no }}-error">{% if record.non_field_errors %}{{ record.non_field_errors.0 }}{% endif %}</div>
@@ -37,7 +38,7 @@ First written: 2020/8/5
           </div>
           <div class="col-sm-4">
             <label for="{{ record_type }}-{{ no }}-amount" class="record-label">{{ _("Amount:")|force_escape }}</label>
-            <input id="{{ record_type }}-{{ no }}-amount" class="form-control record-amount {{ record_type }}-to-sum {% if record.amount.errors %} is-invalid {% endif %}" type="number" step="0.01" min="0.01" name="{{ record_type }}-{{ no }}-amount" value="{{ record.amount.value|default:"" }}" required="required" data-type="{{ record_type }}" />
+            <input id="{{ record_type }}-{{ no }}-amount" class="form-control record-amount {{ record_type }}-to-sum {% if record.amount.errors %} is-invalid {% endif %}" type="number" step="0.01" min="0.01" name="{{ record_type }}-{{ no }}-amount" value="{{ record.amount.value|short_value }}" required="required" data-type="{{ record_type }}" />
             <div id="{{ record_type }}-{{ no }}-amount-error" class="invalid-feedback">{{ record.amount.errors.0|default:"" }}</div>
           </div>
         </div>

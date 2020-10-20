@@ -32,6 +32,21 @@ from mia_core.period import Period
 register = template.Library()
 
 
+def _strip_decimal_zeros(value: Decimal) -> str:
+    """Formats a decimal value, stripping excess decimal zeros.
+
+    Args:
+        value: The value.
+
+    Returns:
+        str: The value with excess decimal zeros stripped.
+    """
+    s = str(value)
+    s = re.sub(r"^(.*\.[0-9]*?)0+$", r"\1", s)
+    s = re.sub(r"^(.*)\.$", r"\1", s)
+    return s
+
+
 def _format_positive_amount(value: Decimal) -> str:
     """Formats a positive amount, groups every 3 digits by commas.
 
@@ -41,14 +56,12 @@ def _format_positive_amount(value: Decimal) -> str:
     Returns:
         str: The amount in the desired format.
     """
-    s = str(value)
+    s = _strip_decimal_zeros(value)
     while True:
         m = re.match("^([1-9][0-9]*)([0-9]{3}.*)", s)
         if m is None:
             break
         s = m.group(1) + "," + m.group(2)
-    s = re.sub(r"^(.*\.[0-9]*?)0+$", r"\1", s)
-    s = re.sub(r"^(.*)\.$", r"\1", s)
     return s
 
 
@@ -91,6 +104,21 @@ def short_amount(value: Optional[Decimal]) -> str:
     if value < 0:
         s = "-" + s
     return s
+
+
+@register.filter
+def short_value(value: Optional[Decimal]) -> str:
+    """Formats a decimal value, stripping excess decimal zeros.
+
+    Args:
+        value: The value.
+
+    Returns:
+        str: The value with excess decimal zeroes stripped.
+    """
+    if value is None:
+        return ""
+    return _strip_decimal_zeros(value)
 
 
 @register.simple_tag(takes_context=True)
