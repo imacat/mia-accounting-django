@@ -228,7 +228,8 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
             for i in range(max_no[record_type]):
                 no = i + 1
                 if F"{record_type}-{no}-id" in post:
-                    record = Record.objects.get(pk=post[F"{record_type}-{no}-id"])
+                    record = Record.objects.get(
+                        pk=post[F"{record_type}-{no}-id"])
                 else:
                     record = Record(
                         is_credit=(record_type == "credit"),
@@ -267,12 +268,11 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
         """Finds the max debit and record numbers from the POSTed form.
 
         Args:
-            txn_type (str): The transaction type.
-            post (dict[str,str]): The POSTed data.
+            txn_type: The transaction type.
+            post: The POSTed data.
 
         Returns:
-            dict[str,int]: The max debit and record numbers from the POSTed form.
-
+            The max debit and record numbers from the POSTed form.
         """
         max_no = {}
         if txn_type != "credit":
@@ -281,7 +281,8 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
             max_no["credit"] = 0
         for key in post.keys():
             m = re.match(
-                "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)$",
+                ("^(debit|credit)-([1-9][0-9]*)-"
+                 "(id|ord|account|summary|amount)$"),
                 key)
             if m is None:
                 continue
