@@ -30,7 +30,7 @@ from django.template import defaultfilters, RequestContext
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
-from django.utils.translation import gettext
+from django.utils.translation import gettext, get_language
 
 from mia_core.utils import UrlBuilder, CssAndJavaScriptLibraries
 
@@ -185,8 +185,20 @@ def smart_date(value: datetime.date) -> str:
     """
     if value == date.today():
         return gettext("Today")
-    if (date.today() - value).days == 1:
+    prev_days = (value - date.today()).days
+    if prev_days == -1:
         return gettext("Yesterday")
+    if prev_days == 1:
+        return gettext("Tomorrow")
+    if get_language() == "zh-hant":
+        if prev_days == -2:
+            return "前天"
+        if prev_days == -3:
+            return "大前天"
+        if prev_days == 2:
+            return "後天"
+        if prev_days == 3:
+            return "大後天"
     if date.today().year == value.year:
         return defaultfilters.date(value, "n/j(D)").replace("星期", "")
     return defaultfilters.date(value, "Y/n/j(D)").replace("星期", "")

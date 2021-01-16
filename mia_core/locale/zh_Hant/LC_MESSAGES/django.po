@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mia-core 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 23:56+0800\n"
-"PO-Revision-Date: 2020-08-18 00:02+0800\n"
+"POT-Creation-Date: 2021-01-17 00:24+0800\n"
+"PO-Revision-Date: 2021-01-17 00:29+0800\n"
 "Last-Translator: imacat <imacat@mail.imacat.idv.tw>\n"
 "Language-Team: Traditional Chinese <imacat@mail.imacat.idv.tw>\n"
 "Language: Traditional Chinese\n"
@@ -38,13 +38,13 @@ msgstr "全部"
 
 #: mia_core/period.py:588 mia_core/period.py:621
 #: mia_core/templates/mia_core/include/period-chooser.html:60
-#: mia_core/templatetags/mia_core.py:173
+#: mia_core/templatetags/mia_core.py:219
 msgid "This Month"
 msgstr "這個月"
 
 #: mia_core/period.py:629
 #: mia_core/templates/mia_core/include/period-chooser.html:63
-#: mia_core/templatetags/mia_core.py:180
+#: mia_core/templatetags/mia_core.py:226
 msgid "Last Month"
 msgstr "上個月"
 
@@ -60,13 +60,13 @@ msgstr "去年"
 
 #: mia_core/period.py:661
 #: mia_core/templates/mia_core/include/period-chooser.html:95
-#: mia_core/templatetags/mia_core.py:153
+#: mia_core/templatetags/mia_core.py:187
 msgid "Today"
 msgstr "今天"
 
 #: mia_core/period.py:663
 #: mia_core/templates/mia_core/include/period-chooser.html:98
-#: mia_core/templatetags/mia_core.py:155
+#: mia_core/templatetags/mia_core.py:190
 msgid "Yesterday"
 msgstr "昨天"
 
@@ -115,17 +115,21 @@ msgstr "從："
 msgid "To:"
 msgstr "到："
 
-#: mia_core/utils.py:347
+#: mia_core/templatetags/mia_core.py:192
+msgid "Tomorrow"
+msgstr "明天"
+
+#: mia_core/utils.py:342
 msgctxt "Pagination|"
 msgid "Previous"
 msgstr "上一頁"
 
-#: mia_core/utils.py:375 mia_core/utils.py:396
+#: mia_core/utils.py:370 mia_core/utils.py:391
 msgctxt "Pagination|"
 msgid "..."
 msgstr "…"
 
-#: mia_core/utils.py:415
+#: mia_core/utils.py:410
 msgctxt "Pagination|"
 msgid "Next"
 msgstr "下一頁"
