@@ -163,8 +163,8 @@ class UrlBuilder:
         self.params = []
         for piece in start_url[pos + 1:].split("&"):
             pos = piece.find("=")
-            name = urllib.parse.unquote(piece[:pos])
-            value = urllib.parse.unquote(piece[pos + 1:])
+            name = urllib.parse.unquote_plus(piece[:pos])
+            value = urllib.parse.unquote_plus(piece[pos + 1:])
             self.params.append(self.Param(name, value))
 
     def add(self, name, value):
