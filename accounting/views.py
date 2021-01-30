@@ -94,7 +94,7 @@ def cash(request: HttpRequest, account: Account,
                 ~Q(account__code__startswith="21"),
                 ~Q(account__code__startswith="22"))
             .order_by("transaction__date", "transaction__ord",
-                      "is_credit", "ord"))
+                      "-is_credit", "ord"))
         balance_before = Record.objects \
             .filter(
                 Q(transaction__date__lt=period.start),
@@ -116,7 +116,7 @@ def cash(request: HttpRequest, account: Account,
                     Q(record__account__code__startswith=account.code))),
                 ~Q(account__code__startswith=account.code))
             .order_by("transaction__date", "transaction__ord",
-                      "is_credit", "ord"))
+                      "-is_credit", "ord"))
         balance_before = Record.objects \
             .filter(
                 transaction__date__lt=period.start,
