@@ -30,8 +30,13 @@ from opencc import OpenCC
 
 
 class Command(BaseCommand):
-    """Populates the database with sample accounting data."""
-    help = "Fills the database with the accounting accounts."
+    """Updates the revision date, converts the Traditional Chinese
+    translation into Simplified Chinese, and then calls the
+    compilemessages command.
+    """
+    help = ("Updates the revision date, converts the Traditional Chinese"
+            " translation into Simplified Chinese, and then calls the"
+            " compilemessages command.")
 
     def __init__(self):
         super().__init__()
@@ -44,8 +49,9 @@ class Command(BaseCommand):
         Args:
             parser (CommandParser): The command line argument parser.
         """
-        parser.add_argument("proj_dir", nargs="+",
-                            help="The domain, either django or djangojs")
+        parser.add_argument("app_dir", nargs="+",
+                            help=("One or more application directories that"
+                                  " contains their locale subdirectories"))
         parser.add_argument("--domain", "-d", action="append",
                             choices=["django", "djangojs"], required=True,
                             help="The domain, either django or djangojs")
@@ -58,7 +64,7 @@ class Command(BaseCommand):
             **options (dict[str,str]): The command line switches.
         """
         locale_dirs = [os.path.join(settings.BASE_DIR, x, "locale")
-                       for x in options["proj_dir"]]
+                       for x in options["app_dir"]]
         missing = [x for x in locale_dirs if not os.path.isdir(x)]
         if len(missing) > 0:
             error = "Directories not exist: " + ", ".join(missing)
