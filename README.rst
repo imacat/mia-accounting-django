@@ -1,11 +1,10 @@
-######################################
+======================================
 The Mia! Django Accounting Application
-######################################
+======================================
 
 
-***********
 Description
-***********
+===========
 
 *mia-accounting* is a `Django <https://www.djangoproject.com>`_
 accounting application.  It was rewritten from my own private
@@ -30,15 +29,14 @@ You may try it in live demonstration at:
 - Password: ``12345``
 
 
-************
 Installation
-************
+============
 
 Install
-#######
+-------
 
-The Mia! Django accounting application requires Python 3.6 or above
-to work.
+The Mia! Django accounting application requires Python 3.7 and Django
+3.1.
 
 Install ``mia-accounting`` with ``pip``.
 
@@ -47,7 +45,7 @@ Install ``mia-accounting`` with ``pip``.
     pip install mia-accounting
 
 ``settings.py``
-###############
+---------------
 
 Add these two applications in the ``INSTALL_APPS`` section of your
 ``settings.py``.
@@ -72,7 +70,7 @@ your ``settings.py``, and add it if it is not added yet.
     ]
 
 ``urls.py``
-###########
+-----------
 
 Add the ``accounting`` application in the ``urlpatterns`` in your
 ``urls.py``.
@@ -98,7 +96,7 @@ your ``urls.py``, and add them if they are not added yet.
     ]
 
 ``base.html``
-#############
+-------------
 
 Add the following to the very beginning of your base template
 ``base.html``, before your first real HTML tag.
@@ -122,7 +120,7 @@ base template ``base.html``.
     {% endfor %}
 
 Database Initialization
-#######################
+-----------------------
 
 Run the management commands to initialize the database.
 
@@ -138,14 +136,13 @@ Optionally you can populate the database with some sample data.
     ./manage.py accounting_sample
 
 Restart Your Web Server
-#######################
+-----------------------
 
 And you are done.
 
 
-*****************
 Advanced Settings
-*****************
+=================
 
 The following advanced settings are available in ``settings.py``.
 
@@ -224,16 +221,17 @@ The following advanced settings are available in ``settings.py``.
 
 
 Bugs and Supports
-#################
+=================
 
 The Mia! Django accounting application is hosted on GitHub.
 
-  https://github.com/imacat/mia-accounting
+    https://github.com/imacat/mia-accounting
 
 Address all bugs and support requests to imacat@mail.imacat.idv.tw.
 
+
 Copyright
-#########
+=========
 
  Copyright (c) 2020-2021 imacat.
 
