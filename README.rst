@@ -141,6 +141,63 @@ Restart Your Web Server
 And you are done.
 
 
+Management Commands
+===================
+
+The following management commands are added by *the Mia! accounting
+application* to ``manage.py``:
+
+``accounting_accounts``
+-----------------------
+
+.. code::
+
+    % ./manage.py accounting_accounts [--user USER]
+
+Fills the database with the accounting accounts.
+
+- ``--user`` *USER*
+
+  An optional user to specify which user these initial accounts
+  belongs to.  When omitted, the first user found in the system will
+  be used.
+
+``accounting_sample``
+---------------------
+
+.. code::
+
+    % ./manage.py accounting_sample [--user USER]
+
+Fills the database with sample accounting data.
+
+- ``--user`` *USER*
+
+  An optional user to specify which user these initial accounts
+  belongs to.  When omitted, the first user found in the system will
+  be used.
+
+``make_trans``
+--------------
+
+.. code::
+
+    % ./manage.py make_trans --domain DOMAIN APP_DIR1 [APP_DIR2 ...]
+
+Updates the revision date, converts the Traditional Chinese
+translation into Simplified Chinese, and then calls the
+``compilemessages`` command.
+
+- ``--domain`` *DOMAIN*
+
+  The message domain, either ``django`` or ``djangojs``.
+
+- *APP_DIR1* [*APP_DIR2* ...]
+
+  One or more application directories that contains their ``locale``
+  subdirectories.
+
+
 Advanced Settings
 =================
 
