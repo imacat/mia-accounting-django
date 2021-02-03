@@ -6,6 +6,5 @@ migrations
 *.mo
 .idea
 venv
-mirror
 excludes
 zh_Hans
