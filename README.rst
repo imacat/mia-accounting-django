@@ -6,13 +6,12 @@ The Mia! Django Accounting Application
 Description
 ===========
 
-*mia-accounting* is a `Django <https://www.djangoproject.com>`_
-accounting application.  It was rewritten from my own private
-accounting application in Perl/`mod_perl <https://perl.apache.org>`_
+*mia-accounting* is a Django_ accounting application.  It was
+rewritten from my own private accounting application in Perl/mod_perl_
 in 2007.  The revision aims to be mobile-friendly with Bootstrap, with
 a modern back-end framework and front-end technology like jQuery.  The
-first revision was in Perl/`Mojolicious <https://mojolicious.org/>`_
-in 2019.  This is the second revision in Python/Django in 2020.
+first revision was in Perl/Mojolicious_ in 2019.  This is the second
+revision in Python/Django in 2020.
 
 The Mia! Django accounting application comes with two parts:
 
@@ -27,6 +26,10 @@ You may try it in live demonstration at:
 - URL: https://accounting.imacat.idv.tw/accounting
 - Username: ``admin``
 - Password: ``12345``
+
+.. _Django: https://www.djangoproject.com
+.. _mod_perl: https://perl.apache.org
+.. _Mojolicious: https://mojolicious.org
 
 
 Installation
