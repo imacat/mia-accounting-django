@@ -28,7 +28,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
-    ExpressionWrapper, Exists, OuterRef, Value, CharField
+    ExpressionWrapper, Exists, OuterRef, Value, CharField, DecimalField
 from django.db.models.functions import TruncMonth, Coalesce, Left, StrIndex
 from django.http import JsonResponse, HttpResponseRedirect, Http404, \
     HttpRequest, HttpResponse
@@ -124,7 +124,8 @@ def cash(request: HttpRequest, account: Account,
             .aggregate(
                 balance=Coalesce(Sum(Case(When(
                     is_credit=True, then=-1),
-                    default=1) * F("amount")), 0))["balance"]
+                    default=1) * F("amount"), output_field=DecimalField()),
+                                 0, output_field=DecimalField()))["balance"]
     balance = balance_before
     for record in records:
         sign = 1 if record.is_credit else -1
