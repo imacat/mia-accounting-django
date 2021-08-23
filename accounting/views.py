@@ -28,7 +28,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import Sum, Case, When, F, Q, Count, BooleanField, \
-    ExpressionWrapper, Exists, OuterRef, Value, CharField
+    ExpressionWrapper, Exists, OuterRef, Value, CharField, DecimalField
 from django.db.models.functions import TruncMonth, Coalesce, Left, StrIndex
 from django.http import JsonResponse, HttpResponseRedirect, Http404, \
     HttpRequest, HttpResponse
@@ -103,9 +103,10 @@ def cash(request: HttpRequest, account: Account,
                  Q(account__code__startswith="21") |
                  Q(account__code__startswith="22"))) \
             .aggregate(
-                balance=Coalesce(Sum(Case(
-                    When(is_credit=True, then=-1),
-                    default=1) * F("amount")), 0))["balance"]
+                balance=Coalesce(Sum(Case(When(is_credit=True, then=-1),
+                                          default=1) * F("amount"),
+                                     output_field=DecimalField()),
+                                 0, output_field=DecimalField()))["balance"]
     else:
         records = list(
             Record.objects
@@ -122,9 +123,10 @@ def cash(request: HttpRequest, account: Account,
                 transaction__date__lt=period.start,
                 account__code__startswith=account.code) \
             .aggregate(
-                balance=Coalesce(Sum(Case(When(
-                    is_credit=True, then=-1),
-                    default=1) * F("amount")), 0))["balance"]
+                balance=Coalesce(Sum(Case(When(is_credit=True, then=-1),
+                                          default=1) * F("amount"),
+                                     output_field=DecimalField()),
+                                 0, output_field=DecimalField()))["balance"]
     balance = balance_before
     for record in records:
         sign = 1 if record.is_credit else -1
@@ -211,15 +213,14 @@ def cash_summary(request: HttpRequest, account: Account) -> HttpResponse:
                   .values("month")
                   .order_by("month")
                   .annotate(
-                    debit=Coalesce(
-                        Sum(Case(When(is_credit=False, then=F("amount")))),
-                        0),
-                    credit=Coalesce(
-                        Sum(Case(When(is_credit=True, then=F("amount")))),
-                        0),
-                    balance=Sum(Case(
-                        When(is_credit=False, then=-F("amount")),
-                        default=F("amount"))))]
+                    debit=Coalesce(Sum(Case(When(is_credit=False,
+                                                 then=F("amount")))),
+                                   0, output_field=DecimalField()),
+                    credit=Coalesce(Sum(Case(When(is_credit=True,
+                                                  then=F("amount")))),
+                                    0, output_field=DecimalField()),
+                    balance=Sum(Case(When(is_credit=False, then=-F("amount")),
+                                     default=F("amount"))))]
     else:
         months = [utils.MonthlySummary(**x) for x in Record.objects
                   .filter(
@@ -230,15 +231,14 @@ def cash_summary(request: HttpRequest, account: Account) -> HttpResponse:
                   .values("month")
                   .order_by("month")
                   .annotate(
-                    debit=Coalesce(
-                        Sum(Case(When(is_credit=False, then=F("amount")))),
-                        0),
-                    credit=Coalesce(
-                        Sum(Case(When(is_credit=True, then=F("amount")))),
-                        0),
-                    balance=Sum(Case(
-                        When(is_credit=False, then=-F("amount")),
-                        default=F("amount"))))]
+                    debit=Coalesce(Sum(Case(When(is_credit=False,
+                                                 then=F("amount")))),
+                                   0, output_field=DecimalField()),
+                    credit=Coalesce(Sum(Case(When(is_credit=True,
+                                                  then=F("amount")))),
+                                    0, output_field=DecimalField()),
+                    balance=Sum(Case(When(is_credit=False, then=-F("amount")),
+                                     default=F("amount"))))]
     cumulative_balance = 0
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
@@ -305,9 +305,10 @@ def ledger(request: HttpRequest, account: Account,
                 transaction__date__lt=period.start,
                 account__code__startswith=account.code) \
             .aggregate(
-                balance=Coalesce(Sum(Case(When(
-                    is_credit=True, then=-1),
-                    default=1) * F("amount")), 0))["balance"]
+                balance=Coalesce(Sum(Case(When(is_credit=True, then=-1),
+                                          default=1) * F("amount"),
+                                     output_field=DecimalField()),
+                                 0, output_field=DecimalField()))["balance"]
         record_brought_forward = Record(
             transaction=Transaction(date=period.start),
             account=account,
@@ -370,15 +371,14 @@ def ledger_summary(request: HttpRequest, account: Account) -> HttpResponse:
               .values("month")
               .order_by("month")
               .annotate(
-                    debit=Coalesce(
-                        Sum(Case(When(is_credit=False, then=F("amount")))),
-                        0),
-                    credit=Coalesce(
-                        Sum(Case(When(is_credit=True, then=F("amount")))),
-                        0),
-                    balance=Sum(Case(
-                        When(is_credit=False, then=F("amount")),
-                        default=-F("amount"))))]
+                    debit=Coalesce(Sum(Case(When(is_credit=False,
+                                                 then=F("amount")))),
+                                   0, output_field=DecimalField()),
+                    credit=Coalesce(Sum(Case(When(is_credit=True,
+                                                  then=F("amount")))),
+                                    0, output_field=DecimalField()),
+                    balance=Sum(Case(When(is_credit=False, then=F("amount")),
+                                     default=-F("amount"))))]
     cumulative_balance = 0
     for month in months:
         cumulative_balance = cumulative_balance + month.balance
@@ -436,11 +436,10 @@ def journal(request: HttpRequest, period: Period) -> HttpResponse:
             | Q(code__startswith="2")
             | Q(code__startswith="3")) \
         .annotate(balance=Sum(
-            Case(
-                When(record__is_credit=True, then=-1),
-                default=1
-            ) * F("record__amount"),
-            filter=Q(record__transaction__date__lt=period.start))) \
+            Case(When(record__is_credit=True, then=-1),
+                 default=1) * F("record__amount"),
+            filter=Q(record__transaction__date__lt=period.start),
+            output_field=DecimalField())) \
         .filter(~Q(balance=0))
     debit_records = [Record(
         transaction=Transaction(date=period.start),
@@ -513,9 +512,9 @@ def trial_balance(request: HttpRequest, period: Period) -> HttpResponse:
               | Q(code__startswith="2")
               | Q(code__startswith="3")))
         .annotate(
-            amount=Sum(Case(
-                When(record__is_credit=True, then=-1),
-                default=1) * F("record__amount")))
+            amount=Sum(Case(When(record__is_credit=True, then=-1),
+                            default=1) * F("record__amount"),
+                       output_field=DecimalField()))
         .filter(Q(amount__isnull=False), ~Q(amount=0))
         .annotate(
             debit_amount=Case(
@@ -534,9 +533,9 @@ def trial_balance(request: HttpRequest, period: Period) -> HttpResponse:
              | Q(code__startswith="3")),
             ~Q(code=Account.ACCUMULATED_BALANCE))
         .annotate(
-            amount=Sum(Case(
-                When(record__is_credit=True, then=-1),
-                default=1) * F("record__amount")))
+            amount=Sum(Case(When(record__is_credit=True, then=-1),
+                            default=1) * F("record__amount"),
+                       output_field=DecimalField()))
         .filter(Q(amount__isnull=False), ~Q(amount=0))
         .annotate(
             debit_amount=Case(
@@ -555,9 +554,9 @@ def trial_balance(request: HttpRequest, period: Period) -> HttpResponse:
             | (Q(transaction__date__lte=period.end)
                & Q(account__code=Account.ACCUMULATED_BALANCE))) \
         .aggregate(
-            balance=Sum(Case(
-                When(is_credit=True, then=-1),
-                default=1) * F("amount")))["balance"]
+            balance=Sum(Case(When(is_credit=True, then=-1),
+                             default=1) * F("amount"),
+                        output_field=DecimalField()))["balance"]
     if balance is not None and balance != 0:
         brought_forward = Account.objects.get(
             code=Account.ACCUMULATED_BALANCE)
@@ -614,9 +613,9 @@ def income_statement(request: HttpRequest, period: Period) -> HttpResponse:
               | Q(code__startswith="2")
               | Q(code__startswith="3")))
         .annotate(
-            amount=Sum(Case(
-                When(record__is_credit=True, then=1),
-                default=-1) * F("record__amount")))
+            amount=Sum(Case(When(record__is_credit=True, then=1),
+                            default=-1) * F("record__amount"),
+                       output_field=DecimalField()))
         .filter(Q(amount__isnull=False), ~Q(amount=0))
         .order_by("code"))
     groups = list(Account.objects.filter(
@@ -687,9 +686,9 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
              | Q(code__startswith="3")),
             ~Q(code=Account.ACCUMULATED_BALANCE))
         .annotate(
-            amount=Sum(Case(
-                When(record__is_credit=True, then=-1),
-                default=1) * F("record__amount")))
+            amount=Sum(Case(When(record__is_credit=True, then=-1),
+                            default=1) * F("record__amount"),
+                       output_field=DecimalField()))
         .filter(Q(amount__isnull=False), ~Q(amount=0))
         .order_by("code"))
     for account in accounts:
@@ -703,9 +702,9 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
                  | Q(account__code__startswith="3"))
                 & ~Q(account__code=Account.ACCUMULATED_BALANCE))) \
         .aggregate(
-            balance=Sum(Case(
-                When(is_credit=True, then=-1),
-                default=1) * F("amount")))["balance"]
+            balance=Sum(Case(When(is_credit=True, then=-1),
+                             default=1) * F("amount"),
+                        output_field=DecimalField()))["balance"]
     if balance is not None and balance != 0:
         brought_forward = Account.objects.get(
             code=Account.ACCUMULATED_BALANCE)
@@ -723,9 +722,9 @@ def balance_sheet(request: HttpRequest, period: Period) -> HttpResponse:
                  | Q(account__code__startswith="3"))
                 & ~Q(account__code=Account.ACCUMULATED_BALANCE))) \
         .aggregate(
-            balance=Sum(Case(
-                When(is_credit=True, then=-1),
-                default=1) * F("amount")))["balance"]
+            balance=Sum(Case(When(is_credit=True, then=-1),
+                             default=1) * F("amount"),
+                        output_field=DecimalField()))["balance"]
     if balance is not None and balance != 0:
         net_change = Account.objects.get(code=Account.NET_CHANGE)
         net_change.amount = balance
