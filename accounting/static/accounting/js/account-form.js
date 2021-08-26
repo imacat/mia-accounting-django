@@ -96,10 +96,10 @@ function updateParent(code) {
  * @private
  */
 function validateForm() {
-    let isValidated = true;
-    isValidated = isValidated && validateCode();
-    isValidated = isValidated && validateTitle();
-    return isValidated;
+    let isValid = true;
+    isValid = isValid && validateCode();
+    isValid = isValid && validateTitle();
+    return isValid;
 }
 
 /**

@@ -337,28 +337,28 @@ function resetRecordButtons() {
  * @private
  */
 function validateForm() {
-    let isValidated = true;
-    isValidated = isValidated && validateDate();
+    let isValid = true;
+    isValid = isValid && validateDate();
     $(".debit-record").each(function () {
-        isValidated = isValidated && validateRecord(this);
+        isValid = isValid && validateRecord(this);
     });
     $(".credit-account").each(function () {
-        isValidated = isValidated && validateRecord(this);
+        isValid = isValid && validateRecord(this);
     });
     $(".record-account").each(function () {
-        isValidated = isValidated && validateAccount(this);
+        isValid = isValid && validateAccount(this);
     });
     $(".record-summary").each(function () {
-        isValidated = isValidated && validateSummary(this);
+        isValid = isValid && validateSummary(this);
     });
     $(".record-amount").each(function () {
-        isValidated = isValidated && validateAmount(this);
+        isValid = isValid && validateAmount(this);
     });
     if (isTransfer()) {
-        isValidated = isValidated && validateBalance();
+        isValid = isValid && validateBalance();
     }
-    isValidated = isValidated && validateNote();
-    return isValidated;
+    isValid = isValid && validateNote();
+    return isValid;
 }
 
 /**
