@@ -91,8 +91,8 @@ let accountOptions;
  */
 function getAccountOptions() {
     const request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
+    request.onload = function() {
+        if (this.status === 200) {
             accountOptions = JSON.parse(this.responseText);
             $(".record-account").each(function () {
                 initializeAccountOptions($(this));
