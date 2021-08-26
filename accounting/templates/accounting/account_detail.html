@@ -42,7 +42,7 @@ First written: 2020/8/8
 <form action="{% url "accounting:accounts.delete" account as url %}{% url_keep_return url %}" method="post">
   {% csrf_token %}
   <!-- The Modal -->
-  <div class="modal" id="del-modal">
+  <div class="modal fade" id="del-modal">
     <div class="modal-dialog">
       <div class="modal-content">
 
