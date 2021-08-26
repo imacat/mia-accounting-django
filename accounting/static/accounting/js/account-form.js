@@ -97,8 +97,8 @@ function updateParent(code) {
  */
 function validateForm() {
     let isValid = true;
-    isValid = isValid && validateCode();
-    isValid = isValid && validateTitle();
+    isValid = validateCode() && isValid;
+    isValid = validateTitle() && isValid;
     return isValid;
 }
 
