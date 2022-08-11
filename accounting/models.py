@@ -173,7 +173,8 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
             self.ord = 1 if max_ord is None else max_ord + 1
         # Collects the records to be deleted
         to_keep = [x.pk for x in self.records if x.pk is not None]
-        to_delete = [x for x in self.record_set.all() if x.pk not in to_keep]
+        to_delete = [] if self.pk is None \
+            else [x for x in self.record_set.all() if x.pk not in to_keep]
         to_save = [x for x in self.records
                    if x.is_dirty(check_relationship=True)]
         for record in to_save:
