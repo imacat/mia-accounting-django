@@ -303,8 +303,11 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
             List[Record]: The records.
         """
         if self._records is None:
-            self._records = list(self.record_set.all())
-            self._records.sort(key=lambda x: (x.is_credit, x.ord))
+            if self.pk is None:
+                self._records = []
+            else:
+                self._records = list(self.record_set.all())
+                self._records.sort(key=lambda x: (x.is_credit, x.ord))
         return self._records
 
     @records.setter
