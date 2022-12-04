@@ -126,9 +126,12 @@ class LocalizedModel(models.Model):
                         current_value = getattr(self, name + "_l10n")
                         if current_value is None or current_value == "":
                             setattr(self, name + "_l10n", new_value)
-                        l10n_rec = self._get_l10n_set()\
-                            .filter(name=name, language=language)\
-                            .first()
+                        if self.pk is None:
+                            l10n_rec = None
+                        else:
+                            l10n_rec = self._get_l10n_set()\
+                                .filter(name=name, language=language)\
+                                .first()
                         if l10n_rec is None:
                             l10n_to_save.append(self._get_l10n_set().model(
                                 master=self, name=name,
