@@ -479,7 +479,7 @@ class TransactionSortForm(forms.Form):
                 post_orders.append(form.Order(txn, 9999))
             else:
                 post_orders.append(form.Order(txn, int(post[key])))
-        post_orders.sort(key=lambda x: (x.order, x.txn.ord))
+        post_orders.sort(key=lambda x: (x.ord, x.txn.ord))
         form.txn_orders = []
         for i in range(len(post_orders)):
             form.txn_orders.append(form.Order(post_orders[i].txn, i + 1))
@@ -488,9 +488,9 @@ class TransactionSortForm(forms.Form):
 
     class Order:
         """A transaction order"""
-        def __init__(self, txn: Transaction, order: int):
+        def __init__(self, txn: Transaction, ord: int):
             self.txn = txn
-            self.order = order
+            self.ord = ord
 
 
 class AccountForm(forms.Form):

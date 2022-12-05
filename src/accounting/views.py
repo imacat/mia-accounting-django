@@ -1086,13 +1086,13 @@ class TransactionSortFormView(FormView):
 
     def form_valid(self, form: TransactionSortForm) -> HttpResponseRedirect:
         """Handles the action when the POST form is valid."""
-        modified = [x for x in form.txn_orders if x.txn.ord != x.order]
+        modified = [x for x in form.txn_orders if x.txn.ord != x.ord]
         if len(modified) == 0:
             message = self.get_not_modified_message(form.cleaned_data)
         else:
             with transaction.atomic():
                 for x in modified:
-                    Transaction.objects.filter(pk=x.txn.pk).update(ord=x.order)
+                    Transaction.objects.filter(pk=x.txn.pk).update(ord=x.ord)
             message = self.get_success_message(form.cleaned_data)
         messages.success(self.request, message)
         return redirect(self.get_success_url())
