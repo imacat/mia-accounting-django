@@ -28,7 +28,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/imacat/mia-accounting",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(where="src"),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
@@ -39,4 +39,5 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=["django", "django-dirtyfields", "titlecase",
                       "django-decorator-include"],
+    package_dir={"": "src"},
 )
