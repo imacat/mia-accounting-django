@@ -1,0 +1,25 @@
+{% load i18n %}
+{% load static %}
+{% load mia_core %}
+{% init_libs %}
+{% block settings %}{% endblock %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" lang="{% get_current_language as language %}{{ language }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% for css in libs.css %}
+    <link rel="stylesheet" type="text/css" href="{% if css|is_static_url %}{% static css %}{% else %}{{ css }}{% endif %}" />
+  {% endfor %}
+  {% for js in libs.js %}
+    <script src="{% if js|is_static_url %}{% static js %}{% else %}{{ js }}{% endif %}"></script>
+  {% endfor %}
+  <title>{{ title }}</title>
+</head>
+<body>
+
+<h1>{{ title }}</h1>
+
+{% block content %}{% endblock %}
+
+</body>
