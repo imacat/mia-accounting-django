@@ -8,3 +8,6 @@ migrations
 venv
 excludes
 zh_Hans
+
+.scannerwork
+sonar-project.properties
