@@ -216,7 +216,7 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
             txn_type: The transaction type.
         """
         self.old_date = self.date
-        m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", post["date"])
+        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", post["date"])
         self.date = datetime.date(
             int(m.group(1)),
             int(m.group(2)),
@@ -282,8 +282,8 @@ class Transaction(DirtyFieldsMixin, StampedModel, RandomPkModel):
             max_no["credit"] = 0
         for key in post.keys():
             m = re.match(
-                ("^(debit|credit)-([1-9][0-9]*)-"
-                 "(id|ord|account|summary|amount)$"),
+                (r"^(debit|credit)-([1-9]\d*)-"
+                 r"(id|ord|account|summary|amount)$"),
                 key)
             if m is None:
                 continue

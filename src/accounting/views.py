@@ -804,9 +804,9 @@ class SearchListView(TemplateView):
                 | Q(code=term)))\
             | Q(summary__icontains=term)\
             | Q(transaction__notes__icontains=term)
-        if re.match("^[0-9]+(?:\\.[0-9]+)?$", term):
+        if re.match(r"^\d+(?:\.\d+)?$", term):
             conditions = conditions | Q(amount=Decimal(term))
-        if re.match("^[1-9][0-8]{9}$", term):
+        if re.match(r"^[1-9][0-8]{9}$", term):
             conditions = conditions\
                          | Q(pk=int(term))\
                          | Q(transaction__pk=int(term))\

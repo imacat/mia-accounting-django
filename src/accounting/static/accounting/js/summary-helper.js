@@ -329,7 +329,7 @@ function parseSummaryForCategoryHelpers(summary) {
     });
 
     // A bus route
-    const matchBus = summary.match(/^([^—]+)—([^—]+)—([^—]+)→([^—]+?)(?:×[0-9]+)?$/);
+    const matchBus = summary.match(/^([^—]+)—([^—]+)—([^—]+)→([^—]+?)(?:×\d+)?$/);
     if (matchBus !== null) {
         $("#summary-bus-category").get(0).value = matchBus[1];
         setSummaryBusCategoryButtons(matchBus[1]);
@@ -342,7 +342,7 @@ function parseSummaryForCategoryHelpers(summary) {
     }
 
     // A general travel route
-    const matchTravel = summary.match(/^([^—]+)—([^—]+)([→|↔])([^—]+?)(?:×[0-9]+)?$/);
+    const matchTravel = summary.match(/^([^—]+)—([^—]+)([→|↔])([^—]+?)(?:×\d+)?$/);
     if (matchTravel !== null) {
         $("#summary-travel-category").get(0).value = matchTravel[1];
         setSummaryTravelCategoryButtons(matchTravel[1]);
@@ -357,7 +357,7 @@ function parseSummaryForCategoryHelpers(summary) {
 
     // A general category
     const generalCategoryTab = $("#summary-tab-category");
-    const matchCategory = summary.match(/^([^—]+)—.+(?:×[0-9]+)?$/);
+    const matchCategory = summary.match(/^([^—]+)—.+(?:×\d+)?$/);
     if (matchCategory !== null) {
         $("#summary-general-category").get(0).value = matchCategory[1];
         setSummaryGeneralCategoryButtons(matchCategory[1]);

@@ -184,8 +184,8 @@ function updateTotalAmount(element) {
         }
     });
     total = String(total);
-    while (total.match(/^[1-9][0-9]*[0-9]{3}/)) {
-        total = total.replace(/^([1-9][0-9]*)([0-9]{3})/, "$1,$2");
+    while (total.match(/^[1-9]\d*\d{3}/)) {
+        total = total.replace(/^([1-9]\d*)(\d{3})/, "$1,$2");
     }
     $("#" + type + "-total").text(total);
 }

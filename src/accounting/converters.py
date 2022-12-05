@@ -40,9 +40,9 @@ class TransactionTypeConverter:
 
 class PeriodConverter:
     """The path converter for the period."""
-    regex = ("([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)|"
-             "([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?-"
-             "([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?")
+    regex = (r"([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)|"
+             r"([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?-"
+             r"([0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?")
 
     def to_python(self, value):
         """Returns the period by the period specification.
@@ -90,7 +90,7 @@ class DateConverter:
         Returns:
             datetime.date: The date.
         """
-        m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$", value)
+        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", value)
         year = int(m.group(1))
         month = int(m.group(2))
         day = int(m.group(3))

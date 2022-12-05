@@ -195,7 +195,7 @@ class Period:
         """
         if self._data_start is None:
             return None
-        m = re.match("^[0-9]{4}-[0-2]{2}", self._period.spec)
+        m = re.match(r"^\d{4}-\d{2}", self._period.spec)
         if m is None:
             return None
         if self._period.end < self._data_start:
@@ -379,9 +379,9 @@ class Period:
         if self.start <= self._data_start:
             return None
         previous_day = self.start - datetime.timedelta(days=1)
-        if re.match("^[0-9]{4}$", self.spec):
+        if re.match(r"^\d{4}$", self.spec):
             return "-" + str(previous_day.year)
-        if re.match("^[0-9]{4}-[0-9]{2}$", self.spec):
+        if re.match(r"^\d{4}-\d{2}$", self.spec):
             return dateformat.format(previous_day, "-Y-m")
         return dateformat.format(previous_day, "-Y-m-d")
 
@@ -441,7 +441,7 @@ class Period:
                 return
             self.spec = spec
             # A specific month
-            m = re.match("^([0-9]{4})-([0-9]{2})$", spec)
+            m = re.match(r"^(\d{4})-(\d{2})$", spec)
             if m is not None:
                 year = int(m.group(1))
                 month = int(m.group(2))
@@ -452,7 +452,7 @@ class Period:
                 self.prep_desc = gettext("In %s") % self.description
                 return
             # From a specific month
-            m = re.match("^([0-9]{4})-([0-9]{2})-$", spec)
+            m = re.match(r"^(\d{4})-(\d{2})-$", spec)
             if m is not None:
                 year = int(m.group(1))
                 month = int(m.group(2))
@@ -464,7 +464,7 @@ class Period:
                 self.prep_desc = self.description
                 return
             # Until a specific month
-            m = re.match("^-([0-9]{4})-([0-9]{2})$", spec)
+            m = re.match(r"^-(\d{4})-(\d{2})$", spec)
             if m is not None:
                 year = int(m.group(1))
                 month = int(m.group(2))
@@ -477,7 +477,7 @@ class Period:
                 self.prep_desc = self.description
                 return
             # A specific year
-            m = re.match("^([0-9]{4})$", spec)
+            m = re.match(r"^(\d{4})$", spec)
             if m is not None:
                 year = int(m.group(1))
                 # Raises ValueError
@@ -487,7 +487,7 @@ class Period:
                 self.prep_desc = gettext("In %s") % self.description
                 return
             # Until a specific year
-            m = re.match("^-([0-9]{4})$", spec)
+            m = re.match(r"^-(\d{4})$", spec)
             if m is not None:
                 year = int(m.group(1))
                 # Raises ValueError
@@ -505,7 +505,7 @@ class Period:
                 self.prep_desc = gettext("In %s") % self.description
                 return
             # A specific date
-            m = re.match("^([0-9]{4})-([0-9]{2})-([0-9]{2})$",
+            m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$",
                          spec)
             if m is not None:
                 # Raises ValueError
@@ -518,8 +518,8 @@ class Period:
                 self.prep_desc = gettext("In %s") % self.description
                 return
             # A specific date period
-            m = re.match(("^([0-9]{4})-([0-9]{2})-([0-9]{2})"
-                          "-([0-9]{4})-([0-9]{2})-([0-9]{2})$"),
+            m = re.match((r"^(\d{4})-(\d{2})-(\d{2})"
+                          r"-(\d{4})-(\d{2})-(\d{2})$"),
                          spec)
             if m is not None:
                 # Raises ValueError
@@ -564,7 +564,7 @@ class Period:
                 self.prep_desc = gettext("In %s") % self.description
                 return
             # Until a specific day
-            m = re.match("^-([0-9]{4})-([0-9]{2})-([0-9]{2})$", spec)
+            m = re.match(r"^-(\d{4})-(\d{2})-(\d{2})$", spec)
             if m is not None:
                 # Raises ValueError
                 self.end = datetime.date(

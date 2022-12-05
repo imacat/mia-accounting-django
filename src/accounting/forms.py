@@ -205,8 +205,8 @@ class TransactionForm(forms.Form):
             by_rec_id = {}
             for key in args[0].keys():
                 m = re.match(
-                    ("^((debit|credit)-([1-9][0-9]*))-"
-                     "(id|ord|account|summary|amount)$"),
+                    (r"^((debit|credit)-([1-9]\d*))-"
+                     r"(id|ord|account|summary|amount)$"),
                     key)
                 if m is None:
                     continue
@@ -271,7 +271,7 @@ class TransactionForm(forms.Form):
         }
         for key in post.keys():
             m = re.match(
-                "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
+                r"^(debit|credit)-([1-9]\d*)-(id|ord|account|summary|amount)",
                 key)
             if m is None:
                 continue
@@ -303,7 +303,7 @@ class TransactionForm(forms.Form):
                             = post[F"{record_type}-{old_no}-{attr}"]
         # Purges the old form and fills it with the new form
         for x in [x for x in post.keys() if re.match(
-                "^(debit|credit)-([1-9][0-9]*)-(id|ord|account|summary|amount)",
+                r"^(debit|credit)-([1-9]\d*)-(id|ord|account|summary|amount)",
                 x)]:
             del post[x]
         for key in new_post.keys():
@@ -475,7 +475,7 @@ class TransactionSortForm(forms.Form):
             key = F"transaction-{txn.pk}-ord"
             if key not in post:
                 post_orders.append(form.Order(txn, 9999))
-            elif not re.match("^[0-9]+$", post[key]):
+            elif not re.match(r"^\d+$", post[key]):
                 post_orders.append(form.Order(txn, 9999))
             else:
                 post_orders.append(form.Order(txn, int(post[key])))

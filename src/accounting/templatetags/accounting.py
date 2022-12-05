@@ -42,7 +42,7 @@ def _strip_decimal_zeros(value: Decimal) -> str:
         str: The value with excess decimal zeros stripped.
     """
     s = str(value)
-    s = re.sub(r"^(.*\.[0-9]*?)0+$", r"\1", s)
+    s = re.sub(r"^(.*\.\d*?)0+$", r"\1", s)
     s = re.sub(r"^(.*)\.$", r"\1", s)
     return s
 
@@ -58,7 +58,7 @@ def _format_positive_amount(value: Decimal) -> str:
     """
     s = _strip_decimal_zeros(value)
     while True:
-        m = re.match("^([1-9][0-9]*)([0-9]{3}.*)", s)
+        m = re.match(r"^([1-9]\d*)(\d{3}.*)", s)
         if m is None:
             break
         s = m.group(1) + "," + m.group(2)
