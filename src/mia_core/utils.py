@@ -19,8 +19,8 @@
 
 """
 import datetime
-import random
 import urllib.parse
+from secrets import randbelow
 from typing import Dict, List, Any, Type, Optional
 
 from django.conf import settings
@@ -40,7 +40,7 @@ def new_pk(cls: Type[Model]) -> int:
          The new random ID.
     """
     while True:
-        pk = random.randint(100000000, 999999999)
+        pk = 100000000 + randbelow(900000000)
         try:
             cls.objects.get(pk=pk)
         except cls.DoesNotExist:
