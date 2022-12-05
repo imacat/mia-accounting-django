@@ -603,7 +603,6 @@ class AccountForm(forms.Form):
                 code="code_unique")
             self.add_error("code", error)
             raise error
-        return
 
     def _validate_code_descendant_code_size(self) -> None:
         """Validates whether the codes of the descendants will be too long.
