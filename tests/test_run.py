@@ -126,6 +126,30 @@ class RunTestCase(unittest.TestCase):
              "credit-3-account": "1113",
              "credit-6-ord": 3,
              "credit-6-summary": "",
+             "credit-6-amount": 320,
+             "credit-6-account": "1111",
+             "notes": "nothing"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"],
+                         "/accounting/transactions/transfer/create?r=/ok")
+
+        response = self.client.post(
+            "/accounting/transactions/transfer/create?r=/ok",
+            {"date": today,
+             "debit-2-ord": 6,
+             "debit-2-summary": "lunch",
+             "debit-2-amount": 80,
+             "debit-2-account": "6272",
+             "debit-8-ord": 4,
+             "debit-8-summary": "movies",
+             "debit-8-amount": 320,
+             "debit-8-account": "6273",
+             "credit-3-ord": 7,
+             "credit-3-summary": "withdrawal",
+             "credit-3-amount": 100,
+             "credit-3-account": "1113",
+             "credit-6-ord": 3,
+             "credit-6-summary": "",
              "credit-6-amount": 300,
              "credit-6-account": "1111",
              "notes": "nothing"})
