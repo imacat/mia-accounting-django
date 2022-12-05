@@ -76,9 +76,13 @@ class RunTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         today: str = datetime.today().strftime("%Y-%m-%d")
+        expense_add_uri: str = "/accounting/transactions/expense/create?r=/ok"
+        income_add_uri: str = "/accounting/transactions/income/create?r=/ok"
+        transfer_add_uri: str \
+            = "/accounting/transactions/transfer/create?r=/ok"
 
         response = self.client.post(
-            "/accounting/transactions/expense/create?r=/ok",
+            expense_add_uri,
             {"date": today,
              "debit-2-ord": 6,
              "debit-2-summary": "lunch",
@@ -90,11 +94,10 @@ class RunTestCase(unittest.TestCase):
              "debit-8-account": "6273",
              "notes": "yammy"})
         self.assertEqual(response.status_code, 302)
-        self.assertNotEqual(response.headers["Location"],
-                            "/accounting/transactions/expense/create?r=/ok")
+        self.assertNotEqual(response.headers["Location"], expense_add_uri)
 
         response = self.client.post(
-            "/accounting/transactions/income/create?r=/ok",
+            income_add_uri,
             {"date": today,
              "credit-3-ord": 7,
              "credit-3-summary": "withdrawal",
@@ -106,11 +109,10 @@ class RunTestCase(unittest.TestCase):
              "credit-6-account": "4611",
              "notes": "wonderful"})
         self.assertEqual(response.status_code, 302)
-        self.assertNotEqual(response.headers["Location"],
-                            "/accounting/transactions/income/create?r=/ok")
+        self.assertNotEqual(response.headers["Location"], income_add_uri)
 
         response = self.client.post(
-            "/accounting/transactions/transfer/create?r=/ok",
+            transfer_add_uri,
             {"date": today,
              "debit-2-ord": 6,
              "debit-2-summary": "lunch",
@@ -130,11 +132,10 @@ class RunTestCase(unittest.TestCase):
              "credit-6-account": "1111",
              "notes": "nothing"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"],
-                         "/accounting/transactions/transfer/create?r=/ok")
+        self.assertEqual(response.headers["Location"], transfer_add_uri)
 
         response = self.client.post(
-            "/accounting/transactions/transfer/create?r=/ok",
+            transfer_add_uri,
             {"date": today,
              "debit-2-ord": 6,
              "debit-2-summary": "lunch",
@@ -154,5 +155,4 @@ class RunTestCase(unittest.TestCase):
              "credit-6-account": "1111",
              "notes": "nothing"})
         self.assertEqual(response.status_code, 302)
-        self.assertNotEqual(response.headers["Location"],
-                            "/accounting/transactions/transfer/create?r=/ok")
+        self.assertNotEqual(response.headers["Location"], transfer_add_uri)
