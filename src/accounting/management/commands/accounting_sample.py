@@ -155,7 +155,7 @@ class Command(BaseCommand):
         payday = today.replace(day=5)
         if payday > today:
             payday = self.previous_month(payday)
-        for i in range(months):
+        for _ in range(months):
             self.add_payroll(payday)
             payday = self.previous_month(payday)
 
