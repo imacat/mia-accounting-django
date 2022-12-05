@@ -90,6 +90,8 @@ class RunTestCase(unittest.TestCase):
              "debit-8-account": "6273",
              "notes": "yammy"})
         self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.headers["Location"],
+                            "/accounting/transactions/expense/create?r=/ok")
 
         response = self.client.post(
             "/accounting/transactions/income/create?r=/ok",
@@ -104,6 +106,8 @@ class RunTestCase(unittest.TestCase):
              "credit-6-account": "4611",
              "notes": "wonderful"})
         self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.headers["Location"],
+                            "/accounting/transactions/income/create?r=/ok")
 
         response = self.client.post(
             "/accounting/transactions/transfer/create?r=/ok",
@@ -126,3 +130,5 @@ class RunTestCase(unittest.TestCase):
              "credit-6-account": "1111",
              "notes": "nothing"})
         self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.headers["Location"],
+                            "/accounting/transactions/transfer/create?r=/ok")
