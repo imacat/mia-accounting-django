@@ -69,7 +69,7 @@ class StampedModel(models.Model):
                 F"Missing current_user in {self.__class__.__name__}")
         try:
             self.created_by
-        except ObjectDoesNotExist as e:
+        except ObjectDoesNotExist:
             self.created_by = self.current_user
         self.updated_by = self.current_user
         super().save(force_insert=force_insert, force_update=force_update,
