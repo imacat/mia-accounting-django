@@ -74,8 +74,6 @@ class RunTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         response = self.client.get("/accounting/", follow=True)
         self.assertEqual(response.status_code, 200)
-        response = self.client.get("/accounting/", follow=True)
-        self.assertEqual(response.status_code, 200)
 
         today: str = datetime.today().strftime("%Y-%m-%d")
 
