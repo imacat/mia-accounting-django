@@ -20,7 +20,7 @@
 """
 import datetime
 import getpass
-import random
+from secrets import randbelow
 from typing import Optional
 
 from django.contrib.auth import get_user_model
@@ -98,20 +98,20 @@ class Command(BaseCommand):
 
             self._filler.add_expense_transaction(
                 -2,
-                [(6272, _("Lunch—Spaghetti"), random.randint(40, 200)),
-                 (6272, _("Drink—Tea"), random.randint(40, 200))])
+                [(6272, _("Lunch—Spaghetti"), 40 + randbelow(160)),
+                 (6272, _("Drink—Tea"), 40 + randbelow(160))])
             self._filler.add_expense_transaction(
                 -1,
-                ([(6272, _("Lunch—Pizza"), random.randint(40, 200)),
-                 (6272, _("Drink—Tea"), random.randint(40, 200))]))
+                ([(6272, _("Lunch—Pizza"), 40 + randbelow(160)),
+                 (6272, _("Drink—Tea"), 40 + randbelow(160))]))
             self._filler.add_expense_transaction(
                 -1,
-                [(6272, _("Lunch—Spaghetti"), random.randint(40, 200)),
-                 (6272, _("Drink—Soda"), random.randint(40, 200))])
+                [(6272, _("Lunch—Spaghetti"), 40 + randbelow(160)),
+                 (6272, _("Drink—Soda"), 40 + randbelow(160))])
             self._filler.add_expense_transaction(
                 0,
-                [(6272, _("Lunch—Salad"), random.randint(40, 200)),
-                 (6272, _("Drink—Coffee"), random.randint(40, 200))])
+                [(6272, _("Lunch—Salad"), 40 + randbelow(160)),
+                 (6272, _("Drink—Coffee"), 40 + randbelow(160))])
 
     @staticmethod
     def get_user(username_option):
@@ -181,7 +181,7 @@ class Command(BaseCommand):
         Args:
             payday: The payday.
         """
-        income = random.randint(40000, 50000)
+        income = 40000 + randbelow(10000)
         pension = 882 if income <= 40100\
             else 924 if income <= 42000\
             else 966 if income <= 43900\
