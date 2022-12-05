@@ -298,7 +298,7 @@ function parseSummaryForHelper(summary) {
     const pos = summary.lastIndexOf("×");
     let count = 1;
     if (pos !== -1) {
-        count = parseInt(summary.substr(pos + 1));
+        count = parseInt(summary.substring(pos + 1));
     }
     if (count === 0) {
         count = 1;

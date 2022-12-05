@@ -75,7 +75,7 @@ function updateParent(code) {
         parent.text(gettext("Topmost"));
         return;
     }
-    const parentCode = code.value.substr(0, code.value.length - 1);
+    const parentCode = code.value.substring(0, code.value.length - 1);
     if (parentCode in accounts) {
         parent.text(parentCode + " " + accounts[parentCode]);
         return;
@@ -136,7 +136,7 @@ function validateCode() {
             return false;
         }
     }
-    const parentCode = code.value.substr(0, code.value.length - 1);
+    const parentCode = code.value.substring(0, code.value.length - 1);
     if (!(parentCode in accounts)) {
         code.classList.add("is-invalid");
         errorMessage.text(gettext("The parent account of this code does not exist."));
