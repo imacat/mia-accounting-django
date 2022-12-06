@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from secrets import token_urlsafe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-vc+(5e-2xn%bc29&k#ah_vf17-)usz4af4y)njbp_k09)uev$$'
+SECRET_KEY = token_urlsafe(48)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
