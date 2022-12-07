@@ -429,8 +429,7 @@ class Pagination:
             url (str): The link URL, or for a non-link slot.
             title (str): The title of the link.
             is_active (bool): Whether this link is currently active.
-            is_small_screen (bool): Whether this link is for small
-                                    screens
+            is_small_screen (bool): Whether this link is for small screens.
         """
         def __int__(self):
             self.url = None

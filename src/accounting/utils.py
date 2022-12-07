@@ -80,10 +80,9 @@ class ReportUrl:
 
     Args:
         namespace: The namespace of the current application.
-        cash: The currently-specified account of the
-            cash account or cash summary.
-        ledger: The currently-specified account of the
-            ledger or leger summary.
+        cash: The currently-specified account of the cash account or cash
+            summary.
+        ledger: The currently-specified account of the ledger or leger summary.
         period: The currently-specified period.
     """
 
@@ -145,9 +144,8 @@ class DataFiller:
         """Adds accounts.
 
         Args:
-            accounts (tuple[tuple[any]]): Tuples of
-                (code, English, Traditional Chinese, Simplified Chinese)
-                of the accounts.
+            accounts: Tuples of (code, English, Traditional Chinese, Simplified
+                Chinese) of the accounts.
         """
         for data in accounts:
             code = data[0]
@@ -167,8 +165,7 @@ class DataFiller:
         """Adds a transfer transaction.
 
         Args:
-            date: The date, or the number of days from
-                today.
+            date: The date, or the number of days from today.
             debit: Tuples of (account, summary, amount) of the debit records.
             credit: Tuples of (account, summary, amount) of the credit records.
         """
