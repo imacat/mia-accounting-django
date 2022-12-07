@@ -1,0 +1,4 @@
+django
+django-dirtyfields
+titlecase
+django-decorator-include
