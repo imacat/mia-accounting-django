@@ -1,5 +1,5 @@
 ======================================
-The Mia! Django Accounting Application
+The Mia! Accounting Django Application
 ======================================
 
 
@@ -13,7 +13,7 @@ a modern back-end framework and front-end technology like jQuery.  The
 first revision was in Perl/Mojolicious_ in 2019.  This is the second
 revision in Python/Django in 2020.
 
-The Mia! Django accounting application comes with two parts:
+The Mia! Accounting Django application comes with two parts:
 
 - The ``accounting`` application contains the main accounting
   application.
@@ -23,7 +23,7 @@ The Mia! Django accounting application comes with two parts:
 
 You may try it in live demonstration at:
 
-- URL: https://accounting.imacat.idv.tw/accounting
+- URL: https://accounting-django.imacat.idv.tw/accounting
 - Username: ``admin``
 - Password: ``12345``
 
@@ -38,14 +38,14 @@ Installation
 Install
 -------
 
-The Mia! Django accounting application requires Python 3.7 and Django
+The Mia! Accounting Django application requires Python 3.7 and Django
 3.1.
 
-Install ``mia-accounting`` with ``pip``.
+Install ``mia-accounting-django`` with ``pip``.
 
 .. code::
 
-    pip install mia-accounting
+    pip install mia-accounting-django
 
 ``settings.py``
 ---------------
@@ -147,7 +147,7 @@ And you are done.
 Management Commands
 ===================
 
-The following management commands are added by *the Mia! accounting
+The following management commands are added by *the Mia! Accounting Django
 application* to ``manage.py``:
 
 ``accounting_accounts``
@@ -283,9 +283,9 @@ The following advanced settings are available in ``settings.py``.
 Bugs and Supports
 =================
 
-The Mia! Django accounting application is hosted on GitHub.
+The Mia! Accounting Django application is hosted on GitHub.
 
-    https://github.com/imacat/mia-accounting
+    https://github.com/imacat/mia-accounting-django
 
 Address all bugs and support requests to imacat@mail.imacat.idv.tw.
 
@@ -293,7 +293,7 @@ Address all bugs and support requests to imacat@mail.imacat.idv.tw.
 Copyright
 =========
 
- Copyright (c) 2020-2021 imacat.
+ Copyright (c) 2020-2023 imacat.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
