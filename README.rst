@@ -3,6 +3,23 @@ The Mia! Accounting Django Application
 ======================================
 
 
+Warning
+=======
+
+This is the last release of Django.  It will be replaced by a new
+Flask_ release, starting from scratch.  Do not upgrade to the next
+release, as it will not work.
+
+This was my first large Python project, and at that time, I had zero
+experience with Django.  I ended up in a mess with Django MVT.  The
+code is unnecessarily complicated, and I do not actually know how the
+views work anymore.
+
+If you are new to the Mia! Accounting project, please skip this and
+try the new release.  You may contact me if you have problems with
+the existing installation, but I may not be able to help you.
+
+
 Description
 ===========
 
@@ -27,6 +44,7 @@ You may try it in live demonstration at:
 - Username: ``admin``
 - Password: ``12345``
 
+.. _Flask: https://flask.palletsprojects.com
 .. _Django: https://www.djangoproject.com
 .. _mod_perl: https://perl.apache.org
 .. _Mojolicious: https://mojolicious.org
