@@ -17,7 +17,7 @@ django.setup()
 project = 'Mia! Accounting Django'
 copyright = '2022-2023, imacat'
 author = 'imacat'
-release = '0.1.0'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
