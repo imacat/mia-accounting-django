@@ -3,8 +3,21 @@ The Mia! Accounting Django Application
 ======================================
 
 
+Obsolete Project
+================
+
+This project is obsolete.  No further Django release will be
+available.  Check the current `Mia! Accounting project`_ for Flask_,
+and the current `Mia! Accounting live demonstration`_.
+
+.. _Mia! Accounting project: https://github.com/imacat/mia-accounting
+.. _Flask: https://flask.palletsprojects.com
+.. _Mia! Accounting live demonstration: https://accounting.imacat.idv.tw
+
+
 Warning
 =======
+
 
 This is the last release of Django.  It will be replaced by a new
 Flask_ release, starting from scratch.  Do not upgrade to the next
@@ -44,7 +57,6 @@ You may try it in live demonstration at:
 - Username: ``admin``
 - Password: ``12345``
 
-.. _Flask: https://flask.palletsprojects.com
 .. _Django: https://www.djangoproject.com
 .. _mod_perl: https://perl.apache.org
 .. _Mojolicious: https://mojolicious.org
